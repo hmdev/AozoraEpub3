@@ -1,6 +1,4 @@
-*.class
-
-# Package Files #
-*.jar
-*.war
-*.ear
+/AozoraEpub3.ini
+/bin
+/.settings
+/AozoraEpub3.jar

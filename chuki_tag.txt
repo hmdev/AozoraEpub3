@@ -1,0 +1,432 @@
+###注記タグ変換表 (前述注記は別処理 後述注記は変換しておく)
+##注記	タグ	行末追加タグ	フラグchar(改行不要:1,ルビ排他開始:2,ルビ排他終了:3 注記前で改ページ処理:P)
+
+############ 改ページ (xhtmlを分ける) ############
+改丁			P
+改ページ			P
+改頁			P
+改段			P
+##### 番外
+本文終わり			P
+
+############ 左右中央 (仮) (改ページまで) ############
+ページの左右中央	<br/>		P
+##ページの左右中央	<div class="lrcenter">		1
+####内部処理用
+##ページの左右中央改ページ	</div>		1
+
+
+############# 見出し #############
+ここから大見出し	<span class="font5">		1
+ここで大見出し終わり	</span>		1
+ここから中見出し	<span class="font3">		1
+ここで中見出し終わり	</span>		1
+ここから小見出し	<span class="font1">		1
+ここで小見出し終わり	</span>		1
+見出し	<span class="font5">	</span>
+#見出し終わり
+大見出し	<span class="font5">	</span>
+#大見出し終わり
+中見出し	<span class="font3">	</span>
+#中見出し終わり
+小見出し	<span class="font1">	</span>
+#小見出し終わり
+同行大見出し	<span class="font5">
+同行大見出し終わり	</span>
+同行中見出し	<span class="font3">
+同行中見出し終わり	</span>
+同行小見出し	<span class="font1">
+同行小見出し終わり	</span>
+#窓大見出し	<span class="font-1">
+#窓大見出し終わり	</span>
+#窓中見出し	<span class="font-3">
+#窓中見出し終わり	</span>
+#窓小見出し	<span class="font-5">
+#窓小見出し終わり	</span>
+
+
+############## 外字 ##############
+## → chuki_utf, chuki_altで別処理
+
+
+############## 訓点 ##############
+## → 未対応
+
+
+############## 強調 ##############
+####圏点
+傍点	<span class="sesame">		2
+傍点終わり	</span>		3
+
+白ゴマ傍点	<span class="open_sesame">		2
+白ゴマ傍点終わり	</span>		3
+
+丸傍点	<span class="dot">		2
+丸傍点終わり	</span>		3
+
+白丸傍点	<span class="open_dot">		2
+白丸傍点終わり	</span>		3
+
+黒三角傍点	<span class="triangle">		2
+黒三角傍点終わり	</span>		3
+
+白三角傍点	<span class="open_triangle">		2
+白三角傍点終わり	</span>		3
+
+二重丸傍点	<span class="open_double-circle">		2
+二重丸傍点終わり	</span>		3
+
+蛇の目傍点	<span class="double-circle">		2
+蛇の目傍点終わり	</span>		3
+
+左に傍点	<span class="left_sesame">		2
+左に傍点終わり	</span>		3
+
+####傍線 (すべて傍線と同じ表現)
+傍線	<span class="underline">
+傍線終わり	</span>
+二重傍線	<span class="double_underline">
+二重傍線終わり	</span>
+鎖線	<span class="dotted_underline">
+鎖線終わり	</span>
+破線	<span class="dashed_underline">
+破線終わり	</span>
+波線	<span class="wave_underline">
+波線終わり	</span>
+
+左に傍線	<span class="left_underline">
+左に傍線終わり	</span>
+
+####太字
+太字	<b>
+太字終わり	</b>
+ここから太字	<b>		1
+ここで太字終わり	</b>		1
+
+####斜体
+斜体	<i>
+斜体終わり	</i>
+ここから斜体	<i>		1
+ここで斜体終わり	</i>		1
+
+
+############## 画像 ############## → 別処理
+#<img src="ファイル名"/> → 変換なし
+#［＃画像（ファイル名）入る］ → プログラム内で<img>に変換
+
+
+##############その他##############
+##訂正と「ママ」 → 未対応
+
+##ルビとルビのように付く文字 → 未対応
+
+####縦横中
+縦中横	<span class="tcy">		2
+縦中横終わり	</span>		3
+
+####割り注
+## → 未対応
+
+####小書き
+行右小書き	<span class="sup">		1
+行右小書き終わり	</span>		1
+行左小書き	<span class="sub">		1
+行左小書き終わり	</span>		1
+上付き小文字	<span class="sup">		1
+上付き小文字終わり	</span>		1
+下付き小文字	<span class="sub">		1
+下付き小文字終わり	</span>		1
+
+####罫囲み
+ここから罫囲み	<div class="border">		1
+ここで罫囲み終わり	</div>		1
+
+####横組み → 未対応(注記削除)
+ここから横組み			1
+ここで横組み終わり			1
+
+####文字サイズ
+１段階大きな文字	<span class="font1">
+２段階大きな文字	<span class="font2">
+３段階大きな文字	<span class="font3">
+４段階大きな文字	<span class="font4">
+５段階大きな文字	<span class="font5">
+大きな文字終わり	</span>
+ここから１段階大きな文字	<span class="font1">		1
+ここから２段階大きな文字	<span class="font2">		1
+ここから３段階大きな文字	<span class="font3">		1
+ここから４段階大きな文字	<span class="font4">		1
+ここから５段階大きな文字	<span class="font5">		1
+ここで大きな文字終わり	</span>		1
+１段階小さな文字	<span class="font-1">
+２段階小さな文字	<span class="font-2">
+３段階小さな文字	<span class="font-3">
+４段階小さな文字	<span class="font-4">
+５段階小さな文字	<span class="font-5">
+小さな文字終わり	</span>
+ここから１段階小さな文字	<span class="font-1">		1
+ここから２段階小さな文字	<span class="font-2">		1
+ここから３段階小さな文字	<span class="font-3">		1
+ここから４段階小さな文字	<span class="font-4">		1
+ここから５段階小さな文字	<span class="font-5">		1
+ここで小さな文字終わり	</span>		1
+
+####外字注記形式による代替表現 → 別処理
+
+
+################################################################
+############# 字下げ #############
+####字下げ (［＃ここで字下げ終わり］の省略判別はプログラム内で処理)
+ここから１字下げ	<div class="top1">		1
+ここから２字下げ	<div class="top2">		1
+ここから３字下げ	<div class="top3">		1
+ここから４字下げ	<div class="top4">		1
+ここから５字下げ	<div class="top5">		1
+ここから６字下げ	<div class="top6">		1
+ここから７字下げ	<div class="top7">		1
+ここから８字下げ	<div class="top8">		1
+ここから９字下げ	<div class="top9">		1
+ここから１０字下げ	<div class="top10">		1
+ここから１１字下げ	<div class="top11">		1
+ここから１２字下げ	<div class="top12">		1
+ここから１３字下げ	<div class="top13">		1
+ここから１４字下げ	<div class="top14">		1
+ここから１５字下げ	<div class="top15">		1
+ここから１６字下げ	<div class="top16">		1
+ここから１７字下げ	<div class="top17">		1
+ここから１８字下げ	<div class="top18">		1
+ここから１９字下げ	<div class="top19">		1
+ここから２０字下げ	<div class="top20">		1
+ここから２１字下げ	<div class="top21">		1
+ここから２２字下げ	<div class="top22">		1
+ここから２３字下げ	<div class="top23">		1
+ここから２４字下げ	<div class="top24">		1
+ここから２５字下げ	<div class="top25">		1
+
+ここから１字下げ、罫囲み	<div class="top1 border">		1
+ここから２字下げ、罫囲み	<div class="top2 border">		1
+ここから３字下げ、罫囲み	<div class="top3 border">		1
+ここから４字下げ、罫囲み	<div class="top4 border">		1
+ここから５字下げ、罫囲み	<div class="top5 border">		1
+ここから６字下げ、罫囲み	<div class="top6 border">		1
+ここから７字下げ、罫囲み	<div class="top7 border">		1
+ここから８字下げ、罫囲み	<div class="top8 border">		1
+ここから９字下げ、罫囲み	<div class="top9 border">		1
+ここから１０字下げ、罫囲み	<div class="top10 border">		1
+ここから１１字下げ、罫囲み	<div class="top11 border">		1
+ここから１２字下げ、罫囲み	<div class="top12 border">		1
+ここから１３字下げ、罫囲み	<div class="top13 border">		1
+ここから１４字下げ、罫囲み	<div class="top14 border">		1
+ここから１５字下げ、罫囲み	<div class="top15 border">		1
+ここから１６字下げ、罫囲み	<div class="top16 border">		1
+ここから１７字下げ、罫囲み	<div class="top17 border">		1
+ここから１８字下げ、罫囲み	<div class="top18 border">		1
+ここから１９字下げ、罫囲み	<div class="top19 border">		1
+ここから２０字下げ、罫囲み	<div class="top20 border">		1
+ここから２１字下げ、罫囲み	<div class="top21 border">		1
+ここから２２字下げ、罫囲み	<div class="top22 border">		1
+ここから２３字下げ、罫囲み	<div class="top23 border">		1
+ここから２４字下げ、罫囲み	<div class="top24 border">		1
+ここから２５字下げ、罫囲み	<div class="top25 border">		1
+
+ここから改行天付き、折り返して１字下げ	<div class="top1 indent-1">		1
+ここから改行天付き、折り返して２字下げ	<div class="top2 indent-2">		1
+ここから改行天付き、折り返して３字下げ	<div class="top3 indent-3">		1
+ここから改行天付き、折り返して４字下げ	<div class="top4 indent-4">		1
+ここから改行天付き、折り返して５字下げ	<div class="top5 indent-5">		1
+ここから改行天付き、折り返して６字下げ	<div class="top6 indent-6">		1
+ここから改行天付き、折り返して７字下げ	<div class="top7 indent-7">		1
+ここから改行天付き、折り返して８字下げ	<div class="top8 indent-8">		1
+ここから改行天付き、折り返して９字下げ	<div class="top9 indent-9">		1
+ここから改行天付き、折り返して１０字下げ	<div class="top10 indent-10">		1
+ここから改行天付き、折り返して１１字下げ	<div class="top11 indent-11">		1
+ここから改行天付き、折り返して１２字下げ	<div class="top12 indent-12">		1
+ここから改行天付き、折り返して１３字下げ	<div class="top13 indent-13">		1
+ここから改行天付き、折り返して１４字下げ	<div class="top14 indent-14">		1
+ここから改行天付き、折り返して１５字下げ	<div class="top15 indent-15">		1
+ここから改行天付き、折り返して１６字下げ	<div class="top16 indent-16">		1
+ここから改行天付き、折り返して１７字下げ	<div class="top17 indent-17">		1
+ここから改行天付き、折り返して１８字下げ	<div class="top18 indent-18">		1
+ここから改行天付き、折り返して１９字下げ	<div class="top19 indent-19">		1
+ここから改行天付き、折り返して２０字下げ	<div class="top20 indent-20">		1
+ここから改行天付き、折り返して２１字下げ	<div class="top11 indent-21">		1
+ここから改行天付き、折り返して２２字下げ	<div class="top12 indent-22">		1
+ここから改行天付き、折り返して２３字下げ	<div class="top13 indent-23">		1
+ここから改行天付き、折り返して２４字下げ	<div class="top14 indent-24">		1
+ここから改行天付き、折り返して２５字下げ	<div class="top15 indent-25">		1
+
+ここで字下げ終わり	</div>		1
+
+####字上げ
+ここから地から１字上げ	<div class="bottom1">		1
+ここから地から２字上げ	<div class="bottom2">		1
+ここから地から３字上げ	<div class="bottom3">		1
+ここから地から４字上げ	<div class="bottom4">		1
+ここから地から５字上げ	<div class="bottom5">		1
+ここから地から６字上げ	<div class="bottom6">		1
+ここから地から７字上げ	<div class="bottom7">		1
+ここから地から８字上げ	<div class="bottom8">		1
+ここから地から９字上げ	<div class="bottom9">		1
+ここから地から１０字上げ	<div class="bottom10">		1
+ここから地から１１字上げ	<div class="bottom11">		1
+ここから地から１２字上げ	<div class="bottom12">		1
+ここから地から１３字上げ	<div class="bottom13">		1
+ここから地から１４字上げ	<div class="bottom14">		1
+ここから地から１５字上げ	<div class="bottom15">		1
+ここから地から１６字上げ	<div class="bottom16">		1
+ここから地から１７字上げ	<div class="bottom17">		1
+ここから地から１８字上げ	<div class="bottom18">		1
+ここから地から１９字上げ	<div class="bottom19">		1
+ここから地から２０字上げ	<div class="bottom20">		1
+ここから地から２１字上げ	<div class="bottom21">		1
+ここから地から２２字上げ	<div class="bottom22">		1
+ここから地から２３字上げ	<div class="bottom23">		1
+ここから地から２４字上げ	<div class="bottom24">		1
+ここから地から２５字上げ	<div class="bottom25">		1
+ここで字上げ終わり	</div>		1
+
+ここから地付き	<div class="bottom">		1
+ここで地付き終わり	</div>		1
+
+
+####閉じていない前述注記
+
+１字下げ	<div class="top1">	</div>	1
+２字下げ	<div class="top2">	</div>	1
+３字下げ	<div class="top3">	</div>	1
+４字下げ	<div class="top4">	</div>	1
+５字下げ	<div class="top5">	</div>	1
+６字下げ	<div class="top6">	</div>	1
+７字下げ	<div class="top7">	</div>	1
+８字下げ	<div class="top8">	</div>	1
+９字下げ	<div class="top9">	</div>	1
+１０字下げ	<div class="top10">	</div>	1
+１１字下げ	<div class="top11">	</div>	1
+１２字下げ	<div class="top12">	</div>	1
+１３字下げ	<div class="top13">	</div>	1
+１４字下げ	<div class="top14">	</div>	1
+１５字下げ	<div class="top15">	</div>	1
+１６字下げ	<div class="top16">	</div>	1
+１７字下げ	<div class="top17">	</div>	1
+１８字下げ	<div class="top18">	</div>	1
+１９字下げ	<div class="top19">	</div>	1
+２０字下げ	<div class="top20">	</div>	1
+２１字下げ	<div class="top21">	</div>	1
+２２字下げ	<div class="top22">	</div>	1
+２３字下げ	<div class="top23">	</div>	1
+２４字下げ	<div class="top24">	</div>	1
+２５字下げ	<div class="top25">	</div>	1
+
+地から１字上げ	<div class="bottom1">	</div>	1
+地から２字上げ	<div class="bottom2">	</div>	1
+地から３字上げ	<div class="bottom3">	</div>	1
+地から４字上げ	<div class="bottom4">	</div>	1
+地から５字上げ	<div class="bottom5">	</div>	1
+地から６字上げ	<div class="bottom6">	</div>	1
+地から７字上げ	<div class="bottom7">	</div>	1
+地から８字上げ	<div class="bottom8">	</div>	1
+地から９字上げ	<div class="bottom9">	</div>	1
+地から１０字上げ	<div class="bottom10">	</div>	1
+地から１１字上げ	<div class="bottom11">	</div>	1
+地から１２字上げ	<div class="bottom12">	</div>	1
+地から１３字上げ	<div class="bottom13">	</div>	1
+地から１４字上げ	<div class="bottom14">	</div>	1
+地から１５字上げ	<div class="bottom15">	</div>	1
+地から１６字上げ	<div class="bottom16">	</div>	1
+地から１７字上げ	<div class="bottom17">	</div>	1
+地から１８字上げ	<div class="bottom18">	</div>	1
+地から１９字上げ	<div class="bottom19">	</div>	1
+地から２０字上げ	<div class="bottom20">	</div>	1
+地から２１字上げ	<div class="bottom21">	</div>	1
+地から２２字上げ	<div class="bottom22">	</div>	1
+地から２３字上げ	<div class="bottom23">	</div>	1
+地から２４字上げ	<div class="bottom24">	</div>	1
+地から２５字上げ	<div class="bottom25">	</div>	1
+
+地付き	<div class="bottom">	</div>	1
+
+####字詰め
+ここから１字詰め	<div class="jizume1">		1
+ここから２字詰め	<div class="jizume2">		1
+ここから３字詰め	<div class="jizume3">		1
+ここから４字詰め	<div class="jizume4">		1
+ここから５字詰め	<div class="jizume5">		1
+ここから６字詰め	<div class="jizume6">		1
+ここから７字詰め	<div class="jizume7">		1
+ここから８字詰め	<div class="jizume8">		1
+ここから９字詰め	<div class="jizume9">		1
+ここから１０字詰め	<div class="jizume10">		1
+ここから１１字詰め	<div class="jizume11">		1
+ここから１２字詰め	<div class="jizume12">		1
+ここから１３字詰め	<div class="jizume13">		1
+ここから１４字詰め	<div class="jizume14">		1
+ここから１５字詰め	<div class="jizume15">		1
+ここから１６字詰め	<div class="jizume16">		1
+ここから１７字詰め	<div class="jizume17">		1
+ここから１８字詰め	<div class="jizume18">		1
+ここから１９字詰め	<div class="jizume19">		1
+ここから２０字詰め	<div class="jizume20">		1
+ここから２０字詰め	<div class="jizume20">		1
+ここから２１字詰め	<div class="jizume21">		1
+ここから２２字詰め	<div class="jizume22">		1
+ここから２３字詰め	<div class="jizume23">		1
+ここから２４字詰め	<div class="jizume24">		1
+ここから２５字詰め	<div class="jizume25">		1
+ここから２６字詰め	<div class="jizume26">		1
+ここから２７字詰め	<div class="jizume27">		1
+ここから２８字詰め	<div class="jizume28">		1
+ここから２９字詰め	<div class="jizume29">		1
+ここから３０字詰め	<div class="jizume30">		1
+ここから３１字詰め	<div class="jizume31">		1
+ここから３２字詰め	<div class="jizume32">		1
+ここから３３字詰め	<div class="jizume33">		1
+ここから３４字詰め	<div class="jizume34">		1
+ここから３５字詰め	<div class="jizume35">		1
+ここから３６字詰め	<div class="jizume36">		1
+ここから３７字詰め	<div class="jizume37">		1
+ここから３８字詰め	<div class="jizume38">		1
+ここから３９字詰め	<div class="jizume39">		1
+ここから４０字詰め	<div class="jizume40">		1
+ここから４１字詰め	<div class="jizume41">		1
+ここから４２字詰め	<div class="jizume42">		1
+ここから４３字詰め	<div class="jizume43">		1
+ここから４４字詰め	<div class="jizume44">		1
+ここから４５字詰め	<div class="jizume45">		1
+ここから４６字詰め	<div class="jizume46">		1
+ここから４７字詰め	<div class="jizume47">		1
+ここから４８字詰め	<div class="jizume48">		1
+ここから４９字詰め	<div class="jizume49">		1
+ここから５０字詰め	<div class="jizume50">		1
+ここで字詰め終わり	</div>		1
+
+################################################################
+####内部処理用
+字下げ省略	</div>
+
+####字下げ折り返し → TODO PatternとFormatにする (演算処理はフラグで切り替え？)
+##ここから([０-９]+)字下げ、折り返して([０-９]+)字下げ	<div class="top{$2} indent{$1-$2}">
+折り返し1	<div class="top
+折り返し2	 indent
+折り返し3	">
+
+####字下げ字詰め → TODO PatternとFormatにする
+##ここから([０-９]+)字下げ、([０-９]+)字詰め	<div class="top{$1} jizume{$2}">
+字下げ字詰め1	<div class="top
+字下げ字詰め2	 jizume
+字下げ字詰め3	">
+
+################################################################
+####その他
+ルビ開始	<ruby>
+ルビ文字	<rt>
+ルビ終了	</rt></ruby>
+
+改行	<br/>
+
+画像開始	<img src="
+画像終了	"/>
+
+表題前	<div><span class="font5">
+表題後	</span></div>
+著者前	<div class="bottom2"><span class="font2">
+著者後	</span></div>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="ja" lang="ja">
+<head>
+#if (${vertical})
+	<link rel="stylesheet" type="text/css" href="../css/vertical.css" class="vertical" title="vertical layout"/>
+#else
+	<link rel="stylesheet" type="text/css" href="../css/horizontal.css" class="horizontal" title="horizontal layout"/>
+#end
+	<title>${title}</title>
+</head>
+<body>
+	<section>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<?oxygen RNGSchema="file:/C:/EPub/epub-revision/build/30/schema/epub-nav-30.rnc" type="compact"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
+<head>
+	<title>TOC</title>
+#if (${vertical})
+	<link rel="stylesheet" type="text/css" href="../css/vertical.css" class="vertical" title="vertical layout"/>
+#else
+	<link rel="stylesheet" type="text/css" href="../css/horizontal.css" class="horizontal" title="horizontal layout"/>
+#end
+</head>
+<body>
+	<section class="frontmatter TableOfContents">
+		<header>
+		</header>
+		<nav xmlns:epub="http://www.idpf.org/2007/ops" epub:type="toc" id="toc">
+			<h1>TOC</h1>
+			<ol>
+#foreach(${section} in ${sections})
+				<li class="chapter" id="toc-${section}"><a href="${section}.xhtml">${section}</a></li>
+#end
+			</ol>
+		</nav>
+	</section>
+</body>
+</html>
