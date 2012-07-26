@@ -17,8 +17,8 @@
 		<nav xmlns:epub="http://www.idpf.org/2007/ops" epub:type="toc" id="toc">
 			<h1>TOC</h1>
 			<ol>
-#foreach(${section} in ${sections})
-				<li class="chapter" id="toc-${section}"><a href="${section}.xhtml">${section}</a></li>
+#foreach(${chapter} in ${chapters})
+				<li class="chapter" id="toc-${chapter.SectionId}"><a href="${chapter.SectionId}.xhtml">${chapter.ChapterName}</a></li>
 #end
 			</ol>
 		</nav>

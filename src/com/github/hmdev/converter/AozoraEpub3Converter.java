@@ -1,6 +1,5 @@
 package com.github.hmdev.converter;
 
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -18,7 +17,6 @@ import com.github.hmdev.util.CharUtils;
 import com.github.hmdev.util.LogAppender;
 import com.github.hmdev.writer.Epub3Writer;
 
-
 /**
  * 青空文庫テキストをePub3形式のXHTMLに変換
  * Licence: Non-commercial use only.
@@ -26,7 +24,10 @@ import com.github.hmdev.writer.Epub3Writer;
 public class AozoraEpub3Converter
 {
 	/** タイトル記載種別 */
-	final static public String[] titleType = {"表題＋著者名", "著者名＋表題", "表題のみ", "著者名のみ", "なし"};
+	final static public String[] titleType = {"表題＋著者名", "著者名＋表題", "表題のみ", "著者名のみ", "なし", "ファイル名から"};
+	
+	/** ファイル名 [著作者] 表題.txt から抽出するパターン */
+	Pattern fileNamePattern = Pattern.compile("\\[(.+?)\\]( |　)*(.+?)(\\(|（|\\.)");
 	
 	//---------------- Properties ----------------//
 	/** UTF-8以外の文字を代替文字に変換 */
@@ -48,6 +49,9 @@ public class AozoraEpub3Converter
 	//---------------- Flags Variables ----------------//
 	/** 字下げ後閉じるまでture */
 	boolean inJisage = false;
+	/** 字下げ折り返しの場合のみtrue inJisage=false時に合わせてfalse */
+	boolean inJisageCr = false;
+
 	
 	//---------------- パターン ----------------//
 	/** 注記パターン */
@@ -87,7 +91,7 @@ public class AozoraEpub3Converter
 	static LatinConverter latinConverter;
 	
 	/** 外字注記タグをUTF-8・グリフタグ・代替文字に変換するクラス */
-	static AozoraGaijiConverter aozoraChukiConverter;
+	static AozoraGaijiConverter ghukiConverter;
 	
 	/** Epub圧縮出力用クラス */
 	Epub3Writer writer;
@@ -97,6 +101,11 @@ public class AozoraEpub3Converter
 	
 	int idNum = 0;
 	int idLineNum = -1;
+	
+	
+	/** 見出し仮対応出力用
+	 * 章の最初の本文をsetChapterNameでセットしたらtrue */
+	boolean chapterStarted = true;
 	
 	/** コンストラクタ
 	 * 変換テーブルやクラスがstaticで初期化されていなければ初期化
@@ -112,7 +121,7 @@ public class AozoraEpub3Converter
 		//拡張ラテン変換
 		latinConverter = new LatinConverter();
 		
-		aozoraChukiConverter = new AozoraGaijiConverter();
+		ghukiConverter = new AozoraGaijiConverter();
 		
 		//注記タグ変換
 		File chukiTagFile = new File("chuki_tag.txt");
@@ -148,9 +157,9 @@ public class AozoraEpub3Converter
 		} finally {
 			src.close();
 		}
+		//TODO パターンとprintfのFormatを設定ファイルから読み込みできるようにする (printfの引数の演算処理はフラグで切り替え？)
 		chukiPatternMap.put("折り返し", Pattern.compile("［＃ここから([０-９]+)字下げ、折り返して([０-９]+)字下げ］"));
 		chukiPatternMap.put("字下げ字詰め", Pattern.compile("［＃ここから([０-９]+)字下げ、([０-９]+)字詰め］"));
-		
 		
 		//前方参照注記
 		File chukiSufFile = new File("chuki_tag_suf.txt");
@@ -273,6 +282,7 @@ public class AozoraEpub3Converter
 		idLineNum = -1;
 		
 		boolean inComment = false;
+		this.chapterStarted = false;
 		while ((line = src.readLine()) != null) {
 			lineNum++;
 			pageLineNum++;
@@ -282,19 +292,22 @@ public class AozoraEpub3Converter
 				convertTextLineToEpub3(out, convertGaijiChuki(line, true), lineNum);
 				out.write(chukiMap.get("表題後")[0]);
 				out.write("\n");
+				this.chapterStarted = false; //章が始まっていないことにする
 			}
 			else if (lineNum == metaInfo.creatorLine) {
 				out.write(chukiMap.get("著者前")[0]);
 				convertTextLineToEpub3(out, convertGaijiChuki(line, true), lineNum);
 				out.write(chukiMap.get("著者後")[0]);
 				out.write("\n");
+				this.chapterStarted = false; //章が始まっていないことにする
 			} else {
-				
+				//コメント除外
 				if (line.startsWith("-------------------------------------------------------")) {
 					if (inComment) { inComment = false; continue;
 					} else { inComment = true; continue;  }
 				}
 				if (inComment) continue;
+				
 				//強制改行
 				if (forcePageBreak >10 && pageLineNum > forcePageBreak) {
 					int emptyLineNum = 0;
@@ -306,6 +319,7 @@ public class AozoraEpub3Converter
 						//空行は出力せずに改ページ
 						this.writer.nextSection(out);
 						this.pageLineNum = 0;
+						this.chapterStarted = false;
 					} else {
 						//空行出力
 						for (int i=0; i<emptyLineNum; i++) convertTextLineToEpub3(out, "", lineNum);
@@ -362,21 +376,21 @@ public class AozoraEpub3Converter
 			if (chuki.charAt(0) == '※') {
 				String[] chukiValues = chuki.substring(3, chuki.length()-1).split("、");
 				//注記文字グリフ or 代替文字変換
-				String gaiji = aozoraChukiConverter.toAlterString(chukiValues[0]);
+				String gaiji = ghukiConverter.toAlterString(chukiValues[0]);
 				//コード変換
 				if (gaiji == null && chukiValues.length > 1) {
-					gaiji = aozoraChukiConverter.codeToCharString(chukiValues[1]);
+					gaiji = ghukiConverter.codeToCharString(chukiValues[1]);
 				}
 				//コード変換
 				if (gaiji == null && chukiValues.length > 2) {
-					gaiji = aozoraChukiConverter.codeToCharString(chukiValues[2]);
+					gaiji = ghukiConverter.codeToCharString(chukiValues[2]);
 				}
 				//コード変換
 				if (gaiji == null && chukiValues.length > 3) {
-					gaiji = aozoraChukiConverter.codeToCharString(chukiValues[3]);
+					gaiji = ghukiConverter.codeToCharString(chukiValues[3]);
 				}
 				//注記名称で変換
-				if (gaiji == null) gaiji = aozoraChukiConverter.toUtf(chukiValues[0]);
+				if (gaiji == null) gaiji = ghukiConverter.toUtf(chukiValues[0]);
 				
 				if (gaiji == null) {
 					LogAppender.append("[外字未変換] : "+chuki+"\n");
@@ -560,13 +574,22 @@ public class AozoraEpub3Converter
 		int begin = 0;
 		int chukiStart = 0;
 		
+		boolean pPrinted = false;
+		//字下げ中でブロック注記(１行に１注記のみ)でなければ行を<p>で括る
+		if (inJisageCr) {
+			if (line.indexOf('］') != ch.length-1) {
+				pPrinted = true;
+				out.write("<p>");
+			}
+		}
+		
 		while (m.find()) {
 			String chukiTag = m.group();
 			chukiStart = m.start();
 			
 			//fontの入れ子は可、圏点・縦横中はルビも付加
-			if (chukiTag.charAt(0) == '<' && chukiTag.charAt(1) != 'i') {
-				//<img 以外のタグはそのまま通す
+			if (chukiTag.charAt(0) == '<' && !(chukiTag.startsWith("<img ") || chukiTag.startsWith("<a ") || chukiTag.startsWith("</a>"))) {
+				//<img <a </a 以外のタグは注記処理せず文字扱い
 				continue;
 			} else {
 				//注記の前まで本文出力
@@ -575,6 +598,12 @@ public class AozoraEpub3Converter
 					if (withIdSpan && noRubyLevel==0) out.write("<span id=\"kobo."+idNum+"."+(lineSpanIdx++)+"\">");//栞用span開始
 					this.printRubyText(out, ch, begin, chukiStart, noRubyLevel>0);
 					if (withIdSpan && noRubyLevel==0) out.write("</span>");//栞用span閉じる
+					
+					//改ページ後の章名称変更
+					if (!this.chapterStarted) {
+						this.chapterStarted = true;
+						this.writer.updateChapterName(line.substring(begin, Math.min(chukiStart, begin+32)).replaceAll("《[^》]+》", "").replaceAll("［＃.+?］", "").replaceAll("^[ |　]+","").replaceAll("[ |　]+$",""));
+					}
 				}
 				
 				//注記→タグ変換
@@ -592,23 +621,41 @@ public class AozoraEpub3Converter
 						//次の文字が改行ならnoBrで前に</br>\n出力
 						if (ch.length == begin+chukiTag.length()) {
 							noBr = true;
-							out.write(chukiMap.get("改行")[0]);
-							out.write("\n");
 						}
 						this.writer.nextSection(out);
 						this.pageLineNum = 0;
+						this.chapterStarted = false;
 					}
 					////////////////////////////////////////////////////////////////
 					
 					//字下げフラグ処理
 					if (chukiTag.endsWith("字下げ］")) {
-						if (inJisage) out.write(chukiMap.get("字下げ省略")[0]);
-						if (tags.length > 1) inJisage = false;//インライン
+						if (inJisage) {
+							if (pPrinted) {
+								pPrinted = false;
+								out.write("</p>");
+							}
+							out.write(chukiMap.get("字下げ省略")[0]);
+						}
+						if (tags.length > 1) {
+							inJisage = false;//インライン
+							inJisageCr = false;
+						}
 						else inJisage = true; //ブロック
+						//折り返しで<p>出力を制御
+						if (chukiTag.indexOf("、折り返して") != -1) {
+							inJisageCr = true;
+						}
 					}
 					else if (chukiTag.equals("［＃ここで字下げ終わり］")) {
+						if (pPrinted) {
+							pPrinted = false;
+							out.write("</p>");
+						}
 						inJisage = false;
+						inJisageCr = false;
 					}
+					
 					//タグ出力
 					out.write(tags[0]);
 					if (tags.length > 1) {
@@ -632,6 +679,7 @@ public class AozoraEpub3Converter
 							out.write(fileName);
 							out.write(chukiMap.get("画像終了")[0]);
 							//LogAppender.append("[画像注記]: "+chukiTag+"\n");
+							noBr = true;
 						}
 					} else if (chukiTag.toLowerCase().startsWith("<img")) {
 						//src=の値抽出
@@ -643,6 +691,7 @@ public class AozoraEpub3Converter
 						out.write(fileName);
 						out.write(chukiMap.get("画像終了")[0]);
 						//LogAppender.append("[画像注記]: "+chukiTag+"\n");
+						noBr = true;
 					}
 					else {
 						//インデント字下げ
@@ -655,8 +704,17 @@ public class AozoraEpub3Converter
 								out.write(chukiMap.get("折り返し2")[0]+(arg0-arg1));
 								out.write(chukiMap.get("折り返し3")[0]);
 								//字下げフラグ処理
-								if (inJisage) out.write(chukiMap.get("字下げ省略")[0]);
-								else inJisage = true;
+								if (inJisage) {
+									if (pPrinted) {
+										pPrinted = false;
+										out.write("</p>");
+									}
+									out.write(chukiMap.get("字下げ省略")[0]);
+								}
+								else {
+									inJisage = true;
+									inJisageCr = true;
+								}
 								noBr = true;//ブロック字下げなので改行なし
 							}
 						} catch (Exception e) { e.printStackTrace(); }
@@ -670,7 +728,13 @@ public class AozoraEpub3Converter
 								out.write(chukiMap.get("字下げ字詰め2")[0]+arg1);
 								out.write(chukiMap.get("字下げ字詰め3")[0]);
 								//字下げフラグ処理
-								if (inJisage) out.write(chukiMap.get("字下げ省略")[0]);
+								if (inJisage) {
+									if (pPrinted) {
+										pPrinted = false;
+										out.write("</p>");
+									}
+									out.write(chukiMap.get("字下げ省略")[0]);
+								}
 								else inJisage = true;
 								noBr = true;//ブロック字下げなので改行なし
 							}
@@ -687,11 +751,23 @@ public class AozoraEpub3Converter
 			if (withIdSpan) out.write("<span id=\"kobo."+idNum+"."+(lineSpanIdx++)+"\">");//栞用span開始
 			this.printRubyText(out, ch, begin, ch.length, false);
 			if (withIdSpan) out.write("</span>");//栞用span閉じる
+			
+			//改ページ後の章名称変更
+			if (!this.chapterStarted) {
+				this.chapterStarted = true;
+				this.writer.updateChapterName(line.substring(begin, Math.min(ch.length, begin+32)).replaceAll("《[^》]+》", "").replaceAll("［＃.+?］", "").replaceAll("^[ |　]+","").replaceAll("[ |　]+$",""));
+			}
 		}
 		//行末タグを追加
 		if (bufSuf.length() > 0) out.write(bufSuf.toString());
+		
+		//字下げの場合に<p>が行頭にあったら閉じる
+		if (pPrinted) {
+			out.write("</p>");
+			out.write("\n");
+		}
 		//改行
-		if (!noBr) {
+		else if (!noBr) {
 			out.write(chukiMap.get("改行")[0]);
 			out.write("\n");
 		}
@@ -699,7 +775,7 @@ public class AozoraEpub3Converter
 	
 	/** ルビタグに変換して出力
 	 * 特殊文字は※が前についているので※の後ろの文字を利用しルビ内なら開始位置以降の文字をずらす
-	 * ・ルビ （前｜漢字《かんじ》 → <ruby><rbase>漢字</rbase><rtop>かんじ</rtop></ruby>）
+	 * ・ルビ （前｜漢字《かんじ》 → 前<ruby><rbase>漢字</rbase><rtop>かんじ</rtop></ruby>）
 	 * ・文字置換 （〝〟―）
 	 * ・半角2文字のみの数字と!?を縦横中変換
 	 * @param out 出力先Writer

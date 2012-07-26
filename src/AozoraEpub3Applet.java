@@ -427,7 +427,7 @@ public class AozoraEpub3Applet extends JApplet
 		//フレーム初期化
 		final JFrame jFrame = new JFrame("青空文庫テキスト → ePub3変換");
 		//アイコン設定
-		jFrame.setIconImage(java.awt.Toolkit.getDefaultToolkit().createImage(AozoraEpub3Applet.class.getResource("icon.png")));
+		jFrame.setIconImage(java.awt.Toolkit.getDefaultToolkit().createImage(AozoraEpub3Applet.class.getResource("images/icon.png")));
 		
 		try {
 			int x = (int)Float.parseFloat(applet.props.getProperty("PosX"));

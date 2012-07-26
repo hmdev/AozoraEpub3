@@ -216,56 +216,56 @@ div.top25 { margin-left: 25em; }
 
 /* 改行天付き、折り返して(.+?)字下げ → class="top{$1} indent-{$1}" */
 /* ここから(.+?)字下げ、折り返して(.+?)字下げ → class="top{$2} indent{$1-$2}" */
-div.indent1 { text-indent: 1em each-line; }
-div.indent2 { text-indent: 2em each-line; }
-div.indent3 { text-indent: 3em each-line; }
-div.indent4 { text-indent: 4em each-line; }
-div.indent5 { text-indent: 5em each-line; }
-div.indent6 { text-indent: 6em each-line; }
-div.indent7 { text-indent: 7em each-line; }
-div.indent8 { text-indent: 8em each-line; }
-div.indent9 { text-indent: 9em each-line; }
-div.indent10 { text-indent: 10em each-line; }
-div.indent11 { text-indent: 11em each-line; }
-div.indent12 { text-indent: 12em each-line; }
-div.indent13 { text-indent: 13em each-line; }
-div.indent14 { text-indent: 14em each-line; }
-div.indent15 { text-indent: 15em each-line; }
-div.indent16 { text-indent: 16em each-line; }
-div.indent17 { text-indent: 17em each-line; }
-div.indent18 { text-indent: 18em each-line; }
-div.indent19 { text-indent: 19em each-line; }
-div.indent20 { text-indent: 20em each-line; }
-div.indent21 { text-indent: 21em each-line; }
-div.indent22 { text-indent: 22em each-line; }
-div.indent23 { text-indent: 23em each-line; }
-div.indent24 { text-indent: 24em each-line; }
-div.indent25 { text-indent: 25em each-line; }
-div.indent-1 { text-indent: -1em each-line; }
-div.indent-2 { text-indent: -2em each-line; }
-div.indent-3 { text-indent: -3em each-line; }
-div.indent-4 { text-indent: -4em each-line; }
-div.indent-5 { text-indent: -5em each-line; }
-div.indent-6 { text-indent: -6em each-line; }
-div.indent-7 { text-indent: -7em each-line; }
-div.indent-8 { text-indent: -8em each-line; }
-div.indent-9 { text-indent: -9em each-line; }
-div.indent-10 { text-indent: -10em each-line; }
-div.indent-11 { text-indent: -11em each-line; }
-div.indent-12 { text-indent: -12em each-line; }
-div.indent-13 { text-indent: -13em each-line; }
-div.indent-14 { text-indent: -14em each-line; }
-div.indent-15 { text-indent: -15em each-line; }
-div.indent-16 { text-indent: -16em each-line; }
-div.indent-17 { text-indent: -17em each-line; }
-div.indent-18 { text-indent: -18em each-line; }
-div.indent-19 { text-indent: -19em each-line; }
-div.indent-20 { text-indent: -20em each-line; }
-div.indent-21 { text-indent: -21em each-line; }
-div.indent-22 { text-indent: -22em each-line; }
-div.indent-23 { text-indent: -23em each-line; }
-div.indent-24 { text-indent: -24em each-line; }
-div.indent-25 { text-indent: -25em each-line; }
+div.indent1 { text-indent: 1em; }
+div.indent2 { text-indent: 2em; }
+div.indent3 { text-indent: 3em; }
+div.indent4 { text-indent: 4em; }
+div.indent5 { text-indent: 5em; }
+div.indent6 { text-indent: 6em; }
+div.indent7 { text-indent: 7em; }
+div.indent8 { text-indent: 8em; }
+div.indent9 { text-indent: 9em; }
+div.indent10 { text-indent: 10em; }
+div.indent11 { text-indent: 11em; }
+div.indent12 { text-indent: 12em; }
+div.indent13 { text-indent: 13em; }
+div.indent14 { text-indent: 14em; }
+div.indent15 { text-indent: 15em; }
+div.indent16 { text-indent: 16em; }
+div.indent17 { text-indent: 17em; }
+div.indent18 { text-indent: 18em; }
+div.indent19 { text-indent: 19em; }
+div.indent20 { text-indent: 20em; }
+div.indent21 { text-indent: 21em; }
+div.indent22 { text-indent: 22em; }
+div.indent23 { text-indent: 23em; }
+div.indent24 { text-indent: 24em; }
+div.indent25 { text-indent: 25em; }
+div.indent-1 { text-indent: -1em; }
+div.indent-2 { text-indent: -2em; }
+div.indent-3 { text-indent: -3em; }
+div.indent-4 { text-indent: -4em; }
+div.indent-5 { text-indent: -5em; }
+div.indent-6 { text-indent: -6em; }
+div.indent-7 { text-indent: -7em; }
+div.indent-8 { text-indent: -8em; }
+div.indent-9 { text-indent: -9em; }
+div.indent-10 { text-indent: -10em; }
+div.indent-11 { text-indent: -11em; }
+div.indent-12 { text-indent: -12em; }
+div.indent-13 { text-indent: -13em; }
+div.indent-14 { text-indent: -14em; }
+div.indent-15 { text-indent: -15em; }
+div.indent-16 { text-indent: -16em; }
+div.indent-17 { text-indent: -17em; }
+div.indent-18 { text-indent: -18em; }
+div.indent-19 { text-indent: -19em; }
+div.indent-20 { text-indent: -20em; }
+div.indent-21 { text-indent: -21em; }
+div.indent-22 { text-indent: -22em; }
+div.indent-23 { text-indent: -23em; }
+div.indent-24 { text-indent: -24em; }
+div.indent-25 { text-indent: -25em; }
 
 
 /* 地付き */
@@ -296,53 +296,53 @@ div.bottom23 { text-align: right; margin-right: 23em; }
 div.bottom24 { text-align: right; margin-right: 24em; }
 div.bottom25 { text-align: right; margin-right: 25em; }
 
-div.jizume1 { width: 1em; }
-div.jizume2 { width: 2em; }
-div.jizume3 { width: 3em; }
-div.jizume4 { width: 4em; }
-div.jizume5 { width: 5em; }
-div.jizume6 { width: 6em; }
-div.jizume7 { width: 7em; }
-div.jizume8 { width: 8em; }
-div.jizume9 { width: 9em; }
-div.jizume10 { width: 10em; }
-div.jizume11 { width: 11em; }
-div.jizume12 { width: 12em; }
-div.jizume13 { width: 13em; }
-div.jizume14 { width: 14em; }
-div.jizume15 { width: 15em; }
-div.jizume16 { width: 16em; }
-div.jizume17 { width: 17em; }
-div.jizume18 { width: 18em; }
-div.jizume19 { width: 19em; }
-div.jizume20 { width: 20em; }
-div.jizume21 { width: 21em; }
-div.jizume22 { width: 22em; }
-div.jizume23 { width: 23em; }
-div.jizume24 { width: 24em; }
-div.jizume25 { width: 25em; }
-div.jizume26 { width: 26em; }
-div.jizume27 { width: 27em; }
-div.jizume28 { width: 28em; }
-div.jizume29 { width: 29em; }
-div.jizume30 { width: 30em; }
-div.jizume31 { width: 31em; }
-div.jizume32 { width: 32em; }
-div.jizume33 { width: 33em; }
-div.jizume34 { width: 34em; }
-div.jizume35 { width: 35em; }
-div.jizume36 { width: 36em; }
-div.jizume37 { width: 37em; }
-div.jizume38 { width: 38em; }
-div.jizume39 { width: 39em; }
-div.jizume40 { width: 40em; }
-div.jizume41 { width: 41em; }
-div.jizume42 { width: 42em; }
-div.jizume43 { width: 43em; }
-div.jizume44 { width: 44em; }
-div.jizume45 { width: 45em; }
-div.jizume46 { width: 46em; }
-div.jizume47 { width: 47em; }
-div.jizume48 { width: 48em; }
-div.jizume49 { width: 49em; }
-div.jizume50 { width: 50em; }
+div.jizume1 { max-width: 1em; }
+div.jizume2 { max-width: 2em; }
+div.jizume3 { max-width: 3em; }
+div.jizume4 { max-width: 4em; }
+div.jizume5 { max-width: 5em; }
+div.jizume6 { max-width: 6em; }
+div.jizume7 { max-width: 7em; }
+div.jizume8 { max-width: 8em; }
+div.jizume9 { max-width: 9em; }
+div.jizume10 { max-width: 10em; }
+div.jizume11 { max-width: 11em; }
+div.jizume12 { max-width: 12em; }
+div.jizume13 { max-width: 13em; }
+div.jizume14 { max-width: 14em; }
+div.jizume15 { max-width: 15em; }
+div.jizume16 { max-width: 16em; }
+div.jizume17 { max-width: 17em; }
+div.jizume18 { max-width: 18em; }
+div.jizume19 { max-width: 19em; }
+div.jizume20 { max-width: 20em; }
+div.jizume21 { max-width: 21em; }
+div.jizume22 { max-width: 22em; }
+div.jizume23 { max-width: 23em; }
+div.jizume24 { max-width: 24em; }
+div.jizume25 { max-width: 25em; }
+div.jizume26 { max-width: 26em; }
+div.jizume27 { max-width: 27em; }
+div.jizume28 { max-width: 28em; }
+div.jizume29 { max-width: 29em; }
+div.jizume30 { max-width: 30em; }
+div.jizume31 { max-width: 31em; }
+div.jizume32 { max-width: 32em; }
+div.jizume33 { max-width: 33em; }
+div.jizume34 { max-width: 34em; }
+div.jizume35 { max-width: 35em; }
+div.jizume36 { max-width: 36em; }
+div.jizume37 { max-width: 37em; }
+div.jizume38 { max-width: 38em; }
+div.jizume39 { max-width: 39em; }
+div.jizume40 { max-width: 40em; }
+div.jizume41 { max-width: 41em; }
+div.jizume42 { max-width: 42em; }
+div.jizume43 { max-width: 43em; }
+div.jizume44 { max-width: 44em; }
+div.jizume45 { max-width: 45em; }
+div.jizume46 { max-width: 46em; }
+div.jizume47 { max-width: 47em; }
+div.jizume48 { max-width: 48em; }
+div.jizume49 { max-width: 49em; }
+div.jizume50 { max-width: 50em; }

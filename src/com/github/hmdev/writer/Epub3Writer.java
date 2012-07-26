@@ -26,10 +26,9 @@ import org.apache.velocity.app.Velocity;
 
 import com.github.hmdev.converter.AozoraEpub3Converter;
 import com.github.hmdev.info.BookInfo;
+import com.github.hmdev.info.ChapterInfo;
 import com.github.hmdev.info.ImageInfo;
 import com.github.hmdev.util.LogAppender;
-
-
 
 /** ePub3用のファイル一式をZipで固めたファイルを生成.
  * 本文は改ページでセクション毎に分割されて xhtml/以下に 0001.xhtml 0002.xhtml の連番ファイル名で格納
@@ -82,7 +81,10 @@ public class Epub3Writer
 	int imageIndex = 0;
 	
 	/** 改ページでセクション分割されたセクション番号(0001)を格納 カバー画像(cover)等も含む */
-	Vector<String> sectionNames;
+	Vector<String> sectionIds;
+	/** 章の名称を格納(仮) */
+	Vector<ChapterInfo> chapterInfos;
+	
 	/** 画像情報リスト Velocity埋め込み */
 	Vector<ImageInfo> imageInfos;
 	/** 画像リネーム情報格納用 重複チェック用にHashに格納 */
@@ -116,7 +118,8 @@ public class Epub3Writer
 		//インデックス初期化
 		this.sectionIndex = 0;
 		this.imageIndex = 0;
-		this.sectionNames = new Vector<String>();
+		this.sectionIds = new Vector<String>();
+		this.chapterInfos = new Vector<ChapterInfo>();
 		this.imageInfos = new Vector<ImageInfo>();
 		this.imageFileNames = new HashMap<String, String>();
 		
@@ -187,7 +190,7 @@ public class Epub3Writer
 		}
 		
 		//package.opf 出力
-		velocityContext.put("sections", sectionNames);
+		velocityContext.put("sections", sectionIds);
 		velocityContext.put("images", imageInfos);
 		zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+PACKAGE_FILE));
 		bw = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"));
@@ -196,6 +199,7 @@ public class Epub3Writer
 		zos.closeArchiveEntry();
 		
 		//navファイル
+		velocityContext.put("chapters", chapterInfos);
 		zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+XHTML_PATH+XHTML_NAV_FILE));
 		bw = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"));
 		Velocity.getTemplate(templatePath+OPS_PATH+XHTML_PATH+XHTML_NAV_VM).merge(velocityContext, bw);
@@ -282,14 +286,16 @@ public class Epub3Writer
 	private void startSection() throws IOException
 	{
 		this.sectionIndex++;
-		String section = this.decimalFormat.format(this.sectionIndex);
+		String sectionId = this.decimalFormat.format(this.sectionIndex);
 		//package.opf用にファイル名
-		this.sectionNames.add(section);
-		this.zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+XHTML_PATH+section+".xhtml"));
+		this.sectionIds.add(sectionId);
+		this.addChapter(sectionId, sectionId); //章の名称はsectionIdを仮に設定
+		
+		this.zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+XHTML_PATH+sectionId+".xhtml"));
 		
 		//ヘッダ出力
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"));
-		this.velocityContext.put("section_id", section);
+		this.velocityContext.put("section_id", sectionId);
 		Velocity.getTemplate(this.templatePath+OPS_PATH+XHTML_PATH+XHTML_HEADER_VM).merge(this.velocityContext, bw);
 		bw.flush();
 	}
@@ -303,6 +309,17 @@ public class Epub3Writer
 		bw.flush();
 		
 		this.zos.closeArchiveEntry();
+	}
+	/** 章を追加 */
+	public void addChapter(String id, String name)
+	{
+		String sectionId = this.sectionIds.lastElement();
+		this.chapterInfos.add(new ChapterInfo(sectionId, id, name));
+	}
+	/** 追加済の章の名称を変更 */
+	public void updateChapterName(String name)
+	{
+		this.chapterInfos.lastElement().setChapterName(name);
 	}
 	
 	/** 連番に変更した画像ファイル名を返却.
