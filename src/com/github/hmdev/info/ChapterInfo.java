@@ -48,6 +48,4 @@ public class ChapterInfo
 	{
 		this.chapterName = chapterName;
 	}
-	
-	
 }

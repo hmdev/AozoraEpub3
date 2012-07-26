@@ -423,7 +423,7 @@
 
 改行	<br/>
 
-画像開始	<div><img src="
+画像開始	<div class="img"><img src="
 画像終了	"/></div>
 
 表題前	<div><span class="font5">

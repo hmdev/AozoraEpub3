@@ -601,8 +601,11 @@ public class AozoraEpub3Converter
 					
 					//改ページ後の章名称変更
 					if (!this.chapterStarted) {
-						this.chapterStarted = true;
-						this.writer.updateChapterName(line.substring(begin, Math.min(chukiStart, begin+32)).replaceAll("《[^》]+》", "").replaceAll("［＃.+?］", "").replaceAll("^[ |　]+","").replaceAll("[ |　]+$",""));
+						String chapterName = line.substring(begin, Math.min(chukiStart, begin+32)).replaceAll("《[^》]+》", "").replaceAll("［＃.+?］", "").replaceAll("^[ |　]+","").replaceAll("[ |　]+$","");
+						if (chapterName.length() >0) {
+							this.chapterStarted = true;
+							this.writer.updateChapterName(chapterName);
+						}
 					}
 				}
 				
@@ -754,8 +757,11 @@ public class AozoraEpub3Converter
 			
 			//改ページ後の章名称変更
 			if (!this.chapterStarted) {
-				this.chapterStarted = true;
-				this.writer.updateChapterName(line.substring(begin, Math.min(ch.length, begin+32)).replaceAll("《[^》]+》", "").replaceAll("［＃.+?］", "").replaceAll("^[ |　]+","").replaceAll("[ |　]+$",""));
+				String chapterName = line.substring(begin, Math.min(ch.length, begin+32)).replaceAll("《[^》]+》", "").replaceAll("［＃.+?］", "").replaceAll("^[ |　]+","").replaceAll("[ |　]+$","");
+				if (chapterName.length() >0) {
+					this.chapterStarted = true;
+					this.writer.updateChapterName(chapterName);
+				}
 			}
 		}
 		//行末タグを追加
