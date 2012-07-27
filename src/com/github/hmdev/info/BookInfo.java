@@ -22,6 +22,9 @@ public class BookInfo
 	/** 縦書きならtrue */
 	public boolean vertical = true;
 	
+	/** 右から左ならtrue */
+	public boolean rtl = false;
+	
 	/** 表紙ファイル名 フルパスかURL ""なら先頭の挿絵 nullなら表紙無し */
 	public String coverFileName;
 	

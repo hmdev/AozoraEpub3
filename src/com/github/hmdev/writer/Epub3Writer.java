@@ -128,9 +128,11 @@ public class Epub3Writer
 		//Velocity用 共通コンテキスト設定
 		this.velocityContext = new VelocityContext();
 		//IDはタイトル著作者のハッシュで適当に生成
-		velocityContext.put("identifier", "ID"+bookInfo.title.hashCode()+bookInfo.creator.hashCode());
-		velocityContext.put("title", bookInfo.title);
-		velocityContext.put("creator", bookInfo.creator);
+		String title = bookInfo.title==null?"":bookInfo.title;
+		String creator = bookInfo.creator==null?"":bookInfo.creator;
+		velocityContext.put("identifier", "ID"+title.hashCode()+creator.hashCode());
+		velocityContext.put("title", title);
+		velocityContext.put("creator", creator);
 		velocityContext.put("modified", dateFormat.format(bookInfo.modified));
 		//縦横書き設定
 		velocityContext.put("vertical", bookInfo.vertical);

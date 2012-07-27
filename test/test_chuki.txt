@@ -63,9 +63,9 @@ http://www.aozora.gr.jp/accent_separation.html
 ================画像見開き================
 この後画像見開き
 ［＃改ページ］
-<img src="右画像.jpg">
+<img src="img/右画像.png">
 ［＃改ページ］
-<img src="左画像.jpg">
+<img src="img/左画像.png">
 ［＃改ページ］
 この前画像見開き
 

@@ -29,6 +29,7 @@ import java.util.regex.Pattern;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
 import javax.swing.JApplet;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -46,6 +47,7 @@ import javax.swing.border.LineBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.github.hmdev.converter.AozoraEpub3Converter;
+import com.github.hmdev.converter.AozoraEpub3Converter.TitleType;
 import com.github.hmdev.util.LogAppender;
 import com.github.hmdev.writer.Epub3Writer;
 
@@ -69,6 +71,9 @@ public class AozoraEpub3Applet extends JApplet
 	
 	JRadioButton jRadioVertical;
 	JRadioButton jRadioHorizontal;
+	
+	JRadioButton jRadioLtR;
+	JRadioButton jRadioRtL;
 	
 	JComboBox jComboEncType;
 	
@@ -117,7 +122,7 @@ public class AozoraEpub3Applet extends JApplet
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch(Exception e) { e.printStackTrace(); }
 		
-		Border panelPadding = BorderFactory.createEmptyBorder(0, 0, 0, 0);
+		Border zeroPadding = BorderFactory.createEmptyBorder(0, 0, 0, 0);
 		
 		BoxLayout boxLayout = new BoxLayout(this.getContentPane(), BoxLayout.Y_AXIS);
 		this.setLayout(boxLayout);
@@ -129,7 +134,7 @@ public class AozoraEpub3Applet extends JApplet
 		//1段目
 		panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		panel.setMaximumSize(new Dimension(1920, 20));
-		panel.setBorder(panelPadding);
+		panel.setBorder(zeroPadding);
 		this.add(panel);
 		
 		//表題行
@@ -139,7 +144,7 @@ public class AozoraEpub3Applet extends JApplet
 		jComboTitle.setFocusable(false);
 		jComboTitle.setPreferredSize(new Dimension(120, 22));
 		try { jComboTitle.setSelectedIndex(Integer.parseInt(props.getProperty("TitleType"))); } catch (Exception e) {}
-		((JLabel)jComboTitle.getRenderer()).setBorder(panelPadding);
+		((JLabel)jComboTitle.getRenderer()).setBorder(zeroPadding);
 		panel.add(jComboTitle);
 		//ファイル名設定
 		propValue = props.getProperty("AutoFileName");
@@ -159,7 +164,7 @@ public class AozoraEpub3Applet extends JApplet
 		//2段目
 		panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		panel.setMaximumSize(new Dimension(1920, 20));
-		panel.setBorder(panelPadding);
+		panel.setBorder(zeroPadding);
 		this.add(panel);
 		//栞用idSpan
 		propValue = props.getProperty("IdSpan");
@@ -185,6 +190,18 @@ public class AozoraEpub3Applet extends JApplet
 		jRadioHorizontal.setFocusPainted(false);
 		panel.add(jRadioHorizontal);
 		group.add(jRadioHorizontal);
+		
+		/*group = new ButtonGroup();
+		propValue = props.getProperty("RtL");
+		boolean propLtR = propValue==null||"1".equals(propValue);
+		jRadioRtL = new JRadioButton("右→左", propLtR);
+		jRadioRtL.setFocusPainted(false);
+		panel.add(jRadioRtL);
+		group.add(jRadioRtL);
+		jRadioLtR = new JRadioButton("左→右", !propLtR);
+		jRadioLtR.setFocusPainted(false);
+		panel.add(jRadioLtR);
+		group.add(jRadioLtR);*/
 		
 		//3段目
 		/*panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -217,7 +234,7 @@ public class AozoraEpub3Applet extends JApplet
 		//4段目
 		panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		panel.setMaximumSize(new Dimension(1920, 20));
-		panel.setBorder(panelPadding);
+		panel.setBorder(zeroPadding);
 		this.add(panel);
 		//入力文字コード
 		label = new JLabel(" 表紙");
@@ -230,7 +247,9 @@ public class AozoraEpub3Applet extends JApplet
 		jComboCover.setPreferredSize(new Dimension(340, 22));
 		panel.add(jComboCover);
 		JButton jButtonCover = new JButton("表紙選択");
+		jButtonCover.setBorder(zeroPadding);
 		jButtonCover.setPreferredSize(new Dimension(80, 22));
+		jButtonCover.setIcon(new ImageIcon(AozoraEpub3Applet.class.getResource("images/image_add.png")));
 		jButtonCover.setFocusable(false);
 		jButtonCover.addActionListener(new CoverChooserListener(this));
 		panel.add(jButtonCover);
@@ -238,7 +257,7 @@ public class AozoraEpub3Applet extends JApplet
 		//5段目
 		panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		panel.setMaximumSize(new Dimension(1920, 20));
-		panel.setBorder(panelPadding);
+		panel.setBorder(zeroPadding);
 		this.add(panel);
 		//入力文字コード
 		label = new JLabel(" 入力文字コード");
@@ -246,7 +265,7 @@ public class AozoraEpub3Applet extends JApplet
 		jComboEncType = new JComboBox(new String[]{"MS932", "UTF-8"});
 		jComboEncType.setFocusable(false);
 		jComboEncType.setPreferredSize(new Dimension(80, 22));
-		((JLabel)jComboEncType.getRenderer()).setBorder(panelPadding);
+		((JLabel)jComboEncType.getRenderer()).setBorder(zeroPadding);
 		try { jComboEncType.setSelectedIndex(Integer.parseInt(props.getProperty("EncType"))); } catch (Exception e) {}
 		panel.add(jComboEncType);
 		//ファイルの上書き許可
@@ -258,7 +277,9 @@ public class AozoraEpub3Applet extends JApplet
 		label = new JLabel("   ");
 		panel.add(label);
 		JButton jButtonFile = new JButton("ファイル選択");
-		jButtonFile.setPreferredSize(new Dimension(90, 22));
+		jButtonFile.setBorder(zeroPadding);
+		jButtonFile.setPreferredSize(new Dimension(100, 22));
+		jButtonFile.setIcon(new ImageIcon(AozoraEpub3Applet.class.getResource("images/folder_page.png")));
 		jButtonFile.setFocusable(false);
 		jButtonFile.addActionListener(new FileChooserListener(this));
 		panel.add(jButtonFile);
@@ -414,7 +435,7 @@ public class AozoraEpub3Applet extends JApplet
 			jRadioVertical.isSelected(),
 			coverFileName,
 			jComboEncType.getSelectedItem().toString(),
-			jComboTitle.getSelectedIndex()
+			TitleType.values()[jComboTitle.getSelectedIndex()]
 		);
 	}
 	
@@ -476,6 +497,7 @@ public class AozoraEpub3Applet extends JApplet
 		this.props.setProperty("OverWrite", this.jCheckOverWrite.isSelected()?"1":"");
 		this.props.setProperty("AutoYoko", this.jCheckAutoYoko.isSelected()?"1":"");
 		this.props.setProperty("Vertical", this.jRadioVertical.isSelected()?"1":"");
+		//this.props.setProperty("RtL", this.jRadioRtL.isSelected()?"1":"");
 		this.props.setProperty("AutoFileName", this.jCheckAutoFileName.isSelected()?"1":"");
 		this.props.setProperty("Ext", ""+this.jComboExt.getSelectedItem().toString().trim());
 		//this.props.setProperty("PageBreak", ""+this.jComboxPageBreak.getSelectedItem().toString().trim());

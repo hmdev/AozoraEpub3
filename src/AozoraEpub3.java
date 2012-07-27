@@ -6,18 +6,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 
 import com.github.hmdev.converter.AozoraEpub3Converter;
+import com.github.hmdev.converter.AozoraEpub3Converter.TitleType;
 import com.github.hmdev.info.BookInfo;
 import com.github.hmdev.util.LogAppender;
 import com.github.hmdev.writer.Epub3Writer;
 
-
-
-
+/** コマンドライン実行用mainとePub3変換関数 */
 public class AozoraEpub3
 {
 	/** コマンドライン実行用 */
@@ -46,7 +47,7 @@ public class AozoraEpub3
 			boolean vertical = true;
 			String coverFileName = "";//先頭の挿絵
 			String encType = "MS932";
-			int titleType = 0;
+			TitleType titleType = TitleType.TITLE_AUTHOR;
 			for (int i=0; i<args.length; i++) {
 				String srcFile = args[i];
 				AozoraEpub3.convertFile(
@@ -54,7 +55,7 @@ public class AozoraEpub3
 						aozoraConverter,
 						epub3Writer,
 						autoFileName, outExt, withIdSpan,
-						overWrite, autoYoko, vertical,coverFileName,
+						overWrite, autoYoko, vertical, coverFileName,
 						encType, titleType);
 			}
 		} catch (IOException e) {
@@ -67,7 +68,7 @@ public class AozoraEpub3
 	static public void convertFile(File srcFile, AozoraEpub3Converter aozoraConverter, Epub3Writer epubWriter,
 			boolean autoFileName, String outExt, boolean withIdSpan,
 			boolean overWrite, boolean autoYoko, boolean vertical, String coverFileName,
-			String encType, int titleType)
+			String encType, TitleType titleType)
 	{
 		try {
 			
@@ -88,6 +89,15 @@ public class AozoraEpub3
 			BufferedReader src = new BufferedReader(new InputStreamReader(is, (String)encType));
 			BookInfo bookInfo = aozoraConverter.getBookInfo(src, titleType);
 			bookInfo.modified = new Date();
+			//ファイル名からタイトル取得
+			if (titleType == TitleType.FILENAME) {
+				Matcher m = Pattern.compile("\\[(.+?)\\]( |　)*(.*?)( |　)*(\\(|（|\\.)").matcher(srcFile.getName());
+				if (m.find()) {
+					bookInfo.title = m.group(3);
+					bookInfo.creator = m.group(1);
+				}
+			}
+			
 			is.close();
 			
 			//縦書き横書き設定追加
@@ -97,7 +107,7 @@ public class AozoraEpub3
 			
 			//出力ファイル
 			String outFileName = "";
-			if (autoFileName && bookInfo.creator != null && bookInfo.title != null) {
+			if (autoFileName && (bookInfo.creator != null || bookInfo.title != null)) {
 				outFileName = srcFile.getAbsoluteFile().getParentFile().getPath()+"/";
 				if (bookInfo.creator != null) outFileName += "["+bookInfo.creator.replaceAll("[\\\\|\\/|\\:|\\*|\\?|\\<|\\>|\\||\\\"]", "")+"] ";
 				if (bookInfo.title != null) outFileName += bookInfo.title.replaceAll("[\\\\|\\/|\\:|\\*|\\?|\\<|\\>|\\||\\\"]", "");
@@ -150,7 +160,8 @@ public class AozoraEpub3
 	}
 	
 	/** 入力ファイルからStreamオープン */
-	static private InputStream getInputStream(File srcFile, String ext, String[] textEntryNames) throws IOException
+	@SuppressWarnings("resource")
+    static private InputStream getInputStream(File srcFile, String ext, String[] textEntryNames) throws IOException
 	{
 		InputStream is = null;
 		if ("zip".equals(ext)) {
