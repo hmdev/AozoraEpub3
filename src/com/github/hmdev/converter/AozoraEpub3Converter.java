@@ -24,9 +24,10 @@ import com.github.hmdev.writer.Epub3Writer;
 public class AozoraEpub3Converter
 {
 	/** タイトル記載種別 */
-	final static public String[] titleType = {"表題+著者名", "著者名＋表題", "表題のみ", "なし", "ファイル名から"};
+	//final static public String[] titleType = {"表題+著者名", "著者名＋表題", "表題のみ", "なし", "ファイル名から"};
 	public enum TitleType {
 		TITLE_AUTHOR, AUTHOR_TITLE, TITLE_ONLY, NONE, FILENAME;
+		final static public String[] titleTypeNames = {"表題＋著者名", "著者名＋表題", "表題のみ", "なし", "ファイル名から"};
 		boolean hasTitleAuthor() {
 			switch (this) {
 			case TITLE_AUTHOR:
@@ -173,6 +174,7 @@ public class AozoraEpub3Converter
 		//TODO パターンとprintfのFormatを設定ファイルから読み込みできるようにする (printfの引数の演算処理はフラグで切り替え？)
 		chukiPatternMap.put("折り返し", Pattern.compile("［＃ここから([０-９]+)字下げ、折り返して([０-９]+)字下げ］"));
 		chukiPatternMap.put("字下げ字詰め", Pattern.compile("［＃ここから([０-９]+)字下げ、([０-９]+)字詰め］"));
+		chukiPatternMap.put("字下げその他", Pattern.compile("［＃ここから([０-９]+)字下げ、(.*)］"));
 		
 		//前方参照注記
 		File chukiSufFile = new File("chuki_tag_suf.txt");
@@ -703,8 +705,8 @@ public class AozoraEpub3Converter
 						}
 					} else if (lowerChukiTag.startsWith("<img")) {
 						//src=の値抽出
-						String srcFilePath = chukiTag.replaceFirst("^.* src=\"(.+?)\" ?.*>$", "$1");
-						if (srcFilePath.length()==0) srcFilePath = chukiTag.replaceFirst("^.* src='(.+?)' ?.*>$", "$1");
+						String srcFilePath = chukiTag.replaceFirst("^.* [S|s][R|r][C|c]=\"(.+?)\" ?.*>$", "$1");
+						if (srcFilePath.length()==0) srcFilePath = chukiTag.replaceFirst("^.* [S|s][R|r][C|c]='(.+?)' ?.*>$", "$1");
 						//画像ファイル名置換処理実行
 						String fileName = writer.getImageFilePath(srcFilePath.trim());
 						out.write(chukiMap.get("画像開始")[0]);
@@ -747,6 +749,25 @@ public class AozoraEpub3Converter
 								out.write(chukiMap.get("字下げ字詰め1")[0]+arg0);
 								out.write(chukiMap.get("字下げ字詰め2")[0]+arg1);
 								out.write(chukiMap.get("字下げ字詰め3")[0]);
+								//字下げフラグ処理
+								if (inJisage) {
+									if (pPrinted) {
+										pPrinted = false;
+										out.write("</p>");
+									}
+									out.write(chukiMap.get("字下げ省略")[0]);
+								}
+								else inJisage = true;
+								noBr = true;//ブロック字下げなので改行なし
+							}
+						} catch (Exception e) { e.printStackTrace(); }
+						//字下げ複合は字下げのみに変更
+						try {
+							Matcher m2 = chukiPatternMap.get("字下げその他").matcher(chukiTag);
+							if (m2.find()) {
+								int arg0 = Integer.parseInt(CharUtils.fullToHalf(m2.group(1)));
+								out.write(chukiMap.get("字下げその他1")[0]+arg0);
+								out.write(chukiMap.get("字下げその他2")[0]);
 								//字下げフラグ処理
 								if (inJisage) {
 									if (pPrinted) {

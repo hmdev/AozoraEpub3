@@ -140,7 +140,7 @@ public class AozoraEpub3Applet extends JApplet
 		//表題行
 		label = new JLabel(" 表題行");
 		panel.add(label);
-		jComboTitle = new JComboBox(AozoraEpub3Converter.titleType);
+		jComboTitle = new JComboBox(AozoraEpub3Converter.TitleType.titleTypeNames);
 		jComboTitle.setFocusable(false);
 		jComboTitle.setPreferredSize(new Dimension(120, 22));
 		try { jComboTitle.setSelectedIndex(Integer.parseInt(props.getProperty("TitleType"))); } catch (Exception e) {}
@@ -278,7 +278,7 @@ public class AozoraEpub3Applet extends JApplet
 		panel.add(label);
 		JButton jButtonFile = new JButton("ファイル選択");
 		jButtonFile.setBorder(zeroPadding);
-		jButtonFile.setPreferredSize(new Dimension(100, 22));
+		jButtonFile.setPreferredSize(new Dimension(100, 24));
 		jButtonFile.setIcon(new ImageIcon(AozoraEpub3Applet.class.getResource("images/folder_page.png")));
 		jButtonFile.setFocusable(false);
 		jButtonFile.addActionListener(new FileChooserListener(this));
@@ -423,15 +423,22 @@ public class AozoraEpub3Applet extends JApplet
 		if (coverFileName.equals(jComboCover.getItemAt(0).toString())) coverFileName = ""; //先頭の挿絵
 		if (coverFileName.equals(jComboCover.getItemAt(1).toString())) coverFileName = null; //表紙無し
 		
+		//変換設定
+		//栞用span出力
+		aozoraConverter.setWithIdSpan(jCheckIdSpan.isSelected());
+		//変換オプション設定
+		aozoraConverter.setAutoYoko(jCheckAutoYoko.isSelected());
+		
+		//BookInfo取得
+		//本情報設定
+		
 		AozoraEpub3.convertFile(
 			srcFile,
 			this.aozoraConverter,
 			this.epub3Writer,
 			jCheckAutoFileName.isSelected(),
 			jComboExt.getSelectedItem().toString().trim(),
-			jCheckIdSpan.isSelected(),
 			jCheckOverWrite.isSelected(),
-			jCheckAutoYoko.isSelected(),
 			jRadioVertical.isSelected(),
 			coverFileName,
 			jComboEncType.getSelectedItem().toString(),

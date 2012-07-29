@@ -35,27 +35,30 @@ public class AozoraEpub3
 			//ePub出力クラス初期化
 			epub3Writer = new Epub3Writer("template/");
 			
+			boolean withIdSpan = false;
+			boolean autoYoko = true;
 			//変換テーブルをstaticに生成
 			aozoraConverter = new AozoraEpub3Converter(epub3Writer);
+			//栞用span出力
+			aozoraConverter.setWithIdSpan(withIdSpan);
+			//変換オプション設定
+			aozoraConverter.setAutoYoko(autoYoko);
 			
 			//コマンドラインオプション
 			boolean autoFileName = true;
 			String outExt = ".epub";
 			boolean overWrite = true;
-			boolean withIdSpan = false;
-			boolean autoYoko = true;
 			boolean vertical = true;
 			String coverFileName = "";//先頭の挿絵
 			String encType = "MS932";
-			TitleType titleType = TitleType.TITLE_AUTHOR;
+			TitleType titleType = TitleType.FILENAME;
 			for (int i=0; i<args.length; i++) {
 				String srcFile = args[i];
 				AozoraEpub3.convertFile(
 						new File(srcFile),
 						aozoraConverter,
 						epub3Writer,
-						autoFileName, outExt, withIdSpan,
-						overWrite, autoYoko, vertical, coverFileName,
+						autoFileName, outExt, overWrite, vertical, coverFileName,
 						encType, titleType);
 			}
 		} catch (IOException e) {
@@ -66,17 +69,11 @@ public class AozoraEpub3
 	/** ファイルを変換
 	 * @param srcFile 変換するファイル */
 	static public void convertFile(File srcFile, AozoraEpub3Converter aozoraConverter, Epub3Writer epubWriter,
-			boolean autoFileName, String outExt, boolean withIdSpan,
-			boolean overWrite, boolean autoYoko, boolean vertical, String coverFileName,
+			boolean autoFileName, String outExt, boolean overWrite,
+			boolean vertical, String coverFileName,
 			String encType, TitleType titleType)
 	{
 		try {
-			
-			//栞用span出力
-			aozoraConverter.setWithIdSpan(withIdSpan);
-			
-			//変換オプション設定
-			aozoraConverter.setAutoYoko(autoYoko);
 			
 			//Zip内テキストファイルのパス
 			String[] textEntryNames = new String[1];
