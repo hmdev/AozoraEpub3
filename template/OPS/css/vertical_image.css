@@ -1,0 +1,43 @@
+@charset "utf-8";
+@namespace "http://www.w3.org/1999/xhtml";
+
+/* 画像用スタイル */
+
+html {
+	writing-mode: vertical-rl;
+	-webkit-writing-mode: vertical-rl;
+	-epub-writing-mode: vertical-rl;
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	display: block;
+	margin: 0;
+	padding: 0;
+}
+
+/* ページ内 画像は縮小のみ */
+body.fit {
+	width: 100%;
+	height: 100%;
+}
+body.fit img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+/* 幅を合わせる 画像は縮小のみ */
+body.fit_w {
+	width: 100%;
+}
+body.fit_w img {
+	max-width: 100%;
+}
+/* 高さを合わせる 画像は縮小のみ */
+body.fit_h {
+	height: 100%;
+}
+body.fit_h img {
+	max-height: 100%;
+}

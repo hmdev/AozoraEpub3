@@ -3,25 +3,17 @@
 <?oxygen RNGSchema="file:/C:/EPub/epub-revision/build/30/schema/epub-nav-30.rnc" type="compact"?>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
 <head>
-	<title>TOC</title>
-#if (${vertical})
-	<link rel="stylesheet" type="text/css" href="../css/vertical.css" class="vertical" title="vertical layout"/>
-#else
-	<link rel="stylesheet" type="text/css" href="../css/horizontal.css" class="horizontal" title="horizontal layout"/>
-#end
+	<title>${bookInfo.Title}</title>
+	<style type="text/css">ol { list-style: none; }</style>
 </head>
 <body>
-	<section class="frontmatter TableOfContents">
-		<header>
-		</header>
-		<nav xmlns:epub="http://www.idpf.org/2007/ops" epub:type="toc" id="toc">
-			<h1>TOC</h1>
-			<ol>
+	<nav xmlns:epub="http://www.idpf.org/2007/ops" epub:type="toc" id="toc">
+		<h1>${toc}</h1>
+		<ol>
 #foreach(${chapter} in ${chapters})
-				<li class="chapter" id="toc-${chapter.SectionId}"><a href="${chapter.SectionId}.xhtml">${chapter.ChapterName}</a></li>
+			<li class="chapter" id="toc${chapter.SectionId}"><a href="${chapter.SectionId}.xhtml">${chapter.ChapterName}</a></li>
 #end
-			</ol>
-		</nav>
-	</section>
+		</ol>
+	</nav>
 </body>
 </html>

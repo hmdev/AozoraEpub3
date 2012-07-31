@@ -1,10 +1,14 @@
 @charset "utf-8";
 @namespace "http://www.w3.org/1999/xhtml";
 
+/** 縦書き用スタイル */
+
 html {
 	writing-mode: vertical-rl;
 	-webkit-writing-mode: vertical-rl;
 	-epub-writing-mode: vertical-rl;
+	-epub-line-break: strict;
+	line-break: strict;	
 }
 
 body {
@@ -217,6 +221,11 @@ div.top22 { margin-top: 22em; }
 div.top23 { margin-top: 23em; }
 div.top24 { margin-top: 24em; }
 div.top25 { margin-top: 25em; }
+div.top26 { margin-top: 26em; }
+div.top27 { margin-top: 27em; }
+div.top28 { margin-top: 28em; }
+div.top29 { margin-top: 29em; }
+div.top30 { margin-top: 30em; }
 
 /* 改行天付き、折り返して(.+?)字下げ → class="top{$1} indent-{$1}" */
 /* ここから(.+?)字下げ、折り返して(.+?)字下げ → class="top{$2} indent{$1-$2}" */
@@ -339,13 +348,3 @@ div.jizume37 { max-height: 37em; }
 div.jizume38 { max-height: 38em; }
 div.jizume39 { max-height: 39em; }
 div.jizume40 { max-height: 40em; }
-div.jizume41 { max-height: 41em; }
-div.jizume42 { max-height: 42em; }
-div.jizume43 { max-height: 43em; }
-div.jizume44 { max-height: 44em; }
-div.jizume45 { max-height: 45em; }
-div.jizume46 { max-height: 46em; }
-div.jizume47 { max-height: 47em; }
-div.jizume48 { max-height: 48em; }
-div.jizume49 { max-height: 49em; }
-div.jizume50 { max-height: 50em; }

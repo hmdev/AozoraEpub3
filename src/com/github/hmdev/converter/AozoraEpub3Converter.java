@@ -53,6 +53,9 @@ public class AozoraEpub3Converter
 	/** 栞用のid付きspanで本文を括るならtrue */
 	boolean withIdSpan = false;
 	
+	/** コメントブロックを非表示 */
+	boolean hideCommentBlock = true;
+	
 	/** 強制改行行数 ページ先頭からこれ以降の行 */
 	int forcePageBreak = 500;
 	/** 強制改行対象の空行 */
@@ -65,7 +68,7 @@ public class AozoraEpub3Converter
 	boolean inJisage = false;
 	/** 字下げ折り返しの場合のみtrue inJisage=false時に合わせてfalse */
 	boolean inJisageCr = false;
-
+	
 	
 	//---------------- パターン ----------------//
 	/** 注記パターン */
@@ -172,8 +175,8 @@ public class AozoraEpub3Converter
 			src.close();
 		}
 		//TODO パターンとprintfのFormatを設定ファイルから読み込みできるようにする (printfの引数の演算処理はフラグで切り替え？)
-		chukiPatternMap.put("折り返し", Pattern.compile("［＃ここから([０-９]+)字下げ、折り返して([０-９]+)字下げ］"));
-		chukiPatternMap.put("字下げ字詰め", Pattern.compile("［＃ここから([０-９]+)字下げ、([０-９]+)字詰め］"));
+		chukiPatternMap.put("折り返し", Pattern.compile("［＃ここから([０-９]+)字下げ、折り返して([０-９]+)字下げ(.*)］"));
+		chukiPatternMap.put("字下げ字詰め", Pattern.compile("［＃ここから([０-９]+)字下げ、([０-９]+)字詰め(.*)］"));
 		chukiPatternMap.put("字下げその他", Pattern.compile("［＃ここから([０-９]+)字下げ、(.*)］"));
 		
 		//前方参照注記
@@ -231,55 +234,75 @@ public class AozoraEpub3Converter
 	{
 		BookInfo bookInfo = new BookInfo();
 		String line;
-		int idx = -1;
-		if (titleType.hasTitleAuthor()) {
-			//画像があったら表紙にする
+		int lineNum = 0;
+		String[] preLines = new String[]{null, null};
+		
+		boolean titleUnchecked = titleType==TitleType.TITLE_AUTHOR || titleType==TitleType.TITLE_ONLY || titleType==TitleType.AUTHOR_TITLE;
+		boolean authorUnchecked = titleType==TitleType.TITLE_AUTHOR || titleType==TitleType.AUTHOR_TITLE;
+		boolean titleFirst = titleType==TitleType.TITLE_AUTHOR || titleType==TitleType.TITLE_ONLY;
+		
+		//最後まで回す
+		while ((line = src.readLine()) != null) {
+			//2行前が画像のみのセクションの行かをチェック
+			this.checkImageOnly(bookInfo, preLines, line, lineNum);
 			
-			// 文字のない行は飛ばす
-			line = src.readLine();
-			idx++;
-			String plainLine = "";
-			while (line != null){
-				plainLine = line.replaceAll("<[^>]+>", "").replaceAll("^[　| ]*(.*?)[　| ]*$", "$1");//タグと前後空白除去
+			//タイトル取得
+			if (titleUnchecked || authorUnchecked) {
+				String plainLine = line.replaceAll("<[^>]+>", "").replaceAll("^[　| ]*(.*?)[　| ]*$", "$1");//タグと前後空白除去
 				//注記も除去して空行チェック
-				if (plainLine.replaceAll("［＃.+?］", "").length() > 0) break;
-				line = src.readLine();
-				idx++;
-			}
-			boolean titleFirst = titleType==TitleType.TITLE_AUTHOR || titleType==TitleType.TITLE_ONLY;
-			// タイトル・著者
-			String replaced = this.replaceToPlain(convertGaijiChuki(line, false));
-			if (titleFirst) {
-				bookInfo.titleLine = idx;
-				bookInfo.title = replaced;
-			} else {
-				bookInfo.creatorLine = idx;
-				bookInfo.creator = replaced;
-			}
-			
-			if (titleType == TitleType.TITLE_AUTHOR || titleType == TitleType.AUTHOR_TITLE) {
-				// 文字のない行は飛ばす
-				line = src.readLine();
-				idx++;
-				while (line != null) {
-					plainLine = line.replaceAll("<[^>]+>", "").replaceAll("^[　| ]*(.*?)[　| ]*$", "$1");//タグと前後空白除去
-					//注記も除去して空行チェック
-					if (plainLine.replaceAll("［＃.+?］", "").length() > 0) break;
-					line = src.readLine();
-					idx++;
+				if (plainLine.replaceAll("［＃.+?］", "").length() > 0) {
+					String replaced = this.replaceToPlain(convertGaijiChuki(line, false));
+					//タイトルまたは著作者を設定
+					if (titleFirst) {
+						if (titleUnchecked) {
+							bookInfo.titleLine = lineNum;
+							bookInfo.title = replaced;
+							titleUnchecked = false;
+						} else if (authorUnchecked) {
+							bookInfo.creatorLine = lineNum;
+							bookInfo.creator = replaced;
+							authorUnchecked = false;
+						}
+					} else {
+						if (authorUnchecked) {
+							bookInfo.creatorLine = lineNum;
+							bookInfo.creator = replaced;
+							authorUnchecked = false;
+						} else if (titleUnchecked) {
+							bookInfo.titleLine = lineNum;
+							bookInfo.title = replaced;
+							titleUnchecked = false;
+						}
+					}
 				}
-				// タイトル・著者
-				replaced = this.replaceToPlain(convertGaijiChuki(line, false));
-				if (!titleFirst) {
-					bookInfo.titleLine = idx;
-					bookInfo.title = replaced;
-				} else {
-					bookInfo.creatorLine = idx;
-					bookInfo.creator = replaced;
+			}
+			//前の2行を保存
+			preLines[1] = preLines[0];
+			preLines[0] = line;
+			lineNum++;
+		}
+		return bookInfo;
+	}
+	
+	/** 改ページ処理があったら次のセクションの情報をbookInfoに追加 */
+	private void checkImageOnly(BookInfo bookInfo, String[] preLines, String line, int lineNum)
+	{
+		//現在の行が改ページ
+		if (preLines[0] == null) return;
+		if (line.indexOf('］') > 3 && chukiFlagPageBreak.contains(line.substring(2, line.indexOf('］')))) {
+			//2行前の行末が改ページまたは現在行が2行目
+			if (preLines[1] == null ||
+				(preLines[1].indexOf('］') > 3 && chukiFlagPageBreak.contains(preLines[1].substring(preLines[1].lastIndexOf('＃')+1, preLines[1].length()-1)))
+				) {
+				//1行前が画像
+				if (
+					(preLines[0].startsWith("［＃") && preLines[0].matches("^［＃.*（....+）") && preLines[0].indexOf('］') == preLines[0].length()-1) ||
+					(preLines[0].toLowerCase().startsWith("<img") && preLines[0].indexOf('>') == preLines[0].length()-1)
+					) {
+					bookInfo.addImageSectionLine(lineNum==1 ? 0 : lineNum-2);
 				}
 			}
 		}
-		return bookInfo;
 	}
 	
 	/** 青空テキストをePub3のXHTMLに変換
@@ -317,11 +340,13 @@ public class AozoraEpub3Converter
 				this.chapterStarted = false; //章が始まっていないことにする
 			} else {
 				//コメント除外
-				if (line.startsWith("-------------------------------------------------------")) {
-					if (inComment) { inComment = false; continue;
-					} else { inComment = true; continue;  }
+				if (hideCommentBlock) {
+					if (line.startsWith("-------------------------------------------------------")) {
+						if (inComment) { inComment = false; continue;
+						} else { inComment = true; continue;  }
+					}
+					if (inComment) continue;
 				}
-				if (inComment) continue;
 				
 				//強制改行
 				if (forcePageBreak >10 && pageLineNum > forcePageBreak) {
@@ -332,7 +357,7 @@ public class AozoraEpub3Converter
 					}
 					if (forcePageBreakEmptyLine <= emptyLineNum) {
 						//空行は出力せずに改ページ
-						this.writer.nextSection(out);
+						this.writer.nextSection(out, lineNum);
 						this.pageLineNum = 0;
 						this.chapterStarted = false;
 					} else {
@@ -409,7 +434,8 @@ public class AozoraEpub3Converter
 				
 				if (gaiji == null) {
 					LogAppender.append("[外字未変換] : "+chuki+"\n");
-					gaiji = "〓";
+					gaiji = "｜〓《"+chukiValues[0]+"》";
+					
 				}
 				else if (gaiji.length() == 1 && escape) {
 					//特殊文字は 前に※をつけて文字出力時に例外処理
@@ -644,7 +670,7 @@ public class AozoraEpub3Converter
 						if (ch.length == begin+chukiTag.length()) {
 							noBr = true;
 						}
-						this.writer.nextSection(out);
+						this.writer.nextSection(out, lineNum);
 						this.pageLineNum = 0;
 						this.chapterStarted = false;
 					}
@@ -717,32 +743,32 @@ public class AozoraEpub3Converter
 					}
 					else {
 						//インデント字下げ
-						try {
-							Matcher m2 = chukiPatternMap.get("折り返し").matcher(chukiTag);
-							if (m2.find()) {
-								int arg0 = Integer.parseInt(CharUtils.fullToHalf(m2.group(1)));
-								int arg1 = Integer.parseInt(CharUtils.fullToHalf(m2.group(2)));
-								out.write(chukiMap.get("折り返し1")[0]+arg1);
-								out.write(chukiMap.get("折り返し2")[0]+(arg0-arg1));
-								out.write(chukiMap.get("折り返し3")[0]);
-								//字下げフラグ処理
-								if (inJisage) {
-									if (pPrinted) {
-										pPrinted = false;
-										out.write("</p>");
-									}
-									out.write(chukiMap.get("字下げ省略")[0]);
+						boolean patternMatched = false;
+						Matcher m2 = chukiPatternMap.get("折り返し").matcher(chukiTag);
+						if (m2.find()) {
+							int arg0 = Integer.parseInt(CharUtils.fullToHalf(m2.group(1)));
+							int arg1 = Integer.parseInt(CharUtils.fullToHalf(m2.group(2)));
+							out.write(chukiMap.get("折り返し1")[0]+arg1);
+							out.write(chukiMap.get("折り返し2")[0]+(arg0-arg1));
+							out.write(chukiMap.get("折り返し3")[0]);
+							//字下げフラグ処理
+							if (inJisage) {
+								if (pPrinted) {
+									pPrinted = false;
+									out.write("</p>");
 								}
-								else {
-									inJisage = true;
-									inJisageCr = true;
-								}
-								noBr = true;//ブロック字下げなので改行なし
+								out.write(chukiMap.get("字下げ省略")[0]);
 							}
-						} catch (Exception e) { e.printStackTrace(); }
+							else {
+								inJisage = true;
+								inJisageCr = true;
+							}
+							noBr = true;//ブロック字下げなので改行なし
+							patternMatched = true;
+						}
 						//インデント字下げ
-						try {
-							Matcher m2 = chukiPatternMap.get("字下げ字詰め").matcher(chukiTag);
+						if (!patternMatched) {
+							m2 = chukiPatternMap.get("字下げ字詰め").matcher(chukiTag);
 							if (m2.find()) {
 								int arg0 = Integer.parseInt(CharUtils.fullToHalf(m2.group(1)));
 								int arg1 = Integer.parseInt(CharUtils.fullToHalf(m2.group(2)));
@@ -760,10 +786,10 @@ public class AozoraEpub3Converter
 								else inJisage = true;
 								noBr = true;//ブロック字下げなので改行なし
 							}
-						} catch (Exception e) { e.printStackTrace(); }
+						}
 						//字下げ複合は字下げのみに変更
-						try {
-							Matcher m2 = chukiPatternMap.get("字下げその他").matcher(chukiTag);
+						if (!patternMatched) {
+							m2 = chukiPatternMap.get("字下げその他").matcher(chukiTag);
 							if (m2.find()) {
 								int arg0 = Integer.parseInt(CharUtils.fullToHalf(m2.group(1)));
 								out.write(chukiMap.get("字下げその他1")[0]+arg0);
@@ -779,7 +805,7 @@ public class AozoraEpub3Converter
 								else inJisage = true;
 								noBr = true;//ブロック字下げなので改行なし
 							}
-						} catch (Exception e) { e.printStackTrace(); }
+						}
 					}
 				}
 			}
@@ -924,18 +950,18 @@ public class AozoraEpub3Converter
 							//同じ長さで同じ文字なら一文字づつルビを振る
 							if (rubyTopStart-rubyStart == i-rubyTopStart-1 && CharUtils.isSameChars(ch, rubyTopStart+1, i)) {
 								for (int j=0; j<rubyTopStart-rubyStart; j++) {
-									out.write(chukiMap.get("ルビ開始")[0]);
+									out.write(chukiMap.get("ルビ前")[0]);
 									printText(out, ch[rubyStart+j]); //本文
-									out.write(chukiMap.get("ルビ文字")[0]);
+									out.write(chukiMap.get("ルビ")[0]);
 									printText(out, ch[rubyTopStart+1+j]);//ルビ
-									out.write(chukiMap.get("ルビ終了")[0]);
+									out.write(chukiMap.get("ルビ後")[0]);
 								}
 							} else {
-								out.write(chukiMap.get("ルビ開始")[0]);
+								out.write(chukiMap.get("ルビ前")[0]);
 								printText(out, ch, rubyStart, rubyTopStart-rubyStart); //本文
-								out.write(chukiMap.get("ルビ文字")[0]);
+								out.write(chukiMap.get("ルビ")[0]);
 								printText(out, ch, rubyTopStart+1, i-rubyTopStart-1);//ルビ
-								out.write(chukiMap.get("ルビ終了")[0]);
+								out.write(chukiMap.get("ルビ後")[0]);
 							}
 						}
 					}

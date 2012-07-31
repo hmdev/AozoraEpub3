@@ -1,37 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<package xmlns="http://www.idpf.org/2007/opf" unique-identifier="pub-id" xml:lang="ja" profile="http://www.idpf.org/epub/30/profile/package/" version="3.0">
-	<metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">
-		<dc:title prefer="dcterms-title">${title}</dc:title>
-		<meta property="dcterms:title" id="dcterms-title">${title}</meta>
-		<dc:creator prefer="auth">${creator}</dc:creator>
-		<meta property="dcterms:creator" id="auth">${creator}</meta>
-		<dc:language prefer="pub-lang">ja</dc:language>
-		<meta property="dcterms:language" id="pub-lang">ja</meta>
+<package xmlns="http://www.idpf.org/2007/opf" unique-identifier="pub-id" xml:lang="ja" version="3.0">
+	<metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
+		<dc:title id="title">${bookInfo.Title}</dc:title>
+		<dc:creator id="creator">${bookInfo.Creator}</dc:creator>
+		<dc:language id="pub-lang">ja</dc:language>
+		<dc:identifier id="pub-id">urn:uuid:${identifier}</dc:identifier>
+		<meta refines="#title" property="dcterms:title">${bookInfo.Title}</meta>
+		<meta refines="#creator" property="dcterms:creator">${bookInfo.Creator}</meta>
+		<meta refines="#pub-lang" property="dcterms:language">ja</meta>
+		<meta refines="#pub-id" property="dcterms:identifier">urn:uuid:${identifier}</meta>
 		<meta property="dcterms:modified">${modified}</meta>
-		<dc:identifier id="pub-id">${identifier}</dc:identifier>
 	</metadata>
 	<manifest>
-		<item id="horizontal" href="css/horizontal.css" media-type="text/css"/>
+#if (${bookInfo.Vertical})
 		<item id="vertical" href="css/vertical.css" media-type="text/css"/>
+		<item id="vertical_image" href="css/vertical_image.css" media-type="text/css"/>
+#else
+		<item id="horizontal" href="css/horizontal.css" media-type="text/css"/>
+		<item id="horizontal_image" href="css/horizontal_image.css" media-type="text/css"/>
+#end
 		<item id="nav" properties="nav" href="xhtml/nav.xhtml" media-type="application/xhtml+xml"/>
-#foreach(${section} in ${sections})
-		<item id="${section}" href="xhtml/${section}.xhtml" media-type="application/xhtml+xml"/>
+#foreach(${sectionInfo} in ${sections})
+		<item id="sec${sectionInfo.SectionId}" href="xhtml/${sectionInfo.SectionId}.xhtml" media-type="application/xhtml+xml"/>
 #end
 #foreach($image in ${images})
 #if ($image.IsCover)
-		<item id="img-$image.Id" href="images/$image.File" media-type="$image.Format" properties="cover-image"/>
+		<item id="img$image.Id" href="images/$image.File" media-type="$image.Format" properties="cover-image"/>
 #else
-		<item id="img-$image.Id" href="images/$image.File" media-type="$image.Format"/>
+		<item id="img$image.Id" href="images/$image.File" media-type="$image.Format"/>
 #end
 #end
 	</manifest>
-#if (${vertical})
+#if (${bookInfo.Vertical})
 	<spine page-progression-direction="rtl">
 #else
 	<spine page-progression-direction="ltr">
 #end
-#foreach(${section} in ${sections})
-		<itemref idref="${section}" linear="yes"/>
+#foreach(${sectionInfo} in ${sections})
+		<itemref idref="sec${sectionInfo.SectionId}" linear="yes"/>
 #end
 	</spine>
 </package>

@@ -14,6 +14,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.Vector;
 
 import org.apache.commons.compress.archivers.ArchiveEntry;
@@ -28,6 +29,7 @@ import com.github.hmdev.converter.AozoraEpub3Converter;
 import com.github.hmdev.info.BookInfo;
 import com.github.hmdev.info.ChapterInfo;
 import com.github.hmdev.info.ImageInfo;
+import com.github.hmdev.info.SectionInfo;
 import com.github.hmdev.util.LogAppender;
 
 /** ePub3用のファイル一式をZipで固めたファイルを生成.
@@ -65,13 +67,14 @@ public class Epub3Writer
 	final static String TOC_VM = "toc.vm";
 	
 	/** コピーのみのファイル */
-	final static String[] TEMPLATE_FILE_NAMES = new String[]{"mimetype", "META-INF/container.xml", OPS_PATH+CSS_PATH+"horizontal.css", OPS_PATH+CSS_PATH+"vertical.css"};
+	final static String[] TEMPLATE_FILE_NAMES = new String[]
+		{"mimetype", "META-INF/container.xml", OPS_PATH+CSS_PATH+"vertical.css", OPS_PATH+CSS_PATH+"vertical_image.css", OPS_PATH+CSS_PATH+"horizontal.css", OPS_PATH+CSS_PATH+"horizontal_image.css"};
 	
 	/** 出力先ePubのZipストリーム */
 	ZipArchiveOutputStream zos;
 	
 	/** ファイル名桁揃え用 */
-	DecimalFormat decimalFormat = new DecimalFormat("0000");
+	public static DecimalFormat decimalFormat = new DecimalFormat("0000");
 	/** 更新日時フォーマット 2011-06-29T12:00:00Z */
 	SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 	
@@ -81,7 +84,7 @@ public class Epub3Writer
 	int imageIndex = 0;
 	
 	/** 改ページでセクション分割されたセクション番号(0001)を格納 カバー画像(cover)等も含む */
-	Vector<String> sectionIds;
+	Vector<SectionInfo> sectionInfos;
 	/** 章の名称を格納(仮) */
 	Vector<ChapterInfo> chapterInfos;
 	
@@ -95,6 +98,9 @@ public class Epub3Writer
 	
 	/** テンプレートパス */
 	String templatePath;
+	
+	/** 出力中の書籍情報 */
+	BookInfo bookInfo;
 	
 	/** コンストラクタ
 	 * @param templatePath epubテンプレート格納パス文字列 最後は"/"
@@ -114,11 +120,12 @@ public class Epub3Writer
 	public void write(AozoraEpub3Converter converter, BufferedReader src, File srcFile, String zipTextFileName, File epubFile, BookInfo bookInfo) throws IOException
 	{
 		String srcPath = srcFile.getParent()+"/";
+		this.bookInfo = bookInfo;
 		
 		//インデックス初期化
 		this.sectionIndex = 0;
 		this.imageIndex = 0;
-		this.sectionIds = new Vector<String>();
+		this.sectionInfos = new Vector<SectionInfo>();
 		this.chapterInfos = new Vector<ChapterInfo>();
 		this.imageInfos = new Vector<ImageInfo>();
 		this.imageFileNames = new HashMap<String, String>();
@@ -130,12 +137,13 @@ public class Epub3Writer
 		//IDはタイトル著作者のハッシュで適当に生成
 		String title = bookInfo.title==null?"":bookInfo.title;
 		String creator = bookInfo.creator==null?"":bookInfo.creator;
-		velocityContext.put("identifier", "ID"+title.hashCode()+creator.hashCode());
-		velocityContext.put("title", title);
-		velocityContext.put("creator", creator);
+		//固有ID
+		velocityContext.put("identifier", UUID.nameUUIDFromBytes((title+"-"+creator).getBytes()));
+		//目次名称
+		velocityContext.put("toc", "目次");
+		//書籍情報 タイトル、著作者、縦書き
+		velocityContext.put("bookInfo", bookInfo);
 		velocityContext.put("modified", dateFormat.format(bookInfo.modified));
-		//縦横書き設定
-		velocityContext.put("vertical", bookInfo.vertical);
 		
 		//出力先ePubのZipストリーム生成
 		zos = new ZipArchiveOutputStream(new BufferedOutputStream(new FileOutputStream(epubFile)));
@@ -152,7 +160,7 @@ public class Epub3Writer
 		}
 		
 		//0001CapterのZipArchiveEntryを設定
-		this.startSection();
+		this.startSection(0);
 		
 		//ePub3変換して出力
 		//改ページ時にnextSection() を、画像出力時にgetImageFilePath() 呼び出し
@@ -192,7 +200,7 @@ public class Epub3Writer
 		}
 		
 		//package.opf 出力
-		velocityContext.put("sections", sectionIds);
+		velocityContext.put("sections", sectionInfos);
 		velocityContext.put("images", imageInfos);
 		zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+PACKAGE_FILE));
 		bw = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"));
@@ -277,27 +285,30 @@ public class Epub3Writer
 	/** 次のチャプター用のZipArchiveEntryに切替え 
 	 * チャプターのファイル名はcpaterFileNamesに追加される (0001)
 	 * @throws IOException */
-	public void nextSection(BufferedWriter bw) throws IOException
+	public void nextSection(BufferedWriter bw, int lineNum) throws IOException
 	{
 		bw.flush();
 		this.endSection();
-		this.startSection();
+		this.startSection(lineNum);
 	}
 	/** セクション開始. 
 	 * @throws IOException */
-	private void startSection() throws IOException
+	private void startSection(int lineNum) throws IOException
 	{
 		this.sectionIndex++;
-		String sectionId = this.decimalFormat.format(this.sectionIndex);
+		String sectionId = decimalFormat.format(this.sectionIndex);
 		//package.opf用にファイル名
-		this.sectionIds.add(sectionId);
+		SectionInfo sectionInfo = new SectionInfo(sectionId);
+		if (this.bookInfo.isImageSectionLine(lineNum)) sectionInfo.setImageFit(true);
+		this.sectionInfos.add(sectionInfo);
 		this.addChapter(sectionId, sectionId); //章の名称はsectionIdを仮に設定
 		
 		this.zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+XHTML_PATH+sectionId+".xhtml"));
 		
 		//ヘッダ出力
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"));
-		this.velocityContext.put("section_id", sectionId);
+		//出力開始するセクションに対応したSectionInfoを設定
+		this.velocityContext.put("sectionInfo", sectionInfo);
 		Velocity.getTemplate(this.templatePath+OPS_PATH+XHTML_PATH+XHTML_HEADER_VM).merge(this.velocityContext, bw);
 		bw.flush();
 	}
@@ -313,10 +324,10 @@ public class Epub3Writer
 		this.zos.closeArchiveEntry();
 	}
 	/** 章を追加 */
-	public void addChapter(String id, String name)
+	public void addChapter(String chapterId, String name)
 	{
-		String sectionId = this.sectionIds.lastElement();
-		this.chapterInfos.add(new ChapterInfo(sectionId, id, name));
+		SectionInfo sectionInfo = this.sectionInfos.lastElement();
+		this.chapterInfos.add(new ChapterInfo(sectionInfo.sectionId, chapterId, name));
 	}
 	/** 追加済の章の名称を変更 */
 	public void updateChapterName(String name)
@@ -339,7 +350,7 @@ public class Epub3Writer
 		
 		if (imageFileName == null) {
 			this.imageIndex++;
-			String imageId = this.decimalFormat.format(this.imageIndex);
+			String imageId = decimalFormat.format(this.imageIndex);
 			imageFileName = IMAGES_PATH+imageId+"."+ext;
 			this.imageFileNames.put(srcFilePath, imageFileName);
 			String format = "image/"+ext.toLowerCase();

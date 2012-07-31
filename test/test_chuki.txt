@@ -65,7 +65,7 @@ http://www.aozora.gr.jp/accent_separation.html
 ［＃改ページ］
 <img src="img/右画像.png">
 ［＃改ページ］
-<IMG SRC="img/左画像.png">
+<IMG SRC="img/左画像.jpg">
 ［＃改ページ］
 この前画像見開き
 

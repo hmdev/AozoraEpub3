@@ -2,12 +2,26 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="ja" lang="ja">
 <head>
-#if (${vertical})
+#if (${bookInfo.Vertical})
+#if (${sectionInfo.ImageFit})
+	<link rel="stylesheet" type="text/css" href="../css/vertical_image.css" class="vertical_image" title="vertical image only"/>
+#else
 	<link rel="stylesheet" type="text/css" href="../css/vertical.css" class="vertical" title="vertical layout"/>
+#end
+#else
+#if (${sectionInfo.ImageFit})
+	<link rel="stylesheet" type="text/css" href="../css/horizontal_image.css" class="horizontal_image" title="horizontal image only"/>
 #else
 	<link rel="stylesheet" type="text/css" href="../css/horizontal.css" class="horizontal" title="horizontal layout"/>
 #end
-	<title>${title}</title>
+#end
+	<title>${bookInfo.Title}</title>
 </head>
+#if (${sectionInfo.ImageFitH})
+<body class="fit_h">
+#elseif (${sectionInfo.ImageFit})
+<body class="fit">
+#else 
 <body>
+#end
 <section>

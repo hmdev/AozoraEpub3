@@ -292,7 +292,7 @@
 ここで地付き終わり	</div>		1
 
 
-####閉じていない前述注記
+####インライン注記
 
 １字下げ	<div class="top1">	</div>	1
 ２字下げ	<div class="top2">	</div>	1
@@ -319,7 +319,13 @@
 ２３字下げ	<div class="top23">	</div>	1
 ２４字下げ	<div class="top24">	</div>	1
 ２５字下げ	<div class="top25">	</div>	1
+２６字下げ	<div class="top26">	</div>	1
+２７字下げ	<div class="top27">	</div>	1
+２８字下げ	<div class="top28">	</div>	1
+２９字下げ	<div class="top29">	</div>	1
+３０字下げ	<div class="top30">	</div>	1
 
+地付き	<div class="bottom">	</div>	1
 地から１字上げ	<div class="bottom1">	</div>	1
 地から２字上げ	<div class="bottom2">	</div>	1
 地から３字上げ	<div class="bottom3">	</div>	1
@@ -345,8 +351,6 @@
 地から２３字上げ	<div class="bottom23">	</div>	1
 地から２４字上げ	<div class="bottom24">	</div>	1
 地から２５字上げ	<div class="bottom25">	</div>	1
-
-地付き	<div class="bottom">	</div>	1
 
 ####字詰め
 ここから１字詰め	<div class="jizume1">		1
@@ -390,16 +394,7 @@
 ここから３８字詰め	<div class="jizume38">		1
 ここから３９字詰め	<div class="jizume39">		1
 ここから４０字詰め	<div class="jizume40">		1
-ここから４１字詰め	<div class="jizume41">		1
-ここから４２字詰め	<div class="jizume42">		1
-ここから４３字詰め	<div class="jizume43">		1
-ここから４４字詰め	<div class="jizume44">		1
-ここから４５字詰め	<div class="jizume45">		1
-ここから４６字詰め	<div class="jizume46">		1
-ここから４７字詰め	<div class="jizume47">		1
-ここから４８字詰め	<div class="jizume48">		1
-ここから４９字詰め	<div class="jizume49">		1
-ここから５０字詰め	<div class="jizume50">		1
+
 ここで字詰め終わり	</div>		1
 
 ################################################################
@@ -426,9 +421,9 @@
 
 ################################################################
 ####その他
-ルビ開始	<ruby>
-ルビ文字	<rt>
-ルビ終了	</rt></ruby>
+ルビ前	<ruby>
+ルビ	<rt>
+ルビ後	</rt></ruby>
 
 改行	<br/>
 
