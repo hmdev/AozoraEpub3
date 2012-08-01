@@ -10,6 +10,11 @@ public class BookInfo
 	/** タイトル行番号 */
 	public int titleLine = -1;
 	
+	/** 副題 */
+	public String subTitle;
+	/** 副題番号 */
+	public int subTitleLine = -1;
+	
 	/** 著作者 */
 	public String creator;
 	/** 著作者行番号 */

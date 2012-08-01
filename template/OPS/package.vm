@@ -10,6 +10,9 @@
 		<meta refines="#pub-lang" property="dcterms:language">ja</meta>
 		<meta refines="#pub-id" property="dcterms:identifier">urn:uuid:${identifier}</meta>
 		<meta property="dcterms:modified">${modified}</meta>
+#if (${bookInfo.Vertical})
+		<meta property="page-progression-direction">rtl</meta>
+#end
 	</metadata>
 	<manifest>
 #if (${bookInfo.Vertical})

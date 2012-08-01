@@ -205,6 +205,11 @@
 ここから２３字下げ	<div class="top23">		1
 ここから２４字下げ	<div class="top24">		1
 ここから２５字下げ	<div class="top25">		1
+ここから２６字下げ	<div class="top26">		1
+ここから２７字下げ	<div class="top27">		1
+ここから２８字下げ	<div class="top28">		1
+ここから２９字下げ	<div class="top29">		1
+ここから３０字下げ	<div class="top30">		1
 
 ここから１字下げ、罫囲み	<div class="top1 border">		1
 ここから２字下げ、罫囲み	<div class="top2 border">		1
@@ -231,6 +236,11 @@
 ここから２３字下げ、罫囲み	<div class="top23 border">		1
 ここから２４字下げ、罫囲み	<div class="top24 border">		1
 ここから２５字下げ、罫囲み	<div class="top25 border">		1
+ここから２６字下げ、罫囲み	<div class="top26 border">		1
+ここから２７字下げ、罫囲み	<div class="top27 border">		1
+ここから２８字下げ、罫囲み	<div class="top28 border">		1
+ここから２９字下げ、罫囲み	<div class="top29 border">		1
+ここから３０字下げ、罫囲み	<div class="top30 border">		1
 
 ここから改行天付き、折り返して１字下げ	<div class="top1 indent-1">		1
 ここから改行天付き、折り返して２字下げ	<div class="top2 indent-2">		1
@@ -252,11 +262,11 @@
 ここから改行天付き、折り返して１８字下げ	<div class="top18 indent-18">		1
 ここから改行天付き、折り返して１９字下げ	<div class="top19 indent-19">		1
 ここから改行天付き、折り返して２０字下げ	<div class="top20 indent-20">		1
-ここから改行天付き、折り返して２１字下げ	<div class="top11 indent-21">		1
-ここから改行天付き、折り返して２２字下げ	<div class="top12 indent-22">		1
-ここから改行天付き、折り返して２３字下げ	<div class="top13 indent-23">		1
-ここから改行天付き、折り返して２４字下げ	<div class="top14 indent-24">		1
-ここから改行天付き、折り返して２５字下げ	<div class="top15 indent-25">		1
+ここから改行天付き、折り返して２１字下げ	<div class="top21 indent-21">		1
+ここから改行天付き、折り返して２２字下げ	<div class="top22 indent-22">		1
+ここから改行天付き、折り返して２３字下げ	<div class="top23 indent-23">		1
+ここから改行天付き、折り返して２４字下げ	<div class="top24 indent-24">		1
+ここから改行天付き、折り返して２５字下げ	<div class="top25 indent-25">		1
 
 ここで字下げ終わり	</div>		1
 

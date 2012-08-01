@@ -248,7 +248,7 @@ public class AozoraEpub3Converter
 			
 			//タイトル取得
 			if (titleUnchecked || authorUnchecked) {
-				String plainLine = line.replaceAll("<[^>]+>", "").replaceAll("^[　| ]*(.*?)[　| ]*$", "$1");//タグと前後空白除去
+				String plainLine = line.replaceAll("<[^>]+>", "").replaceAll("^[　| |-|=]*(.*?)[　| |-|=]*$", "$1").replaceAll("^[-|=]+$", "");//タグと前後空白-=除去
 				//注記も除去して空行チェック
 				if (plainLine.replaceAll("［＃.+?］", "").length() > 0) {
 					String replaced = this.replaceToPlain(convertGaijiChuki(line, false));
@@ -274,6 +274,19 @@ public class AozoraEpub3Converter
 							titleUnchecked = false;
 						}
 					}
+				}
+			}
+			//タイトルが2行前で著者名が1行前で、空白行でないなら1行前は副題
+			if (lineNum > 1 && bookInfo.titleLine == lineNum-2 && bookInfo.creatorLine == lineNum-1) {
+				String plainLine = line.replaceAll("<[^>]+>", "").replaceAll("^[　| |-|=]*(.*?)[　| |-|=]*$", "$1").replaceAll("^[-|=]+$", "");//タグと前後空白,"-","="除去
+				if (plainLine.replaceAll("［＃.+?］", "").length() > 0) {
+					String replaced = this.replaceToPlain(convertGaijiChuki(line, false));
+					bookInfo.subTitle = bookInfo.creator;
+					bookInfo.subTitleLine = bookInfo.creatorLine;
+					//タイトルに連結
+					bookInfo.title += " "+bookInfo.subTitle;
+					bookInfo.creatorLine = lineNum;
+					bookInfo.creator = replaced;
 				}
 			}
 			//前の2行を保存
@@ -432,9 +445,15 @@ public class AozoraEpub3Converter
 				//注記名称で変換
 				if (gaiji == null) gaiji = ghukiConverter.toUtf(chukiValues[0]);
 				
+				//フォントでの表示不可能文字なら小書き出力
+				//if (unsupportGaiji.contains(gaiji)) {
+				//	gaiji = "gaiji［＃行右小書き］（"+chukiValues[0]+"）［＃行右小書き終わり］";
+				//}
+				
 				if (gaiji == null) {
 					LogAppender.append("[外字未変換] : "+chuki+"\n");
-					gaiji = "｜〓《"+chukiValues[0]+"》";
+					//gaiji = "〓";
+					gaiji = "〓［＃行右小書き］（"+chukiValues[0]+"）［＃行右小書き終わり］";
 					
 				}
 				else if (gaiji.length() == 1 && escape) {

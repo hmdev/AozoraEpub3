@@ -53,34 +53,32 @@ public class AozoraEpub3
 			String encType = "MS932";
 			TitleType titleType = TitleType.FILENAME;
 			for (int i=0; i<args.length; i++) {
-				String srcFile = args[i];
+				File srcFile = new File(args[i]);
+				BookInfo bookInfo = AozoraEpub3.getBookInfo(srcFile, aozoraConverter, autoFileName, outExt, overWrite, vertical, coverFileName, encType, titleType);
+				
 				AozoraEpub3.convertFile(
-						new File(srcFile),
-						aozoraConverter,
-						epub3Writer,
-						autoFileName, outExt, overWrite, vertical, coverFileName,
-						encType, titleType);
+						srcFile, aozoraConverter, epub3Writer,
+						autoFileName, outExt, overWrite,
+						encType, bookInfo);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	/** ファイルを変換
-	 * @param srcFile 変換するファイル */
-	static public void convertFile(File srcFile, AozoraEpub3Converter aozoraConverter, Epub3Writer epubWriter,
+	/** 前処理で一度読み込んでタイトル等の情報を取得 */
+	static public BookInfo getBookInfo(File srcFile, AozoraEpub3Converter aozoraConverter,
 			boolean autoFileName, String outExt, boolean overWrite,
 			boolean vertical, String coverFileName,
 			String encType, TitleType titleType)
 	{
 		try {
-			
 			//Zip内テキストファイルのパス
 			String[] textEntryNames = new String[1];
 			String ext = srcFile.getName().substring(srcFile.getName().lastIndexOf('.')+1).toLowerCase();
-			//.txt .zip拡張子のみ
+			
 			InputStream is = getInputStream(srcFile, ext, textEntryNames);
-			if (is == null) return;
+			if (is == null) return null;
 			
 			//タイトル取得
 			BufferedReader src = new BufferedReader(new InputStreamReader(is, (String)encType));
@@ -88,13 +86,19 @@ public class AozoraEpub3
 			bookInfo.modified = new Date();
 			//ファイル名からタイトル取得
 			if (titleType == TitleType.FILENAME) {
-				Matcher m = Pattern.compile("\\[(.+?)\\]( |　)*(.*?)( |　)*(\\(|（|\\.)").matcher(srcFile.getName());
+				Matcher m = Pattern.compile("[\\[|［](.+?)[\\]|］]( |　)*(.*?)( |　)*(\\(|（|\\.)").matcher(srcFile.getName());
 				if (m.find()) {
 					bookInfo.title = m.group(3);
 					bookInfo.creator = m.group(1);
+				} else {
+					m = Pattern.compile("^(.*?)( |　)*(\\(|（|\\.)").matcher(srcFile.getName());
+					if (m.find()) {
+						bookInfo.title = m.group(1);
+					} else {
+						bookInfo.title = srcFile.getName().replaceAll("\\.[^\\.]+$", "");
+					}
 				}
 			}
-			
 			is.close();
 			
 			//縦書き横書き設定追加
@@ -102,11 +106,35 @@ public class AozoraEpub3
 			//表紙情報追加
 			bookInfo.coverFileName = coverFileName;
 			
+			return bookInfo;
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			LogAppender.append("エラーが発生しました : ");
+			LogAppender.append(e.getMessage());
+			LogAppender.append("\n");
+		}
+		return null;
+	}
+	
+	/** ファイルを変換
+	 * @param srcFile 変換するファイル */
+	static public void convertFile(File srcFile, AozoraEpub3Converter aozoraConverter, Epub3Writer epubWriter,
+			boolean autoFileName, String outExt, boolean overWrite,
+			String encType, BookInfo bookInfo)
+	{
+		try {
+			
+			//Zip内テキストファイルのパス
+			String[] textEntryNames = new String[1];
+			String ext = srcFile.getName().substring(srcFile.getName().lastIndexOf('.')+1).toLowerCase();
+			//.txt .zip拡張子のみ
+			
 			//出力ファイル
 			String outFileName = "";
 			if (autoFileName && (bookInfo.creator != null || bookInfo.title != null)) {
 				outFileName = srcFile.getAbsoluteFile().getParentFile().getPath()+"/";
-				if (bookInfo.creator != null) outFileName += "["+bookInfo.creator.replaceAll("[\\\\|\\/|\\:|\\*|\\?|\\<|\\>|\\||\\\"]", "")+"] ";
+				if (bookInfo.creator != null && bookInfo.creator.length() > 0) outFileName += "["+bookInfo.creator.replaceAll("[\\\\|\\/|\\:|\\*|\\?|\\<|\\>|\\||\\\"]", "")+"] ";
 				if (bookInfo.title != null) outFileName += bookInfo.title.replaceAll("[\\\\|\\/|\\:|\\*|\\?|\\<|\\>|\\||\\\"]", "");
 			} else {
 				outFileName = srcFile.getPath().replaceFirst("\\.[^\\.]+$", "");
@@ -130,9 +158,9 @@ public class AozoraEpub3
 			LogAppender.append("\n");
 			
 			//入力Stream再オープン
-			is = getInputStream(srcFile, ext, textEntryNames);
+			InputStream is = getInputStream(srcFile, ext, textEntryNames);
 			
-			src = new BufferedReader(new InputStreamReader(is, (String)encType));
+			BufferedReader src = new BufferedReader(new InputStreamReader(is, encType));
 			//BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFile), "UTF-8"));
 			
 			// 青空文庫→ePub3タグへ変換
@@ -153,7 +181,6 @@ public class AozoraEpub3
 			LogAppender.append(e.getMessage());
 			LogAppender.append("\n");
 		}
-		
 	}
 	
 	/** 入力ファイルからStreamオープン */
