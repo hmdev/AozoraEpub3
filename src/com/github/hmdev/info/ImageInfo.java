@@ -9,6 +9,11 @@ public class ImageInfo
 	/** 画像フォーマット image/png */
 	String format;
 	
+	/** 画像幅 */
+	int width = -1;
+	/** 画像高さ */
+	int height = -1;
+	
 	/** カバー画像ならtrue */
 	boolean isCover;
 	

@@ -177,7 +177,8 @@ public class AozoraEpub3Converter
 		//TODO パターンとprintfのFormatを設定ファイルから読み込みできるようにする (printfの引数の演算処理はフラグで切り替え？)
 		chukiPatternMap.put("折り返し", Pattern.compile("［＃ここから([０-９]+)字下げ、折り返して([０-９]+)字下げ(.*)］"));
 		chukiPatternMap.put("字下げ字詰め", Pattern.compile("［＃ここから([０-９]+)字下げ、([０-９]+)字詰め(.*)］"));
-		chukiPatternMap.put("字下げその他", Pattern.compile("［＃ここから([０-９]+)字下げ、(.*)］"));
+		chukiPatternMap.put("字下げ複合", Pattern.compile("［＃ここから([０-９]+)字下げ、(.*)］"));
+		chukiPatternMap.put("字下げ終わり複合", Pattern.compile("［＃ここで字下げ終わり、(.*)］"));
 		
 		//前方参照注記
 		File chukiSufFile = new File("chuki_tag_suf.txt");
@@ -822,11 +823,11 @@ public class AozoraEpub3Converter
 						}
 						//字下げ複合は字下げのみに変更
 						if (!patternMatched) {
-							m2 = chukiPatternMap.get("字下げその他").matcher(chukiTag);
+							m2 = chukiPatternMap.get("字下げ複合").matcher(chukiTag);
 							if (m2.find()) {
 								int arg0 = Integer.parseInt(CharUtils.fullToHalf(m2.group(1)));
-								out.write(chukiMap.get("字下げその他1")[0]+arg0);
-								out.write(chukiMap.get("字下げその他2")[0]);
+								out.write(chukiMap.get("字下げ複合1")[0]+arg0);
+								out.write(chukiMap.get("字下げ複合2")[0]);
 								//字下げフラグ処理
 								if (inJisage) {
 									if (pPrinted) {
@@ -837,6 +838,19 @@ public class AozoraEpub3Converter
 								}
 								else inJisage = true;
 								noBr = true;//ブロック字下げなので改行なし
+							}
+						}
+						//字下げ終わり複合注記
+						if (!patternMatched) {
+							m2 = chukiPatternMap.get("字下げ終わり複合").matcher(chukiTag);
+							if (m2.find()) {
+								out.write(chukiMap.get("ここで字下げ終わり")[0]);
+								if (pPrinted) {
+									pPrinted = false;
+									out.write("</p>");
+								}
+								inJisage = false;
+								inJisageCr = false;
 							}
 						}
 					}
