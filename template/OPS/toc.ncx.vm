@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1">
+<head>
+<meta name="dtb:uid" content="urn:uuid:${identifier}"/>
+<meta name="dtb:depth" content="1"/>
+<meta name="dtb:totalPageCount" content="0"/>
+<meta name="dtb:maxPageNumber" content="0"/>
+</head>
+<docTitle>
+	<text>${toc}</text>
+</docTitle>
+<navMap>
+#set($idx=0)
+#foreach(${chapter} in ${chapters})
+#set($idx=$idx+1)
+	<navPoint id="toc${chapter.SectionId}" playOrder="${idx}">
+		<navLabel>
+			<text>${chapter.ChapterName}</text>
+		</navLabel>
+		<content src="xhtml/${chapter.SectionId}.xhtml"/>
+	</navPoint>
+#end
+</navMap>
+</ncx>
