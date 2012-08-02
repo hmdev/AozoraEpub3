@@ -61,10 +61,11 @@ public class Epub3Writer
 	final static String PACKAGE_FILE = "package.opf";
 	/** opfファイル Velocityテンプレート */
 	final static String PACKAGE_VM = "package.vm";
-	/** opfファイル */
+	
+	/** tocファイル */
 	final static String TOC_FILE = "toc.ncx";
 	/** tocファイル Velocityテンプレート */
-	final static String TOC_VM = "toc.vm";
+	final static String TOC_VM = "toc.ncx.vm";
 	
 	/** コピーのみのファイル */
 	final static String[] TEMPLATE_FILE_NAMES = new String[]
@@ -213,6 +214,14 @@ public class Epub3Writer
 		zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+XHTML_PATH+XHTML_NAV_FILE));
 		bw = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"));
 		Velocity.getTemplate(templatePath+OPS_PATH+XHTML_PATH+XHTML_NAV_VM).merge(velocityContext, bw);
+		bw.flush();
+		zos.closeArchiveEntry();
+		
+		//tocファイル
+		velocityContext.put("chapters", chapterInfos);
+		zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+TOC_FILE));
+		bw = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"));
+		Velocity.getTemplate(templatePath+OPS_PATH+TOC_VM).merge(velocityContext, bw);
 		bw.flush();
 		zos.closeArchiveEntry();
 		

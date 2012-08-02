@@ -195,6 +195,9 @@ span.sub {
 	letter-spacing: -2px;
 }
 
+/* 中央揃え */
+div.center { text-align: center;}
+
 /* 字下げ */
 div.top1 { margin-top: 1em; }
 div.top2 { margin-top: 2em; }

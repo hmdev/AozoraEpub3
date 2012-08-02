@@ -342,48 +342,74 @@ public class AozoraEpub3Applet extends JApplet
 		jDialogConfirm = new JDialog();
 		jDialogConfirm.setIconImage(iconImage);
 		jDialogConfirm.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
-		jDialogConfirm.setSize(new Dimension(480, 220));
+		jDialogConfirm.setSize(new Dimension(480, 240));
 		jDialogConfirm.setResizable(false);
 		jDialogConfirm.setTitle("変換前確認");
 		jDialogConfirm.setLayout(new BoxLayout(jDialogConfirm.getContentPane(), BoxLayout.Y_AXIS));
 		jDialogConfirm.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent evt) { convertCanceled = true; }
 		});
+		Border titlePadding4 = BorderFactory.createEmptyBorder(0, 4, 4, 4);
+		Border padding4 = BorderFactory.createEmptyBorder(4, 4, 4, 4);
+		Border padding4H = BorderFactory.createEmptyBorder(0, 4, 0, 4);
+		
 		JPanel dialogPanel = new JPanel();
 		dialogPanel.setLayout(new BoxLayout(dialogPanel, BoxLayout.Y_AXIS));
-		dialogPanel.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
+		dialogPanel.setBorder(padding4);
 		jDialogConfirm.add(dialogPanel);
 		
+		JPanel inputOuter = new JPanel();
+		inputOuter.setBorder(BorderFactory.createTitledBorder("入力ファイル"));
+		inputOuter.setLayout(new BoxLayout(inputOuter, BoxLayout.X_AXIS));
+		inputOuter.setPreferredSize(new Dimension(420, 52));
 		panel = new JPanel();
-		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-		panel.setSize(new Dimension(480, 26));
-		panel.add(new JLabel("入力ファイル : "));
+		panel.setLayout(new FlowLayout(FlowLayout.LEFT));
+		panel.setBorder(titlePadding4);
+		panel.setPreferredSize(new Dimension(420, 26));
 		jTextSrcFileName = new JTextField();
 		jTextSrcFileName.setEditable(false);
-		jTextSrcFileName.setBorder(zeroPadding);
-		jTextSrcFileName.setPreferredSize(new Dimension(420, 26));
-		jTextSrcFileName.setMaximumSize(new Dimension(420, 26));
+		jTextSrcFileName.setPreferredSize(new Dimension(440, 24));
 		panel.add(jTextSrcFileName);
-		dialogPanel.add(panel);
+		inputOuter.add(panel);
+		dialogPanel.add(inputOuter);
 		
-		panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		panel.setSize(new Dimension(480, 26));
-		panel.add(new JLabel("表題と著者名を設定します (本文は変更されません)"));
-		dialogPanel.add(panel);
+		JPanel metadataOuter = new JPanel();
+		metadataOuter.setBorder(BorderFactory.createTitledBorder("メタデータ設定 (本文は変更されません)"));
+		metadataOuter.setLayout(new BoxLayout(metadataOuter, BoxLayout.X_AXIS));
+		metadataOuter.setPreferredSize(new Dimension(420, 90));
+		dialogPanel.add(metadataOuter);
+		JPanel metadataInner = new JPanel();
+		metadataInner.setLayout(new BoxLayout(metadataInner, BoxLayout.Y_AXIS));
+		metadataOuter.add(metadataInner);
 		
 		panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-		dialogPanel.add(panel);
+		panel.setBorder(titlePadding4);
+		panel.setPreferredSize(new Dimension(420, 28));
 		panel.add(new JLabel("表題 : "));
 		jTextTitle = new JTextField();
 		jTextTitle.setPreferredSize(new Dimension(420, 26));
 		jTextTitle.setMaximumSize(new Dimension(420, 26));
 		panel.add(jTextTitle);
+		metadataInner.add(panel);
+		
+		panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		panel.setBorder(titlePadding4);
+		panel.setPreferredSize(new Dimension(420, 28));
+		panel.add(new JLabel("著者 : "));
+		jTextCreator = new JTextField();
+		jTextCreator.setPreferredSize(new Dimension(420, 26));
+		jTextCreator.setMaximumSize(new Dimension(420, 26));
+		panel.add(jTextCreator);
+		metadataInner.add(panel);
 		
 		panel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-		panel.setSize(new Dimension(480, 24));
-		dialogPanel.add(panel);
-		jButton = new JButton("入れ替え");
+		panel.setBorder(padding4H);
+		panel.setPreferredSize(new Dimension(32, 52));
+		panel.setBorder(BorderFactory.createEmptyBorder(12, 0, 0, 0));
+		jButton = new JButton();
+		jButton.setPreferredSize(new Dimension(32, 32));
 		jButton.setIcon(new ImageIcon(AozoraEpub3Applet.class.getResource("images/replace.png")));
 		jButton.addActionListener(new ActionListener() {
 			@Override
@@ -394,19 +420,13 @@ public class AozoraEpub3Applet extends JApplet
 			}
 		});
 		panel.add(jButton);
+		metadataOuter.add(panel);
 		
-		panel = new JPanel();
-		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-		dialogPanel.add(panel);
-		panel.add(new JLabel("著者 : "));
-		jTextCreator = new JTextField();
-		jTextCreator.setPreferredSize(new Dimension(420, 26));
-		jTextCreator.setMaximumSize(new Dimension(420, 26));
-		panel.add(jTextCreator);
-		
+		JPanel buttonPanel = new JPanel();
+		buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+		buttonPanel.setBorder(padding4H);
+		dialogPanel.add(buttonPanel);
 		panel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-		panel.setSize(new Dimension(480, 26));
-		dialogPanel.add(panel);
 		jButton = new JButton("変換実行");
 		jButton.setIcon(new ImageIcon(AozoraEpub3Applet.class.getResource("images/apply.png")));
 		jButton.addActionListener(new ActionListener() {
@@ -419,7 +439,9 @@ public class AozoraEpub3Applet extends JApplet
 			}
 		});
 		panel.add(jButton);
-		panel.add(new JLabel("        "));
+		buttonPanel.add(panel);
+		
+		panel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		jButton = new JButton("キャンセル");
 		jButton.setIcon(new ImageIcon(AozoraEpub3Applet.class.getResource("images/cancel.png")));
 		jButton.addActionListener(new ActionListener() {
@@ -429,12 +451,19 @@ public class AozoraEpub3Applet extends JApplet
 			}
 		});
 		panel.add(jButton);
-		
+		buttonPanel.add(panel);
 		////////////////////////////////////////////////////////////////
 		//設定ダイアログ
 		jDialogSetting = new JDialog();
 		jDialogSetting.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
+		jDialogSetting.setSize(new Dimension(480, 220));
+		jDialogSetting.setResizable(false);
+		jDialogSetting.setTitle("詳細設定");
 		jDialogSetting.setLayout(new BoxLayout(jDialogSetting.getContentPane(), BoxLayout.Y_AXIS));
+		/*jDialogSetting.addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent evt) { restoreSetting(); }
+		});*/
+		
 		
 		
 		////////////////////////////////////////////////////////////////

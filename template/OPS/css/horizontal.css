@@ -190,6 +190,9 @@ span.sub {
 	letter-spacing: -2px;
 }
 
+/* 中央揃え */
+div.center { text-align: center;}
+
 /* 字下げ */
 div.top1 { margin-left: 1em; }
 div.top2 { margin-left: 2em; }

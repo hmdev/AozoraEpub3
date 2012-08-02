@@ -33,11 +33,12 @@
 		<item id="img$image.Id" href="images/$image.File" media-type="$image.Format"/>
 #end
 #end
+		<item href="toc.ncx" id="ncx" media-type="application/x-dtbncx+xml"/>
 	</manifest>
 #if (${bookInfo.Vertical})
-	<spine page-progression-direction="rtl">
+	<spine page-progression-direction="rtl" toc="ncx">
 #else
-	<spine page-progression-direction="ltr">
+	<spine page-progression-direction="ltr" toc="ncx">
 #end
 #foreach(${sectionInfo} in ${sections})
 		<itemref idref="sec${sectionInfo.SectionId}" linear="yes"/>

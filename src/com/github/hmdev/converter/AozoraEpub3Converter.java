@@ -309,7 +309,7 @@ public class AozoraEpub3Converter
 				) {
 				//1行前が画像
 				if (
-					(preLines[0].startsWith("［＃") && preLines[0].matches("^［＃.*（....+）") && preLines[0].indexOf('］') == preLines[0].length()-1) ||
+					(preLines[0].startsWith("［＃") && preLines[0].matches("^［＃.*（.+\\..+") && preLines[0].indexOf('］') == preLines[0].length()-1) ||
 					(preLines[0].toLowerCase().startsWith("<img") && preLines[0].indexOf('>') == preLines[0].length()-1)
 					) {
 					bookInfo.addImageSectionLine(lineNum==1 ? 0 : lineNum-2);
@@ -663,8 +663,7 @@ public class AozoraEpub3Converter
 					//改ページ後の章名称変更
 					if (!this.chapterStarted) {
 						String chapterName = this.replaceToPlain(line.substring(begin,chukiStart));
-						chapterName = chapterName.replaceAll("^=+", "").replaceAll("=+$", "");
-						chapterName = chapterName.replaceAll("^-+", "").replaceAll("-+$", "");
+						chapterName = chapterName.replaceAll("^[=|-|―|─]+", "").replaceAll("[=|-|―|─]+$", "");
 						if (chapterName.length() >0) {
 							
 							this.chapterStarted = true;
@@ -738,8 +737,12 @@ public class AozoraEpub3Converter
 					//訓点と区別するため3文字目から（チェック
 					int imageStartIdx = chukiTag.indexOf('（', 2);
 					if (imageStartIdx > -1) {
-						if (chukiTag.indexOf('）', 6) > -1) {
-							String srcFilePath = chukiTag.replaceFirst("^.*（(.*?)(、.+)?）.*$", "$1");
+						int dotIdx = chukiTag.indexOf('.', imageStartIdx+1);
+						if (dotIdx > -1 && chukiTag.indexOf('）', dotIdx) > -1) {
+							int imageEndIdx = chukiTag.indexOf('、', imageStartIdx+1);
+							if (imageEndIdx == -1) imageEndIdx = chukiTag.indexOf('）', imageStartIdx+1);
+							else imageEndIdx = Math.min(imageEndIdx, chukiTag.indexOf('）', imageStartIdx+1));
+							String srcFilePath = chukiTag.substring(imageStartIdx+1, imageEndIdx);
 							//画像ファイル名置換処理実行
 							String fileName = writer.getImageFilePath(srcFilePath.trim());
 							out.write(chukiMap.get("画像開始")[0]);
@@ -747,6 +750,12 @@ public class AozoraEpub3Converter
 							out.write(chukiMap.get("画像終了")[0]);
 							//LogAppender.append("[画像注記]: "+chukiTag+"\n");
 							noBr = true;
+							//本文がなければ画像ファイル名が目次になる
+							if (!this.chapterStarted) {
+								String chapterName = srcFilePath.substring(srcFilePath.lastIndexOf('/')+1);
+								this.writer.updateChapterName(chapterName.length()>64 ? chapterName.substring(0, 64) : chapterName);
+							}
+							
 						}
 					} else if (lowerChukiTag.startsWith("<img")) {
 						//src=の値抽出
@@ -759,6 +768,11 @@ public class AozoraEpub3Converter
 						out.write(chukiMap.get("画像終了")[0]);
 						//LogAppender.append("[画像注記]: "+chukiTag+"\n");
 						noBr = true;
+						//本文がなければ画像ファイル名が目次になる
+						if (!this.chapterStarted) {
+							String chapterName = srcFilePath.substring(srcFilePath.lastIndexOf('/')+1);
+							this.writer.updateChapterName(chapterName.length()>64 ? chapterName.substring(0, 64) : chapterName);
+						}
 					}
 					else {
 						//インデント字下げ
@@ -841,8 +855,7 @@ public class AozoraEpub3Converter
 			//改ページ後の章名称変更
 			if (!this.chapterStarted) {
 				String chapterName = this.replaceToPlain(line.substring(begin, ch.length));
-				chapterName = chapterName.replaceAll("^=+", "").replaceAll("=+$", "");
-				chapterName = chapterName.replaceAll("^-+", "").replaceAll("-+$", "");
+				chapterName = chapterName.replaceAll("^[=|-|―|─]+", "").replaceAll("[=|-|―|─]+$", "");
 				if (chapterName.length() >0) {
 					this.chapterStarted = true;
 					this.writer.updateChapterName(chapterName.length()>64 ? chapterName.substring(0, 64) : chapterName);
