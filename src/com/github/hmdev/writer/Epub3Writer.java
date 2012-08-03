@@ -57,6 +57,11 @@ public class Epub3Writer
 	/** navファイル Velocityテンプレート 未対応 */
 	final static String XHTML_NAV_VM = "xhtml_nav.vm";
 	
+	/** 表紙XHTMLファイル */
+	final static String COVER_FILE = "cover.xhtml";
+	/** 表紙ページ Velocityテンプレート */
+	final static String COVER_VM = "cover.vm";
+	
 	/** opfファイル */
 	final static String PACKAGE_FILE = "package.opf";
 	/** opfファイル Velocityテンプレート */
@@ -68,8 +73,14 @@ public class Epub3Writer
 	final static String TOC_VM = "toc.ncx.vm";
 	
 	/** コピーのみのファイル */
-	final static String[] TEMPLATE_FILE_NAMES = new String[]
-		{"mimetype", "META-INF/container.xml", OPS_PATH+CSS_PATH+"vertical.css", OPS_PATH+CSS_PATH+"vertical_image.css", OPS_PATH+CSS_PATH+"horizontal.css", OPS_PATH+CSS_PATH+"horizontal_image.css"};
+	final static String[] TEMPLATE_FILE_NAMES = new String[]{
+		"mimetype",
+		"META-INF/container.xml",
+		OPS_PATH+CSS_PATH+"vertical.css",
+		OPS_PATH+CSS_PATH+"vertical_image.css",
+		OPS_PATH+CSS_PATH+"horizontal.css",
+		OPS_PATH+CSS_PATH+"horizontal_image.css"
+	};
 	
 	/** 出力先ePubのZipストリーム */
 	ZipArchiveOutputStream zos;
@@ -200,6 +211,30 @@ public class Epub3Writer
 			} catch (Exception e) { e.printStackTrace(); }
 		}
 		
+		//表紙ページ出力 先頭画像表示時は先頭画像は出力しない
+		if (bookInfo.insertCoverPage) {
+			ImageInfo coverPageImage = coverImageInfo;
+			if (coverPageImage == null) {
+				for (ImageInfo imageInfo2 : imageInfos) {
+					if (imageInfo2.getIsCover()) {
+						coverPageImage = imageInfo2;
+						break;
+					}
+				}
+			}
+			if (coverPageImage != null) {
+				velocityContext.put("coverImage", coverPageImage);
+				zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+XHTML_PATH+COVER_FILE));
+				bw = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"));
+				Velocity.getTemplate(templatePath+OPS_PATH+XHTML_PATH+COVER_VM).merge(velocityContext, bw);
+				bw.flush();
+				zos.closeArchiveEntry();
+			} else {
+				//画像がなかったら表紙ページ無し
+				bookInfo.insertCoverPage = false;
+			}
+		}
+		
 		//package.opf 出力
 		velocityContext.put("sections", sectionInfos);
 		velocityContext.put("images", imageInfos);
@@ -229,8 +264,7 @@ public class Epub3Writer
 		
 		zos.setLevel(0);
 		//画像ファイルコピー (連番にリネーム)
-		//表紙指定があればそれを入力に設定 先頭画像のisCoverはfalseに
-		//表紙
+		//表紙指定があればそれを入力に設定 先頭画像のisCoverはfalseになっている
 		if (coverImageInfo != null) {
 			try {
 				BufferedInputStream bis;
@@ -310,7 +344,7 @@ public class Epub3Writer
 		SectionInfo sectionInfo = new SectionInfo(sectionId);
 		if (this.bookInfo.isImageSectionLine(lineNum)) sectionInfo.setImageFit(true);
 		this.sectionInfos.add(sectionInfo);
-		this.addChapter(sectionId, sectionId); //章の名称はsectionIdを仮に設定
+		this.addChapter(sectionId, null); //章の名称はsectionIdを仮に設定
 		
 		this.zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+XHTML_PATH+sectionId+".xhtml"));
 		
@@ -348,9 +382,11 @@ public class Epub3Writer
 	 * 重複していたら前に出力したときの連番ファイル名を返す
 	 * 返り値はxhtmlからの相対パスにする (../images/0001.jpg)
 	 * 変更前と変更後のファイル名はimageFileNamesに格納される (images/0001.jpg)
+	 * @return 画像タグを出力しない場合はnullを返す
 	 *  */
 	public String getImageFilePath(String srcFilePath)
 	{
+		//boolean isCover = false;
 		String ext = "";
 		try { ext = srcFilePath.substring(srcFilePath.lastIndexOf('.')+1); } catch (Exception e) {}
 		
@@ -367,10 +403,15 @@ public class Epub3Writer
 			if (!format.matches("^image\\/(png|jpeg|gif)$")) LogAppender.append("画像フォーマットエラー: "+srcFilePath+"\n");
 			else {
 				ImageInfo imageInfo = new ImageInfo(imageId, imageId+"."+ext, format);
-				if (this.imageIndex == 1) imageInfo.setIsCover(true);
+				if (this.imageIndex == 1) {
+					imageInfo.setIsCover(true);
+					//isCover = true;
+				}
 				this.imageInfos.add(imageInfo);
 			}
 		}
+		//先頭に表紙ページ移動の場合でカバーページならnullを返す
+		//if (bookInfo.insertCoverPage && isCover) return null;
 		return "../"+imageFileName;
 	}
 }

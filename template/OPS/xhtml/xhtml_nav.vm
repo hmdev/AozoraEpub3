@@ -11,7 +11,9 @@
 		<h1>${toc}</h1>
 		<ol>
 #foreach(${chapter} in ${chapters})
+#if ($chapter.ChapterName)
 			<li class="chapter" id="toc${chapter.SectionId}"><a href="${chapter.SectionId}.xhtml">${chapter.ChapterName}</a></li>
+#end
 #end
 		</ol>
 	</nav>

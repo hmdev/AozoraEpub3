@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="ja" lang="ja">
+<head>
+#if (${bookInfo.Vertical})
+	<link rel="stylesheet" type="text/css" href="../css/vertical_image.css" class="vertical_image" title="vertical image only"/>
+#else
+	<link rel="stylesheet" type="text/css" href="../css/horizontal_image.css" class="horizontal_image" title="horizontal image only"/>
+#end
+	<title>${bookInfo.Title}</title>
+</head>
+<body class="cover">
+<div><img src="../images/${coverImage.File}"/></div>
+</body>
+</html>

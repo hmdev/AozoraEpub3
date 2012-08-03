@@ -18,13 +18,19 @@ body {
 }
 
 /* ページ内 画像は縮小のみ */
-body.fit {
+body.fit, body.cover {
 	width: 100%;
 	height: 100%;
 }
 body.fit img {
 	max-width: 100%;
 	max-height: 100%;
+}
+
+/* 表紙画像は小さければ拡大 */
+body.cover img{
+	width: 100%;
+	height: auto;
 }
 
 /* 幅を合わせる 画像は縮小のみ */

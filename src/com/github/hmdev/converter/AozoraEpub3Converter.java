@@ -732,7 +732,7 @@ public class AozoraEpub3Converter
 					if (chukiFlagNoBr.contains(chukiName)) noBr = true;
 					
 				} else {
-					//画像 (訓点 ［＃（ス）］ は1-2文字かどうかで判断)
+					//画像 (訓点 ［＃（ス）］ は . があるかで判断)
 					// <img src="img/filename"/> → <object src="filename"/>
 					// ［＃表紙（表紙.jpg）］［＃（表紙.jpg）］［＃「キャプション」（表紙.jpg、横321×縦123）入る）］
 					//訓点と区別するため3文字目から（チェック
@@ -744,35 +744,38 @@ public class AozoraEpub3Converter
 							if (imageEndIdx == -1) imageEndIdx = chukiTag.indexOf('）', imageStartIdx+1);
 							else imageEndIdx = Math.min(imageEndIdx, chukiTag.indexOf('）', imageStartIdx+1));
 							String srcFilePath = chukiTag.substring(imageStartIdx+1, imageEndIdx);
-							//画像ファイル名置換処理実行
-							String fileName = writer.getImageFilePath(srcFilePath.trim());
-							out.write(chukiMap.get("画像開始")[0]);
-							out.write(fileName);
-							out.write(chukiMap.get("画像終了")[0]);
 							//LogAppender.append("[画像注記]: "+chukiTag+"\n");
 							noBr = true;
-							//本文がなければ画像ファイル名が目次になる
-							if (!this.chapterStarted) {
-								String chapterName = srcFilePath.substring(srcFilePath.lastIndexOf('/')+1);
-								this.writer.updateChapterName(chapterName.length()>64 ? chapterName.substring(0, 64) : chapterName);
+							//画像ファイル名置換処理実行
+							String fileName = writer.getImageFilePath(srcFilePath.trim());
+							if (fileName != null) { //先頭に移動してここで出力しない場合はnull
+								out.write(chukiMap.get("画像開始")[0]);
+								out.write(fileName);
+								out.write(chukiMap.get("画像終了")[0]);
+								//本文がなければ画像ファイル名が目次になる
+								if (!this.chapterStarted) {
+									String chapterName = srcFilePath.substring(srcFilePath.lastIndexOf('/')+1);
+									this.writer.updateChapterName(chapterName.length()>64 ? chapterName.substring(0, 64) : chapterName);
+								}
 							}
-							
 						}
 					} else if (lowerChukiTag.startsWith("<img")) {
 						//src=の値抽出
 						String srcFilePath = chukiTag.replaceFirst("^.* [S|s][R|r][C|c]=\"(.+?)\" ?.*>$", "$1");
 						if (srcFilePath.length()==0) srcFilePath = chukiTag.replaceFirst("^.* [S|s][R|r][C|c]='(.+?)' ?.*>$", "$1");
-						//画像ファイル名置換処理実行
-						String fileName = writer.getImageFilePath(srcFilePath.trim());
-						out.write(chukiMap.get("画像開始")[0]);
-						out.write(fileName);
-						out.write(chukiMap.get("画像終了")[0]);
 						//LogAppender.append("[画像注記]: "+chukiTag+"\n");
 						noBr = true;
-						//本文がなければ画像ファイル名が目次になる
-						if (!this.chapterStarted) {
-							String chapterName = srcFilePath.substring(srcFilePath.lastIndexOf('/')+1);
-							this.writer.updateChapterName(chapterName.length()>64 ? chapterName.substring(0, 64) : chapterName);
+						//画像ファイル名置換処理実行
+						String fileName = writer.getImageFilePath(srcFilePath.trim());
+						if (fileName != null) { //先頭に移動してここで出力しない場合はnull
+							out.write(chukiMap.get("画像開始")[0]);
+							out.write(fileName);
+							out.write(chukiMap.get("画像終了")[0]);
+							//本文がなければ画像ファイル名が目次になる
+							if (!this.chapterStarted) {
+								String chapterName = srcFilePath.substring(srcFilePath.lastIndexOf('/')+1);
+								this.writer.updateChapterName(chapterName.length()>64 ? chapterName.substring(0, 64) : chapterName);
+							}
 						}
 					}
 					else {

@@ -34,6 +34,9 @@ public class BookInfo
 	/** 表紙ファイル名 フルパスかURL ""なら先頭の挿絵 nullなら表紙無し */
 	public String coverFileName;
 	
+	/** 先頭に表紙ページを追加 */
+	public boolean insertCoverPage = false;
+	
 	
 	/** 改ページ単位で区切られたセクションの情報を格納 */
 	//Vector<SectionInfo> vecSectionInfo;
@@ -157,4 +160,16 @@ public class BookInfo
 	{
 		this.coverFileName = coverFileName;
 	}
+
+	public boolean isInsertCoverPage()
+	{
+		return insertCoverPage;
+	}
+
+	public void setInsertCoverPage(boolean insertCoverPage)
+	{
+		this.insertCoverPage = insertCoverPage;
+	}
+	
+	
 }
