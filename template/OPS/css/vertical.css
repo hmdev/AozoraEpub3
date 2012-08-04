@@ -9,35 +9,21 @@ html {
 	-epub-writing-mode: vertical-rl;
 	-epub-line-break: strict;
 	line-break: strict;	
+	margin: 0;
+	padding: 0;
 }
-
+@page {
+	/* 上右下左 */
+	margin: 0.5em 0.5em 0 0;
+}
 body {
+	margin: 0;
+	padding: 0;
 	display: block;
-	padding-top: 0.5em;
-	padding-bottom: 0.5em;
-	padding-right: 0.5em;
-	color: #070707;
+	color: #000;
 	font-family: "@ＭＳ 明朝", "@MS Mincho", "ヒラギノ明朝 ProN W3", "HiraMinProN-W3", serif, sans-serif;
 	font-size: 1em;
 	line-height: 1.75;
-}
-
-body.cover {
-	margin: 0;
-	padding: 0;
-	width: 100%;
-	height: 100%;
-}
-
-div.page_box {
-	display: table;
-	width: 100%;
-	height: 100%;
-}
-div.page_container {
-	display: table-cell;
-	vertical-align: middle;
-	text-align: center;
 }
 
 :link { color: #00C; background: transparent; }
@@ -54,6 +40,13 @@ h5 { font: italic 100%; }
 h6 { font: small-caps 100%; }
 
 p { margin: 0; }
+
+span.b {
+	font-weight: bolder;
+}
+span.i {
+	font-style: italic;
+}
 
 /* 改ページ */
 .pagebreak { page-break-before: always; }

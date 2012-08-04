@@ -1,41 +1,44 @@
 @charset "utf-8";
 @namespace "http://www.w3.org/1999/xhtml";
 
+@page {
+	/* 上右下左 */
+	margin: 0.5em 0 0 0.5em;
+}
+
 html {
 	writing-mode: horizontal-tb;
 	-webkit-writing-mode: horizontal-tb;
 	-epub-writing-mode: horizontal-tb;
 	-epub-line-break: strict;
 	line-break: strict;	
+	-epub-word-break: normal;
+	word-break: normal;
+	margin: 0;
+	padding: 0;
+}
+
+section, nav, div, p, header, footer, 
+table, th, tr, td, thead, tbody, tfoot , 
+img , video, embed , 
+span, a, ruby { 
+	margin: 0;
+	padding: 0;
+	border: none;
+	font-size: 1em;
+	vertical-align: baseline;
 }
 
 body {
+	margin: 0;
+	padding: 0;
 	display: block;
-	padding-top: 0.5em;
-	padding-left: 0.5em;
-	padding-right: 0.5em;
-	color: #070707;
+	color: #000;
+	border: none;
 	font-family: "ＭＳ 明朝", "MS Mincho", "ヒラギノ明朝 ProN W3", "HiraMinProN-W3", serif, sans-serif;
 	font-size: 1em;
 	line-height: 1.75;
-}
-
-body.cover {
-	margin: 0;
-	padding: 0;
-	width: 100%;
-	height: 100%;
-}
-
-div.page_box {
-	display: table;
-	width: 100%;
-	height: 100%;
-}
-div.page_container {
-	display: table-cell;
-	vertical-align: middle;
-	text-align: center;
+	vertical-align: baseline;
 }
 
 :link { color: #00C; background: transparent; }

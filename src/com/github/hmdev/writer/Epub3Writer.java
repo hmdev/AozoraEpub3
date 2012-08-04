@@ -182,6 +182,25 @@ public class Epub3Writer
 		
 		this.endSection();
 		
+		//入力ファイル名と同じpng/jpgがあればそのファイルを表紙に指定
+		if ("*".equals(bookInfo.coverFileName)) {
+			bookInfo.coverFileName = null; //マッチしなかったら表紙無し
+			String baseFileName = srcFile.getPath();
+			baseFileName = baseFileName.substring(0, baseFileName.lastIndexOf('.'));
+			if (new File (baseFileName+".png").exists()) {
+				bookInfo.coverFileName = baseFileName+".png";
+			} else if (new File (baseFileName+".jpg").exists()) {
+				bookInfo.coverFileName = baseFileName+".jpg";
+			} else if (new File (baseFileName+".jpeg").exists()) {
+				bookInfo.coverFileName = baseFileName+".jpeg";
+			} else if (new File (baseFileName+".PNG").exists()) {
+				bookInfo.coverFileName = baseFileName+".PNG";
+			} else if (new File (baseFileName+".JPG").exists()) {
+				bookInfo.coverFileName = baseFileName+".JPG";
+			} else if (new File (baseFileName+".JPEG").exists()) {
+				bookInfo.coverFileName = baseFileName+".JPEG";
+			}
+		}
 		ImageInfo coverImageInfo = null;
 		if (bookInfo.coverFileName == null) {
 			//表紙無し
