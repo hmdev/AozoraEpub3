@@ -41,6 +41,10 @@ body {
 	vertical-align: baseline;
 }
 
+img {
+	max-width: 100%;
+}
+
 :link { color: #00C; background: transparent; }
 :visited { color: #609; background: transparent; }
 a:active { color: #C00; background: transparent; }
@@ -223,135 +227,135 @@ div.top23 { margin-left: 23em; }
 div.top24 { margin-left: 24em; }
 div.top25 { margin-left: 25em; }
 
-/* 改行天付き、折り返して(.+?)字下げ → class="top{$1} indent-{$1}" */
-/* ここから(.+?)字下げ、折り返して(.+?)字下げ → class="top{$2} indent{$1-$2}" */
-div.indent1 { text-indent: 1em; }
-div.indent2 { text-indent: 2em; }
-div.indent3 { text-indent: 3em; }
-div.indent4 { text-indent: 4em; }
-div.indent5 { text-indent: 5em; }
-div.indent6 { text-indent: 6em; }
-div.indent7 { text-indent: 7em; }
-div.indent8 { text-indent: 8em; }
-div.indent9 { text-indent: 9em; }
-div.indent10 { text-indent: 10em; }
-div.indent11 { text-indent: 11em; }
-div.indent12 { text-indent: 12em; }
-div.indent13 { text-indent: 13em; }
-div.indent14 { text-indent: 14em; }
-div.indent15 { text-indent: 15em; }
-div.indent16 { text-indent: 16em; }
-div.indent17 { text-indent: 17em; }
-div.indent18 { text-indent: 18em; }
-div.indent19 { text-indent: 19em; }
-div.indent20 { text-indent: 20em; }
-div.indent21 { text-indent: 21em; }
-div.indent22 { text-indent: 22em; }
-div.indent23 { text-indent: 23em; }
-div.indent24 { text-indent: 24em; }
-div.indent25 { text-indent: 25em; }
-div.indent-1 { text-indent: -1em; }
-div.indent-2 { text-indent: -2em; }
-div.indent-3 { text-indent: -3em; }
-div.indent-4 { text-indent: -4em; }
-div.indent-5 { text-indent: -5em; }
-div.indent-6 { text-indent: -6em; }
-div.indent-7 { text-indent: -7em; }
-div.indent-8 { text-indent: -8em; }
-div.indent-9 { text-indent: -9em; }
-div.indent-10 { text-indent: -10em; }
-div.indent-11 { text-indent: -11em; }
-div.indent-12 { text-indent: -12em; }
-div.indent-13 { text-indent: -13em; }
-div.indent-14 { text-indent: -14em; }
-div.indent-15 { text-indent: -15em; }
-div.indent-16 { text-indent: -16em; }
-div.indent-17 { text-indent: -17em; }
-div.indent-18 { text-indent: -18em; }
-div.indent-19 { text-indent: -19em; }
-div.indent-20 { text-indent: -20em; }
-div.indent-21 { text-indent: -21em; }
-div.indent-22 { text-indent: -22em; }
-div.indent-23 { text-indent: -23em; }
-div.indent-24 { text-indent: -24em; }
-div.indent-25 { text-indent: -25em; }
+/* 改行天付き、折り返して(.+?)字下げ → class="top{$1} idt-{$1}" */
+/* ここから(.+?)字下げ、折り返して(.+?)字下げ → class="top{$2} idt{$1-$2}" */
+div.idt1 { text-indent: 1em; }
+div.idt2 { text-indent: 2em; }
+div.idt3 { text-indent: 3em; }
+div.idt4 { text-indent: 4em; }
+div.idt5 { text-indent: 5em; }
+div.idt6 { text-indent: 6em; }
+div.idt7 { text-indent: 7em; }
+div.idt8 { text-indent: 8em; }
+div.idt9 { text-indent: 9em; }
+div.idt10 { text-indent: 10em; }
+div.idt11 { text-indent: 11em; }
+div.idt12 { text-indent: 12em; }
+div.idt13 { text-indent: 13em; }
+div.idt14 { text-indent: 14em; }
+div.idt15 { text-indent: 15em; }
+div.idt16 { text-indent: 16em; }
+div.idt17 { text-indent: 17em; }
+div.idt18 { text-indent: 18em; }
+div.idt19 { text-indent: 19em; }
+div.idt20 { text-indent: 20em; }
+div.idt21 { text-indent: 21em; }
+div.idt22 { text-indent: 22em; }
+div.idt23 { text-indent: 23em; }
+div.idt24 { text-indent: 24em; }
+div.idt25 { text-indent: 25em; }
+div.idt-1 { text-indent: -1em; }
+div.idt-2 { text-indent: -2em; }
+div.idt-3 { text-indent: -3em; }
+div.idt-4 { text-indent: -4em; }
+div.idt-5 { text-indent: -5em; }
+div.idt-6 { text-indent: -6em; }
+div.idt-7 { text-indent: -7em; }
+div.idt-8 { text-indent: -8em; }
+div.idt-9 { text-indent: -9em; }
+div.idt-10 { text-indent: -10em; }
+div.idt-11 { text-indent: -11em; }
+div.idt-12 { text-indent: -12em; }
+div.idt-13 { text-indent: -13em; }
+div.idt-14 { text-indent: -14em; }
+div.idt-15 { text-indent: -15em; }
+div.idt-16 { text-indent: -16em; }
+div.idt-17 { text-indent: -17em; }
+div.idt-18 { text-indent: -18em; }
+div.idt-19 { text-indent: -19em; }
+div.idt-20 { text-indent: -20em; }
+div.idt-21 { text-indent: -21em; }
+div.idt-22 { text-indent: -22em; }
+div.idt-23 { text-indent: -23em; }
+div.idt-24 { text-indent: -24em; }
+div.idt-25 { text-indent: -25em; }
 
 
 /* 地付き */
-div.bottom { text-align: right; margin-right: 0em; }
-div.bottom1 { text-align: right; margin-right: 1em; }
-div.bottom2 { text-align: right; margin-right: 2em; }
-div.bottom3 { text-align: right; margin-right: 3em; }
-div.bottom4 { text-align: right; margin-right: 4em; }
-div.bottom5 { text-align: right; margin-right: 5em; }
-div.bottom6 { text-align: right; margin-right: 6em; }
-div.bottom7 { text-align: right; margin-right: 7em; }
-div.bottom8 { text-align: right; margin-right: 8em; }
-div.bottom9 { text-align: right; margin-right: 9em; }
-div.bottom10 { text-align: right; margin-right: 10em; }
-div.bottom11 { text-align: right; margin-right: 11em; }
-div.bottom12 { text-align: right; margin-right: 12em; }
-div.bottom13 { text-align: right; margin-right: 13em; }
-div.bottom14 { text-align: right; margin-right: 14em; }
-div.bottom15 { text-align: right; margin-right: 15em; }
-div.bottom16 { text-align: right; margin-right: 16em; }
-div.bottom17 { text-align: right; margin-right: 17em; }
-div.bottom18 { text-align: right; margin-right: 18em; }
-div.bottom19 { text-align: right; margin-right: 19em; }
-div.bottom20 { text-align: right; margin-right: 20em; }
-div.bottom21 { text-align: right; margin-right: 21em; }
-div.bottom22 { text-align: right; margin-right: 22em; }
-div.bottom23 { text-align: right; margin-right: 23em; }
-div.bottom24 { text-align: right; margin-right: 24em; }
-div.bottom25 { text-align: right; margin-right: 25em; }
+div.btm { text-align: right; margin-right: 0em; }
+div.btm1 { text-align: right; margin-right: 1em; }
+div.btm2 { text-align: right; margin-right: 2em; }
+div.btm3 { text-align: right; margin-right: 3em; }
+div.btm4 { text-align: right; margin-right: 4em; }
+div.btm5 { text-align: right; margin-right: 5em; }
+div.btm6 { text-align: right; margin-right: 6em; }
+div.btm7 { text-align: right; margin-right: 7em; }
+div.btm8 { text-align: right; margin-right: 8em; }
+div.btm9 { text-align: right; margin-right: 9em; }
+div.btm10 { text-align: right; margin-right: 10em; }
+div.btm11 { text-align: right; margin-right: 11em; }
+div.btm12 { text-align: right; margin-right: 12em; }
+div.btm13 { text-align: right; margin-right: 13em; }
+div.btm14 { text-align: right; margin-right: 14em; }
+div.btm15 { text-align: right; margin-right: 15em; }
+div.btm16 { text-align: right; margin-right: 16em; }
+div.btm17 { text-align: right; margin-right: 17em; }
+div.btm18 { text-align: right; margin-right: 18em; }
+div.btm19 { text-align: right; margin-right: 19em; }
+div.btm20 { text-align: right; margin-right: 20em; }
+div.btm21 { text-align: right; margin-right: 21em; }
+div.btm22 { text-align: right; margin-right: 22em; }
+div.btm23 { text-align: right; margin-right: 23em; }
+div.btm24 { text-align: right; margin-right: 24em; }
+div.btm25 { text-align: right; margin-right: 25em; }
 
-div.jizume1 { max-width: 1em; }
-div.jizume2 { max-width: 2em; }
-div.jizume3 { max-width: 3em; }
-div.jizume4 { max-width: 4em; }
-div.jizume5 { max-width: 5em; }
-div.jizume6 { max-width: 6em; }
-div.jizume7 { max-width: 7em; }
-div.jizume8 { max-width: 8em; }
-div.jizume9 { max-width: 9em; }
-div.jizume10 { max-width: 10em; }
-div.jizume11 { max-width: 11em; }
-div.jizume12 { max-width: 12em; }
-div.jizume13 { max-width: 13em; }
-div.jizume14 { max-width: 14em; }
-div.jizume15 { max-width: 15em; }
-div.jizume16 { max-width: 16em; }
-div.jizume17 { max-width: 17em; }
-div.jizume18 { max-width: 18em; }
-div.jizume19 { max-width: 19em; }
-div.jizume20 { max-width: 20em; }
-div.jizume21 { max-width: 21em; }
-div.jizume22 { max-width: 22em; }
-div.jizume23 { max-width: 23em; }
-div.jizume24 { max-width: 24em; }
-div.jizume25 { max-width: 25em; }
-div.jizume26 { max-width: 26em; }
-div.jizume27 { max-width: 27em; }
-div.jizume28 { max-width: 28em; }
-div.jizume29 { max-width: 29em; }
-div.jizume30 { max-width: 30em; }
-div.jizume31 { max-width: 31em; }
-div.jizume32 { max-width: 32em; }
-div.jizume33 { max-width: 33em; }
-div.jizume34 { max-width: 34em; }
-div.jizume35 { max-width: 35em; }
-div.jizume36 { max-width: 36em; }
-div.jizume37 { max-width: 37em; }
-div.jizume38 { max-width: 38em; }
-div.jizume39 { max-width: 39em; }
-div.jizume40 { max-width: 40em; }
-div.jizume41 { max-width: 41em; }
-div.jizume42 { max-width: 42em; }
-div.jizume43 { max-width: 43em; }
-div.jizume44 { max-width: 44em; }
-div.jizume45 { max-width: 45em; }
-div.jizume46 { max-width: 46em; }
-div.jizume47 { max-width: 47em; }
-div.jizume48 { max-width: 48em; }
-div.jizume49 { max-width: 49em; }
-div.jizume50 { max-width: 50em; }
+div.jzm1 { max-width: 1em; }
+div.jzm2 { max-width: 2em; }
+div.jzm3 { max-width: 3em; }
+div.jzm4 { max-width: 4em; }
+div.jzm5 { max-width: 5em; }
+div.jzm6 { max-width: 6em; }
+div.jzm7 { max-width: 7em; }
+div.jzm8 { max-width: 8em; }
+div.jzm9 { max-width: 9em; }
+div.jzm10 { max-width: 10em; }
+div.jzm11 { max-width: 11em; }
+div.jzm12 { max-width: 12em; }
+div.jzm13 { max-width: 13em; }
+div.jzm14 { max-width: 14em; }
+div.jzm15 { max-width: 15em; }
+div.jzm16 { max-width: 16em; }
+div.jzm17 { max-width: 17em; }
+div.jzm18 { max-width: 18em; }
+div.jzm19 { max-width: 19em; }
+div.jzm20 { max-width: 20em; }
+div.jzm21 { max-width: 21em; }
+div.jzm22 { max-width: 22em; }
+div.jzm23 { max-width: 23em; }
+div.jzm24 { max-width: 24em; }
+div.jzm25 { max-width: 25em; }
+div.jzm26 { max-width: 26em; }
+div.jzm27 { max-width: 27em; }
+div.jzm28 { max-width: 28em; }
+div.jzm29 { max-width: 29em; }
+div.jzm30 { max-width: 30em; }
+div.jzm31 { max-width: 31em; }
+div.jzm32 { max-width: 32em; }
+div.jzm33 { max-width: 33em; }
+div.jzm34 { max-width: 34em; }
+div.jzm35 { max-width: 35em; }
+div.jzm36 { max-width: 36em; }
+div.jzm37 { max-width: 37em; }
+div.jzm38 { max-width: 38em; }
+div.jzm39 { max-width: 39em; }
+div.jzm40 { max-width: 40em; }
+div.jzm41 { max-width: 41em; }
+div.jzm42 { max-width: 42em; }
+div.jzm43 { max-width: 43em; }
+div.jzm44 { max-width: 44em; }
+div.jzm45 { max-width: 45em; }
+div.jzm46 { max-width: 46em; }
+div.jzm47 { max-width: 47em; }
+div.jzm48 { max-width: 48em; }
+div.jzm49 { max-width: 49em; }
+div.jzm50 { max-width: 50em; }

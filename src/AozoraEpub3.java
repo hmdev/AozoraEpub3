@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Date;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,13 +31,38 @@ public class AozoraEpub3
 		/** ePub3出力クラス */
 		Epub3Writer epub3Writer;
 		
+		/** 設定ファイル */
+		Properties props;
+		/** 設定ファイル名 */
+		String propFileName = "AozoraEpub3.ini";
+		
 		//初期化
 		try {
+			props = new Properties(); 
+			try {
+				props.load(new FileInputStream(propFileName));
+			} catch (Exception e) { }
+			
 			//ePub出力クラス初期化
 			epub3Writer = new Epub3Writer("template/");
 			
+			//固定オプション
 			boolean withIdSpan = false;
 			boolean autoYoko = true;
+			boolean overWrite = true;
+			String coverFileName = "";//先頭の挿絵
+			TitleType titleType = TitleType.FILENAME;
+			
+			//propsから取得するオプション
+			String propValue = props.getProperty("AutoFileName");
+			boolean autoFileName = propValue==null||"1".equals(propValue);
+			propValue = props.getProperty("Ext");
+			String outExt = propValue==null||propValue.length()==0?".epub":propValue;
+			propValue = props.getProperty("Vertical");
+			boolean vertical = propValue==null||"1".equals(propValue);
+			propValue = props.getProperty("EncType");
+			String encType = "1".equals(propValue)?"UTF-8":"MS932";
+			
 			//変換テーブルをstaticに生成
 			aozoraConverter = new AozoraEpub3Converter(epub3Writer);
 			//栞用span出力
@@ -44,14 +70,6 @@ public class AozoraEpub3
 			//変換オプション設定
 			aozoraConverter.setAutoYoko(autoYoko);
 			
-			//コマンドラインオプション
-			boolean autoFileName = true;
-			String outExt = ".epub";
-			boolean overWrite = true;
-			boolean vertical = true;
-			String coverFileName = "";//先頭の挿絵
-			String encType = "MS932";
-			TitleType titleType = TitleType.FILENAME;
 			for (int i=0; i<args.length; i++) {
 				File srcFile = new File(args[i]);
 				BookInfo bookInfo = AozoraEpub3.getBookInfo(srcFile, aozoraConverter, autoFileName, outExt, overWrite, encType, titleType);

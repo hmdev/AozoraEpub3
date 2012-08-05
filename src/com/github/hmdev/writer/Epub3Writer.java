@@ -405,7 +405,7 @@ public class Epub3Writer
 	 *  */
 	public String getImageFilePath(String srcFilePath)
 	{
-		//boolean isCover = false;
+		boolean isCover = false;
 		String ext = "";
 		try { ext = srcFilePath.substring(srcFilePath.lastIndexOf('.')+1); } catch (Exception e) {}
 		
@@ -424,13 +424,13 @@ public class Epub3Writer
 				ImageInfo imageInfo = new ImageInfo(imageId, imageId+"."+ext, format);
 				if (this.imageIndex == 1) {
 					imageInfo.setIsCover(true);
-					//isCover = true;
+					isCover = true;
 				}
 				this.imageInfos.add(imageInfo);
 			}
 		}
-		//先頭に表紙ページ移動の場合でカバーページならnullを返す
-		//if (bookInfo.insertCoverPage && isCover) return null;
+		//先頭に表紙ページ移動の場合でカバーページならnullを返して本文中から削除
+		if (bookInfo.insertCoverPage && isCover) return null;
 		return "../"+imageFileName;
 	}
 }
