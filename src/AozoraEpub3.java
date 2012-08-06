@@ -66,7 +66,7 @@ public class AozoraEpub3
 			//変換テーブルをstaticに生成
 			aozoraConverter = new AozoraEpub3Converter(epub3Writer);
 			//栞用span出力
-			aozoraConverter.setWithIdSpan(withIdSpan);
+			aozoraConverter.setWithMarkId(withIdSpan);
 			//変換オプション設定
 			aozoraConverter.setAutoYoko(autoYoko);
 			

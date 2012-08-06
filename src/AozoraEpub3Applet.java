@@ -88,7 +88,7 @@ public class AozoraEpub3Applet extends JApplet
 	JCheckBox jCheckConfirm;
 	JCheckBox jCheckAutoFileName;
 	JComboBox jComboExt;
-	JCheckBox jCheckIdSpan;
+	JCheckBox jCheckMarkId;
 	
 	JCheckBox jCheckOverWrite;
 	JCheckBox jCheckAutoYoko;
@@ -201,11 +201,11 @@ public class AozoraEpub3Applet extends JApplet
 		panel.setMaximumSize(new Dimension(1920, 20));
 		panel.setBorder(zeroPadding);
 		this.add(panel);
-		//栞用idSpan
-		propValue = props.getProperty("IdSpan");
-		jCheckIdSpan = new JCheckBox("栞用span出力", propValue==null||"1".equals(propValue));
-		jCheckIdSpan.setFocusPainted(false);
-		panel.add(jCheckIdSpan);
+		//栞用ID出力
+		propValue = props.getProperty("MarkId");
+		jCheckMarkId = new JCheckBox("栞用ID出力", propValue==null||"1".equals(propValue));
+		jCheckMarkId.setFocusPainted(false);
+		panel.add(jCheckMarkId);
 		//半角2文字縦書き
 		propValue = props.getProperty("AutoYoko");
 		jCheckAutoYoko = new JCheckBox("半角2文字縦中横", propValue==null||"1".equals(propValue));
@@ -651,7 +651,7 @@ public class AozoraEpub3Applet extends JApplet
 		
 		//変換設定
 		//栞用span出力
-		this.aozoraConverter.setWithIdSpan(this.jCheckIdSpan.isSelected());
+		this.aozoraConverter.setWithMarkId(this.jCheckMarkId.isSelected());
 		//変換オプション設定
 		this.aozoraConverter.setAutoYoko(this.jCheckAutoYoko.isSelected());
 		
@@ -725,7 +725,7 @@ public class AozoraEpub3Applet extends JApplet
 		this.props.setProperty("EncType", ""+this.jComboEncType.getSelectedIndex());
 		this.props.setProperty("TitleType", ""+this.jComboTitle.getSelectedIndex());
 		this.props.setProperty("OverWrite", this.jCheckOverWrite.isSelected()?"1":"");
-		this.props.setProperty("IdSpan", this.jCheckIdSpan.isSelected()?"1":"");
+		this.props.setProperty("MarkId", this.jCheckMarkId.isSelected()?"1":"");
 		this.props.setProperty("AutoYoko", this.jCheckAutoYoko.isSelected()?"1":"");
 		this.props.setProperty("Vertical", this.jRadioVertical.isSelected()?"1":"");
 		//this.props.setProperty("RtL", this.jRadioRtL.isSelected()?"1":"");
