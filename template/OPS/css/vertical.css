@@ -128,34 +128,29 @@ span.left_sesame {
 
 /* 傍線 */
 span.underline, span.double_underline, span.dotted_underline, span.dashed_underline, span.wave_underline {
-	text-decoration: overline;
-	-webkit-text-decoration: overline;
-	-epub-text-decoration: overline;
+	border-right-width: 1px;
+	padding-right: 1px;
 }
-span.left_underline {
-	text-decoration: underline;
-	-webkit-text-decoration: underline;
-	-epub-text-decoration: underline;
+span.underline {
+	border-right-style: solid
 }
 span.double_underline {
-	text-decoration-style: dobule;
-	-webkit-text-decoration-style: dobule;
-	-epub-text-decoration-style: dobule;
+	border-right-width: 3px;
+	border-right-style: double;
 }
 span.dotted_underline {
-	text-decoration-style: dotted;
-	-webkit-text-decoration-style: dotted;
-	-epub-text-decoration-style: dotted;
+	border-right-style: dotted;
 }
 span.dashed_underline {
-	text-decoration-style: dashed;
-	-webkit-text-decoration-style: dashed;
-	-epub-text-decoration-style: dashed;
+	border-right-style: dashed;
 }
 span.wave_underline {
-	text-decoration-style: wave;
-	-webkit-text-decoration-style: wave;
-	-epub-text-decoration-style: wave;
+	border-right-style: solid;/*wave;*/
+}
+span.left_underline {
+	border-left-style: solid;
+	padding-left: 1px;
+	border-left-width: 1px;
 }
 
 /* 文字サイズ 大 */

@@ -51,7 +51,8 @@ public class AozoraEpub3
 			boolean autoYoko = true;
 			boolean overWrite = true;
 			String coverFileName = "";//先頭の挿絵
-			TitleType titleType = TitleType.FILENAME;
+			TitleType titleType = TitleType.TITLE_AUTHOR;
+			boolean useFileName = true;
 			
 			//propsから取得するオプション
 			String propValue = props.getProperty("AutoFileName");
@@ -75,9 +76,15 @@ public class AozoraEpub3
 				BookInfo bookInfo = AozoraEpub3.getBookInfo(srcFile, aozoraConverter, autoFileName, outExt, overWrite, encType, titleType);
 				bookInfo.vertical = vertical;
 				bookInfo.coverFileName = coverFileName;
-				
+				//確認なしなのでnullでなければ上書き
+				if (useFileName) {
+					String[] titleCreator = getFileTitleCreator(srcFile.getName());
+					if (titleCreator[0] != null && titleCreator[0].trim().length() >0) bookInfo.title = titleCreator[0];
+					if (titleCreator[1] != null && titleCreator[1].trim().length() >0) bookInfo.creator = titleCreator[1];
+				}
 				AozoraEpub3.convertFile(
-						srcFile, aozoraConverter, epub3Writer,
+						srcFile, null,
+						aozoraConverter, epub3Writer,
 						autoFileName, outExt, overWrite,
 						encType, bookInfo);
 			}
@@ -103,21 +110,6 @@ public class AozoraEpub3
 			BufferedReader src = new BufferedReader(new InputStreamReader(is, (String)encType));
 			BookInfo bookInfo = aozoraConverter.getBookInfo(src, titleType);
 			bookInfo.modified = new Date();
-			//ファイル名からタイトル取得
-			if (titleType == TitleType.FILENAME) {
-				Matcher m = Pattern.compile("[\\[|［](.+?)[\\]|］]( |　)*(.*?)( |　)*(\\(|（|\\.)").matcher(srcFile.getName());
-				if (m.find()) {
-					bookInfo.title = m.group(3);
-					bookInfo.creator = m.group(1);
-				} else {
-					m = Pattern.compile("^(.*?)( |　)*(\\(|（|\\.)").matcher(srcFile.getName());
-					if (m.find()) {
-						bookInfo.title = m.group(1);
-					} else {
-						bookInfo.title = srcFile.getName().replaceAll("\\.[^\\.]+$", "");
-					}
-				}
-			}
 			is.close();
 			
 			return bookInfo;
@@ -132,8 +124,9 @@ public class AozoraEpub3
 	}
 	
 	/** ファイルを変換
-	 * @param srcFile 変換するファイル */
-	static public void convertFile(File srcFile, AozoraEpub3Converter aozoraConverter, Epub3Writer epubWriter,
+	 * @param srcFile 変換するファイル
+	 * @param dstPath 出力先パス */
+	static public void convertFile(File srcFile, File dstPath, AozoraEpub3Converter aozoraConverter, Epub3Writer epubWriter,
 			boolean autoFileName, String outExt, boolean overWrite,
 			String encType, BookInfo bookInfo)
 	{
@@ -145,9 +138,10 @@ public class AozoraEpub3
 			//.txt .zip拡張子のみ
 			
 			//出力ファイル
+			if (dstPath == null) dstPath = srcFile.getAbsoluteFile().getParentFile();
 			String outFileName = "";
 			if (autoFileName && (bookInfo.creator != null || bookInfo.title != null)) {
-				outFileName = srcFile.getAbsoluteFile().getParentFile().getPath()+"/";
+				outFileName = dstPath.getAbsolutePath()+"/";
 				if (bookInfo.creator != null && bookInfo.creator.length() > 0) {
 					String str = bookInfo.creator.replaceAll("[\\\\|\\/|\\:|\\*|\\?|\\<|\\>|\\||\\\"|\t]", "");
 					if (str.length() > 64) str = str.substring(0, 64);
@@ -158,7 +152,7 @@ public class AozoraEpub3
 				}
 				if (outFileName.length() > 250) outFileName = outFileName.substring(0, 250);
 			} else {
-				outFileName = srcFile.getPath().replaceFirst("\\.[^\\.]+$", "");
+				outFileName = dstPath.getAbsolutePath()+"/"+srcFile.getName().replaceFirst("\\.[^\\.]+$", "");
 			}
 			
 			if (outExt.length() == 0) outExt = ".epub";
@@ -202,6 +196,26 @@ public class AozoraEpub3
 			LogAppender.append(e.getMessage());
 			LogAppender.append("\n");
 		}
+	}
+	
+	/** ファイル名からタイトルと著者名を取得 */
+	static public String[] getFileTitleCreator(String fileName)
+	{
+		//ファイル名からタイトル取得
+		String[] titleCreator = new String[2];
+		Matcher m = Pattern.compile("[\\[|［](.+?)[\\]|］]( |　)*(.*?)( |　)*(\\(|（|\\.)").matcher(fileName);
+		if (m.find()) {
+			titleCreator[0] = m.group(3);
+			titleCreator[1] = m.group(1);
+		} else {
+			m = Pattern.compile("^(.*?)( |　)*(\\(|（|\\.)").matcher(fileName);
+			if (m.find()) {
+				titleCreator[0] = m.group(1);
+			} else {
+				titleCreator[0] = fileName.replaceAll("\\.[^\\.]+$", "");
+			}
+		}
+		return titleCreator;
 	}
 	
 	/** 入力ファイルからStreamオープン */

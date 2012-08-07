@@ -152,7 +152,9 @@ public class Epub3Writer
 		//固有ID
 		velocityContext.put("identifier", UUID.nameUUIDFromBytes((title+"-"+creator).getBytes()));
 		//目次名称
-		velocityContext.put("toc", "目次");
+		velocityContext.put("toc_name", "目次");
+		//表紙
+		velocityContext.put("cover_name", "表紙");
 		//書籍情報 タイトル、著作者、縦書き
 		velocityContext.put("bookInfo", bookInfo);
 		velocityContext.put("modified", dateFormat.format(bookInfo.modified));

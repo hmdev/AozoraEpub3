@@ -8,8 +8,11 @@
 </head>
 <body>
 	<nav xmlns:epub="http://www.idpf.org/2007/ops" epub:type="toc" id="toc">
-		<h1>${toc}</h1>
+		<h1>${toc_name}</h1>
 		<ol>
+#if (${bookInfo.InsertCoverPage})
+			<li class="chapter" id="toccover"><a href="cover.xhtml">${cover_name}</a></li>
+#end
 #foreach(${chapter} in ${chapters})
 #if ($chapter.ChapterName)
 			<li class="chapter" id="toc${chapter.SectionId}"><a href="${chapter.SectionId}.xhtml">${chapter.ChapterName}</a></li>

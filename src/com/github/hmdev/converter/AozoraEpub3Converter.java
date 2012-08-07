@@ -26,8 +26,8 @@ public class AozoraEpub3Converter
 	/** タイトル記載種別 */
 	//final static public String[] titleType = {"表題+著者名", "著者名＋表題", "表題のみ", "なし", "ファイル名から"};
 	public enum TitleType {
-		TITLE_AUTHOR, AUTHOR_TITLE, TITLE_ONLY, NONE, FILENAME;
-		final static public String[] titleTypeNames = {"表題＋著者名", "著者名＋表題", "表題のみ", "なし", "ファイル名から"};
+		TITLE_AUTHOR, AUTHOR_TITLE, TITLE_ONLY, NONE;
+		final static public String[] titleTypeNames = {"表題＋著者名", "著者名＋表題", "表題のみ", "なし"};
 		boolean hasTitleAuthor() {
 			switch (this) {
 			case TITLE_AUTHOR:
@@ -69,7 +69,7 @@ public class AozoraEpub3Converter
 	
 	//---------------- パターン ----------------//
 	/** 注記パターン */
-	static Pattern chukiPattern = Pattern.compile("[［＃|<].+?[］|>]");
+	static Pattern chukiPattern = Pattern.compile("(［＃.+?］)|(<.+?>)");
 	/** 外字注記パターン */
 	static Pattern gaijiChukiPattern = Pattern.compile("(※［＃.+?］)|(〔.+?〕)|(／″?＼)");
 	/** 後述注記パターン */
@@ -677,101 +677,107 @@ public class AozoraEpub3Converter
 			chukiStart = m.start();
 			
 			//fontの入れ子は可、圏点・縦横中はルビも付加
-			if (chukiTag.charAt(0) == '<' && !(lowerChukiTag.startsWith("<img ") || lowerChukiTag.startsWith("<a ") || lowerChukiTag.startsWith("</a>"))) {
-				//<img <a </a 以外のタグは注記処理せず本文処理
+			//なぜか【＃マッチするので除外
+			if (chukiTag.charAt(0) == '＃') {
 				continue;
-			} else {
-				//注記の前まで本文出力
-				if (begin < chukiStart) {
-					if (lineNum != idLineNum) { idNum++; idLineNum = lineNum; };
-					//if (withIdSpan && noRubyLevel==0) buf.append("<span id=\"kobo."+idNum+"."+(lineSpanIdx++)+"\">");//栞用span開始
-					this.printRubyText(buf, ch, begin, chukiStart, noRubyLevel>0);
-					//if (withIdSpan && noRubyLevel==0) buf.append("</span>");//栞用span閉じる
-					
-					//改ページ後の章名称変更
-					if (!this.chapterStarted) {
-						String chapterName = this.replaceToPlain(line.substring(begin,chukiStart));
-						chapterName = chapterName.replaceAll("^[=|-|―|─]+", "").replaceAll("[=|-|―|─]+$", "");
-						if (chapterName.length() >0) {
-							
-							this.chapterStarted = true;
-							this.writer.updateChapterName(chapterName.length()>64 ? chapterName.substring(0, 64) : chapterName);
-						}
+			}
+			//<img <a </a 以外のタグは注記処理せず本文処理
+			if (chukiTag.charAt(0) == '<' && !(lowerChukiTag.startsWith("<img ") || lowerChukiTag.startsWith("<a ") || lowerChukiTag.startsWith("</a>"))) {
+				continue;
+			}
+			
+			//注記の前まで本文出力
+			if (begin < chukiStart) {
+				if (lineNum != idLineNum) { idNum++; idLineNum = lineNum; };
+				//if (withIdSpan && noRubyLevel==0) buf.append("<span id=\"kobo."+idNum+"."+(lineSpanIdx++)+"\">");//栞用span開始
+				this.printRubyText(buf, ch, begin, chukiStart, noRubyLevel>0);
+				//if (withIdSpan && noRubyLevel==0) buf.append("</span>");//栞用span閉じる
+				
+				//改ページ後の章名称変更
+				if (!this.chapterStarted) {
+					String chapterName = this.replaceToPlain(line.substring(begin,chukiStart));
+					chapterName = chapterName.replaceAll("^[=|-|―|─]+", "").replaceAll("[=|-|―|─]+$", "");
+					if (chapterName.length() >0) {
+						
+						this.chapterStarted = true;
+						this.writer.updateChapterName(chapterName.length()>64 ? chapterName.substring(0, 64) : chapterName);
 					}
 				}
-				
-				//注記→タグ変換
-				String chukiName = chukiTag.substring(2, chukiTag.length()-1);
-				
-				//ルビ無効チェック
-				if (chukiFlagNoRubyStart.contains(chukiName)) noRubyLevel++;
-				else if (chukiFlagNoRubyEnd.contains(chukiName)) noRubyLevel--;
-				
-				String[] tags = chukiMap.get(chukiName);
-				if (tags != null) {
-					////////////////////////////////////////////////////////////////
-					//改ページ処理
-					//画像削除で何も無いページなら改ページしない
-					////////////////////////////////////////////////////////////////
-					if (chukiFlagPageBreak.contains(chukiName)) {
-						this.printTextLine(out, buf, hasBlock, true);
-						sectionCharLength += buf.length();
-						if (sectionCharLength > 0) {
-							this.writer.nextSection(out, lineNum);
-							this.pageLineNum = 0;
-							this.sectionCharLength = 0;
-							this.chapterStarted = false;
-							//ブロック注記フラグoff
-							hasBlock = false;
-							//次の文字が改行ならnoBrで前に</br>\n出力
-							if (ch.length == begin+chukiTag.length()) {
-								hasBlock = true;
-							}
+			}
+			
+			//注記→タグ変換
+			String chukiName = chukiTag.substring(2, chukiTag.length()-1);
+			
+			//ルビ無効チェック
+			if (chukiFlagNoRubyStart.contains(chukiName)) noRubyLevel++;
+			else if (chukiFlagNoRubyEnd.contains(chukiName)) noRubyLevel--;
+			
+			String[] tags = chukiMap.get(chukiName);
+			if (tags != null) {
+				////////////////////////////////////////////////////////////////
+				//改ページ処理
+				//画像削除で何も無いページなら改ページしない
+				////////////////////////////////////////////////////////////////
+				if (chukiFlagPageBreak.contains(chukiName)) {
+					this.printTextLine(out, buf, hasBlock, true);
+					sectionCharLength += buf.length();
+					if (sectionCharLength > 0) {
+						this.writer.nextSection(out, lineNum);
+						this.pageLineNum = 0;
+						this.sectionCharLength = 0;
+						this.chapterStarted = false;
+						//ブロック注記フラグoff
+						hasBlock = false;
+						//次の文字が改行ならnoBrで前に</br>\n出力
+						if (ch.length == begin+chukiTag.length()) {
+							hasBlock = true;
 						}
-						//バッファクリア
-						buf.setLength(0);
 					}
-					////////////////////////////////////////////////////////////////
-					
-					//字下げフラグ処理
-					if (chukiTag.endsWith("字下げ］")) {
-						if (inJisage) {
-							buf.append(chukiMap.get("字下げ省略")[0]);
-						}
-						if (tags.length > 1) {
-							inJisage = false;//インライン
-						}
-						else inJisage = true; //ブロック
+					//バッファクリア
+					buf.setLength(0);
+				}
+				////////////////////////////////////////////////////////////////
+				
+				//字下げフラグ処理
+				if (chukiTag.endsWith("字下げ］")) {
+					if (inJisage) {
+						buf.append(chukiMap.get("字下げ省略")[0]);
 					}
-					else if (chukiTag.equals("［＃ここで字下げ終わり］")) {
-						inJisage = false;
-					}
-					
-					//タグ出力
-					buf.append(tags[0]);
 					if (tags.length > 1) {
-						bufSuf.insert(0, tags[1]);
+						inJisage = false;//インライン
 					}
-					//ブロック注記チェック
-					if (chukiFlagNoBr.contains(chukiName)) hasBlock = true;
-					
-				} else {
-					//画像 (訓点 ［＃（ス）］ は . があるかで判断)
-					// <img src="img/filename"/> → <object src="filename"/>
-					// ［＃表紙（表紙.jpg）］［＃（表紙.jpg）］［＃「キャプション」（表紙.jpg、横321×縦123）入る）］
-					//訓点と区別するため3文字目から（チェック
-					int imageStartIdx = chukiTag.indexOf('（', 2);
-					if (imageStartIdx > -1) {
-						//訓点送り仮名チェック ＃の次が（で.を含まない
-						if (imageStartIdx == 2 && chukiTag.endsWith("）］") && chukiTag.indexOf('.', 2) == -1) {
-							buf.append(chukiMap.get("行右小書き")[0]);
-							buf.append(chukiTag.substring(3, chukiTag.length()-2));
-							buf.append(chukiMap.get("行右小書き終わり")[0]);
-						} else {
-							//画像注記
-							int imageEndIdx = chukiTag.indexOf('、', imageStartIdx+1);
-							if (imageEndIdx == -1) imageEndIdx = chukiTag.indexOf('）', imageStartIdx+1);
-							else imageEndIdx = Math.min(imageEndIdx, chukiTag.indexOf('）', imageStartIdx+1));
+					else inJisage = true; //ブロック
+				}
+				else if (chukiTag.equals("［＃ここで字下げ終わり］")) {
+					inJisage = false;
+				}
+				
+				//タグ出力
+				buf.append(tags[0]);
+				if (tags.length > 1) {
+					bufSuf.insert(0, tags[1]);
+				}
+				//ブロック注記チェック
+				if (chukiFlagNoBr.contains(chukiName)) hasBlock = true;
+				
+			} else {
+				//画像 (訓点 ［＃（ス）］ は . があるかで判断)
+				// <img src="img/filename"/> → <object src="filename"/>
+				// ［＃表紙（表紙.jpg）］［＃（表紙.jpg）］［＃「キャプション」（表紙.jpg、横321×縦123）入る）］
+				//訓点と区別するため3文字目から（チェック
+				int imageStartIdx = chukiTag.indexOf('（', 2);
+				if (imageStartIdx > -1) {
+					//訓点送り仮名チェック ＃の次が（で.を含まない
+					if (imageStartIdx == 2 && chukiTag.endsWith("）］") && chukiTag.indexOf('.', 2) == -1) {
+						buf.append(chukiMap.get("行右小書き")[0]);
+						buf.append(chukiTag.substring(3, chukiTag.length()-2));
+						buf.append(chukiMap.get("行右小書き終わり")[0]);
+					} else {
+						//画像注記
+						int imageEndIdx = chukiTag.indexOf('、', imageStartIdx+1);
+						if (imageEndIdx == -1) imageEndIdx = chukiTag.indexOf('）', imageStartIdx+1);
+						else imageEndIdx = Math.min(imageEndIdx, chukiTag.indexOf('）', imageStartIdx+1));
+						if (imageStartIdx < imageEndIdx) {
 							String srcFilePath = chukiTag.substring(imageStartIdx+1, imageEndIdx);
 							String imageTitle = srcFilePath.substring(srcFilePath.lastIndexOf('/')+1);
 							if (imageStartIdx > 0) imageTitle = chukiTag.substring(2, imageStartIdx);
@@ -789,106 +795,108 @@ public class AozoraEpub3Converter
 									this.writer.updateChapterName(chapterName.length()>64 ? chapterName.substring(0, 64) : chapterName);
 								}
 							}
+						} else {
+							LogAppender.append("注記エラー: "+chukiTag+"\n");
 						}
-					} else if (lowerChukiTag.startsWith("<img")) {
-						//src=の値抽出
-						int srcIdx = lowerChukiTag.indexOf(" src=");
-						if (srcIdx == -1) {
+					}
+				} else if (lowerChukiTag.startsWith("<img")) {
+					//src=の値抽出
+					int srcIdx = lowerChukiTag.indexOf(" src=");
+					if (srcIdx == -1) {
+						LogAppender.append("画像注記エラー: "+chukiTag+"\n");
+					} else {
+						int start = srcIdx + 5;
+						int end = -1;
+						if (chukiTag.charAt(start) == '"') end = chukiTag.indexOf('"', start+1);
+						if (chukiTag.charAt(start) == '\'') end = chukiTag.indexOf('\'', start+1);
+						if (end == -1) {
 							LogAppender.append("画像注記エラー: "+chukiTag+"\n");
 						} else {
-							int start = srcIdx + 5;
-							int end = -1;
-							if (chukiTag.charAt(start) == '"') end = chukiTag.indexOf('"', start+1);
-							if (chukiTag.charAt(start) == '\'') end = chukiTag.indexOf('\'', start+1);
-							if (end == -1) {
-								LogAppender.append("画像注記エラー: "+chukiTag+"\n");
-							} else {
-								String srcFilePath = chukiTag.substring(start+1, end);
-								//LogAppender.append("[画像注記]: "+chukiTag+"\n");
-								hasBlock = true;
-								//画像ファイル名置換処理実行
-								String fileName = writer.getImageFilePath(srcFilePath.trim());
-								if (fileName != null) { //先頭に移動してここで出力しない場合はnull
-									buf.append(chukiMap.get("画像開始")[0]);
-									buf.append(fileName);
-									buf.append(chukiMap.get("画像終了")[0]);
-									//本文がなければ画像ファイル名が目次になる
-									if (!this.chapterStarted) {
-										String imageTitle = srcFilePath.substring(srcFilePath.lastIndexOf('/')+1);
-										int altIdx = lowerChukiTag.indexOf(" alt=");
-										if (altIdx > -1) {
-											start = altIdx + 5;
-											end = -1;
-											if (chukiTag.charAt(start) == '"') end = chukiTag.indexOf('"', start+1);
-											if (chukiTag.charAt(start) == '\'') end = chukiTag.indexOf('\'', start+1);
-											if (end > -1) imageTitle = chukiTag.substring(start+1, end);
-										}
-										String chapterName = imageTitle;
-										this.writer.updateChapterName(chapterName.length()>64 ? chapterName.substring(0, 64) : chapterName);
+							String srcFilePath = chukiTag.substring(start+1, end);
+							//LogAppender.append("[画像注記]: "+chukiTag+"\n");
+							hasBlock = true;
+							//画像ファイル名置換処理実行
+							String fileName = writer.getImageFilePath(srcFilePath.trim());
+							if (fileName != null) { //先頭に移動してここで出力しない場合はnull
+								buf.append(chukiMap.get("画像開始")[0]);
+								buf.append(fileName);
+								buf.append(chukiMap.get("画像終了")[0]);
+								//本文がなければ画像ファイル名が目次になる
+								if (!this.chapterStarted) {
+									String imageTitle = srcFilePath.substring(srcFilePath.lastIndexOf('/')+1);
+									int altIdx = lowerChukiTag.indexOf(" alt=");
+									if (altIdx > -1) {
+										start = altIdx + 5;
+										end = -1;
+										if (chukiTag.charAt(start) == '"') end = chukiTag.indexOf('"', start+1);
+										if (chukiTag.charAt(start) == '\'') end = chukiTag.indexOf('\'', start+1);
+										if (end > -1) imageTitle = chukiTag.substring(start+1, end);
 									}
+									String chapterName = imageTitle;
+									this.writer.updateChapterName(chapterName.length()>64 ? chapterName.substring(0, 64) : chapterName);
 								}
 							}
 						}
 					}
-					else {
-						//インデント字下げ
-						boolean patternMatched = false;
-						Matcher m2 = chukiPatternMap.get("折り返し").matcher(chukiTag);
+				}
+				else {
+					//インデント字下げ
+					boolean patternMatched = false;
+					Matcher m2 = chukiPatternMap.get("折り返し").matcher(chukiTag);
+					if (m2.find()) {
+						int arg0 = Integer.parseInt(CharUtils.fullToHalf(m2.group(1)));
+						int arg1 = Integer.parseInt(CharUtils.fullToHalf(m2.group(2)));
+						buf.append(chukiMap.get("折り返し1")[0]+arg1);
+						buf.append(chukiMap.get("折り返し2")[0]+(arg0-arg1));
+						buf.append(chukiMap.get("折り返し3")[0]);
+						//字下げフラグ処理
+						if (inJisage) {
+							buf.append(chukiMap.get("字下げ省略")[0]);
+						}
+						else {
+							inJisage = true;
+						}
+						hasBlock = true;//ブロック字下げなので改行なし
+						patternMatched = true;
+					}
+					//インデント字下げ
+					if (!patternMatched) {
+						m2 = chukiPatternMap.get("字下げ字詰め").matcher(chukiTag);
 						if (m2.find()) {
 							int arg0 = Integer.parseInt(CharUtils.fullToHalf(m2.group(1)));
 							int arg1 = Integer.parseInt(CharUtils.fullToHalf(m2.group(2)));
-							buf.append(chukiMap.get("折り返し1")[0]+arg1);
-							buf.append(chukiMap.get("折り返し2")[0]+(arg0-arg1));
-							buf.append(chukiMap.get("折り返し3")[0]);
+							buf.append(chukiMap.get("字下げ字詰め1")[0]+arg0);
+							buf.append(chukiMap.get("字下げ字詰め2")[0]+arg1);
+							buf.append(chukiMap.get("字下げ字詰め3")[0]);
 							//字下げフラグ処理
 							if (inJisage) {
 								buf.append(chukiMap.get("字下げ省略")[0]);
 							}
-							else {
-								inJisage = true;
-							}
+							else inJisage = true;
 							hasBlock = true;//ブロック字下げなので改行なし
-							patternMatched = true;
 						}
-						//インデント字下げ
-						if (!patternMatched) {
-							m2 = chukiPatternMap.get("字下げ字詰め").matcher(chukiTag);
-							if (m2.find()) {
-								int arg0 = Integer.parseInt(CharUtils.fullToHalf(m2.group(1)));
-								int arg1 = Integer.parseInt(CharUtils.fullToHalf(m2.group(2)));
-								buf.append(chukiMap.get("字下げ字詰め1")[0]+arg0);
-								buf.append(chukiMap.get("字下げ字詰め2")[0]+arg1);
-								buf.append(chukiMap.get("字下げ字詰め3")[0]);
-								//字下げフラグ処理
-								if (inJisage) {
-									buf.append(chukiMap.get("字下げ省略")[0]);
-								}
-								else inJisage = true;
-								hasBlock = true;//ブロック字下げなので改行なし
+					}
+					//字下げ複合は字下げのみに変更
+					if (!patternMatched) {
+						m2 = chukiPatternMap.get("字下げ複合").matcher(chukiTag);
+						if (m2.find()) {
+							int arg0 = Integer.parseInt(CharUtils.fullToHalf(m2.group(1)));
+							buf.append(chukiMap.get("字下げ複合1")[0]+arg0);
+							buf.append(chukiMap.get("字下げ複合2")[0]);
+							//字下げフラグ処理
+							if (inJisage) {
+								buf.append(chukiMap.get("字下げ省略")[0]);
 							}
+							else inJisage = true;
+							hasBlock = true;//ブロック字下げなので改行なし
 						}
-						//字下げ複合は字下げのみに変更
-						if (!patternMatched) {
-							m2 = chukiPatternMap.get("字下げ複合").matcher(chukiTag);
-							if (m2.find()) {
-								int arg0 = Integer.parseInt(CharUtils.fullToHalf(m2.group(1)));
-								buf.append(chukiMap.get("字下げ複合1")[0]+arg0);
-								buf.append(chukiMap.get("字下げ複合2")[0]);
-								//字下げフラグ処理
-								if (inJisage) {
-									buf.append(chukiMap.get("字下げ省略")[0]);
-								}
-								else inJisage = true;
-								hasBlock = true;//ブロック字下げなので改行なし
-							}
-						}
-						//字下げ終わり複合注記
-						if (!patternMatched) {
-							m2 = chukiPatternMap.get("字下げ終わり複合").matcher(chukiTag);
-							if (m2.find()) {
-								buf.append(chukiMap.get("ここで字下げ終わり")[0]);
-								inJisage = false;
-							}
+					}
+					//字下げ終わり複合注記
+					if (!patternMatched) {
+						m2 = chukiPatternMap.get("字下げ終わり複合").matcher(chukiTag);
+						if (m2.find()) {
+							buf.append(chukiMap.get("ここで字下げ終わり")[0]);
+							inJisage = false;
 						}
 					}
 				}
@@ -1111,8 +1119,8 @@ public class AozoraEpub3Converter
 		//String str = latinConverter.toLatinGlyphString(ch);
 		//if (str != null) out.write(str);
 		//else out.write(ch);
+		int length = buf.length();
 		if (this.bookInfo.vertical) {
-			int length = buf.length();
 			switch (ch[idx]) {
 			case '<':
 				if (idx > 0 && ch[idx-1] == '<' && (idx <= 1 || ch[idx-2] != '<') && (ch.length-1==idx || ch[idx+1] != '<')) {
@@ -1164,6 +1172,20 @@ public class AozoraEpub3Converter
 				break;
 			case '>':
 				buf.append("&gt;");
+				break;
+			case '＜':
+				if (idx > 0 && ch[idx-1] == '＜' && (idx <= 1 || ch[idx-2] != '＜') && (ch.length-1==idx || ch[idx+1] != '＜')) {
+					buf.setLength(length-1); buf.append("《");
+				} else {
+					buf.append(ch[idx]);
+				}
+				break;
+			case '＞':
+				if (idx > 0 && ch[idx-1] == '＞' && (idx <= 1 || ch[idx-2] != '＞') && (ch.length-1==idx || ch[idx+1] != '＞')) {
+					buf.setLength(length-1); buf.append("》");
+				} else {
+					buf.append(ch[idx]);
+				}
 				break;
 			default:
 				buf.append(ch[idx]);
