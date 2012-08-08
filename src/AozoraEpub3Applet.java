@@ -832,7 +832,8 @@ public class AozoraEpub3Applet extends JApplet
 		this.props.setProperty("UseFileName", this.jCheckUserFileName.isSelected()?"1":"");
 		this.props.setProperty("AutoFileName", this.jCheckAutoFileName.isSelected()?"1":"");
 		//出力先と履歴
-		this.props.setProperty("DstPath", ""+this.jComboDstPath.getSelectedItem().toString().trim());
+		if (this.jComboDstPath.getSelectedIndex() == 0) this.props.setProperty("DstPath","");
+		else if (this.jComboDstPath.getSelectedIndex() == 1) this.props.setProperty("DstPath", ""+this.jComboDstPath.getSelectedItem().toString().trim());
 		//設定
 		this.props.setProperty("MarkId", this.jCheckMarkId.isSelected()?"1":"");
 		this.props.setProperty("AutoYoko", this.jCheckAutoYoko.isSelected()?"1":"");

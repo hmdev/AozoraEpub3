@@ -100,6 +100,9 @@ public class AozoraEpub3Converter
 	
 	static HashMap<String, Pattern> chukiPatternMap = new HashMap<String, Pattern>();
 	
+	/** 文字置換マップ */
+	static HashMap<Character, String> replaceMap = null;
+	
 	
 	/** 「基本ラテン文字のみによる拡張ラテン文字Aの分解表記」の変換クラス */
 	static LatinConverter latinConverter;
@@ -212,6 +215,33 @@ public class AozoraEpub3Converter
 			}
 		} finally {
 			src.close();
+		}
+		
+		//単純文字置換
+		File replaceFile = new File("replace.txt");
+		if (replaceFile.exists()) {
+			replaceMap = new HashMap<Character, String>();
+			src = new BufferedReader(new InputStreamReader(new FileInputStream(replaceFile), "UTF-8"));
+			lineNum = 0;
+			try {
+				while ((line = src.readLine()) != null) {
+					lineNum++;
+					if (line.length() > 0 && line.charAt(0)!='#') {
+						try {
+							String[] values = line.split("\t");
+							if (values[0].length() == 1) {
+								replaceMap.put(values[0].charAt(0), values[1]);
+							} else {
+								LogAppender.append("[ERROR] "+replaceFile.getName()+" ("+lineNum+" is no char) : "+line+"\n");
+							}
+						} catch (Exception e) {
+							LogAppender.append("[ERROR] "+replaceFile.getName()+" ("+lineNum+") : "+line+"\n");
+						}
+					}
+				}
+			} finally {
+				src.close();
+			}
 		}
 		
 		inited = true;
@@ -1120,6 +1150,14 @@ public class AozoraEpub3Converter
 		//if (str != null) out.write(str);
 		//else out.write(ch);
 		int length = buf.length();
+		if (replaceMap != null) {
+			String replaced = replaceMap.get(ch[idx]);
+			//置換して終了
+			if (replaced != null) {
+				buf.append(replaced);
+				return;
+			}
+		}
 		if (this.bookInfo.vertical) {
 			switch (ch[idx]) {
 			case '<':
