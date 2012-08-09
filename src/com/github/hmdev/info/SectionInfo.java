@@ -11,6 +11,9 @@ public class SectionInfo
 	/** 画像のみのページで高さに合わる場合にtrue */
 	public boolean imageFitH = false;
 	
+	/** 左右中央のページならtrue */
+	public boolean isMiddle = false;
+	
 	/** セクション開始行 */
 	public int startLine = 0;
 	
@@ -50,6 +53,16 @@ public class SectionInfo
 	public void setImageFitH(boolean imageFitH)
 	{
 		this.imageFitH = imageFitH;
+	}
+
+	public boolean isMiddle()
+	{
+		return isMiddle;
+	}
+
+	public void setMiddle(boolean isMiddle)
+	{
+		this.isMiddle = isMiddle;
 	}
 
 	public int getStartLine()

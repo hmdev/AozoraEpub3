@@ -1,3 +1,5 @@
-</section>
+#if (${sectionInfo.Middle})
+</div></td></tr></table>
+#end
 </body>
 </html>

@@ -1,7 +1,11 @@
 @charset "utf-8";
 @namespace "http://www.w3.org/1999/xhtml";
 
-/* 画像用スタイル */
+/* 画像用 */
+@page {
+	margin: 0;
+	padding: 0;
+}
 
 html {
 	writing-mode: vertical-rl;
@@ -9,11 +13,8 @@ html {
 	-epub-writing-mode: vertical-rl;
 	margin: 0;
 	padding: 0;
-}
-
-@page {
-	margin: 0;
-	padding: 0;
+	width: 100%;
+	height: 100%;
 }
 
 body {
@@ -42,7 +43,7 @@ body.cover img{
 	height: auto;
 }
 
-/* 幅を合わせる 画像は縮小のみ */
+/* 幅を合わせる 幅600px以上で縦横比4:3以上 */
 body.fit_w {
 	width: 100%;
 }

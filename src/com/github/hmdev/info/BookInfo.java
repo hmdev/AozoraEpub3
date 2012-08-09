@@ -37,6 +37,8 @@ public class BookInfo
 	/** 先頭に表紙ページを追加 */
 	public boolean insertCoverPage = false;
 	
+	/** 先頭がページの左右中央ならtrue */
+	public boolean startMiddle = false; 
 	
 	/** 改ページ単位で区切られたセクションの情報を格納 */
 	//Vector<SectionInfo> vecSectionInfo;
@@ -44,11 +46,16 @@ public class BookInfo
 	/** 画像単体ページ開始行 */
 	HashSet<Integer> mapImageSectionLine;
 	
+	/** 改行ページしない行 (［＃ページの左右中央］の前の［＃改ページ］) */
+	HashSet<Integer> mapNoPageBreakLine;
+	
+	
 	////////////////////////////////////////////////////////////////
 	public BookInfo()
 	{
 		//this.vecSectionInfo = new Vector<SectionInfo>();
 		this.mapImageSectionLine = new HashSet<Integer>();
+		this.mapNoPageBreakLine = new HashSet<Integer>();
 	}
 	
 	/*public void addSectionInfo(SectionInfo sectionInfo)
@@ -70,6 +77,16 @@ public class BookInfo
 		return this.mapImageSectionLine.contains(lineNum);
 	}
 	
+	/** 改ページしない行数を保存 */
+	public void addNoPageBreakLine(int lineNum)
+	{
+		this.mapNoPageBreakLine.add(lineNum);
+	}
+	/** 改ページしない行ならtrue */
+	public boolean isNoPageBreakLine(int lineNum)
+	{
+		return this.mapNoPageBreakLine.contains(lineNum);
+	}
 	////////////////////////////////////////////////////////////////
 	public String getTitle()
 	{

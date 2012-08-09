@@ -92,6 +92,8 @@ public class AozoraEpub3Converter
 	static HashSet<String> chukiFlagNoRubyEnd = new HashSet<String>();
 	/** 注記フラグ 改ページ処理 key = 注記名 */
 	static HashSet<String> chukiFlagPageBreak = new HashSet<String>();
+	/** 注記フラグ 左右中央 key = 注記名 */
+	static HashSet<String> chukiFlagMiddle = new HashSet<String>();
 	
 	/** 後述注記→タグ変換用
 	 * key=注記文字列 (「」内削除)
@@ -133,6 +135,8 @@ public class AozoraEpub3Converter
 	/** 見出し仮対応出力用
 	 * 章の最初の本文をsetChapterNameでセットしたらtrue */
 	boolean chapterStarted = true;
+	/** 画像名がページ先頭に設定されている */
+	boolean chapterIsImageTitle = false;
 	
 	/** コンストラクタ
 	 * 変換テーブルやクラスがstaticで初期化されていなければ初期化
@@ -173,6 +177,9 @@ public class AozoraEpub3Converter
 							case '2': chukiFlagNoRubyStart.add(values[0]); break;
 							case '3': chukiFlagNoRubyEnd.add(values[0]); break;
 							case 'P': chukiFlagPageBreak.add(values[0]); break;
+							case 'M': chukiFlagPageBreak.add(values[0]);
+								chukiFlagMiddle.add(values[0]);
+								break;
 							}
 						}
 						
@@ -273,6 +280,7 @@ public class AozoraEpub3Converter
 		BookInfo bookInfo = new BookInfo();
 		String line;
 		int lineNum = 0;
+		//前の行のバッファ [1行前, 2行前]
 		String[] preLines = new String[]{null, null};
 		
 		boolean titleEmpty = titleType==TitleType.TITLE_AUTHOR || titleType==TitleType.TITLE_ONLY || titleType==TitleType.AUTHOR_TITLE;
@@ -295,7 +303,17 @@ public class AozoraEpub3Converter
 				if (inComment) continue;
 			}
 			
-			//2行前が画像のみのセクションの行かをチェック
+			if (line.startsWith("［＃ページの左右中央］")) {
+				if (lineNum == 0) bookInfo.startMiddle = true;
+				else {
+					String lastChuki = preLines[0].replaceFirst("［＃(.+?)］$", "$1");
+					if (lastChuki != null && chukiFlagPageBreak.contains(lastChuki)) {
+						bookInfo.addNoPageBreakLine(lineNum-1);
+					}
+				}
+			}
+			
+			//2行前が画像のみのセクションの行かをチェックして行番号をbookInfoに保存
 			this.checkImageOnly(bookInfo, preLines, line, lineNum);
 			
 			//コメント行の後はタイトル取得はしない
@@ -399,7 +417,17 @@ public class AozoraEpub3Converter
 		//コメントブロック内
 		boolean inComment = false;
 		this.chapterStarted = false;
+		this.chapterIsImageTitle= false; 
 		while ((line = src.readLine()) != null) {
+			//コメント除外
+			if (hideCommentBlock) {
+				if (line.startsWith("-------------------------------------------------------")) {
+					if (inComment) { inComment = false; continue;
+					} else { inComment = true; continue;  }
+				}
+				if (inComment) continue;
+			}
+			
 			lineNum++;
 			pageLineNum++;
 			
@@ -417,15 +445,6 @@ public class AozoraEpub3Converter
 				out.write("\n");
 				this.chapterStarted = false; //章が始まっていないことにする
 			} else {
-				//コメント除外
-				if (hideCommentBlock) {
-					if (line.startsWith("-------------------------------------------------------")) {
-						if (inComment) { inComment = false; continue;
-						} else { inComment = true; continue;  }
-					}
-					if (inComment) continue;
-				}
-				
 				//強制改行
 				if (forcePageBreak >10 && pageLineNum > forcePageBreak) {
 					int emptyLineNum = 0;
@@ -435,9 +454,10 @@ public class AozoraEpub3Converter
 					}
 					if (forcePageBreakEmptyLine <= emptyLineNum) {
 						//空行は出力せずに改ページ
-						this.writer.nextSection(out, lineNum);
+						this.writer.nextSection(out, lineNum, false);
 						this.pageLineNum = 0;
 						this.chapterStarted = false;
+						this.chapterIsImageTitle= false;
 					} else {
 						//空行出力
 						for (int i=0; i<emptyLineNum; i++) convertTextLineToEpub3(out, "", lineNum);
@@ -746,16 +766,22 @@ public class AozoraEpub3Converter
 			if (tags != null) {
 				////////////////////////////////////////////////////////////////
 				//改ページ処理
-				//画像削除で何も無いページなら改ページしない
+				//左右中央や表紙移動でで何も無いページなら改ページしない
 				////////////////////////////////////////////////////////////////
-				if (chukiFlagPageBreak.contains(chukiName)) {
+				if (chukiFlagPageBreak.contains(chukiName) && !bookInfo.isNoPageBreakLine(lineNum)) {
 					this.printTextLine(out, buf, hasBlock, true);
+					//前の行まで出す
 					sectionCharLength += buf.length();
 					if (sectionCharLength > 0) {
-						this.writer.nextSection(out, lineNum);
+						if (chukiFlagMiddle.contains(chukiName)) {
+							this.writer.nextSection(out, lineNum, true);
+						} else {
+							this.writer.nextSection(out, lineNum, false);
+						}
 						this.pageLineNum = 0;
 						this.sectionCharLength = 0;
 						this.chapterStarted = false;
+						this.chapterIsImageTitle= false;
 						//ブロック注記フラグoff
 						hasBlock = false;
 						//次の文字が改行ならnoBrで前に</br>\n出力
@@ -769,7 +795,7 @@ public class AozoraEpub3Converter
 				////////////////////////////////////////////////////////////////
 				
 				//字下げフラグ処理
-				if (chukiTag.endsWith("字下げ］")) {
+				else if (chukiTag.endsWith("字下げ］")) {
 					if (inJisage) {
 						buf.append(chukiMap.get("字下げ省略")[0]);
 					}
@@ -820,9 +846,10 @@ public class AozoraEpub3Converter
 								buf.append(fileName);
 								buf.append(chukiMap.get("画像終了")[0]);
 								//本文がなければ画像ファイル名が目次になる
-								if (!this.chapterStarted) {
+								if (!this.chapterStarted && this.chapterIsImageTitle) {
 									String chapterName = imageTitle;
 									this.writer.updateChapterName(chapterName.length()>64 ? chapterName.substring(0, 64) : chapterName);
+									this.chapterIsImageTitle = true;
 								}
 							}
 						} else {
@@ -852,7 +879,7 @@ public class AozoraEpub3Converter
 								buf.append(fileName);
 								buf.append(chukiMap.get("画像終了")[0]);
 								//本文がなければ画像ファイル名が目次になる
-								if (!this.chapterStarted) {
+								if (!this.chapterStarted && !this.chapterIsImageTitle) {
 									String imageTitle = srcFilePath.substring(srcFilePath.lastIndexOf('/')+1);
 									int altIdx = lowerChukiTag.indexOf(" alt=");
 									if (altIdx > -1) {
@@ -864,6 +891,7 @@ public class AozoraEpub3Converter
 									}
 									String chapterName = imageTitle;
 									this.writer.updateChapterName(chapterName.length()>64 ? chapterName.substring(0, 64) : chapterName);
+									this.chapterIsImageTitle = true;
 								}
 							}
 						}

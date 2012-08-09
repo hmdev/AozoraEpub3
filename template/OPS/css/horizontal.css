@@ -18,17 +18,6 @@ html {
 	padding: 0;
 }
 
-section, nav, div, p, header, footer, 
-table, th, tr, td, thead, tbody, tfoot , 
-img , video, embed , 
-span, a, ruby { 
-	margin: 0;
-	padding: 0;
-	border: none;
-	font-size: 1em;
-	vertical-align: baseline;
-}
-
 body {
 	margin: 0;
 	padding: 0;

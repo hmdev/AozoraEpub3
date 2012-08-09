@@ -77,8 +77,10 @@ public class Epub3Writer
 		"mimetype",
 		"META-INF/container.xml",
 		OPS_PATH+CSS_PATH+"vertical.css",
+		OPS_PATH+CSS_PATH+"vertical_middle.css",
 		OPS_PATH+CSS_PATH+"vertical_image.css",
 		OPS_PATH+CSS_PATH+"horizontal.css",
+		OPS_PATH+CSS_PATH+"horizontal_middle.css",
 		OPS_PATH+CSS_PATH+"horizontal_image.css"
 	};
 	
@@ -174,7 +176,7 @@ public class Epub3Writer
 		}
 		
 		//0001CapterのZipArchiveEntryを設定
-		this.startSection(0);
+		this.startSection(0, bookInfo.startMiddle);
 		
 		//ePub3変換して出力
 		//改ページ時にnextSection() を、画像出力時にgetImageFilePath() 呼び出し
@@ -349,21 +351,22 @@ public class Epub3Writer
 	/** 次のチャプター用のZipArchiveEntryに切替え 
 	 * チャプターのファイル名はcpaterFileNamesに追加される (0001)
 	 * @throws IOException */
-	public void nextSection(BufferedWriter bw, int lineNum) throws IOException
+	public void nextSection(BufferedWriter bw, int lineNum, boolean isMiddle) throws IOException
 	{
 		bw.flush();
 		this.endSection();
-		this.startSection(lineNum);
+		this.startSection(lineNum, isMiddle);
 	}
 	/** セクション開始. 
 	 * @throws IOException */
-	private void startSection(int lineNum) throws IOException
+	private void startSection(int lineNum, boolean isMiddle) throws IOException
 	{
 		this.sectionIndex++;
 		String sectionId = decimalFormat.format(this.sectionIndex);
 		//package.opf用にファイル名
 		SectionInfo sectionInfo = new SectionInfo(sectionId);
 		if (this.bookInfo.isImageSectionLine(lineNum)) sectionInfo.setImageFit(true);
+		if (isMiddle) sectionInfo.setMiddle(true);
 		this.sectionInfos.add(sectionInfo);
 		this.addChapter(sectionId, null); //章の名称はsectionIdを仮に設定
 		
