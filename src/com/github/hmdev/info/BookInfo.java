@@ -49,6 +49,8 @@ public class BookInfo
 	/** 改行ページしない行 (［＃ページの左右中央］の前の［＃改ページ］) */
 	HashSet<Integer> mapNoPageBreakLine;
 	
+	/** 出力ページしない行 (左右中央後の空行と改ページ前の空行) */
+	HashSet<Integer> mapIgnoreLine;
 	
 	////////////////////////////////////////////////////////////////
 	public BookInfo()
@@ -56,6 +58,7 @@ public class BookInfo
 		//this.vecSectionInfo = new Vector<SectionInfo>();
 		this.mapImageSectionLine = new HashSet<Integer>();
 		this.mapNoPageBreakLine = new HashSet<Integer>();
+		this.mapIgnoreLine = new HashSet<Integer>();
 	}
 	
 	/*public void addSectionInfo(SectionInfo sectionInfo)
@@ -87,6 +90,18 @@ public class BookInfo
 	{
 		return this.mapNoPageBreakLine.contains(lineNum);
 	}
+	
+	/** 出力しない行数を保存 */
+	public void addIgnoreLine(int lineNum)
+	{
+		this.mapIgnoreLine.add(lineNum);
+	}
+	/** 出力しない行ならtrue */
+	public boolean isIgnoreLine(int lineNum)
+	{
+		return this.mapIgnoreLine.contains(lineNum);
+	}
+	
 	////////////////////////////////////////////////////////////////
 	public String getTitle()
 	{

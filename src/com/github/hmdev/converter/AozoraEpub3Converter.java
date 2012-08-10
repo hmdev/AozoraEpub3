@@ -104,6 +104,8 @@ public class AozoraEpub3Converter
 	
 	/** 文字置換マップ */
 	static HashMap<Character, String> replaceMap = null;
+	/** 文字置換マップ 2文字用 */
+	static HashMap<String, String> replace2Map = null;
 	
 	
 	/** 「基本ラテン文字のみによる拡張ラテン文字Aの分解表記」の変換クラス */
@@ -228,6 +230,7 @@ public class AozoraEpub3Converter
 		File replaceFile = new File("replace.txt");
 		if (replaceFile.exists()) {
 			replaceMap = new HashMap<Character, String>();
+			replace2Map = new HashMap<String, String>();
 			src = new BufferedReader(new InputStreamReader(new FileInputStream(replaceFile), "UTF-8"));
 			lineNum = 0;
 			try {
@@ -238,8 +241,10 @@ public class AozoraEpub3Converter
 							String[] values = line.split("\t");
 							if (values[0].length() == 1) {
 								replaceMap.put(values[0].charAt(0), values[1]);
+							} else if (values[0].length() == 2) {
+									replace2Map.put(values[0], values[1]);
 							} else {
-								LogAppender.append("[ERROR] "+replaceFile.getName()+" ("+lineNum+" is no char) : "+line+"\n");
+								LogAppender.append("[ERROR] "+replaceFile.getName()+" ("+lineNum+" too long) : "+line+"\n");
 							}
 						} catch (Exception e) {
 							LogAppender.append("[ERROR] "+replaceFile.getName()+" ("+lineNum+") : "+line+"\n");
@@ -279,7 +284,7 @@ public class AozoraEpub3Converter
 	{
 		BookInfo bookInfo = new BookInfo();
 		String line;
-		int lineNum = 0;
+		int lineNum = -1;
 		//前の行のバッファ [1行前, 2行前]
 		String[] preLines = new String[]{null, null};
 		
@@ -290,8 +295,17 @@ public class AozoraEpub3Converter
 		//コメントブロック内
 		boolean inComment = false;
 		boolean hasComment = false;
+		
+		//空行チェック用 開始行  左右中央の場合は -2
+		int emptyLineStart = -1;
+		
 		//最後まで回す
 		while ((line = src.readLine()) != null) {
+			//前の2行を保存
+			preLines[1] = preLines[0];
+			preLines[0] = line;
+			lineNum++;
+			
 			//コメント除外
 			if (hideCommentBlock) {
 				if (line.startsWith("-------------------------------------------------------")) {
@@ -303,12 +317,35 @@ public class AozoraEpub3Converter
 				if (inComment) continue;
 			}
 			
-			if (line.startsWith("［＃ページの左右中央］")) {
-				if (lineNum == 0) bookInfo.startMiddle = true;
-				else {
-					String lastChuki = preLines[0].replaceFirst("［＃(.+?)］$", "$1");
-					if (lastChuki != null && chukiFlagPageBreak.contains(lastChuki)) {
-						bookInfo.addNoPageBreakLine(lineNum-1);
+			//空行チェック
+			if (line.equals("")) {
+				if (emptyLineStart == -2) bookInfo.addIgnoreLine(lineNum);
+				else if (emptyLineStart == -1) emptyLineStart = lineNum;
+				//空行なので次の行へ
+				continue;
+			}
+			//改ページの前に空行がある
+			if (emptyLineStart > -1) {
+				String firstChuki = line.replaceFirst("^［＃(.+?)］", "$1");
+				if (firstChuki != null && chukiFlagPageBreak.contains(firstChuki)) {
+					for (int i=emptyLineStart; i<lineNum; i++) {
+						bookInfo.addIgnoreLine(i);
+					}
+				}
+			}
+			
+			emptyLineStart = -1;
+			
+			if (line.endsWith("ページの左右中央］")) {
+				emptyLineStart = -2;
+				//［＃改ページ］の後の［＃ページの左右中央］の場合は改ページしない
+				if (line.startsWith("［＃ページの左右中央］")) {
+					if (lineNum == 0) bookInfo.startMiddle = true;
+					else {
+						String lastChuki = preLines[0].replaceFirst("［＃(.+?)］$", "$1");
+						if (lastChuki != null && chukiFlagPageBreak.contains(lastChuki)) {
+							bookInfo.addNoPageBreakLine(lineNum-1);
+						}
 					}
 				}
 			}
@@ -362,10 +399,6 @@ public class AozoraEpub3Converter
 					}
 				}
 			}
-			//前の2行を保存
-			preLines[1] = preLines[0];
-			preLines[0] = line;
-			lineNum++;
 		}
 		if (bookInfo.creator != null && (bookInfo.creator.startsWith("―") || bookInfo.creator.startsWith("【"))) bookInfo.creator = null;
 		
@@ -419,6 +452,9 @@ public class AozoraEpub3Converter
 		this.chapterStarted = false;
 		this.chapterIsImageTitle= false; 
 		while ((line = src.readLine()) != null) {
+			lineNum++;
+			pageLineNum++;
+			
 			//コメント除外
 			if (hideCommentBlock) {
 				if (line.startsWith("-------------------------------------------------------")) {
@@ -428,8 +464,8 @@ public class AozoraEpub3Converter
 				if (inComment) continue;
 			}
 			
-			lineNum++;
-			pageLineNum++;
+			//出力しない行を飛ばす
+			if (bookInfo.isIgnoreLine(lineNum)) continue;
 			
 			if (lineNum == metaInfo.titleLine) {
 				out.write(chukiMap.get("表題前")[0]);
@@ -772,9 +808,17 @@ public class AozoraEpub3Converter
 					this.printTextLine(out, buf, hasBlock, true);
 					//前の行まで出す
 					sectionCharLength += buf.length();
-					if (sectionCharLength > 0) {
+					
+					//次の行が画像単独ページで先頭画像で表紙に移動する場合は改ページしない
+					if (bookInfo.isImageSectionLine(lineNum+1) && bookInfo.coverFileName.equals("") && bookInfo.insertCoverPage && writer.getImageIndex() == 0) {
+					} else {
+						//空のページなら改行出力
+						if (sectionCharLength == 0) {
+							this.printTextLine(out, buf, false, false);
+						}
 						if (chukiFlagMiddle.contains(chukiName)) {
-							this.writer.nextSection(out, lineNum, true);
+							//先頭が左右中央の場合は出力済
+							if (lineNum > 0) this.writer.nextSection(out, lineNum, true);
 						} else {
 							this.writer.nextSection(out, lineNum, false);
 						}
@@ -1182,6 +1226,15 @@ public class AozoraEpub3Converter
 			String replaced = replaceMap.get(ch[idx]);
 			//置換して終了
 			if (replaced != null) {
+				buf.append(replaced);
+				return;
+			}
+		}
+		if (replace2Map != null && idx != 0) {
+			String replaced = replace2Map.get(""+ch[idx-1]+ch[idx]);
+			//置換して終了
+			if (replaced != null) {
+				buf.setLength(length-1);//1文字削除
 				buf.append(replaced);
 				return;
 			}

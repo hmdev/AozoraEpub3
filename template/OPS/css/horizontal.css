@@ -30,6 +30,11 @@ body {
 	vertical-align: baseline;
 }
 
+
+/* 横書き基本部分 */
+p {
+	text-align: justify;
+}
 img {
 	max-width: 100%;
 }
@@ -49,14 +54,6 @@ h6 { font: small-caps 100%; }
 
 p { margin: 0; }
 
-/* 改ページ */
-.pagebreak { page-break-before: always; }
-
-/* 左右中央 */
-.lrcenter {
-	height: 100%;
-	vertical-align: middle;
-}
 /** 罫囲み */
 .border {
 	border: 1px solid #000;
@@ -182,7 +179,7 @@ span.sub {
 }
 
 /* 中央揃え */
-div.center { text-align: center;}
+div.center, div.center p { text-align: center;}
 
 /* 字下げ */
 div.top1 { margin-left: 1em; }
@@ -266,32 +263,32 @@ div.idt-25 { text-indent: -25em; }
 
 
 /* 地付き */
-div.btm { text-align: right; margin-right: 0em; }
-div.btm1 { text-align: right; margin-right: 1em; }
-div.btm2 { text-align: right; margin-right: 2em; }
-div.btm3 { text-align: right; margin-right: 3em; }
-div.btm4 { text-align: right; margin-right: 4em; }
-div.btm5 { text-align: right; margin-right: 5em; }
-div.btm6 { text-align: right; margin-right: 6em; }
-div.btm7 { text-align: right; margin-right: 7em; }
-div.btm8 { text-align: right; margin-right: 8em; }
-div.btm9 { text-align: right; margin-right: 9em; }
-div.btm10 { text-align: right; margin-right: 10em; }
-div.btm11 { text-align: right; margin-right: 11em; }
-div.btm12 { text-align: right; margin-right: 12em; }
-div.btm13 { text-align: right; margin-right: 13em; }
-div.btm14 { text-align: right; margin-right: 14em; }
-div.btm15 { text-align: right; margin-right: 15em; }
-div.btm16 { text-align: right; margin-right: 16em; }
-div.btm17 { text-align: right; margin-right: 17em; }
-div.btm18 { text-align: right; margin-right: 18em; }
-div.btm19 { text-align: right; margin-right: 19em; }
-div.btm20 { text-align: right; margin-right: 20em; }
-div.btm21 { text-align: right; margin-right: 21em; }
-div.btm22 { text-align: right; margin-right: 22em; }
-div.btm23 { text-align: right; margin-right: 23em; }
-div.btm24 { text-align: right; margin-right: 24em; }
-div.btm25 { text-align: right; margin-right: 25em; }
+div.btm, div.btm p { text-align: right; margin-right: 0em; }
+div.btm1, div.btm1 p { text-align: right; margin-right: 1em; }
+div.btm2, div.btm2 p { text-align: right; margin-right: 2em; }
+div.btm3, div.btm3 p { text-align: right; margin-right: 3em; }
+div.btm4, div.btm4 p { text-align: right; margin-right: 4em; }
+div.btm5, div.btm5 p { text-align: right; margin-right: 5em; }
+div.btm6, div.btm6 p { text-align: right; margin-right: 6em; }
+div.btm7, div.btm7 p { text-align: right; margin-right: 7em; }
+div.btm8, div.btm8 p { text-align: right; margin-right: 8em; }
+div.btm9, div.btm9 p { text-align: right; margin-right: 9em; }
+div.btm10, div.btm10 p { text-align: right; margin-right: 10em; }
+div.btm11, div.btm11 p { text-align: right; margin-right: 11em; }
+div.btm12, div.btm12 p { text-align: right; margin-right: 12em; }
+div.btm13, div.btm13 p { text-align: right; margin-right: 13em; }
+div.btm14, div.btm14 p { text-align: right; margin-right: 14em; }
+div.btm15, div.btm15 p { text-align: right; margin-right: 15em; }
+div.btm16, div.btm16 p { text-align: right; margin-right: 16em; }
+div.btm17, div.btm17 p { text-align: right; margin-right: 17em; }
+div.btm18, div.btm18 p { text-align: right; margin-right: 18em; }
+div.btm19, div.btm19 p { text-align: right; margin-right: 19em; }
+div.btm20, div.btm20 p { text-align: right; margin-right: 20em; }
+div.btm21, div.btm21 p { text-align: right; margin-right: 21em; }
+div.btm22, div.btm22 p { text-align: right; margin-right: 22em; }
+div.btm23, div.btm23 p { text-align: right; margin-right: 23em; }
+div.btm24, div.btm24 p { text-align: right; margin-right: 24em; }
+div.btm25, div.btm25 p { text-align: right; margin-right: 25em; }
 
 div.jzm1 { max-width: 1em; }
 div.jzm2 { max-width: 2em; }

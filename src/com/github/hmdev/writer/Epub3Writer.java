@@ -438,4 +438,10 @@ public class Epub3Writer
 		if (bookInfo.insertCoverPage && isCover) return null;
 		return "../"+imageFileName;
 	}
+	
+	/** 現在の出力済画像枚数を返す 0なら未出力 */
+	public int getImageIndex()
+	{
+		return this.imageIndex;
+	}
 }

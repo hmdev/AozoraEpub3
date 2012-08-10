@@ -8,10 +8,27 @@
 }
 
 html {
+	writing-mode: vertical-rl;
+	-webkit-writing-mode: vertical-rl;
+	-epub-writing-mode: vertical-rl;
+	-epub-line-break: strict;
+	line-break: strict;	
+	-epub-word-break: normal;
+	word-break: normal;
+	margin: 0;
+	padding: 0;
 	width:100%;
 	height:100%;
 }
 body {
+	margin: 0;
+	padding: 0;
+	display: block;
+	color: #000;
+	font-family: "@ＭＳ 明朝", "@MS Mincho", "ヒラギノ明朝 ProN W3", "HiraMinProN-W3", serif, sans-serif;
+	font-size: 1em;
+	line-height: 1.75;
+	vertical-align: baseline;
 	width:100%;
 	height:100%;
 }
@@ -31,3 +48,319 @@ table.middle {
 table.middle td {
 	vertical-align: middle;
 }
+
+
+/** 縦書き用 ページ設定以外の基本部分 */
+p {
+	text-align: justify;
+}
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+:link { color: #00C; background: transparent; }
+:visited { color: #609; background: transparent; }
+a:active { color: #C00; background: transparent; }
+a:link img, a:visited img { border-style: none; }
+
+h1 { font-size: 200%; margin-top: 2em; }
+h2, h3, h4, h5, h6 { margin-top: 3em; }
+h2 { font-size: 150%;}
+h3 { font-size: 120%;}
+h4 { font: bold 100%; }
+h5 { font: italic 100%; }
+h6 { font: small-caps 100%; }
+
+p { margin: 0; }
+
+span.b {
+	font-weight: bolder;
+}
+span.i {
+	font-style: italic;
+}
+
+/** 罫囲み */
+.border {
+	border: 1px solid #000;
+	padding: 0.5em;
+}
+
+/* 圏点 */
+span.sesame {
+	text-emphasis-style: sesame;
+	-webkit-text-emphasis-style: sesame;
+	-epub-text-emphasis-style: sesame;
+}
+span.open_sesame {
+	text-emphasis-style: open sesame;
+	-webkit-text-emphasis-style: open sesame;
+	-epub-text-emphasis-style: open sesame;
+}
+span.dot {
+	text-emphasis-style: dot;
+	-webkit-text-emphasis-style: dot;
+	-epub-text-emphasis-style: dot;
+}
+span.open_dot {
+	text-emphasis-style: open dot;
+	-webkit-text-emphasis-style: open dot;
+	-epub-text-emphasis-style: open dot;
+}
+span.circle {
+	text-emphasis-style: circle;
+	-webkit-text-emphasis-style: circle;
+	-epub-text-emphasis-style: circle;
+}
+span.open_circle {
+	text-emphasis-style: open circle;
+	-webkit-text-emphasis-style: open circle;
+	-epub-text-emphasis-style: open circle;
+}
+span.double-circle {
+	text-emphasis-style: double-circle;
+	-webkit-text-emphasis-style: double-circle;
+	-epub-text-emphasis-style: double-circle;
+}
+span.open_double-circle {
+	text-emphasis-style: open double-circle;
+	-webkit-text-emphasis-style: open double-circle;
+	-epub-text-emphasis-style: open double-circle;
+}
+span.triangle {
+	text-emphasis-style: triangle;
+	-webkit-text-emphasis-style: triangle;
+	-epub-text-emphasis-style: triangle;
+}
+span.open_triangle {
+	text-emphasis-style: open triangle;
+	-webkit-text-emphasis-style: open triangle;
+	-epub-text-emphasis-style: open triangle;
+}
+span.left_sesame {
+	text-emphasis-style: sesame;
+	text-emphasis-position: under;
+	-webkit-text-emphasis-style: sesame;
+	-webkit-text-emphasis-position: under;
+	-epub-text-emphasis-style: sesame;
+	-epub-text-emphasis-position: under;
+}
+
+/* 傍線 */
+span.underline, span.double_underline, span.dotted_underline, span.dashed_underline, span.wave_underline {
+	border-right-width: 1px;
+	padding-right: 1px;
+}
+span.underline {
+	border-right-style: solid
+}
+span.double_underline {
+	border-right-width: 3px;
+	border-right-style: double;
+}
+span.dotted_underline {
+	border-right-style: dotted;
+}
+span.dashed_underline {
+	border-right-style: dashed;
+}
+span.wave_underline {
+	border-right-style: solid;/*wave;*/
+}
+span.left_underline {
+	border-left-style: solid;
+	padding-left: 1px;
+	border-left-width: 1px;
+}
+
+/* 文字サイズ 大 */
+span.font1 { font-size: 110%; }
+span.font2 { font-size: 120%; }
+span.font3 { font-size: 130%; }
+span.font4 { font-size: 140%; }
+span.font5 { font-size: 150%; }
+/* 文字サイズ 小 */
+span.font-1 { font-size: 90%; }
+span.font-2 { font-size: 80%; }
+span.font-3 { font-size: 70%; }
+span.font-4 { font-size: 60%; }
+span.font-5 { font-size: 50%; }
+span.kogaki { font-size: 50%; }
+
+/* 縦中横 */
+span.tcy {
+	text-combine: horizontal;
+	-webkit-text-combine: horizontal;
+	-epub-text-combine: horizontal;
+}
+
+/* 行右小書き 上付き小文字 */
+span.sup {
+	vertical-align: super;
+	font-size: 0.5em;
+	letter-spacing: -2px;
+}
+/* 行左小書き 下付き小文字 */
+span.sub {
+	vertical-align: sub;
+	font-size: 0.5em;
+	letter-spacing: -2px;
+}
+
+/* 中央揃え */
+div.center, div.center p { text-align: center;}
+
+/* 字下げ */
+div.top1 { margin-top: 1em; }
+div.top2 { margin-top: 2em; }
+div.top3 { margin-top: 3em; }
+div.top4 { margin-top: 4em; }
+div.top5 { margin-top: 5em; }
+div.top6 { margin-top: 6em; }
+div.top7 { margin-top: 7em; }
+div.top8 { margin-top: 8em; }
+div.top9 { margin-top: 9em; }
+div.top10 { margin-top: 10em; }
+div.top11 { margin-top: 11em; }
+div.top12 { margin-top: 12em; }
+div.top13 { margin-top: 13em; }
+div.top14 { margin-top: 14em; }
+div.top15 { margin-top: 15em; }
+div.top16 { margin-top: 16em; }
+div.top17 { margin-top: 17em; }
+div.top18 { margin-top: 18em; }
+div.top19 { margin-top: 19em; }
+div.top20 { margin-top: 20em; }
+div.top21 { margin-top: 21em; }
+div.top22 { margin-top: 22em; }
+div.top23 { margin-top: 23em; }
+div.top24 { margin-top: 24em; }
+div.top25 { margin-top: 25em; }
+div.top26 { margin-top: 26em; }
+div.top27 { margin-top: 27em; }
+div.top28 { margin-top: 28em; }
+div.top29 { margin-top: 29em; }
+div.top30 { margin-top: 30em; }
+
+/* 改行天付き、折り返して(.+?)字下げ → class="top{$1} idt-{$1}" */
+/* ここから(.+?)字下げ、折り返して(.+?)字下げ → class="top{$2} idt{$1-$2}" */
+div.idt1 { text-indent: 1em; }
+div.idt2 { text-indent: 2em; }
+div.idt3 { text-indent: 3em; }
+div.idt4 { text-indent: 4em; }
+div.idt5 { text-indent: 5em; }
+div.idt6 { text-indent: 6em; }
+div.idt7 { text-indent: 7em; }
+div.idt8 { text-indent: 8em; }
+div.idt9 { text-indent: 9em; }
+div.idt10 { text-indent: 10em; }
+div.idt11 { text-indent: 11em; }
+div.idt12 { text-indent: 12em; }
+div.idt13 { text-indent: 13em; }
+div.idt14 { text-indent: 14em; }
+div.idt15 { text-indent: 15em; }
+div.idt16 { text-indent: 16em; }
+div.idt17 { text-indent: 17em; }
+div.idt18 { text-indent: 18em; }
+div.idt19 { text-indent: 19em; }
+div.idt20 { text-indent: 20em; }
+div.idt21 { text-indent: 21em; }
+div.idt22 { text-indent: 22em; }
+div.idt23 { text-indent: 23em; }
+div.idt24 { text-indent: 24em; }
+div.idt25 { text-indent: 25em; }
+div.idt-1 { text-indent: -1em; }
+div.idt-2 { text-indent: -2em; }
+div.idt-3 { text-indent: -3em; }
+div.idt-4 { text-indent: -4em; }
+div.idt-5 { text-indent: -5em; }
+div.idt-6 { text-indent: -6em; }
+div.idt-7 { text-indent: -7em; }
+div.idt-8 { text-indent: -8em; }
+div.idt-9 { text-indent: -9em; }
+div.idt-10 { text-indent: -10em; }
+div.idt-11 { text-indent: -11em; }
+div.idt-12 { text-indent: -12em; }
+div.idt-13 { text-indent: -13em; }
+div.idt-14 { text-indent: -14em; }
+div.idt-15 { text-indent: -15em; }
+div.idt-16 { text-indent: -16em; }
+div.idt-17 { text-indent: -17em; }
+div.idt-18 { text-indent: -18em; }
+div.idt-19 { text-indent: -19em; }
+div.idt-20 { text-indent: -20em; }
+div.idt-21 { text-indent: -21em; }
+div.idt-22 { text-indent: -22em; }
+div.idt-23 { text-indent: -23em; }
+div.idt-24 { text-indent: -24em; }
+div.idt-25 { text-indent: -25em; }
+
+/* 地付き */
+div.btm, div.btm p { text-align: right; margin-bottom: 0em; }
+div.btm1, div.btm1 p { text-align: right; margin-bottom: 1em; }
+div.btm2, div.btm2 p { text-align: right; margin-bottom: 2em; }
+div.btm3, div.btm3 p { text-align: right; margin-bottom: 3em; }
+div.btm4, div.btm4 p { text-align: right; margin-bottom: 4em; }
+div.btm5, div.btm5 p { text-align: right; margin-bottom: 5em; }
+div.btm6, div.btm6 p { text-align: right; margin-bottom: 6em; }
+div.btm7, div.btm7 p { text-align: right; margin-bottom: 7em; }
+div.btm8, div.btm8 p { text-align: right; margin-bottom: 8em; }
+div.btm9, div.btm9 p { text-align: right; margin-bottom: 9em; }
+div.btm10, div.btm10 p { text-align: right; margin-bottom: 10em; }
+div.btm11, div.btm11 p { text-align: right; margin-bottom: 11em; }
+div.btm12, div.btm12 p { text-align: right; margin-bottom: 12em; }
+div.btm13, div.btm13 p { text-align: right; margin-bottom: 13em; }
+div.btm14, div.btm14 p { text-align: right; margin-bottom: 14em; }
+div.btm15, div.btm15 p { text-align: right; margin-bottom: 15em; }
+div.btm16, div.btm16 p { text-align: right; margin-bottom: 16em; }
+div.btm17, div.btm17 p { text-align: right; margin-bottom: 17em; }
+div.btm18, div.btm18 p { text-align: right; margin-bottom: 18em; }
+div.btm19, div.btm19 p { text-align: right; margin-bottom: 19em; }
+div.btm20, div.btm20 p { text-align: right; margin-bottom: 20em; }
+div.btm21, div.btm21 p { text-align: right; margin-bottom: 21em; }
+div.btm22, div.btm22 p { text-align: right; margin-bottom: 22em; }
+div.btm23, div.btm23 p { text-align: right; margin-bottom: 23em; }
+div.btm24, div.btm24 p { text-align: right; margin-bottom: 24em; }
+div.btm25, div.btm25 p { text-align: right; margin-bottom: 25em; }
+
+div.jzm1 { max-height: 1em; }
+div.jzm2 { max-height: 2em; }
+div.jzm3 { max-height: 3em; }
+div.jzm4 { max-height: 4em; }
+div.jzm5 { max-height: 5em; }
+div.jzm6 { max-height: 6em; }
+div.jzm7 { max-height: 7em; }
+div.jzm8 { max-height: 8em; }
+div.jzm9 { max-height: 9em; }
+div.jzm10 { max-height: 10em; }
+div.jzm11 { max-height: 11em; }
+div.jzm12 { max-height: 12em; }
+div.jzm13 { max-height: 13em; }
+div.jzm14 { max-height: 14em; }
+div.jzm15 { max-height: 15em; }
+div.jzm16 { max-height: 16em; }
+div.jzm17 { max-height: 17em; }
+div.jzm18 { max-height: 18em; }
+div.jzm19 { max-height: 19em; }
+div.jzm20 { max-height: 20em; }
+div.jzm21 { max-height: 21em; }
+div.jzm22 { max-height: 22em; }
+div.jzm23 { max-height: 23em; }
+div.jzm24 { max-height: 24em; }
+div.jzm25 { max-height: 25em; }
+div.jzm26 { max-height: 26em; }
+div.jzm27 { max-height: 27em; }
+div.jzm28 { max-height: 28em; }
+div.jzm29 { max-height: 29em; }
+div.jzm30 { max-height: 30em; }
+div.jzm31 { max-height: 31em; }
+div.jzm32 { max-height: 32em; }
+div.jzm33 { max-height: 33em; }
+div.jzm34 { max-height: 34em; }
+div.jzm35 { max-height: 35em; }
+div.jzm36 { max-height: 36em; }
+div.jzm37 { max-height: 37em; }
+div.jzm38 { max-height: 38em; }
+div.jzm39 { max-height: 39em; }
+div.jzm40 { max-height: 40em; }

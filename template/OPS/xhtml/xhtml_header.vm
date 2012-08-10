@@ -5,20 +5,18 @@
 #if (${bookInfo.Vertical})
 #if (${sectionInfo.ImageFit})
 	<link rel="stylesheet" type="text/css" href="../css/vertical_image.css" class="vertical_image" title="vertical image only"/>
+#elseif (${sectionInfo.Middle})
+	<link rel="stylesheet" type="text/css" href="../css/vertical_middle.css" class="vertical_middle" title="vertical middle"/>
 #else
 	<link rel="stylesheet" type="text/css" href="../css/vertical.css" class="vertical" title="vertical layout"/>
-#if (${sectionInfo.Middle})
-	<link rel="stylesheet" type="text/css" href="../css/vertical_middle.css" class="vertical_middle" title="vertical middle"/>
-#end
 #end
 #else
 #if (${sectionInfo.ImageFit})
 	<link rel="stylesheet" type="text/css" href="../css/horizontal_image.css" class="horizontal_image" title="horizontal image only"/>
+#elseif (${sectionInfo.Middle})
+	<link rel="stylesheet" type="text/css" href="../css/horizontal_middle.css" class="horizontal_middle" title="horizontal middle"/>
 #else
 	<link rel="stylesheet" type="text/css" href="../css/horizontal.css" class="horizontal" title="horizontal layout"/>
-#if (${sectionInfo.Middle})
-	<link rel="stylesheet" type="text/css" href="../css/horizontal_middle.css" class="horizontal_middle" title="horizontal middle"/>
-#end
 #end
 #end
 	<title>${bookInfo.Title}</title>

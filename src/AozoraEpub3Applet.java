@@ -187,7 +187,7 @@ public class AozoraEpub3Applet extends JApplet
 		panel.add(jComboTitle);
 		//入力ファイル名優先
 		propValue = props.getProperty("UseFileName");
-		jCheckUserFileName = new JCheckBox("ファイル名優先 ", propValue!=null||"1".equals(propValue));
+		jCheckUserFileName = new JCheckBox("ファイル名優先 ", propValue==null||"1".equals(propValue));
 		jCheckUserFileName.setFocusPainted(false);
 		panel.add(jCheckUserFileName);
 		//出力ファイル名設定
