@@ -51,6 +51,7 @@ public class AozoraEpub3
 			boolean autoYoko = true;
 			boolean overWrite = true;
 			String coverFileName = "";//先頭の挿絵
+			boolean insertCoverPage = false;
 			TitleType titleType = TitleType.TITLE_AUTHOR;
 			boolean useFileName = true;
 			
@@ -73,9 +74,8 @@ public class AozoraEpub3
 			
 			for (int i=0; i<args.length; i++) {
 				File srcFile = new File(args[i]);
-				BookInfo bookInfo = AozoraEpub3.getBookInfo(srcFile, aozoraConverter, autoFileName, outExt, overWrite, encType, titleType);
+				BookInfo bookInfo = AozoraEpub3.getBookInfo(srcFile, aozoraConverter, autoFileName, outExt, overWrite, coverFileName, insertCoverPage, encType, titleType);
 				bookInfo.vertical = vertical;
-				bookInfo.coverFileName = coverFileName;
 				//確認なしなのでnullでなければ上書き
 				if (useFileName) {
 					String[] titleCreator = getFileTitleCreator(srcFile.getName());
@@ -96,6 +96,7 @@ public class AozoraEpub3
 	/** 前処理で一度読み込んでタイトル等の情報を取得 */
 	static public BookInfo getBookInfo(File srcFile, AozoraEpub3Converter aozoraConverter,
 			boolean autoFileName, String outExt, boolean overWrite,
+			String coverFileName, boolean insertCoverPage,
 			String encType, TitleType titleType)
 	{
 		try {
@@ -108,7 +109,7 @@ public class AozoraEpub3
 			
 			//タイトル取得
 			BufferedReader src = new BufferedReader(new InputStreamReader(is, (String)encType));
-			BookInfo bookInfo = aozoraConverter.getBookInfo(src, titleType);
+			BookInfo bookInfo = aozoraConverter.getBookInfo(src, titleType, coverFileName, insertCoverPage);
 			bookInfo.modified = new Date();
 			is.close();
 			

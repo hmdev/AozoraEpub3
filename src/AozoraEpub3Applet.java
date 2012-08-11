@@ -694,6 +694,11 @@ public class AozoraEpub3Applet extends JApplet
 		*/
 		this.aozoraConverter.setForcePageBreak(forcePageBreak, forcePageBreakEmpty, pattern);
 		
+		//表紙情報追加
+		String coverFileName = this.jComboCover.getSelectedItem().toString();
+		if (coverFileName.equals(this.jComboCover.getItemAt(0).toString())) coverFileName = ""; //先頭の挿絵
+		if (coverFileName.equals(this.jComboCover.getItemAt(1).toString())) coverFileName = "*"; //入力ファイルと同じ名前+.jpg/.png
+		if (coverFileName.equals(this.jComboCover.getItemAt(2).toString())) coverFileName = null; //表紙無し
 		//BookInfo取得
 		BookInfo bookInfo = AozoraEpub3.getBookInfo(
 			srcFile,
@@ -701,20 +706,13 @@ public class AozoraEpub3Applet extends JApplet
 			this.jCheckAutoFileName.isSelected(),
 			this.jComboExt.getSelectedItem().toString().trim(),
 			this.jCheckOverWrite.isSelected(),
+			coverFileName, this.jCheckCoverPage.isSelected(),
 			this.jComboEncType.getSelectedItem().toString(),
 			TitleType.values()[this.jComboTitle.getSelectedIndex()]
 		);
 		if (bookInfo == null) return;
 		//縦書き横書き設定追加
 		bookInfo.vertical = this.jRadioVertical.isSelected();
-		//表紙情報追加
-		String coverFileName = this.jComboCover.getSelectedItem().toString();
-		if (coverFileName.equals(this.jComboCover.getItemAt(0).toString())) coverFileName = ""; //先頭の挿絵
-		if (coverFileName.equals(this.jComboCover.getItemAt(1).toString())) coverFileName = "*"; //入力ファイルと同じ名前+.jpg/.png
-		if (coverFileName.equals(this.jComboCover.getItemAt(2).toString())) coverFileName = null; //表紙無し
-		bookInfo.coverFileName = coverFileName;
-		//表紙ページ挿入
-		bookInfo.insertCoverPage = this.jCheckCoverPage.isSelected();
 		
 		//確認ページ 変換ボタン押下時にbookInfo更新
 		if (this.jCheckConfirm.isSelected()) {

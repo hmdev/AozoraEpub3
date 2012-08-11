@@ -1,34 +1,4 @@
 @charset "utf-8";
-@namespace "http://www.w3.org/1999/xhtml";
-
-/** 縦書き用 */
-@page {
-	/* 上右下左 */
-	margin: 0.5em 0.5em 0 0;
-}
-
-html {
-	writing-mode: vertical-rl;
-	-webkit-writing-mode: vertical-rl;
-	-epub-writing-mode: vertical-rl;
-	-epub-line-break: strict;
-	line-break: strict;	
-	-epub-word-break: normal;
-	word-break: normal;
-	margin: 0;
-	padding: 0;
-}
-body {
-	margin: 0;
-	padding: 0;
-	display: block;
-	color: #000;
-	font-family: "@ＭＳ 明朝", "@MS Mincho", "ヒラギノ明朝 ProN W3", "HiraMinProN-W3", serif, sans-serif;
-	font-size: 1em;
-	line-height: 1.75;
-	vertical-align: baseline;
-}
-
 
 /** 縦書き用 ページ設定以外の基本部分 */
 p {

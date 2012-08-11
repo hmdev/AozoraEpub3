@@ -20,12 +20,14 @@
 	<manifest>
 #if (${bookInfo.Vertical})
 		<item id="vertical" href="css/vertical.css" media-type="text/css"/>
-		<item id="vertical_middle" href="css/vertical_middle.css" media-type="text/css"/>
-		<item id="vertical_image" href="css/vertical_image.css" media-type="text/css"/>
+		<item id="v_text" href="css/vertical_text.css" media-type="text/css"/>
+		<item id="v_middle" href="css/vertical_middle.css" media-type="text/css"/>
+		<item id="v_image" href="css/vertical_image.css" media-type="text/css"/>
 #else
 		<item id="horizontal" href="css/horizontal.css" media-type="text/css"/>
-		<item id="horizontal_middle" href="css/horizontal_middle.css" media-type="text/css"/>
-		<item id="horizontal_image" href="css/horizontal_image.css" media-type="text/css"/>
+		<item id="h_text" href="css/horizontal_text.css" media-type="text/css"/>
+		<item id="h_middle" href="css/horizontal_middle.css" media-type="text/css"/>
+		<item id="h_image" href="css/horizontal_image.css" media-type="text/css"/>
 #end
 		<item id="nav" properties="nav" href="xhtml/nav.xhtml" media-type="application/xhtml+xml"/>
 #if (${bookInfo.InsertCoverPage})

@@ -280,9 +280,11 @@ public class AozoraEpub3Converter
 	}
 	/** タイトルと著作者を取得. 行番号も保存して出力時に変換出力
 	 * @throws IOException */
-	public BookInfo getBookInfo(BufferedReader src, TitleType titleType) throws IOException
+	public BookInfo getBookInfo(BufferedReader src, TitleType titleType, String coverFileName, boolean insertCoverPage) throws IOException
 	{
 		BookInfo bookInfo = new BookInfo();
+		bookInfo.coverFileName = coverFileName;
+		bookInfo.insertCoverPage = insertCoverPage;
 		String line;
 		int lineNum = -1;
 		//前の行のバッファ [1行前, 2行前]
@@ -301,9 +303,6 @@ public class AozoraEpub3Converter
 		
 		//最後まで回す
 		while ((line = src.readLine()) != null) {
-			//前の2行を保存
-			preLines[1] = preLines[0];
-			preLines[0] = line;
 			lineNum++;
 			
 			//コメント除外
@@ -399,6 +398,9 @@ public class AozoraEpub3Converter
 					}
 				}
 			}
+			//前の2行を保存
+			preLines[1] = preLines[0];
+			preLines[0] = line;
 		}
 		if (bookInfo.creator != null && (bookInfo.creator.startsWith("―") || bookInfo.creator.startsWith("【"))) bookInfo.creator = null;
 		
@@ -413,8 +415,10 @@ public class AozoraEpub3Converter
 	{
 		//現在の行が改ページ
 		if (preLines[0] == null) return;
-		if (line.indexOf('］') > 3 && chukiFlagPageBreak.contains(line.substring(2, line.indexOf('］')))) {
-			//2行前の行末が改ページまたは現在行が2行目
+		if (line.indexOf('］') <= 3) return;
+		String curChuki = line.substring(2, line.indexOf('］')); //現在行の行頭注記
+		if (chukiFlagPageBreak.contains(curChuki)) {
+			//2行前の行末が改ページまたは現在行が先頭から2行目
 			if (preLines[1] == null ||
 				(preLines[1].indexOf('］') > 3 && chukiFlagPageBreak.contains(preLines[1].substring(preLines[1].lastIndexOf('＃')+1, preLines[1].length()-1)))
 				) {
@@ -422,8 +426,14 @@ public class AozoraEpub3Converter
 				if (
 					(preLines[0].startsWith("［＃") && preLines[0].matches("^［＃.*（.+\\..+") && preLines[0].indexOf('］') == preLines[0].length()-1) ||
 					(preLines[0].toLowerCase().startsWith("<img") && preLines[0].indexOf('>') == preLines[0].length()-1)
-					) {
-					bookInfo.addImageSectionLine(lineNum==1 ? 0 : lineNum-2);
+				) {
+					//先頭が画像で単ページでかつ表紙出力の場合は改行を無視 左右中央なら先頭フラグON
+					if (lineNum == 1 && "".equals(bookInfo.coverFileName) && bookInfo.insertCoverPage) {
+						bookInfo.addIgnoreLine(1);
+						if (chukiFlagMiddle.contains(curChuki)) bookInfo.startMiddle = true;
+					} else {
+						bookInfo.addImageSectionLine(lineNum==1 ? 0 : lineNum-2);
+					}
 				}
 			}
 		}
@@ -451,6 +461,7 @@ public class AozoraEpub3Converter
 		boolean inComment = false;
 		this.chapterStarted = false;
 		this.chapterIsImageTitle= false; 
+		
 		while ((line = src.readLine()) != null) {
 			lineNum++;
 			pageLineNum++;

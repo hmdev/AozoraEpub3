@@ -76,12 +76,14 @@ public class Epub3Writer
 	final static String[] TEMPLATE_FILE_NAMES = new String[]{
 		"mimetype",
 		"META-INF/container.xml",
-		OPS_PATH+CSS_PATH+"vertical.css",
+		OPS_PATH+CSS_PATH+"vertical_text.css",
 		OPS_PATH+CSS_PATH+"vertical_middle.css",
 		OPS_PATH+CSS_PATH+"vertical_image.css",
-		OPS_PATH+CSS_PATH+"horizontal.css",
+		OPS_PATH+CSS_PATH+"vertical.css",
+		OPS_PATH+CSS_PATH+"horizontal_text.css",
 		OPS_PATH+CSS_PATH+"horizontal_middle.css",
-		OPS_PATH+CSS_PATH+"horizontal_image.css"
+		OPS_PATH+CSS_PATH+"horizontal_image.css",
+		OPS_PATH+CSS_PATH+"horizontal.css"
 	};
 	
 	/** 出力先ePubのZipストリーム */
