@@ -989,13 +989,18 @@ public class AozoraEpub3Converter
 							hasBlock = true;//ブロック字下げなので改行なし
 						}
 					}
-					//字下げ複合は字下げのみに変更
+					//字下げ複合は字下げの後の複合注記をclassに追加
 					if (!patternMatched) {
 						m2 = chukiPatternMap.get("字下げ複合").matcher(chukiTag);
 						if (m2.find()) {
 							int arg0 = Integer.parseInt(CharUtils.fullToHalf(m2.group(1)));
 							buf.append(chukiMap.get("字下げ複合1")[0]+arg0);
+							//複合注記クラス追加
+							if (chukiTag.indexOf("罫囲み") > 0) buf.append(" ").append(chukiMap.get("字下げ罫囲み")[0]);
+							if (chukiTag.indexOf("中央揃え") > 0) buf.append(" ").append(chukiMap.get("字下げ中央揃え")[0]);
+							//複合字下げclass閉じる
 							buf.append(chukiMap.get("字下げ複合2")[0]);
+							
 							//字下げフラグ処理
 							if (inJisage) {
 								buf.append(chukiMap.get("字下げ省略")[0]);

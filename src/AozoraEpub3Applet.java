@@ -600,14 +600,7 @@ public class AozoraEpub3Applet extends JApplet
 			int state = fileChooser.showOpenDialog(parent);
 			switch (state) {
 			case JFileChooser.APPROVE_OPTION:
-				convertCanceled = false;
-				File[] files = fileChooser.getSelectedFiles();
-				for (File srcFile : files) {
-					convertFile(srcFile);
-					currentPath = srcFile.getParentFile();
-					//キャンセル
-					if (convertCanceled) return;
-				}
+				convertFiles(fileChooser.getSelectedFiles());
 			}
 		}
 	}
@@ -651,15 +644,9 @@ public class AozoraEpub3Applet extends JApplet
 			dtde.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
 			Transferable transfer = dtde.getTransferable();
 			try {
-				convertCanceled = false;
 				@SuppressWarnings("unchecked")
 				List<File> files = (List<File>) transfer.getTransferData(DataFlavor.javaFileListFlavor);
-				for (File srcFile : files) {
-					convertFile(srcFile);
-					currentPath = srcFile.getParentFile();
-					//キャンセル
-					if (convertCanceled) return;
-				}
+				convertFiles((File[])(files.toArray()));
 			} catch (Exception e) {
 				e.printStackTrace();
 			} finally {
@@ -668,11 +655,14 @@ public class AozoraEpub3Applet extends JApplet
 		}
 	}
 	
-	/** 内部用変換関数 Appletの設定を引数に渡す */
-	private void convertFile(File srcFile)
+	/** 複数ファイルを変換 */
+	private void convertFiles(File[] srcFiles)
 	{
-		//パラメータ設定
+		if (srcFiles.length == 0 ) return;
+		convertCanceled = false;
+		currentPath = srcFiles[0].getParentFile();
 		
+		//共通パラメータ取得
 		//出力先取得
 		File dstPath = null;
 		if (jComboDstPath.getSelectedIndex() != 0) {
@@ -682,7 +672,6 @@ public class AozoraEpub3Applet extends JApplet
 				return;
 			}
 		}
-		
 		//自動改ページ
 		int forcePageBreak = 0;
 		int forcePageBreakEmpty = 2;
@@ -693,6 +682,37 @@ public class AozoraEpub3Applet extends JApplet
 		} catch (Exception e) {}
 		*/
 		this.aozoraConverter.setForcePageBreak(forcePageBreak, forcePageBreakEmpty, pattern);
+		//栞用span出力
+		this.aozoraConverter.setWithMarkId(this.jCheckMarkId.isSelected());
+		//変換オプション設定
+		this.aozoraConverter.setAutoYoko(this.jCheckAutoYoko.isSelected());
+		
+		//すべてのファイルの変換実行
+		_convertFiles(srcFiles, dstPath);
+		
+	}
+	/** サブディレクトリ再起用 */
+	private void _convertFiles(File[] srcFiles, File dstPath)
+	{
+		for (File srcFile : srcFiles) {
+			if (srcFile.isDirectory()) {
+				//サブディレクトリ 再帰
+				_convertFiles(srcFile.listFiles(), dstPath);
+			} else if (srcFile.isFile()) {
+				convertFile(srcFile, dstPath);
+			}
+			//キャンセル
+			if (convertCanceled) return;
+		}
+		
+	}
+
+	
+	/** 内部用変換関数 Appletの設定を引数に渡す
+	 * TODO 共通パラメータは事前に取得しておく */
+	private void convertFile(File srcFile, File dstPath)
+	{
+		//パラメータ設定
 		
 		//表紙情報追加
 		String coverFileName = this.jComboCover.getSelectedItem().toString();
@@ -752,12 +772,6 @@ public class AozoraEpub3Applet extends JApplet
 				if (titleCreator[1] != null && titleCreator[1].trim().length() >0) bookInfo.creator = titleCreator[1];
 			}
 		}
-		
-		//変換設定
-		//栞用span出力
-		this.aozoraConverter.setWithMarkId(this.jCheckMarkId.isSelected());
-		//変換オプション設定
-		this.aozoraConverter.setAutoYoko(this.jCheckAutoYoko.isSelected());
 		
 		AozoraEpub3.convertFile(
 			srcFile, dstPath,

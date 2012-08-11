@@ -218,37 +218,6 @@
 ここから２９字下げ	<div class="top29">		1
 ここから３０字下げ	<div class="top30">		1
 
-ここから１字下げ、罫囲み	<div class="top1 border">		1
-ここから２字下げ、罫囲み	<div class="top2 border">		1
-ここから３字下げ、罫囲み	<div class="top3 border">		1
-ここから４字下げ、罫囲み	<div class="top4 border">		1
-ここから５字下げ、罫囲み	<div class="top5 border">		1
-ここから６字下げ、罫囲み	<div class="top6 border">		1
-ここから７字下げ、罫囲み	<div class="top7 border">		1
-ここから８字下げ、罫囲み	<div class="top8 border">		1
-ここから９字下げ、罫囲み	<div class="top9 border">		1
-ここから１０字下げ、罫囲み	<div class="top10 border">		1
-ここから１１字下げ、罫囲み	<div class="top11 border">		1
-ここから１２字下げ、罫囲み	<div class="top12 border">		1
-ここから１３字下げ、罫囲み	<div class="top13 border">		1
-ここから１４字下げ、罫囲み	<div class="top14 border">		1
-ここから１５字下げ、罫囲み	<div class="top15 border">		1
-ここから１６字下げ、罫囲み	<div class="top16 border">		1
-ここから１７字下げ、罫囲み	<div class="top17 border">		1
-ここから１８字下げ、罫囲み	<div class="top18 border">		1
-ここから１９字下げ、罫囲み	<div class="top19 border">		1
-ここから２０字下げ、罫囲み	<div class="top20 border">		1
-ここから２１字下げ、罫囲み	<div class="top21 border">		1
-ここから２２字下げ、罫囲み	<div class="top22 border">		1
-ここから２３字下げ、罫囲み	<div class="top23 border">		1
-ここから２４字下げ、罫囲み	<div class="top24 border">		1
-ここから２５字下げ、罫囲み	<div class="top25 border">		1
-ここから２６字下げ、罫囲み	<div class="top26 border">		1
-ここから２７字下げ、罫囲み	<div class="top27 border">		1
-ここから２８字下げ、罫囲み	<div class="top28 border">		1
-ここから２９字下げ、罫囲み	<div class="top29 border">		1
-ここから３０字下げ、罫囲み	<div class="top30 border">		1
-
 ここから改行天付き、折り返して１字下げ	<div class="top1 idt-1">		1
 ここから改行天付き、折り返して２字下げ	<div class="top2 idt-2">		1
 ここから改行天付き、折り返して３字下げ	<div class="top3 idt-3">		1
@@ -433,6 +402,7 @@
 ####字下げ その他の複合注記 → 字下げのみ有効 ※字下げ終わりも複合表記有り
 ##ここから([０-９]+)字下げ、(.*)	<div class="top{$1}">
 字下げ複合1	<div class="top
+##この間に複合注記のクラスが追加される
 字下げ複合2	">
 
 ##字下げ複合時あれば class=""内に追加する

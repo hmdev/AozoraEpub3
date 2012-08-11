@@ -34,7 +34,9 @@ span.i {
 /** 罫囲み */
 .border {
 	border: 1px solid #000;
+	margin: 0 0.5em;
 	padding: 0.5em;
+	display: inline-block;
 }
 
 /* 圏点 */
@@ -246,7 +248,7 @@ div.idt-23 { text-indent: -23em; }
 div.idt-24 { text-indent: -24em; }
 div.idt-25 { text-indent: -25em; }
 
-/* 地付き */
+/* 地付き 地上げ */
 div.btm, div.btm p { text-align: right; margin-bottom: 0em; }
 div.btm1, div.btm1 p { text-align: right; margin-bottom: 1em; }
 div.btm2, div.btm2 p { text-align: right; margin-bottom: 2em; }
