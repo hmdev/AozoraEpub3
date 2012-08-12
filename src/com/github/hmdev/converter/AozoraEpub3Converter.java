@@ -56,6 +56,9 @@ public class AozoraEpub3Converter
 	/** コメントブロックを非表示 */
 	boolean hideCommentBlock = true;
 	
+	/** UTF-32文字に小書き注記表示 */
+	boolean gaijiKogaki32 = false;
+	
 	/** 強制改行行数 ページ先頭からこれ以降の行 */
 	int forcePageBreak = 500;
 	/** 強制改行対象の空行 */
@@ -427,12 +430,13 @@ public class AozoraEpub3Converter
 					(preLines[0].startsWith("［＃") && preLines[0].matches("^［＃.*（.+\\..+") && preLines[0].indexOf('］') == preLines[0].length()-1) ||
 					(preLines[0].toLowerCase().startsWith("<img") && preLines[0].indexOf('>') == preLines[0].length()-1)
 				) {
-					//先頭が画像で単ページでかつ表紙出力の場合は改行を無視 左右中央なら先頭フラグON
+					//先頭が画像で単ページでかつ表紙出力の場合は後ろの改行を無視 左右中央なら先頭フラグON
+					//先頭以外の場合は出力時の改ページ処理時に判別して処理を飛ばす
 					if (lineNum == 1 && "".equals(bookInfo.coverFileName) && bookInfo.insertCoverPage) {
 						bookInfo.addIgnoreLine(1);
 						if (chukiFlagMiddle.contains(curChuki)) bookInfo.startMiddle = true;
 					} else {
-						bookInfo.addImageSectionLine(lineNum==1 ? 0 : lineNum-2);
+						bookInfo.addImageSectionLine(lineNum==1 ? 0 : lineNum-1);
 					}
 				}
 			}
@@ -577,10 +581,12 @@ public class AozoraEpub3Converter
 				//注記名称で変換
 				if (gaiji == null) gaiji = ghukiConverter.toUtf(chukiValues[0]);
 				
-				//フォントでの表示不可能文字なら小書き出力
+				//未サポート外字
 				//if (unsupportGaiji.contains(gaiji)) {
-				//	gaiji = "gaiji［＃行右小書き］（"+chukiValues[0]+"）［＃行右小書き終わり］";
-				//}
+				//Unicode32文字なら小書き出力
+				if (gaijiKogaki32 && gaiji != null && gaiji.getBytes().length ==4) {
+					gaiji += "［＃行右小書き］（"+chukiValues[0]+"）［＃行右小書き終わり］";
+				}
 				
 				if (gaiji == null) {
 					LogAppender.append("[外字未変換] : "+chuki+"\n");
@@ -816,14 +822,14 @@ public class AozoraEpub3Converter
 				//左右中央や表紙移動でで何も無いページなら改ページしない
 				////////////////////////////////////////////////////////////////
 				if (chukiFlagPageBreak.contains(chukiName) && !bookInfo.isNoPageBreakLine(lineNum)) {
+					//前の文字まで出力
 					this.printTextLine(out, buf, hasBlock, true);
-					//前の行まで出す
 					sectionCharLength += buf.length();
 					
 					//次の行が画像単独ページで先頭画像で表紙に移動する場合は改ページしない
-					if (bookInfo.isImageSectionLine(lineNum+1) && bookInfo.coverFileName.equals("") && bookInfo.insertCoverPage && writer.getImageIndex() == 0) {
+					if (bookInfo.isImageSectionLine(lineNum+1) && "".equals(bookInfo.coverFileName) && bookInfo.insertCoverPage && writer.getImageIndex() == 0) {
 					} else {
-						//空のページなら改行出力
+						//空のページなら改行出力（エラー対策）
 						if (sectionCharLength == 0) {
 							this.printTextLine(out, buf, false, false);
 						}
@@ -920,7 +926,9 @@ public class AozoraEpub3Converter
 						int start = srcIdx + 5;
 						int end = -1;
 						if (chukiTag.charAt(start) == '"') end = chukiTag.indexOf('"', start+1);
-						if (chukiTag.charAt(start) == '\'') end = chukiTag.indexOf('\'', start+1);
+						else if (chukiTag.charAt(start) == '\'') end = chukiTag.indexOf('\'', start+1);
+						if (end == -1) { end = chukiTag.indexOf('>', start); start--; }
+						if (end == -1) { end = chukiTag.indexOf(' ', start); start--; }
 						if (end == -1) {
 							LogAppender.append("画像注記エラー: "+chukiTag+"\n");
 						} else {

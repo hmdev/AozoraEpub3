@@ -574,6 +574,8 @@ public class AozoraEpub3Applet extends JApplet
 		public void actionPerformed(ActionEvent e)
 		{
 			JFileChooser fileChooser = new JFileChooser(currentPath);
+			fileChooser.setDialogTitle("表紙画像を選択");
+			fileChooser.setApproveButtonText("選択");
 			fileChooser.setFileFilter(new FileNameExtensionFilter("表紙画像(jpg,png,gif)", new String[]{"jpg","png","gif"}));
 			int state = fileChooser.showOpenDialog(parent);
 			switch (state) {
@@ -595,6 +597,7 @@ public class AozoraEpub3Applet extends JApplet
 		public void actionPerformed(ActionEvent e)
 		{
 			JFileChooser fileChooser = new JFileChooser(currentPath);
+			fileChooser.setDialogTitle("変換する青空文庫テキストを開く");
 			fileChooser.setFileFilter(new FileNameExtensionFilter("青空文庫テキスト(txt,zip)", new String[]{"txt","zip"}));
 			fileChooser.setMultiSelectionEnabled(true);
 			int state = fileChooser.showOpenDialog(parent);
@@ -615,13 +618,19 @@ public class AozoraEpub3Applet extends JApplet
 		@Override
 		public void actionPerformed(ActionEvent e)
 		{
-			JFileChooser fileChooser = new JFileChooser(currentPath);
+			File path = currentPath;
+			File selectedPath = new File((String)jComboDstPath.getSelectedItem());
+			if (selectedPath.isDirectory()) path = selectedPath;
+			else if (selectedPath.isFile()) path = selectedPath.getParentFile();
+			JFileChooser fileChooser = new JFileChooser(path);
+			fileChooser.setDialogTitle("出力先を選択");
+			fileChooser.setApproveButtonText("選択");
 			fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 			int state = fileChooser.showOpenDialog(parent);
 			switch (state) {
 			case JFileChooser.APPROVE_OPTION:
-				String path = fileChooser.getSelectedFile().getAbsolutePath();
-				jComboDstPath.setSelectedItem(path);
+				String pathString = fileChooser.getSelectedFile().getAbsolutePath();
+				jComboDstPath.setSelectedItem(pathString);
 			}
 		}
 	}
@@ -845,7 +854,23 @@ public class AozoraEpub3Applet extends JApplet
 		this.props.setProperty("AutoFileName", this.jCheckAutoFileName.isSelected()?"1":"");
 		//出力先と履歴
 		if (this.jComboDstPath.getSelectedIndex() == 0) this.props.setProperty("DstPath","");
-		else if (this.jComboDstPath.getSelectedIndex() == 1) this.props.setProperty("DstPath", ""+this.jComboDstPath.getSelectedItem().toString().trim());
+		else {
+			String dstPath = this.jComboDstPath.getSelectedItem().toString().trim();
+			this.props.setProperty("DstPath", ""+dstPath);
+			//履歴
+			String dstPathList = this.props.getProperty("DstPathList");
+			if (dstPathList == null) dstPathList = dstPath;
+			else {
+				//最大10件
+				dstPathList = dstPath;
+				int count = Math.min(10, this.jComboDstPath.getItemCount());
+				for (int i=1; i<count; i++) {
+					String item = (String)this.jComboDstPath.getItemAt(i);
+					if (!dstPath.equals(item)) dstPathList += ","+item;
+				}
+			}
+			this.props.setProperty("DstPathList", dstPathList);
+		}
 		//設定
 		this.props.setProperty("MarkId", this.jCheckMarkId.isSelected()?"1":"");
 		this.props.setProperty("AutoYoko", this.jCheckAutoYoko.isSelected()?"1":"");

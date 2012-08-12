@@ -204,16 +204,19 @@ public class AozoraEpub3
 	{
 		//ファイル名からタイトル取得
 		String[] titleCreator = new String[2];
-		Matcher m = Pattern.compile("[\\[|［](.+?)[\\]|］]( |　)*(.*?)( |　)*(\\(|（|\\.)").matcher(fileName);
+		String noExtName = fileName.substring(0, fileName.lastIndexOf('.'));
+		noExtName = noExtName.replaceAll("^(.*)[\\(|（].*?[\\)|）][ |　]*$", "$1");
+		Matcher m = Pattern.compile("[\\[|［](.+?)[\\]|］][ |　]*(.*)[ |　]*$").matcher(noExtName);
 		if (m.find()) {
-			titleCreator[0] = m.group(3);
+			titleCreator[0] = m.group(2);
 			titleCreator[1] = m.group(1);
 		} else {
-			m = Pattern.compile("^(.*?)( |　)*(\\(|（|\\.)").matcher(fileName);
+			m = Pattern.compile("^(.*?)( |　)*(\\(|（)").matcher(noExtName);
 			if (m.find()) {
 				titleCreator[0] = m.group(1);
 			} else {
-				titleCreator[0] = fileName.replaceAll("\\.[^\\.]+$", "");
+				//一致しなければ拡張子のみ除外
+				titleCreator[0] = noExtName;
 			}
 		}
 		return titleCreator;
