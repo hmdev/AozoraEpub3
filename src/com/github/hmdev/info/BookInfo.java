@@ -15,10 +15,17 @@ public class BookInfo
 	/** 副題番号 */
 	public int subTitleLine = -1;
 	
+	/** 原題行番号 */
+	public int orgTitleLine = -1;
+	/** 原副題行番号 */
+	public int subOrgTitleLine = -1;
+	
 	/** 著作者 */
 	public String creator;
 	/** 著作者行番号 */
 	public int creatorLine = -1;
+	/** 複著作者行番号 */
+	public int subCreatorLine = -1;
 	
 	/** 発刊日時 */
 	public Date published;

@@ -25,7 +25,7 @@ h6 { font: small-caps 100%; }
 p { margin: 0; }
 
 span.b {
-	font-weight: bolder;
+	font-weight: bold;
 }
 span.i {
 	font-style: italic;
