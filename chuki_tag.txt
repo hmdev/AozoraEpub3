@@ -12,11 +12,14 @@
 ############ 左右中央 (仮) (改ページまで) ############
 ###改ページ (前に改ページがあったら無視)
 ページの左右中央			M
+ページの左右中央に			M
 ページの天地左右中央			M
 ページの天地左右中央に			M
 ##複合注記
 改丁、ページの左右中央			M
+改丁、ページの左右中央に			M
 改ページ、ページの左右中央			M
+改ページ、ページの左右中央に			M
 
 ############# 見出し #############
 ここから大見出し	<span class="font5">		1
@@ -56,9 +59,20 @@
 ## 返り点 左小書き 以下のもののみ対応
 一	<span class="sub">一</span>
 二	<span class="sub">二</span>
+三	<span class="sub">三</span>
 レ	<span class="sub">レ</span>
 一レ	<span class="sub">一レ</span>
 上レ	<span class="sub">上レ</span>
+上	<span class="sub">上</span>
+中	<span class="sub">中</span>
+下	<span class="sub">下</span>
+甲	<span class="sub">甲</span>
+乙	<span class="sub">乙</span>
+丙	<span class="sub">丙</span>
+天	<span class="sub">天</span>
+地	<span class="sub">地</span>
+人	<span class="sub">人</span>
+
 ##［＃「二」は返り点］の注記
 返り点	<span class="sub">		2
 返り点終わり	</span>		3
@@ -136,6 +150,17 @@
 
 ####割り注
 ## → 未対応
+## ブロック注記改行制御とログ表示抑止のため空欄で設定
+ここから割り注		1
+ここで割り注終わり		1
+
+####横組み
+## → 未対応(注記削除)
+## ブロック注記改行制御とログ表示抑止のため空欄で設定
+ここから横組み			1
+ここで横組み終わり			1
+ここから横書き			1
+ここで横書き終わり			1
 
 ####小書き
 行右小書き	<span class="sup">
@@ -148,6 +173,14 @@
 下付き小文字終わり	</span>
 
 ####罫囲み
+罫囲み	<div class="border">
+罫囲み終わり	</div>
+破線罫囲み	<div class="dashed_border">
+破線罫囲み終わり	</div><br/>
+枠囲み	<div class="border">
+枠囲み終わり	</div>
+破線枠囲み	<div class="dashed_border">
+破線枠囲み終わり	</div>
 ここから罫囲み	<div class="border">		1
 ここで罫囲み終わり	</div>		1
 ここから破線罫囲み	<div class="dashed_border">		1
@@ -156,10 +189,6 @@
 ここで枠囲み終わり	</div>		1
 ここから破線枠囲み	<div class="dashed_border">		1
 ここで破線枠囲み終わり	</div>		1
-
-####横組み → 未対応(注記削除)
-ここから横組み			1
-ここで横組み終わり			1
 
 ####文字サイズ
 １段階大きな文字	<span class="font1">
@@ -195,6 +224,7 @@
 中央揃え	<div class="center">	</div>	1
 ここから中央揃え	<div class="center">		1
 ここで中央揃え終わり	</div>		1
+中央寄せ	<div class="center">	</div>	1
 
 ############# 字下げ #############
 ####字下げ (［＃ここで字下げ終わり］の省略判別はプログラム内で処理)
@@ -256,6 +286,9 @@
 ここから改行天付き、折り返して２５字下げ	<div class="top25 idt-25">		1
 
 ここで字下げ終わり	</div>		1
+ここで字下げ終り	</div>		1
+字下げ終わり	</div>		1
+字下げ終り	</div>		1
 
 ####字上げ
 ここから地から１字上げ	<div class="btm1">		1
@@ -287,6 +320,9 @@
 
 ここから地付き	<div class="btm">		1
 ここで地付き終わり	</div>		1
+ここで地付き終り	</div>		1
+地付き終わり	</div>		1
+地付き終り	</div>		1
 
 
 ####インライン注記
@@ -321,6 +357,43 @@
 ２８字下げ	<div class="top28">	</div>	1
 ２９字下げ	<div class="top29">	</div>	1
 ３０字下げ	<div class="top30">	</div>	1
+##はみ出すので30文字
+３１字下げ	<div class="top30">	</div>	1
+３２字下げ	<div class="top30">	</div>	1
+３３字下げ	<div class="top30">	</div>	1
+３４字下げ	<div class="top30">	</div>	1
+３５字下げ	<div class="top30">	</div>	1
+
+天から１字下げ	<div class="top1">	</div>	1
+天から２字下げ	<div class="top2">	</div>	1
+天から３字下げ	<div class="top3">	</div>	1
+天から４字下げ	<div class="top4">	</div>	1
+天から５字下げ	<div class="top5">	</div>	1
+天から６字下げ	<div class="top6">	</div>	1
+天から７字下げ	<div class="top7">	</div>	1
+天から８字下げ	<div class="top8">	</div>	1
+天から９字下げ	<div class="top9">	</div>	1
+天から１０字下げ	<div class="top10">	</div>	1
+天から１１字下げ	<div class="top11">	</div>	1
+天から１２字下げ	<div class="top12">	</div>	1
+天から１３字下げ	<div class="top13">	</div>	1
+天から１４字下げ	<div class="top14">	</div>	1
+天から１５字下げ	<div class="top15">	</div>	1
+天から１６字下げ	<div class="top16">	</div>	1
+天から１７字下げ	<div class="top17">	</div>	1
+天から１８字下げ	<div class="top18">	</div>	1
+天から１９字下げ	<div class="top19">	</div>	1
+天から２０字下げ	<div class="top20">	</div>	1
+天から２１字下げ	<div class="top21">	</div>	1
+天から２２字下げ	<div class="top22">	</div>	1
+天から２３字下げ	<div class="top23">	</div>	1
+天から２４字下げ	<div class="top24">	</div>	1
+天から２５字下げ	<div class="top25">	</div>	1
+天から２６字下げ	<div class="top26">	</div>	1
+天から２７字下げ	<div class="top27">	</div>	1
+天から２８字下げ	<div class="top28">	</div>	1
+天から２９字下げ	<div class="top29">	</div>	1
+天から３０字下げ	<div class="top30">	</div>	1
 
 地付き	<div class="btm">	</div>	1
 地から１字上げ	<div class="btm1">	</div>	1
@@ -393,6 +466,9 @@
 ここから４０字詰め	<div class="jzm40">		1
 
 ここで字詰め終わり	</div>		1
+ここで字詰め終り	</div>		1
+字詰め終わり	</div>		1
+字詰め終り	</div>		1
 
 ################################################################
 ####内部処理用

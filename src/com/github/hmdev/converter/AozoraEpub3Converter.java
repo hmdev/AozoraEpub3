@@ -939,7 +939,7 @@ public class AozoraEpub3Converter
 					
 					//字下げ状態エラー出力
 					if (inJisage >= 0) {
-						LogAppender.append("字下げ注記エラー: ("+lineNum+") "+(inJisage+1)+"\n");
+						LogAppender.append("字下げ注記エラー: ("+lineNum+") "+inJisage+"\n");
 					}
 					
 					//次の行が画像単独ページで先頭画像で表紙に移動する場合は改ページしない
@@ -981,7 +981,7 @@ public class AozoraEpub3Converter
 					}
 					else inJisage = lineNum; //ブロック開始
 				}
-				else if (chukiTag.equals("［＃ここで字下げ終わり］")) {
+				else if (chukiTag.endsWith("字下げ終わり］")) {
 					 if (inJisage == -1) {
 						 LogAppender.append("字下げ注記エラー：("+lineNum+")\n");
 						 noAppend = true;
@@ -1139,6 +1139,7 @@ public class AozoraEpub3Converter
 							buf.append(chukiMap.get("字下げ複合2")[0]);
 							
 							hasBlock = true;//ブロック字下げなので改行なし
+							patternMatched = true;
 						}
 					}
 					//字下げ終わり複合注記
@@ -1149,11 +1150,13 @@ public class AozoraEpub3Converter
 							else buf.append(chukiMap.get("ここで字下げ終わり")[0]);
 							inJisage = -1;
 							hasBlock = true;
+							patternMatched = true;
 						}
 					}
 					
 					if (!patternMatched) {
-						LogAppender.append("注記未変換: ("+lineNum+") "+chukiTag+"\n");
+						if (chukiTag.indexOf("底本では") == -1 && chukiTag.indexOf("に「ママ」") == -1 && chukiTag.indexOf("」はママ") == -1)
+							LogAppender.append("注記未変換: ("+lineNum+") "+chukiTag+"\n");
 					}
 				}
 			}
