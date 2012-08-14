@@ -261,7 +261,7 @@ public class AozoraEpub3Applet extends JApplet
 		panel.add(jButtonCover);
 		//表紙ページ
 		propValue = props.getProperty("CoverPage");
-		jCheckCoverPage = new JCheckBox("表紙ページ出力", propValue!=null||"1".equals(propValue));
+		jCheckCoverPage = new JCheckBox("表紙ページ出力", propValue==null||"1".equals(propValue));
 		jCheckCoverPage.setFocusPainted(false);
 		panel.add(jCheckCoverPage);
 		

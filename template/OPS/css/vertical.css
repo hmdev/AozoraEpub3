@@ -38,6 +38,13 @@ span.i {
 	padding: 0.5em;
 	display: inline-block;
 }
+/** 破線罫囲み */
+.dashed_border {
+	border: 1px dashed #000;
+	margin: 0 0.5em;
+	padding: 0.5em;
+	display: inline-block;
+}
 
 /* 圏点 */
 span.sesame {
