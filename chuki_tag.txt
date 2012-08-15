@@ -133,6 +133,23 @@
 ここから斜体	<span class="i">		1
 ここで斜体終わり	</span>		1
 
+####取り消し線 二重は普通の取り消し線で代用
+取消線	<span class="strike">
+取消線終わり	</span>
+ここから取消線	<span class="strike">		1
+ここで取消線終わり	</span>		1
+取り消し線	<span class="strike">
+取り消し線終わり	</span>
+ここから取り消し線	<span class="strike">		1
+ここで取り消し線終わり	</span>		1
+二重取り消し線	<span class="strike">
+二重取り消し線終わり	</span>
+ここから二重取り消し線	<span class="strike">		1
+ここで二重取り消し線終わり	</span>		1
+二重取消線	<span class="strike">
+二重取消線終わり	</span>
+ここから二重取消線	<span class="strike">		1
+ここで二重取消線終わり	</span>		1
 
 ############## 画像 ############## → 別処理
 #<img src="ファイル名"/> → 変換なし
@@ -514,11 +531,11 @@
 表題後	</span></div>
 原題前	<div><span class="font4">
 原題後	</span></div>
-副題前	<div class="top2"><span class="font3">
+副題前	<div class="top2"><span class="font2">
 副題後	</span></div>
-副原題前	<div class="top2"><span class="font3">
+副原題前	<div class="top2"><span class="font2">
 副原題後	</span></div>
-著者前	<div class="btm"><span class="font2">
-著者後	</span>　　</div>
-副著者前	<div class="btm"><span class="font1">
-副著者後	</span>　　</div>
+著者前	<div class="btm2"><span class="font1">
+著者後	</span></div>
+副著者前	<div class="btm2"><span class="font1">
+副著者後	</span></div>

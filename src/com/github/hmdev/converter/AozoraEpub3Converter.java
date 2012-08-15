@@ -322,7 +322,7 @@ public class AozoraEpub3Converter
 					//コメントブロックに入ったらタイトル著者終了
 					titleEnded = true;
 					if (inComment) {
-						if (commentLineNum >= 15) LogAppender.append("[WARN] コメントが "+commentLineNum+" 行\n");
+						if (commentLineNum > 20) LogAppender.append("[WARN] コメントが "+commentLineNum+" 行 ("+lineNum+")\n");
 						commentLineNum = 0;
 						inComment = false; continue;
 					}
@@ -430,6 +430,29 @@ public class AozoraEpub3Converter
 					}
 				}
 				break;
+			case 5:
+				if (titleFirst) {
+					bookInfo.titleLine = firstLineStart;
+					bookInfo.orgTitleLine = firstLineStart+1;
+					bookInfo.subTitleLine = firstLineStart+2;
+					bookInfo.subOrgTitleLine = firstLineStart+3;
+					bookInfo.title = firstLines[0]+" "+firstLines[2];
+					if (hasAuthor) {
+						bookInfo.creatorLine = firstLineStart+4;
+						bookInfo.creator = firstLines[4];
+					}
+				} else {
+					bookInfo.creatorLine = firstLineStart;
+					bookInfo.creator = firstLines[0];
+					if (hasTitle) {
+						bookInfo.titleLine = firstLineStart+1;
+						bookInfo.orgTitleLine = firstLineStart+2;
+						bookInfo.subTitleLine = firstLineStart+3;
+						bookInfo.subOrgTitleLine = firstLineStart+4;
+						bookInfo.title = firstLines[1]+" "+firstLines[3];
+					}
+				}
+				break;
 			case 4:
 				if (titleFirst) {
 					bookInfo.titleLine = firstLineStart; bookInfo.subTitleLine = firstLineStart+1;
@@ -457,17 +480,22 @@ public class AozoraEpub3Converter
 				} else {
 					bookInfo.creatorLine = firstLineStart; bookInfo.creator = firstLines[0];
 					if (hasTitle) {
-						bookInfo.title = firstLines[1]+" "+firstLines[2];
 						bookInfo.titleLine = firstLineStart+1; bookInfo.subTitleLine = firstLineStart+2;
+						bookInfo.title = firstLines[1]+" "+firstLines[2];
 					}
 				}
 				break;
-			case 2: //2行+空行+1行
-			case 5:
+			case 2: //表題+副題+空行+著者
 				if (titleFirst) {
 					bookInfo.titleLine = firstLineStart; bookInfo.title = firstLines[0];
 					if (hasAuthor) {
-						bookInfo.creatorLine = firstLineStart+1; bookInfo.creator = firstLines[1];
+						if (firstLines[3] != null && firstLines[3].length() > 0 && (firstLines[4] == null || firstLines[4].length() == 0)) {
+							bookInfo.titleLine = firstLineStart; bookInfo.subTitleLine = firstLineStart+1;
+							bookInfo.title = firstLines[0]+" "+firstLines[1];
+							bookInfo.creatorLine = firstLineStart+3; bookInfo.creator = firstLines[3];
+						} else {
+							bookInfo.creatorLine = firstLineStart+1; bookInfo.creator = firstLines[1];
+						}
 					}
 				} else {
 					bookInfo.creatorLine = firstLineStart; bookInfo.creator = firstLines[0];

@@ -24,12 +24,9 @@ h6 { font: small-caps 100%; }
 
 p { margin: 0; }
 
-span.b {
-	font-weight: bold;
-}
-span.i {
-	font-style: italic;
-}
+span.b { font-weight: bold; }
+span.i { font-style: italic; }
+span.strike { text-decoration:line-through; }
 
 /** 罫囲み */
 .border {
