@@ -723,6 +723,7 @@ public class AozoraEpub3Applet extends JApplet
 	{
 		//パラメータ設定
 		
+		LogAppender.append("----------------------------------------------------------------\n");
 		//表紙情報追加
 		String coverFileName = this.jComboCover.getSelectedItem().toString();
 		if (coverFileName.equals(this.jComboCover.getItemAt(0).toString())) coverFileName = ""; //先頭の挿絵
@@ -739,7 +740,10 @@ public class AozoraEpub3Applet extends JApplet
 			this.jComboEncType.getSelectedItem().toString(),
 			TitleType.values()[this.jComboTitle.getSelectedIndex()]
 		);
-		if (bookInfo == null) return;
+		if (bookInfo == null) {
+			LogAppender.append("[ERROR] 書籍の情報が取得できませんでした\n");
+			return;
+		}
 		//縦書き横書き設定追加
 		bookInfo.vertical = this.jRadioVertical.isSelected();
 		

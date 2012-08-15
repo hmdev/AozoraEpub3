@@ -168,7 +168,6 @@ public class AozoraEpub3
 				return;
 			}
 			
-			LogAppender.append("----------------------------------------------------------------\n");
 			LogAppender.append("変換開始 : ");
 			LogAppender.append(srcFile.getPath());
 			LogAppender.append("\n");

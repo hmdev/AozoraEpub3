@@ -310,20 +310,27 @@ public class AozoraEpub3Converter
 		String[] firstLines = new String[7];
 		//先頭行の開始行番号
 		int firstLineStart = -1;
-		
+		//コメント内の行数
+		int commentLineNum = 0;
 		//最後まで回す
 		while ((line = src.readLine()) != null) {
 			lineNum++;
 			
 			//コメント除外
-			if (line.startsWith("-------------------------------------------------------")) {
-				//コメントブロックに入ったらタイトル著者終了
-				titleEnded = true;
-				if (hideCommentBlock) {
-					if (inComment) { inComment = false; continue; }
+			if (hideCommentBlock) {
+				if (line.startsWith("-------------------------------------------------------")) {
+					//コメントブロックに入ったらタイトル著者終了
+					titleEnded = true;
+					if (inComment) {
+						if (commentLineNum >= 15) LogAppender.append("[WARN] コメントが "+commentLineNum+" 行\n");
+						commentLineNum = 0;
+						inComment = false; continue;
+					}
 					else { inComment = true; continue;  }
 				}
+				if (inComment) commentLineNum++;
 			}
+			
 			
 			//空行チェック
 			if (line.equals("")) {
@@ -383,6 +390,8 @@ public class AozoraEpub3Converter
 			preLines[1] = preLines[0];
 			preLines[0] = line;
 		}
+		
+		if (inComment) LogAppender.append("[ERROR] コメントが閉じていません\n");
 		
 		if (titleType != TitleType.NONE) {
 			//バッファからタイトルと著者取得
@@ -1189,7 +1198,7 @@ public class AozoraEpub3Converter
 				} else {
 					this.writer.nextSection(out, lineNum, false);
 					//this.writer.updateChapterName("奥付");
-					this.writer.updateChapterName("");
+					this.writer.updateChapterName(null);
 					this.pageLineNum = 0;
 					this.sectionCharLength = 0;
 					this.chapterStarted = true;
