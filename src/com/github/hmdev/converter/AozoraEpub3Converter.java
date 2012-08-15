@@ -176,7 +176,8 @@ public class AozoraEpub3Converter
 						String[] values = line.split("\t");
 						//タグ取得 3列目は行末タグ
 						String[] tags;
-						if (values.length > 2 && values[2].length() > 0) tags = new String[]{values[1], values[2]};
+						if (values.length == 1) tags = new String[]{""};
+						else if (values.length > 2 && values[2].length() > 0) tags = new String[]{values[1], values[2]};
 						else tags = new String[]{values[1]};
 						chukiMap.put(values[0], tags);
 						//注記フラグ
@@ -1418,6 +1419,9 @@ public class AozoraEpub3Converter
 		}
 		if (this.bookInfo.vertical) {
 			switch (ch[idx]) {
+			case '&':
+				buf.append("&amp;");
+				break;
 			case '<':
 				if (idx > 0 && ch[idx-1] == '<' && (idx <= 1 || ch[idx-2] != '<') && (ch.length-1==idx || ch[idx+1] != '<')) {
 					buf.setLength(length-4); buf.append("《");
@@ -1463,6 +1467,9 @@ public class AozoraEpub3Converter
 			}
 		} else {
 			switch (ch[idx]) {
+			case '&':
+				buf.append("&amp;");
+				break;
 			case '<':
 				buf.append("&lt;");
 				break;

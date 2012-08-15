@@ -29,13 +29,13 @@
 ここから小見出し	<span class="font1">		1
 ここで小見出し終わり	</span>		1
 見出し	<span class="font5">	</span>
-#見出し終わり
+見出し終わり
 大見出し	<span class="font5">	</span>
-#大見出し終わり
+大見出し終わり
 中見出し	<span class="font3">	</span>
-#中見出し終わり
+中見出し終わり
 小見出し	<span class="font1">	</span>
-#小見出し終わり
+小見出し終わり
 同行大見出し	<span class="font5">
 同行大見出し終わり	</span>
 同行中見出し	<span class="font3">
