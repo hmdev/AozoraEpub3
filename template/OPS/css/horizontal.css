@@ -7,8 +7,11 @@ p {
 }
 img {
 	max-width: 100%;
+	max-height: 100%;
 }
-
+div.img {
+	display: inline-block;
+}
 :link { color: #00C; background: transparent; }
 :visited { color: #609; background: transparent; }
 a:active { color: #C00; background: transparent; }
@@ -27,13 +30,21 @@ p { margin: 0; }
 span.b { font-weight: bold; }
 span.i { font-style: italic; }
 span.strike { text-decoration:line-through; }
+span.dbl_strike { text-decoration:line-through; }
 
-/** 罫囲み */
+/* 外字文字画像 */
+.gaiji {
+	vertical-align: baseline;
+}
+.gaiji img {
+	height: 1em;
+}
+/* 罫囲み */
 .border {
 	border: 1px solid #000;
 	padding: 0.5em;
 }
-/** 破線罫囲み */
+/* 破線罫囲み */
 .dashed_border {
 	border: 1px dashed #000;
 	padding: 0.5em;
@@ -141,7 +152,7 @@ span.font-4 { font-size: 60%; }
 span.font-5 { font-size: 50%; }
 span.kogaki { font-size: 50%; }
 
-/* 縦横中 */
+/* 縦中横 */
 span.tcy {
 /*	text-combine: horizontal;*/
 }

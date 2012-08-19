@@ -312,6 +312,8 @@ public class AozoraEpub3Converter
 		int firstLineStart = -1;
 		//コメント内の行数
 		int commentLineNum = 0;
+		//コメント開始行
+		int commentLineStart = -1;
 		//最後まで回す
 		while ((line = src.readLine()) != null) {
 			lineNum++;
@@ -322,11 +324,15 @@ public class AozoraEpub3Converter
 					//コメントブロックに入ったらタイトル著者終了
 					titleEnded = true;
 					if (inComment) {
-						if (commentLineNum > 20) LogAppender.append("[WARN] コメントが "+commentLineNum+" 行 ("+lineNum+")\n");
+						if (commentLineNum > 20) LogAppender.append("[WARN] コメントが "+commentLineNum+" 行 ("+commentLineStart+"-"+lineNum+")\n");
 						commentLineNum = 0;
 						inComment = false; continue;
 					}
-					else { inComment = true; continue;  }
+					else {
+						commentLineStart = lineNum;
+						inComment = true;
+						continue;
+					}
 				}
 				if (inComment) commentLineNum++;
 			}
@@ -391,7 +397,9 @@ public class AozoraEpub3Converter
 			preLines[0] = line;
 		}
 		
-		if (inComment) LogAppender.append("[ERROR] コメントが閉じていません\n");
+		if (inComment) {
+			LogAppender.append("[ERROR] コメントが閉じていません ("+commentLineStart+")\n");
+		}
 		
 		if (titleType != TitleType.NONE) {
 			//バッファからタイトルと著者取得
@@ -715,6 +723,12 @@ public class AozoraEpub3Converter
 				String[] chukiValues = chuki.substring(3, chuki.length()-1).split("、");
 				//注記文字グリフ or 代替文字変換
 				String gaiji = ghukiConverter.toAlterString(chukiValues[0]);
+				//注記内なら注記タグは除外する
+				if (gaiji != null) {
+					if (isInnerChuki(line, m.start())) {
+						gaiji = gaiji.replaceAll(chukiPattern.pattern(), "");
+					}
+				}
 				//コード変換
 				if (gaiji == null && chukiValues.length > 1) {
 					gaiji = ghukiConverter.codeToCharString(chukiValues[1]);
@@ -728,20 +742,40 @@ public class AozoraEpub3Converter
 					gaiji = ghukiConverter.codeToCharString(chukiValues[3]);
 				}
 				//注記名称で変換
-				if (gaiji == null) gaiji = ghukiConverter.toUtf(chukiValues[0]);
+				if (gaiji == null) {
+					gaiji = ghukiConverter.toUtf(chukiValues[0]);
+				}
 				
 				//未サポート外字
 				//if (unsupportGaiji.contains(gaiji)) {
-				//Unicode32文字なら小書き出力
+				//Unicode32文字なら後ろに小書きで注記追加
 				if (gaijiKogaki32 && gaiji != null && gaiji.getBytes().length ==4) {
-					gaiji += "［＃行右小書き］（"+chukiValues[0]+"）［＃行右小書き終わり］";
+					if (!isInnerChuki(line, m.start())) {
+						gaiji += "［＃行右小書き］（"+chukiValues[0]+"）［＃行右小書き終わり］";
+					}
 				}
-				
+				//変換不可 画像指定付き外字なら画像注記に変更
 				if (gaiji == null) {
-					LogAppender.append("外字未変換 : ("+this.lineNum+") "+chuki+"\n");
-					//gaiji = "〓";
-					gaiji = "〓［＃行右小書き］（"+chukiValues[0]+"）［＃行右小書き終わり］";
-					
+					if (isInnerChuki(line, m.start())) {
+						gaiji = "〓";
+					} else {
+						//画像指定外字
+						int imageStartIdx = chuki.indexOf('（', 2);
+						if (imageStartIdx > -1) {
+							if (chuki.indexOf('.', 2) == -1) {
+								//拡張子を含まない
+								LogAppender.append("外字未変換: ("+this.lineNum+") "+chuki+"\n");
+							} else {
+								//※を消して画像注記に変更
+								gaiji = chuki.substring(1);
+								LogAppender.append("外字画像利用: ("+this.lineNum+") "+chuki+"\n");
+							}
+						} else {
+							//画像以外
+							LogAppender.append("外字未変換: ("+this.lineNum+") "+chuki+"\n");
+							gaiji = "〓［＃行右小書き］（"+chukiValues[0]+"）［＃行右小書き終わり］";
+						}
+					}
 				}
 				else if (gaiji.length() == 1 && escape) {
 					//特殊文字は 前に※をつけて文字出力時に例外処理
@@ -779,6 +813,15 @@ public class AozoraEpub3Converter
 		//残りの文字
 		buf.append(line.substring(begin));
 		return buf.toString();
+	}
+	
+	/** 注記内かチェック
+	 * @param gaijiStart これより前で注記が閉じていないかをチェック */
+	private boolean isInnerChuki(String line, int gaijiStart)
+	{
+		int chukiStart = line.lastIndexOf("［＃", gaijiStart-1);
+		int chukiEnd = line.lastIndexOf('］', gaijiStart-1);
+		return chukiStart > chukiEnd;
 	}
 	
 	/** 後述注記をインライン注記変換
@@ -1063,7 +1106,8 @@ public class AozoraEpub3Converter
 							String imageTitle = srcFilePath.substring(srcFilePath.lastIndexOf('/')+1);
 							if (imageStartIdx > 0) imageTitle = chukiTag.substring(2, imageStartIdx);
 							//LogAppender.append("[画像注記]: "+chukiTag+"\n");
-							hasBlock = true;
+							//単ページ画像の場合は<p>タグを出さない
+							if (bookInfo.isImageSectionLine(lineNum)) hasBlock = true;
 							//画像ファイル名置換処理実行
 							String fileName = writer.getImageFilePath(srcFilePath.trim());
 							if (fileName != null) { //先頭に移動してここで出力しない場合はnull
@@ -1098,7 +1142,7 @@ public class AozoraEpub3Converter
 						} else {
 							String srcFilePath = chukiTag.substring(start+1, end);
 							//LogAppender.append("[画像注記]: "+chukiTag+"\n");
-							hasBlock = true;
+							if (bookInfo.isImageSectionLine(lineNum)) hasBlock = true;
 							//画像ファイル名置換処理実行
 							String fileName = writer.getImageFilePath(srcFilePath.trim());
 							if (fileName != null) { //先頭に移動してここで出力しない場合はnull

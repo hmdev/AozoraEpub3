@@ -60,6 +60,7 @@
 一	<span class="sub">一</span>
 二	<span class="sub">二</span>
 三	<span class="sub">三</span>
+四	<span class="sub">四</span>
 レ	<span class="sub">レ</span>
 一レ	<span class="sub">一レ</span>
 上レ	<span class="sub">上レ</span>
@@ -69,6 +70,7 @@
 甲	<span class="sub">甲</span>
 乙	<span class="sub">乙</span>
 丙	<span class="sub">丙</span>
+丁	<span class="sub">丁</span>
 天	<span class="sub">天</span>
 地	<span class="sub">地</span>
 人	<span class="sub">人</span>
@@ -142,13 +144,13 @@
 取り消し線終わり	</span>
 ここから取り消し線	<span class="strike">		1
 ここで取り消し線終わり	</span>		1
-二重取り消し線	<span class="strike">
+二重取り消し線	<span class="dbl_strike">
 二重取り消し線終わり	</span>
-ここから二重取り消し線	<span class="strike">		1
+ここから二重取り消し線	<span class="dbl_strike">		1
 ここで二重取り消し線終わり	</span>		1
-二重取消線	<span class="strike">
+二重取消線	<span class="dbl_strike">
 二重取消線終わり	</span>
-ここから二重取消線	<span class="strike">		1
+ここから二重取消線	<span class="dbl_strike">		1
 ここで二重取消線終わり	</span>		1
 
 ############## 画像 ############## → 別処理
@@ -162,8 +164,8 @@
 ##ルビとルビのように付く文字 → 未対応
 
 ####縦横中
-縦中横	<span class="tcy">		2
-縦中横終わり	</span>		3
+縦中横	<div class="tcy"><span>		2
+縦中横終わり	</span></div>		3
 
 ####割り注
 ## → 未対応
@@ -526,6 +528,8 @@
 
 画像開始	<div class="img"><img src="
 画像終了	"/></div>
+外字画像開始	<div class="img gaiji"><img src="
+外字画像終了	"/></div>
 
 表題前	<div><span class="font5">
 表題後	</span></div>

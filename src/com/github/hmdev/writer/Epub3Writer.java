@@ -367,8 +367,9 @@ public class Epub3Writer
 		String sectionId = decimalFormat.format(this.sectionIndex);
 		//package.opf用にファイル名
 		SectionInfo sectionInfo = new SectionInfo(sectionId);
-		if (this.bookInfo.isImageSectionLine(lineNum)) sectionInfo.setImageFit(true);
-		if (isMiddle) sectionInfo.setMiddle(true);
+		//次の行が単一画像なら画像専用指定
+		if (this.bookInfo.isImageSectionLine(lineNum+1)) sectionInfo.setImageFit(true);
+		else if (isMiddle) sectionInfo.setMiddle(true);
 		this.sectionInfos.add(sectionInfo);
 		this.addChapter(sectionId, null); //章の名称はsectionIdを仮に設定
 		
