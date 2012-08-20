@@ -101,6 +101,12 @@ public class AozoraEpub3Converter
 	/** 注記フラグ 左右中央 key = 注記名 */
 	static HashSet<String> chukiFlagMiddle = new HashSet<String>();
 	
+	/** 注記を返す 画像のみの出力用 */
+	public String[] getChukiValue(String key)
+	{
+		return chukiMap.get(key);
+	}
+	
 	/** 後述注記→タグ変換用
 	 * key=注記文字列 (「」内削除)
 	 * value= { 前タグ, 後タグ } */

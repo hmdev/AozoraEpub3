@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Vector;
@@ -56,6 +57,7 @@ import com.github.hmdev.converter.AozoraEpub3Converter;
 import com.github.hmdev.converter.AozoraEpub3Converter.TitleType;
 import com.github.hmdev.info.BookInfo;
 import com.github.hmdev.util.LogAppender;
+import com.github.hmdev.writer.Epub3ImageWriter;
 import com.github.hmdev.writer.Epub3Writer;
 
 
@@ -122,6 +124,9 @@ public class AozoraEpub3Applet extends JApplet
 	
 	/** ePub3出力クラス */
 	Epub3Writer epub3Writer;
+	
+	/** ePub3画像出力クラス */
+	Epub3Writer epub3ImageWriter;
 	
 	/** UTF-8 → グリフタグ変換クラス */
 	//GlyphConverter glyphConverter;
@@ -552,6 +557,8 @@ public class AozoraEpub3Applet extends JApplet
 		try {
 			//ePub出力クラス初期化
 			this.epub3Writer = new Epub3Writer("template/");
+			//ePub画像出力クラス初期化
+			this.epub3ImageWriter = new Epub3ImageWriter("template/");
 			
 			//変換テーブルをstaticに生成
 			this.aozoraConverter = new AozoraEpub3Converter(this.epub3Writer);
@@ -740,6 +747,26 @@ public class AozoraEpub3Applet extends JApplet
 			this.jComboEncType.getSelectedItem().toString(),
 			TitleType.values()[this.jComboTitle.getSelectedIndex()]
 		);
+		
+		Epub3Writer writer = this.epub3Writer;
+		//Zip内の画像ファイル一覧を取得
+		HashSet<String> zipImageFileNames = null;
+		try {
+			if (srcFile.getName().toLowerCase().endsWith("zip")) {
+				zipImageFileNames = AozoraEpub3.getZipImageNames(srcFile);
+				if (bookInfo == null) {
+					//画像出力用のBookInfo生成
+					bookInfo = new BookInfo();
+					bookInfo.imageOnly = true;
+					writer = this.epub3ImageWriter;
+					LogAppender.append("画像のみのePubファイルを生成します\n");
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			LogAppender.append("[ERROR] "+e+"\n");
+		}
+		
 		if (bookInfo == null) {
 			LogAppender.append("[ERROR] 書籍の情報が取得できませんでした\n");
 			return;
@@ -789,12 +816,12 @@ public class AozoraEpub3Applet extends JApplet
 		AozoraEpub3.convertFile(
 			srcFile, dstPath,
 			this.aozoraConverter,
-			this.epub3Writer,
+			writer,
 			this.jCheckAutoFileName.isSelected(),
 			this.jComboExt.getSelectedItem().toString().trim(),
 			this.jCheckOverWrite.isSelected(),
 			this.jComboEncType.getSelectedItem().toString(),
-			bookInfo
+			bookInfo, zipImageFileNames
 		);
 	}
 	

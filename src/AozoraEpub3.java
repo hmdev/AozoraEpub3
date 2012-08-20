@@ -5,7 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Date;
+import java.util.HashSet;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -82,11 +82,22 @@ public class AozoraEpub3
 					if (titleCreator[0] != null && titleCreator[0].trim().length() >0) bookInfo.title = titleCreator[0];
 					if (titleCreator[1] != null && titleCreator[1].trim().length() >0) bookInfo.creator = titleCreator[1];
 				}
+				
+				HashSet<String> zipImageFileNames = null;
+				try {
+					if (srcFile.getName().toLowerCase().endsWith("zip")) {
+						zipImageFileNames = AozoraEpub3.getZipImageNames(srcFile);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+					LogAppender.append("[ERROR] "+e+"\n");
+				}
+				
 				AozoraEpub3.convertFile(
 						srcFile, null,
 						aozoraConverter, epub3Writer,
 						autoFileName, outExt, overWrite,
-						encType, bookInfo);
+						encType, bookInfo, zipImageFileNames);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -105,12 +116,13 @@ public class AozoraEpub3
 			String ext = srcFile.getName().substring(srcFile.getName().lastIndexOf('.')+1).toLowerCase();
 			
 			InputStream is = getInputStream(srcFile, ext, textEntryNames);
-			if (is == null) return null;
+			if (is == null) {
+				return null;
+			}
 			
 			//タイトル取得
 			BufferedReader src = new BufferedReader(new InputStreamReader(is, (String)encType));
 			BookInfo bookInfo = aozoraConverter.getBookInfo(src, titleType, coverFileName, insertCoverPage);
-			bookInfo.modified = new Date();
 			is.close();
 			
 			return bookInfo;
@@ -129,7 +141,7 @@ public class AozoraEpub3
 	 * @param dstPath 出力先パス */
 	static public void convertFile(File srcFile, File dstPath, AozoraEpub3Converter aozoraConverter, Epub3Writer epubWriter,
 			boolean autoFileName, String outExt, boolean overWrite,
-			String encType, BookInfo bookInfo)
+			String encType, BookInfo bookInfo, HashSet<String> zipImageFileNames)
 	{
 		try {
 			
@@ -173,19 +185,13 @@ public class AozoraEpub3
 			LogAppender.append("\n");
 			
 			//入力Stream再オープン
-			InputStream is = getInputStream(srcFile, ext, textEntryNames);
-			
-			BufferedReader src = new BufferedReader(new InputStreamReader(is, encType));
-			//BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFile), "UTF-8"));
-			
-			// 青空文庫→ePub3タグへ変換
-			//aozoraConverter.convertTextToEpub3(out, src, metaInfo);
+			BufferedReader src = null;
+			if (!bookInfo.imageOnly) {
+				src = new BufferedReader(new InputStreamReader(getInputStream(srcFile, ext, textEntryNames), encType));
+			}
 			
 			//ePub書き出し srcは中でクローズされる
-			epubWriter.write(aozoraConverter, src, srcFile, textEntryNames[0], outFile, bookInfo);
-			
-			//src.close();
-			//out.close();
+			epubWriter.write(aozoraConverter, src, srcFile, textEntryNames[0], outFile, bookInfo, zipImageFileNames);
 			
 			LogAppender.append("変換完了 : ");
 			LogAppender.append(outFile.getPath());
@@ -240,6 +246,7 @@ public class AozoraEpub3
 				LogAppender.append("zip内にtxtファイルがありません: ");
 				LogAppender.append(srcFile.getName());
 				LogAppender.append("\n");
+				zis.close();
 				return null;
 			}
 		} else if ("txt".equals(ext)) {
@@ -250,6 +257,23 @@ public class AozoraEpub3
 			LogAppender.append("\n");
 		}
 		return is;
+	}
+	
+	/** zip内の画像ファイルパスを取得 
+	 * @throws IOException */
+	static public HashSet<String> getZipImageNames(File srcFile) throws IOException
+	{
+		HashSet<String> zipImageNames = new HashSet<String>();
+		ZipArchiveInputStream zis = new ZipArchiveInputStream(new BufferedInputStream(new FileInputStream(srcFile)), "Shift_JIS", false);
+		ArchiveEntry entry;
+		while ((entry = zis.getNextEntry()) != null) {
+			String lowerName = entry.getName().toLowerCase();
+			if (lowerName.endsWith(".png") || lowerName.endsWith(".jpg") || lowerName.endsWith(".jpeg") || lowerName.endsWith(".gif")) {
+				zipImageNames.add(entry.getName());
+			}
+		}
+		zis.close();
+		return zipImageNames;
 	}
 	
 }

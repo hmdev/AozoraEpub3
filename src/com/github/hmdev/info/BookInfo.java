@@ -47,6 +47,9 @@ public class BookInfo
 	/** 先頭がページの左右中央ならtrue */
 	public boolean startMiddle = false; 
 	
+	/** txtのない画像のみの場合 */
+	public boolean imageOnly = false;
+	
 	/** 改ページ単位で区切られたセクションの情報を格納 */
 	//Vector<SectionInfo> vecSectionInfo;
 	
@@ -59,6 +62,7 @@ public class BookInfo
 	/** 出力ページしない行 (左右中央後の空行と改ページ前の空行) */
 	HashSet<Integer> mapIgnoreLine;
 	
+	
 	////////////////////////////////////////////////////////////////
 	public BookInfo()
 	{
@@ -66,6 +70,8 @@ public class BookInfo
 		this.mapImageSectionLine = new HashSet<Integer>();
 		this.mapNoPageBreakLine = new HashSet<Integer>();
 		this.mapIgnoreLine = new HashSet<Integer>();
+		
+		this.modified = new Date();
 	}
 	
 	/*public void addSectionInfo(SectionInfo sectionInfo)

@@ -13,6 +13,7 @@ import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.UUID;
 import java.util.Vector;
@@ -118,6 +119,9 @@ public class Epub3Writer
 	/** 出力中の書籍情報 */
 	BookInfo bookInfo;
 	
+	boolean imageMode = false;
+	
+	
 	/** コンストラクタ
 	 * @param templatePath epubテンプレート格納パス文字列 最後は"/"
 	 */
@@ -133,7 +137,7 @@ public class Epub3Writer
 	 * @param epubFile 出力ファイル .epub拡張子
 	 * @param bookInfo 書籍情報と縦横書き指定
 	 * @throws IOException */
-	public void write(AozoraEpub3Converter converter, BufferedReader src, File srcFile, String zipTextFileName, File epubFile, BookInfo bookInfo) throws IOException
+	public void write(AozoraEpub3Converter converter, BufferedReader src, File srcFile, String zipTextFileName, File epubFile, BookInfo bookInfo, HashSet<String> zipImageFileNames) throws IOException
 	{
 		String srcPath = srcFile.getParent()+"/";
 		this.bookInfo = bookInfo;
@@ -177,16 +181,10 @@ public class Epub3Writer
 			zos.setLevel(9);
 		}
 		
-		//0001CapterのZipArchiveEntryを設定
-		this.startSection(0, bookInfo.startMiddle);
-		
-		//ePub3変換して出力
-		//改ページ時にnextSection() を、画像出力時にgetImageFilePath() 呼び出し
+		//zip出力用Writer
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"));
-		converter.convertTextToEpub3(bw, src, bookInfo);
-		bw.flush();
-		
-		this.endSection();
+		//本文を出力
+		this.writeSections(converter, src, bw, zipImageFileNames);
 		
 		//入力ファイル名と同じpng/jpgがあればそのファイルを表紙に指定
 		if ("*".equals(bookInfo.coverFileName)) {
@@ -285,7 +283,7 @@ public class Epub3Writer
 		bw.flush();
 		zos.closeArchiveEntry();
 		
-		src.close();
+		if (src != null) src.close();
 		
 		zos.setLevel(0);
 		//画像ファイルコピー (連番にリネーム)
@@ -309,7 +307,8 @@ public class Epub3Writer
 			}
 		}
 		if (srcFile.getName().toLowerCase().endsWith(".zip")) {
-			int zipPathLength = zipTextFileName.indexOf('/')+1;
+			int zipPathLength = 0;
+			if (zipTextFileName != null) zipPathLength = zipTextFileName.indexOf('/')+1;
 			ZipArchiveInputStream zis = new ZipArchiveInputStream(new BufferedInputStream(new FileInputStream(srcFile)), "Shift_JIS", false);
 			ArchiveEntry entry;
 			while( (entry = zis.getNextEntry()) != null ) {
@@ -350,6 +349,20 @@ public class Epub3Writer
 		zos.close();
 	}
 	
+	/** 本文を出力する */
+	void writeSections(AozoraEpub3Converter converter, BufferedReader src, BufferedWriter bw, HashSet<String> zipImageFileNames) throws IOException
+	{
+		//0001CapterのZipArchiveEntryを設定
+		this.startSection(0, bookInfo.startMiddle);
+		
+		//ePub3変換して出力
+		//改ページ時にnextSection() を、画像出力時にgetImageFilePath() 呼び出し
+		converter.convertTextToEpub3(bw, src, bookInfo);
+		bw.flush();
+		
+		this.endSection();
+	}
+	
 	/** 次のチャプター用のZipArchiveEntryに切替え 
 	 * チャプターのファイル名はcpaterFileNamesに追加される (0001)
 	 * @throws IOException */
@@ -361,7 +374,7 @@ public class Epub3Writer
 	}
 	/** セクション開始. 
 	 * @throws IOException */
-	private void startSection(int lineNum, boolean isMiddle) throws IOException
+	void startSection(int lineNum, boolean isMiddle) throws IOException
 	{
 		this.sectionIndex++;
 		String sectionId = decimalFormat.format(this.sectionIndex);
@@ -384,7 +397,7 @@ public class Epub3Writer
 	}
 	/** セクション終了. 
 	 * @throws IOException */
-	private void endSection() throws IOException
+	void endSection() throws IOException
 	{
 		//フッタ出力
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"));
