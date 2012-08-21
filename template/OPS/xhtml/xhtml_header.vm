@@ -25,7 +25,7 @@
 #end
 	<title>${bookInfo.Title}</title>
 </head>
-#if (${sectionInfo.ImageFitH})
+#if (${bookInfo.ImageOnly})
 <body class="fit_h">
 #elseif (${sectionInfo.ImageFit})
 <body class="fit">

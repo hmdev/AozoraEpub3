@@ -743,7 +743,6 @@ public class AozoraEpub3Applet extends JApplet
 			this.jCheckAutoFileName.isSelected(),
 			this.jComboExt.getSelectedItem().toString().trim(),
 			this.jCheckOverWrite.isSelected(),
-			coverFileName, this.jCheckCoverPage.isSelected(),
 			this.jComboEncType.getSelectedItem().toString(),
 			TitleType.values()[this.jComboTitle.getSelectedIndex()]
 		);
@@ -757,6 +756,9 @@ public class AozoraEpub3Applet extends JApplet
 				if (bookInfo == null) {
 					//画像出力用のBookInfo生成
 					bookInfo = new BookInfo();
+					String[] titleCreator = AozoraEpub3.getFileTitleCreator(srcFile.getName());
+					if (titleCreator[0] != null && titleCreator[0].trim().length() >0) bookInfo.title = titleCreator[0];
+					if (titleCreator[1] != null && titleCreator[1].trim().length() >0) bookInfo.creator = titleCreator[1];
 					bookInfo.imageOnly = true;
 					writer = this.epub3ImageWriter;
 					LogAppender.append("画像のみのePubファイルを生成します\n");
@@ -771,6 +773,10 @@ public class AozoraEpub3Applet extends JApplet
 			LogAppender.append("[ERROR] 書籍の情報が取得できませんでした\n");
 			return;
 		}
+		
+		//表紙設定
+		bookInfo.coverFileName = coverFileName;
+		bookInfo.insertCoverPage = this.jCheckCoverPage.isSelected();
 		//縦書き横書き設定追加
 		bookInfo.vertical = this.jRadioVertical.isSelected();
 		

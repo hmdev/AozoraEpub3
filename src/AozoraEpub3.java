@@ -74,7 +74,9 @@ public class AozoraEpub3
 			
 			for (int i=0; i<args.length; i++) {
 				File srcFile = new File(args[i]);
-				BookInfo bookInfo = AozoraEpub3.getBookInfo(srcFile, aozoraConverter, autoFileName, outExt, overWrite, coverFileName, insertCoverPage, encType, titleType);
+				BookInfo bookInfo = AozoraEpub3.getBookInfo(srcFile, aozoraConverter, autoFileName, outExt, overWrite, encType, titleType);
+				bookInfo.coverFileName = coverFileName;
+				bookInfo.insertCoverPage = insertCoverPage;
 				bookInfo.vertical = vertical;
 				//確認なしなのでnullでなければ上書き
 				if (useFileName) {
@@ -107,7 +109,6 @@ public class AozoraEpub3
 	/** 前処理で一度読み込んでタイトル等の情報を取得 */
 	static public BookInfo getBookInfo(File srcFile, AozoraEpub3Converter aozoraConverter,
 			boolean autoFileName, String outExt, boolean overWrite,
-			String coverFileName, boolean insertCoverPage,
 			String encType, TitleType titleType)
 	{
 		try {
@@ -122,7 +123,7 @@ public class AozoraEpub3
 			
 			//タイトル取得
 			BufferedReader src = new BufferedReader(new InputStreamReader(is, (String)encType));
-			BookInfo bookInfo = aozoraConverter.getBookInfo(src, titleType, coverFileName, insertCoverPage);
+			BookInfo bookInfo = aozoraConverter.getBookInfo(src, titleType);
 			is.close();
 			
 			return bookInfo;
@@ -213,8 +214,8 @@ public class AozoraEpub3
 		noExtName = noExtName.replaceAll("^(.*)[\\(|（].*?[\\)|）][ |　]*$", "$1");
 		Matcher m = Pattern.compile("[\\[|［](.+?)[\\]|］][ |　]*(.*)[ |　]*$").matcher(noExtName);
 		if (m.find()) {
-			titleCreator[0] = m.group(2);
-			titleCreator[1] = m.group(1);
+			titleCreator[0] = m.group(2).trim();
+			titleCreator[1] = m.group(1).trim();
 		} else {
 			m = Pattern.compile("^(.*?)( |　)*(\\(|（)").matcher(noExtName);
 			if (m.find()) {

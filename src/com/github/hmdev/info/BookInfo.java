@@ -216,5 +216,15 @@ public class BookInfo
 		this.insertCoverPage = insertCoverPage;
 	}
 	
+	public boolean isImageOnly()
+	{
+		return imageOnly;
+	}
+
+	public void setImageOnly(boolean imageOnly)
+	{
+		this.imageOnly = imageOnly;
+	}
+
 	
 }

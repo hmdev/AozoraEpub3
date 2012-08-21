@@ -86,6 +86,10 @@ public class Epub3Writer
 		OPS_PATH+CSS_PATH+"horizontal_image.css",
 		OPS_PATH+CSS_PATH+"horizontal.css"
 	};
+	String[] getTemplateFiles()
+	{
+		return TEMPLATE_FILE_NAMES;
+	}
 	
 	/** 出力先ePubのZipストリーム */
 	ZipArchiveOutputStream zos;
@@ -121,6 +125,7 @@ public class Epub3Writer
 	
 	boolean imageMode = false;
 	
+	HashSet<String> zipImageFileNames;
 	
 	/** コンストラクタ
 	 * @param templatePath epubテンプレート格納パス文字列 最後は"/"
@@ -141,6 +146,8 @@ public class Epub3Writer
 	{
 		String srcPath = srcFile.getParent()+"/";
 		this.bookInfo = bookInfo;
+		
+		this.zipImageFileNames = zipImageFileNames;
 		
 		//インデックス初期化
 		this.sectionIndex = 0;
@@ -172,7 +179,7 @@ public class Epub3Writer
 		//mimetypeは非圧縮
 		zos.setLevel(0);
 		//テンプレートのファイルを格納
-		for (String fileName : TEMPLATE_FILE_NAMES) {
+		for (String fileName : getTemplateFiles()) {
 			zos.putArchiveEntry(new ZipArchiveEntry(fileName));
 			FileInputStream fis = new FileInputStream(new File(templatePath+fileName));
 			IOUtils.copy(fis, zos);
@@ -184,7 +191,7 @@ public class Epub3Writer
 		//zip出力用Writer
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"));
 		//本文を出力
-		this.writeSections(converter, src, bw, zipImageFileNames);
+		this.writeSections(converter, src, bw);
 		
 		//入力ファイル名と同じpng/jpgがあればそのファイルを表紙に指定
 		if ("*".equals(bookInfo.coverFileName)) {
@@ -222,7 +229,7 @@ public class Epub3Writer
 				}
 				String ext = "";
 				try { ext = bookInfo.coverFileName.substring(bookInfo.coverFileName.lastIndexOf('.')+1); } catch (Exception e) {}
-				String imageId = "cover";
+				String imageId = "0000";
 				String format = "image/"+ext.toLowerCase();
 				if ("image/jpg".equals(format)) format = "image/jpeg";
 				if (!format.matches("^image\\/(png|jpeg|gif)$")) LogAppender.append("表紙画像フォーマットエラー: "+bookInfo.coverFileName+"\n");
@@ -303,7 +310,7 @@ public class Epub3Writer
 				imageInfos.remove(0);//カバー画像情報削除
 			} catch (Exception e) {
 				e.printStackTrace();
-				LogAppender.append("表紙画像取得エラー: "+bookInfo.coverFileName+"\n");
+				LogAppender.append("[ERROR] 表紙画像取得エラー: "+bookInfo.coverFileName+"\n");
 			}
 		}
 		if (srcFile.getName().toLowerCase().endsWith(".zip")) {
@@ -325,7 +332,7 @@ public class Epub3Writer
 			zis.close();
 			//出力されなかった画像をログ出力
 			for(Map.Entry<String, String> e : imageFileNames.entrySet()) {
-				LogAppender.append("画像ファイルなし: "+e.getKey()+"\n");
+				LogAppender.append("[WARN] 画像ファイルなし: "+e.getKey()+"\n");
 			}
 		} else {
 			//TODO 出力順をimageFiles順にする?
@@ -340,7 +347,7 @@ public class Epub3Writer
 					zos.closeArchiveEntry();
 					fis.close();
 				} else {
-					LogAppender.append("画像ファイルなし: "+srcFilePath+"\n");
+					LogAppender.append("[WARN] 画像ファイルなし: "+srcFilePath+"\n");
 				}
 			}
 		}
@@ -350,7 +357,7 @@ public class Epub3Writer
 	}
 	
 	/** 本文を出力する */
-	void writeSections(AozoraEpub3Converter converter, BufferedReader src, BufferedWriter bw, HashSet<String> zipImageFileNames) throws IOException
+	void writeSections(AozoraEpub3Converter converter, BufferedReader src, BufferedWriter bw) throws IOException
 	{
 		//0001CapterのZipArchiveEntryを設定
 		this.startSection(0, bookInfo.startMiddle);

@@ -10,6 +10,6 @@
 	<title>${bookInfo.Title}</title>
 </head>
 <body class="cover">
-<div><img src="../images/${coverImage.File}"/></div>
+<div class="img"><img src="../images/${coverImage.File}"/></div>
 </body>
 </html>
