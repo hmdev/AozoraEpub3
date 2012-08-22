@@ -767,15 +767,10 @@ public class AozoraEpub3Converter
 					} else {
 						//画像指定外字
 						int imageStartIdx = chuki.indexOf('（', 2);
-						if (imageStartIdx > -1) {
-							if (chuki.indexOf('.', 2) == -1) {
-								//拡張子を含まない
-								LogAppender.append("外字未変換: ("+this.lineNum+") "+chuki+"\n");
-							} else {
-								//※を消して画像注記に変更
-								gaiji = chuki.substring(1);
-								LogAppender.append("外字画像利用: ("+this.lineNum+") "+chuki+"\n");
-							}
+						if (imageStartIdx > -1 && chuki.indexOf('.', 2) != -1) {
+							//※を消して画像注記に変更
+							gaiji = chuki.substring(1);
+							LogAppender.append("外字画像利用: ("+this.lineNum+") "+chuki+"\n");
 						} else {
 							//画像以外
 							LogAppender.append("外字未変換: ("+this.lineNum+") "+chuki+"\n");

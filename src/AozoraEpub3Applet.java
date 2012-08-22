@@ -48,6 +48,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
@@ -116,6 +117,9 @@ public class AozoraEpub3Applet extends JApplet
 	JComboBox jComboCover;
 	JCheckBox jCheckCoverPage;
 	
+	/** ファイル選択ボタン */
+	JButton jButtonFile;
+	
 	JScrollPane jScrollPane;
 	JTextArea jTextArea;
 	
@@ -132,7 +136,10 @@ public class AozoraEpub3Applet extends JApplet
 	//GlyphConverter glyphConverter;
 	//String initdConverterType = null;
 	
+	/** 変換をキャンセルした場合true */
 	boolean convertCanceled = false;
+	/** 変換実行中 */
+	boolean running = false;
 	
 	/** 設定ファイル */
 	Properties props;
@@ -365,7 +372,7 @@ public class AozoraEpub3Applet extends JApplet
 		//開く
 		label = new JLabel("  ");
 		panel.add(label);
-		JButton jButtonFile = new JButton("ファイル選択");
+		jButtonFile = new JButton("ファイル選択");
 		jButtonFile.setBorder(zeroPadding);
 		jButtonFile.setPreferredSize(new Dimension(100, 24));
 		jButtonFile.setIcon(new ImageIcon(AozoraEpub3Applet.class.getResource("images/folder_page.png")));
@@ -592,28 +599,6 @@ public class AozoraEpub3Applet extends JApplet
 		}
 	}
 	
-	/** ファイル選択ボタンイベント */
-	class FileChooserListener implements ActionListener
-	{
-		Component parent;
-		private FileChooserListener(Component parent)
-		{
-			this.parent = parent;
-		}
-		@Override
-		public void actionPerformed(ActionEvent e)
-		{
-			JFileChooser fileChooser = new JFileChooser(currentPath);
-			fileChooser.setDialogTitle("変換する青空文庫テキストを開く");
-			fileChooser.setFileFilter(new FileNameExtensionFilter("青空文庫テキスト(txt,zip)", new String[]{"txt","zip"}));
-			fileChooser.setMultiSelectionEnabled(true);
-			int state = fileChooser.showOpenDialog(parent);
-			switch (state) {
-			case JFileChooser.APPROVE_OPTION:
-				convertFiles(fileChooser.getSelectedFiles());
-			}
-		}
-	}
 	/** 出力先選択ボタンイベント */
 	class PathChooserListener implements ActionListener
 	{
@@ -642,6 +627,33 @@ public class AozoraEpub3Applet extends JApplet
 		}
 	}
 	
+	/** ファイル選択ボタンイベント */
+	class FileChooserListener implements ActionListener
+	{
+		Component parent;
+		private FileChooserListener(Component parent)
+		{
+			this.parent = parent;
+		}
+		@Override
+		public void actionPerformed(ActionEvent e)
+		{
+			if (isRunning()) return;
+			
+			JFileChooser fileChooser = new JFileChooser(currentPath);
+			fileChooser.setDialogTitle("変換する青空文庫テキストを開く");
+			fileChooser.setFileFilter(new FileNameExtensionFilter("青空文庫テキスト(txt,zip)", new String[]{"txt","zip"}));
+			fileChooser.setMultiSelectionEnabled(true);
+			int state = fileChooser.showOpenDialog(parent);
+			switch (state) {
+			case JFileChooser.APPROVE_OPTION:
+				//convertFiles(fileChooser.getSelectedFiles());
+				//Worker初期化
+				ConvertFilesWorker convertFilesWorker = new ConvertFilesWorker(fileChooser.getSelectedFiles());
+				convertFilesWorker.execute();
+			}
+		}
+	}
 	/** ドラッグ＆ドロップイベント
 	 * 複数ファイルに対応 */
 	class DropListener implements DropTargetListener
@@ -657,12 +669,18 @@ public class AozoraEpub3Applet extends JApplet
 		@Override
 		public void drop(DropTargetDropEvent dtde)
 		{
+			if (isRunning()) return;
+			
 			dtde.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
 			Transferable transfer = dtde.getTransferable();
 			try {
 				@SuppressWarnings("unchecked")
 				List<File> files = (List<File>) transfer.getTransferData(DataFlavor.javaFileListFlavor);
-				convertFiles((File[])(files.toArray()));
+				
+				//convertFiles((File[])(files.toArray()));
+				ConvertFilesWorker convertFilesWorker = new ConvertFilesWorker((File[])(files.toArray()));
+				convertFilesWorker.execute();
+				
 			} catch (Exception e) {
 				e.printStackTrace();
 			} finally {
@@ -671,6 +689,8 @@ public class AozoraEpub3Applet extends JApplet
 		}
 	}
 	
+	
+	////////////////////////////////////////////////////////////////
 	/** 複数ファイルを変換 */
 	private void convertFiles(File[] srcFiles)
 	{
@@ -722,7 +742,6 @@ public class AozoraEpub3Applet extends JApplet
 		}
 		
 	}
-
 	
 	/** 内部用変換関数 Appletの設定を引数に渡す
 	 * TODO 共通パラメータは事前に取得しておく */
@@ -831,6 +850,54 @@ public class AozoraEpub3Applet extends JApplet
 		);
 	}
 	
+	////////////////////////////////////////////////////////////////
+	/** 別スレッド実行用SwingWorker */
+	class ConvertFilesWorker extends SwingWorker<Object, Object>
+	{
+		/** 面倒なのでAppletを渡す */
+		AozoraEpub3Applet applet;
+		/** 変換対象ファイル */
+		File[] srcFiles;
+		
+		public ConvertFilesWorker(File[] srcFiles)
+		{
+			this.applet = getApplet();
+			this.srcFiles = srcFiles;
+		}
+		
+		@Override
+		protected Object doInBackground() throws Exception
+		{
+			this.applet.running = true;
+			applet.jButtonFile.setEnabled(false);
+			try {
+				applet.convertFiles(srcFiles);
+			} finally {
+				applet.jButtonFile.setEnabled(true);
+				this.applet.running = false;
+			}
+			return null;
+		}
+		
+		@Override
+		protected void done()
+		{
+			super.done();
+			applet.jButtonFile.setEnabled(true);
+			this.applet.running = false;
+		}
+	}
+	/** イベント内でWorker初期化する用 */
+	private AozoraEpub3Applet getApplet()
+	{
+		return this;
+	}
+	/** Worker実行中フラグ取得 */
+	private boolean isRunning()
+	{
+		return this.running;
+	}
+	////////////////////////////////////////////////////////////////
 	/** Jar実行用 */
 	public static void main(String args[])
 	{
