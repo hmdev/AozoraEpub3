@@ -74,7 +74,8 @@ public class AozoraEpub3
 			
 			for (int i=0; i<args.length; i++) {
 				File srcFile = new File(args[i]);
-				BookInfo bookInfo = AozoraEpub3.getBookInfo(srcFile, aozoraConverter, autoFileName, outExt, overWrite, encType, titleType);
+				BookInfo bookInfo = new BookInfo();
+				AozoraEpub3.getBookInfo(bookInfo, srcFile, aozoraConverter, encType, titleType);
 				bookInfo.coverFileName = coverFileName;
 				bookInfo.insertCoverPage = insertCoverPage;
 				bookInfo.vertical = vertical;
@@ -107,8 +108,7 @@ public class AozoraEpub3
 	}
 	
 	/** 前処理で一度読み込んでタイトル等の情報を取得 */
-	static public BookInfo getBookInfo(File srcFile, AozoraEpub3Converter aozoraConverter,
-			boolean autoFileName, String outExt, boolean overWrite,
+	static public boolean getBookInfo(BookInfo bookInfo, File srcFile, AozoraEpub3Converter aozoraConverter,
 			String encType, TitleType titleType)
 	{
 		try {
@@ -118,15 +118,14 @@ public class AozoraEpub3
 			
 			InputStream is = getInputStream(srcFile, ext, textEntryNames);
 			if (is == null) {
-				return null;
+				return false;
 			}
 			
 			//タイトル取得
 			BufferedReader src = new BufferedReader(new InputStreamReader(is, (String)encType));
-			BookInfo bookInfo = aozoraConverter.getBookInfo(src, titleType);
+			aozoraConverter.readBookInfo(bookInfo, src, titleType);
 			is.close();
-			
-			return bookInfo;
+			return true;
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -134,7 +133,7 @@ public class AozoraEpub3
 			LogAppender.append(e.getMessage());
 			LogAppender.append("\n");
 		}
-		return null;
+		return false;
 	}
 	
 	/** ファイルを変換

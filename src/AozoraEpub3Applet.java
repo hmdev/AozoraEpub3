@@ -119,6 +119,8 @@ public class AozoraEpub3Applet extends JApplet
 	
 	/** ファイル選択ボタン */
 	JButton jButtonFile;
+	JButton jButtonCover;
+	JButton jButtonDstPath;
 	
 	JScrollPane jScrollPane;
 	JTextArea jTextArea;
@@ -240,13 +242,13 @@ public class AozoraEpub3Applet extends JApplet
 		if (propValue==null||propValue.length()==0) jComboDstPath.setSelectedIndex(0);
 		else jComboDstPath.setSelectedItem(propValue);
 		panel.add(jComboDstPath);
-		JButton jButtonDst = new JButton("選択");
-		jButtonDst.setBorder(zeroPadding);
-		jButtonDst.setPreferredSize(new Dimension(54, 23));
-		jButtonDst.setIcon(new ImageIcon(AozoraEpub3Applet.class.getResource("images/save.png")));
-		jButtonDst.setFocusable(false);
-		jButtonDst.addActionListener(new PathChooserListener(this));
-		panel.add(jButtonDst);
+		jButtonDstPath = new JButton("選択");
+		jButtonDstPath.setBorder(zeroPadding);
+		jButtonDstPath.setPreferredSize(new Dimension(54, 23));
+		jButtonDstPath.setIcon(new ImageIcon(AozoraEpub3Applet.class.getResource("images/save.png")));
+		jButtonDstPath.setFocusable(false);
+		jButtonDstPath.addActionListener(new PathChooserListener(this));
+		panel.add(jButtonDstPath);
 		
 		////////////////////////////////
 		//3段目
@@ -264,7 +266,7 @@ public class AozoraEpub3Applet extends JApplet
 		else jComboCover.setSelectedItem(propValue);
 		jComboCover.setPreferredSize(new Dimension(280, 22));
 		panel.add(jComboCover);
-		JButton jButtonCover = new JButton("選択");
+		jButtonCover = new JButton("選択");
 		jButtonCover.setBorder(zeroPadding);
 		jButtonCover.setPreferredSize(new Dimension(54, 23));
 		jButtonCover.setIcon(new ImageIcon(AozoraEpub3Applet.class.getResource("images/image_add.png")));
@@ -717,8 +719,11 @@ public class AozoraEpub3Applet extends JApplet
 			forcePageBreakEmpty = Integer.parseInt(jComboxPageBreakEmpty.getSelectedItem().toString());
 		} catch (Exception e) {}
 		*/
+		
+		//Appletのパラメータを取得しておく
+		
 		this.aozoraConverter.setForcePageBreak(forcePageBreak, forcePageBreakEmpty, pattern);
-		//栞用span出力
+		//栞用ID出力
 		this.aozoraConverter.setWithMarkId(this.jCheckMarkId.isSelected());
 		//変換オプション設定
 		this.aozoraConverter.setAutoYoko(this.jCheckAutoYoko.isSelected());
@@ -727,7 +732,7 @@ public class AozoraEpub3Applet extends JApplet
 		_convertFiles(srcFiles, dstPath);
 		
 	}
-	/** サブディレクトリ再起用 */
+	/** サブディレクトリ再帰用 */
 	private void _convertFiles(File[] srcFiles, File dstPath)
 	{
 		for (File srcFile : srcFiles) {
@@ -756,12 +761,9 @@ public class AozoraEpub3Applet extends JApplet
 		if (coverFileName.equals(this.jComboCover.getItemAt(1).toString())) coverFileName = "*"; //入力ファイルと同じ名前+.jpg/.png
 		if (coverFileName.equals(this.jComboCover.getItemAt(2).toString())) coverFileName = null; //表紙無し
 		//BookInfo取得
-		BookInfo bookInfo = AozoraEpub3.getBookInfo(
-			srcFile,
-			this.aozoraConverter,
-			this.jCheckAutoFileName.isSelected(),
-			this.jComboExt.getSelectedItem().toString().trim(),
-			this.jCheckOverWrite.isSelected(),
+		BookInfo bookInfo = new BookInfo();
+		boolean hasBookInfo = AozoraEpub3.getBookInfo(
+			bookInfo, srcFile, this.aozoraConverter,
 			this.jComboEncType.getSelectedItem().toString(),
 			TitleType.values()[this.jComboTitle.getSelectedIndex()]
 		);
@@ -772,14 +774,15 @@ public class AozoraEpub3Applet extends JApplet
 		try {
 			if (srcFile.getName().toLowerCase().endsWith("zip")) {
 				zipImageFileNames = AozoraEpub3.getZipImageNames(srcFile);
-				if (bookInfo == null) {
+				if (!hasBookInfo) {
 					//画像出力用のBookInfo生成
-					bookInfo = new BookInfo();
 					String[] titleCreator = AozoraEpub3.getFileTitleCreator(srcFile.getName());
 					if (titleCreator[0] != null && titleCreator[0].trim().length() >0) bookInfo.title = titleCreator[0];
 					if (titleCreator[1] != null && titleCreator[1].trim().length() >0) bookInfo.creator = titleCreator[1];
 					bookInfo.imageOnly = true;
+					//Writerを画像出力用派生クラスに入れ替え
 					writer = this.epub3ImageWriter;
+					hasBookInfo = true;
 					LogAppender.append("画像のみのePubファイルを生成します\n");
 				}
 			}
@@ -788,7 +791,7 @@ public class AozoraEpub3Applet extends JApplet
 			LogAppender.append("[ERROR] "+e+"\n");
 		}
 		
-		if (bookInfo == null) {
+		if (!hasBookInfo) {
 			LogAppender.append("[ERROR] 書籍の情報が取得できませんでした\n");
 			return;
 		}
@@ -869,11 +872,11 @@ public class AozoraEpub3Applet extends JApplet
 		protected Object doInBackground() throws Exception
 		{
 			this.applet.running = true;
-			applet.jButtonFile.setEnabled(false);
+			applet.setConvertEnabled(false);
 			try {
 				applet.convertFiles(srcFiles);
 			} finally {
-				applet.jButtonFile.setEnabled(true);
+				applet.setConvertEnabled(true);
 				this.applet.running = false;
 			}
 			return null;
@@ -883,7 +886,7 @@ public class AozoraEpub3Applet extends JApplet
 		protected void done()
 		{
 			super.done();
-			applet.jButtonFile.setEnabled(true);
+			applet.setConvertEnabled(true);
 			this.applet.running = false;
 		}
 	}
@@ -897,6 +900,31 @@ public class AozoraEpub3Applet extends JApplet
 	{
 		return this.running;
 	}
+	/** 変換中に操作不可にするコンポーネントのenabledを設定 */
+	private void setConvertEnabled(boolean enabled)
+	{
+		this.jComboTitle.setEnabled(enabled);
+		this.jCheckAutoFileName.setEnabled(enabled);
+		this.jCheckUserFileName.setEnabled(enabled);
+		
+		this.jComboCover.setEnabled(enabled);
+		this.jButtonCover.setEnabled(enabled);
+		this.jCheckCoverPage.setEnabled(enabled);
+		
+		this.jComboExt.setEnabled(enabled);
+		this.jComboDstPath.setEnabled(enabled);
+		this.jButtonDstPath.setEnabled(enabled);
+		
+		this.jCheckMarkId.setEnabled(enabled);
+		this.jCheckAutoYoko.setEnabled(enabled);
+		this.jRadioVertical.setEnabled(enabled);
+		this.jRadioHorizontal.setEnabled(enabled);
+		
+		this.jComboEncType.setEnabled(enabled);
+		this.jCheckOverWrite.setEnabled(enabled);
+		this.jButtonFile.setEnabled(enabled);
+	}
+	
 	////////////////////////////////////////////////////////////////
 	/** Jar実行用 */
 	public static void main(String args[])
@@ -952,6 +980,8 @@ public class AozoraEpub3Applet extends JApplet
 	@Override
 	protected void finalize() throws Throwable
 	{
+		this.convertCanceled = true;
+		
 		//アップレット設定の保存
 		this.props.setProperty("TitleType", ""+this.jComboTitle.getSelectedIndex());
 		this.props.setProperty("UseFileName", this.jCheckUserFileName.isSelected()?"1":"");

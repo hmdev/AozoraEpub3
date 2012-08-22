@@ -296,9 +296,8 @@ public class AozoraEpub3Converter
 	}
 	/** タイトルと著作者を取得. 行番号も保存して出力時に変換出力
 	 * @throws IOException */
-	public BookInfo getBookInfo(BufferedReader src, TitleType titleType) throws IOException
+	public void readBookInfo(BookInfo bookInfo, BufferedReader src, TitleType titleType) throws IOException
 	{
-		BookInfo bookInfo = new BookInfo();
 		String line;
 		lineNum = -1;
 		//前の行のバッファ [1行前, 2行前]
@@ -308,6 +307,8 @@ public class AozoraEpub3Converter
 		boolean inComment = false;
 		//タイトル行がおわったらtrue
 		boolean titleEnded = false;
+		
+		int firstCommentLineNum = -1;
 		
 		//空行チェック用 開始行  左右中央の場合は -2
 		int emptyLineStart = -1;
@@ -327,6 +328,7 @@ public class AozoraEpub3Converter
 			//コメント除外
 			if (hideCommentBlock) {
 				if (line.startsWith("-------------------------------------------------------")) {
+					if (firstCommentLineNum == -1) firstCommentLineNum = lineNum;
 					//コメントブロックに入ったらタイトル著者終了
 					titleEnded = true;
 					if (inComment) {
@@ -499,11 +501,11 @@ public class AozoraEpub3Converter
 					}
 				}
 				break;
-			case 2: //表題+副題+空行+著者
+			case 2: //表題+著者 すぐ後にコメント行がある場合のみ表題+副題+空行+著者
 				if (titleFirst) {
 					bookInfo.titleLine = firstLineStart; bookInfo.title = firstLines[0];
 					if (hasAuthor) {
-						if (firstLines[3] != null && firstLines[3].length() > 0 && (firstLines[4] == null || firstLines[4].length() == 0)) {
+						if (firstCommentLineNum > 0 && firstCommentLineNum <= 6 && firstLines[3] != null && firstLines[3].length() > 0 && (firstLines[4] == null || firstLines[4].length() == 0)) {
 							bookInfo.titleLine = firstLineStart; bookInfo.subTitleLine = firstLineStart+1;
 							bookInfo.title = firstLines[0]+" "+firstLines[1];
 							bookInfo.creatorLine = firstLineStart+3; bookInfo.creator = firstLines[3];
@@ -544,8 +546,6 @@ public class AozoraEpub3Converter
 		
 		//BookInfoの参照を保持
 		this.bookInfo = bookInfo;
-		
-		return bookInfo;
 	}
 	
 	/** 改ページ処理があったら次のセクションの情報をbookInfoに追加 */
