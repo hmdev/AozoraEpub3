@@ -74,8 +74,7 @@ public class AozoraEpub3
 			
 			for (int i=0; i<args.length; i++) {
 				File srcFile = new File(args[i]);
-				BookInfo bookInfo = new BookInfo();
-				AozoraEpub3.getBookInfo(bookInfo, srcFile, aozoraConverter, encType, titleType);
+				BookInfo bookInfo = AozoraEpub3.getBookInfo(srcFile, aozoraConverter, encType, titleType, coverFileName);
 				bookInfo.coverFileName = coverFileName;
 				bookInfo.insertCoverPage = insertCoverPage;
 				bookInfo.vertical = vertical;
@@ -108,8 +107,8 @@ public class AozoraEpub3
 	}
 	
 	/** 前処理で一度読み込んでタイトル等の情報を取得 */
-	static public boolean getBookInfo(BookInfo bookInfo, File srcFile, AozoraEpub3Converter aozoraConverter,
-			String encType, TitleType titleType)
+	static public BookInfo getBookInfo(File srcFile, AozoraEpub3Converter aozoraConverter,
+			String encType, TitleType titleType, String coverFileName)
 	{
 		try {
 			//Zip内テキストファイルのパス
@@ -118,14 +117,14 @@ public class AozoraEpub3
 			
 			InputStream is = getInputStream(srcFile, ext, textEntryNames);
 			if (is == null) {
-				return false;
+				return null;
 			}
 			
 			//タイトル取得
 			BufferedReader src = new BufferedReader(new InputStreamReader(is, (String)encType));
-			aozoraConverter.readBookInfo(bookInfo, src, titleType);
+			BookInfo bookInfo = aozoraConverter.getBookInfo(src, titleType, coverFileName);
 			is.close();
-			return true;
+			return bookInfo;
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -133,7 +132,7 @@ public class AozoraEpub3
 			LogAppender.append(e.getMessage());
 			LogAppender.append("\n");
 		}
-		return false;
+		return null;
 	}
 	
 	/** ファイルを変換
@@ -213,8 +212,8 @@ public class AozoraEpub3
 		noExtName = noExtName.replaceAll("^(.*)[\\(|（].*?[\\)|）][ |　]*$", "$1");
 		Matcher m = Pattern.compile("[\\[|［](.+?)[\\]|］][ |　]*(.*)[ |　]*$").matcher(noExtName);
 		if (m.find()) {
-			titleCreator[0] = m.group(2).trim();
-			titleCreator[1] = m.group(1).trim();
+			titleCreator[0] = m.group(2);
+			titleCreator[1] = m.group(1);
 		} else {
 			m = Pattern.compile("^(.*?)( |　)*(\\(|（)").matcher(noExtName);
 			if (m.find()) {
@@ -223,6 +222,15 @@ public class AozoraEpub3
 				//一致しなければ拡張子のみ除外
 				titleCreator[0] = noExtName;
 			}
+		}
+		//trimして長さが0ならnullにする
+		if (titleCreator[0] != null) {
+			titleCreator[0] = titleCreator[0].trim();
+			if (titleCreator[0].length() == 0) titleCreator[0] = null;
+		}
+		if (titleCreator[1] != null) {
+			titleCreator[1] = titleCreator[1].trim();
+			if (titleCreator[1].length() == 0) titleCreator[1] = null;
 		}
 		return titleCreator;
 	}

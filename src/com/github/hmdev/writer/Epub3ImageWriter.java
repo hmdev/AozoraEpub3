@@ -11,8 +11,10 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.velocity.app.Velocity;
 
 import com.github.hmdev.converter.AozoraEpub3Converter;
+import com.github.hmdev.info.ImageInfo;
 import com.github.hmdev.info.SectionInfo;
 import com.github.hmdev.util.FileNameComparator;
+import com.github.hmdev.util.LogAppender;
 
 /** ePub3用のファイル一式をZipで固めたファイルを生成.
  * 画像のみのZipの場合こちらで画像専用の処理を行う
@@ -52,8 +54,10 @@ public class Epub3ImageWriter extends Epub3Writer
 		Arrays.sort(fileNames, new FileNameComparator());
 		
 		//画像xhtmlを出力
+		int pageNum = 0;
 		for (String srcFilePath : fileNames) {
-			String fileName = this.getImageFilePath(srcFilePath.trim());
+			pageNum++;
+			String fileName = this.getImageFilePath(srcFilePath.trim(), pageNum);
 			if (fileName != null) {
 				this.startImageSection();
 				bw.write(converter.getChukiValue("画像開始")[0]);
@@ -85,4 +89,31 @@ public class Epub3ImageWriter extends Epub3Writer
 		Velocity.getTemplate(this.templatePath+OPS_PATH+XHTML_PATH+XHTML_HEADER_VM).merge(this.velocityContext, bw);
 		bw.flush();
 	}
+	
+	@Override
+	public String getImageFilePath(String srcImageFileName, int lineNum)
+	{
+		boolean isCover = false;
+		this.imageIndex++;
+		String ext = "";
+		try { ext = srcImageFileName.substring(srcImageFileName.lastIndexOf('.')+1); } catch (Exception e) {}
+		String imageId = decimalFormat.format(this.imageIndex);
+		String imageFileName = IMAGES_PATH+imageId+"."+ext;
+		this.imageFileNames.put(srcImageFileName, imageFileName);
+		String format = "image/"+ext.toLowerCase();
+		if ("image/jpg".equals(format)) format = "image/jpeg";
+		if (!format.matches("^image\\/(png|jpeg|gif)$")) LogAppender.append("画像フォーマットエラー: ("+lineNum+") "+srcImageFileName+"\n");
+		else {
+			ImageInfo imageInfo = new ImageInfo(imageId, imageId+"."+ext, format);
+			if (this.imageIndex == 1 &&  "".equals(bookInfo.coverFileName)) {
+				imageInfo.setIsCover(true);
+				isCover = true;
+			}
+			this.imageInfos.add(imageInfo);
+		}
+		//先頭に表紙ページ移動の場合でカバーページならnullを返して本文中から削除
+		if (bookInfo.insertCoverPage && isCover) return null;
+		return "../"+imageFileName;
+	}
+	
 }

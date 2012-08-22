@@ -127,6 +127,10 @@ public class Epub3Writer
 	
 	HashSet<String> zipImageFileNames;
 	
+	
+	String srcFilePath;
+	String zipTextFileName;
+	
 	/** コンストラクタ
 	 * @param templatePath epubテンプレート格納パス文字列 最後は"/"
 	 */
@@ -144,9 +148,9 @@ public class Epub3Writer
 	 * @throws IOException */
 	public void write(AozoraEpub3Converter converter, BufferedReader src, File srcFile, String zipTextFileName, File epubFile, BookInfo bookInfo, HashSet<String> zipImageFileNames) throws IOException
 	{
-		String srcPath = srcFile.getParent()+"/";
 		this.bookInfo = bookInfo;
-		
+		this.srcFilePath = srcFile.getParent()+"/";
+		this.zipTextFileName = zipTextFileName;
 		this.zipImageFileNames = zipImageFileNames;
 		
 		//インデックス初期化
@@ -320,9 +324,9 @@ public class Epub3Writer
 			ArchiveEntry entry;
 			while( (entry = zis.getNextEntry()) != null ) {
 				String entryName = entry.getName().substring(zipPathLength);
-				String dstFilePath = imageFileNames.get(entryName);
-				if (dstFilePath != null) {
-					zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+dstFilePath));
+				String dstImageFileName = imageFileNames.get(entryName);
+				if (dstImageFileName != null) {
+					zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+dstImageFileName));
 					IOUtils.copy(zis, zos);
 					zos.closeArchiveEntry();
 					//チェック用に出力したら削除
@@ -337,17 +341,17 @@ public class Epub3Writer
 		} else {
 			//TODO 出力順をimageFiles順にする?
 			for(Map.Entry<String, String> e : imageFileNames.entrySet()) {
-				String srcFilePath = e.getKey();
-				String dstFilePath = e.getValue();
-				File imageFile = new File(srcPath+srcFilePath);
+				String srImagecFileName = e.getKey();
+				String dstImageFileName = e.getValue();
+				File imageFile = new File(srcFilePath+srImagecFileName);
 				if (imageFile.exists()) {
-					zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+dstFilePath));
+					zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+dstImageFileName));
 					FileInputStream fis = new FileInputStream(imageFile);
 					IOUtils.copy(fis, zos);
 					zos.closeArchiveEntry();
 					fis.close();
 				} else {
-					LogAppender.append("[WARN] 画像ファイルなし: "+srcFilePath+"\n");
+					LogAppender.append("[WARN] 画像ファイルなし: "+srImagecFileName+"\n");
 				}
 			}
 		}
@@ -431,30 +435,82 @@ public class Epub3Writer
 	 * 変更前と変更後のファイル名はimageFileNamesに格納される (images/0001.jpg)
 	 * @return 画像タグを出力しない場合はnullを返す
 	 *  */
-	public String getImageFilePath(String srcFilePath)
+	public String getImageFilePath(String srcImageFileName, int lineNum)
 	{
 		boolean isCover = false;
-		String ext = "";
-		try { ext = srcFilePath.substring(srcFilePath.lastIndexOf('.')+1); } catch (Exception e) {}
 		
 		//すでに出力済みの画像
-		String imageFileName = this.imageFileNames.get(srcFilePath);
+		String imageFileName = this.imageFileNames.get(srcImageFileName);
 		
 		if (imageFileName == null) {
-			this.imageIndex++;
-			String imageId = decimalFormat.format(this.imageIndex);
-			imageFileName = IMAGES_PATH+imageId+"."+ext;
-			this.imageFileNames.put(srcFilePath, imageFileName);
-			String format = "image/"+ext.toLowerCase();
-			if ("image/jpg".equals(format)) format = "image/jpeg";
-			if (!format.matches("^image\\/(png|jpeg|gif)$")) LogAppender.append("画像フォーマットエラー: "+srcFilePath+"\n");
-			else {
-				ImageInfo imageInfo = new ImageInfo(imageId, imageId+"."+ext, format);
-				if (this.imageIndex == 1) {
-					imageInfo.setIsCover(true);
-					isCover = true;
+			//画像があるかチェック
+			boolean exists = false;
+			if (this.zipImageFileNames == null) {
+				File imageFile = new File(srcFilePath+srcImageFileName);
+				exists = imageFile.exists();
+				//拡張子変更
+				if (!exists) {
+					if (new File(srcFilePath+srcImageFileName.replaceFirst("\\.\\w+$", ".png")).exists()) {
+						exists = true;
+						srcImageFileName = srcImageFileName.replaceFirst("\\.\\w+$", ".png");
+					} else if (new File(srcFilePath+srcImageFileName.replaceFirst("\\.\\w+$", ".jpg")).exists()) {
+						exists = true;
+						srcImageFileName = srcImageFileName.replaceFirst("\\.\\w+$", ".jpg");
+					} else if (new File(srcFilePath+srcImageFileName.replaceFirst("\\.\\w+$", ".jpeg")).exists()) {
+						exists = true;
+						srcImageFileName = srcImageFileName.replaceFirst("\\.\\w+$", ".jpeg");
+					}
+					if (exists) LogAppender.append("画像拡張子変更: ("+lineNum+") "+srcImageFileName+"\n");
 				}
-				this.imageInfos.add(imageInfo);
+			} else {
+				//Zipの場合
+				String zipTextParent = zipTextFileName.substring(0, zipTextFileName.indexOf('/')+1);
+				exists = this.zipImageFileNames.contains(zipTextParent+srcImageFileName);
+				//拡張子変更
+				if (!exists) {
+					if (this.zipImageFileNames.contains(zipTextParent+srcImageFileName.replaceFirst("\\.\\w+$", ".png"))) {
+						exists = true;
+						srcImageFileName = srcImageFileName.replaceFirst("\\.\\w+$", ".png");
+					} else if (this.zipImageFileNames.contains(zipTextParent+srcImageFileName.replaceFirst("\\.\\w+$", ".jpg"))) {
+						exists = true;
+						srcImageFileName = srcImageFileName.replaceFirst("\\.\\w+$", ".jpg");
+					} else if (this.zipImageFileNames.contains(zipTextParent+srcImageFileName.replaceFirst("\\.\\w+$", ".jpeg"))) {
+						exists = true;
+						srcImageFileName = srcImageFileName.replaceFirst("\\.\\w+$", ".jpeg");
+					}
+					if (exists) LogAppender.append("画像拡張子変更: ("+lineNum+") "+srcImageFileName+"\n");
+				}
+			}
+			if (!exists) {
+				//画像端ページの場合はセクションを出力しない
+				if (bookInfo.isImageSectionLine(lineNum)) {
+					this.sectionInfos.remove(this.sectionInfos.size()-1);
+				}
+				//画像タグを出力しない
+				LogAppender.append("画像なし: ("+lineNum+") "+srcImageFileName+"\n");
+				return null;
+			}
+			
+			//拡張子変更があるので再度ファイル名チェック
+			imageFileName = this.imageFileNames.get(srcImageFileName);
+			if (imageFileName == null) {
+				this.imageIndex++;
+				String ext = "";
+				try { ext = srcImageFileName.substring(srcImageFileName.lastIndexOf('.')+1); } catch (Exception e) {}
+				String imageId = decimalFormat.format(this.imageIndex);
+				imageFileName = IMAGES_PATH+imageId+"."+ext;
+				this.imageFileNames.put(srcImageFileName, imageFileName);
+				String format = "image/"+ext.toLowerCase();
+				if ("image/jpg".equals(format)) format = "image/jpeg";
+				if (!format.matches("^image\\/(png|jpeg|gif)$")) LogAppender.append("画像フォーマットエラー: ("+lineNum+") "+srcImageFileName+"\n");
+				else {
+					ImageInfo imageInfo = new ImageInfo(imageId, imageId+"."+ext, format);
+					if (this.imageIndex == 1 &&  "".equals(bookInfo.coverFileName)) {
+						imageInfo.setIsCover(true);
+						isCover = true;
+					}
+					this.imageInfos.add(imageInfo);
+				}
 			}
 		}
 		//先頭に表紙ページ移動の場合でカバーページならnullを返して本文中から削除
