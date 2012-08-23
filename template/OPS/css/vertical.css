@@ -8,7 +8,7 @@ img {
 	max-width: 100%;
 	max-height: 100%;
 }
-div.img {
+span.img {
 	display: inline-block;
 	vertical-align: middle;
 }
@@ -157,7 +157,7 @@ span.font-5 { font-size: 50%; }
 span.kogaki { font-size: 50%; }
 
 /* 縦中横 */
-div.tcy {
+span.tcy {
 	display: inline-block;
 }
 .tcy span {

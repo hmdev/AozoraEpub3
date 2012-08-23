@@ -53,7 +53,6 @@ import javax.swing.border.LineBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.github.hmdev.converter.AozoraEpub3Converter;
-import com.github.hmdev.converter.AozoraEpub3Converter.TitleType;
 import com.github.hmdev.info.BookInfo;
 import com.github.hmdev.util.LogAppender;
 import com.github.hmdev.writer.Epub3ImageWriter;
@@ -191,7 +190,7 @@ public class AozoraEpub3Applet extends JApplet
 		//表題行
 		label = new JLabel(" 表題 本文内");
 		panel.add(label);
-		jComboTitle = new JComboBox(AozoraEpub3Converter.TitleType.titleTypeNames);
+		jComboTitle = new JComboBox(BookInfo.TitleType.titleTypeNames);
 		jComboTitle.setFocusable(false);
 		jComboTitle.setPreferredSize(new Dimension(120, 22));
 		try { jComboTitle.setSelectedIndex(Integer.parseInt(props.getProperty("TitleType"))); } catch (Exception e) {}
@@ -803,7 +802,7 @@ public class AozoraEpub3Applet extends JApplet
 		BookInfo bookInfo = AozoraEpub3.getBookInfo(
 			srcFile, this.aozoraConverter,
 			this.jComboEncType.getSelectedItem().toString(),
-			TitleType.values()[this.jComboTitle.getSelectedIndex()],
+			BookInfo.TitleType.values()[this.jComboTitle.getSelectedIndex()],
 			coverFileName
 		);
 		
@@ -899,6 +898,9 @@ public class AozoraEpub3Applet extends JApplet
 			this.jComboEncType.getSelectedItem().toString(),
 			bookInfo, zipImageFileNames
 		);
+		
+		zipImageFileNames.clear();
+		bookInfo.clear();
 	}
 	
 	////////////////////////////////////////////////////////////////

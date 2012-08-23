@@ -5,6 +5,23 @@ import java.util.HashSet;
 /** タイトル著作者等のメタ情報を格納 */
 public class BookInfo
 {
+	/** タイトル記載種別 */
+	//final static public String[] titleType = {"表題+著者名", "著者名＋表題", "表題のみ", "なし", "ファイル名から"};
+	public enum TitleType {
+		TITLE_AUTHOR, AUTHOR_TITLE, TITLE_ONLY, NONE;
+		final static public String[] titleTypeNames = {"表題＋著者名", "著者名＋表題", "表題のみ", "なし"};
+		boolean hasTitleAuthor() {
+			switch (this) {
+			case TITLE_AUTHOR:
+			case AUTHOR_TITLE:
+			case TITLE_ONLY:
+				return true;
+			default:
+				return false;
+			}
+		}
+	}
+	
 	/** タイトル */
 	public String title;
 	/** タイトル行番号 */
@@ -62,7 +79,6 @@ public class BookInfo
 	/** 出力ページしない行 (左右中央後の空行と改ページ前の空行) */
 	HashSet<Integer> mapIgnoreLine;
 	
-	
 	////////////////////////////////////////////////////////////////
 	public BookInfo()
 	{
@@ -72,6 +88,13 @@ public class BookInfo
 		this.mapIgnoreLine = new HashSet<Integer>();
 		
 		this.modified = new Date();
+	}
+	
+	public void clear()
+	{
+		this.mapImageSectionLine.clear();
+		this.mapNoPageBreakLine.clear();
+		this.mapIgnoreLine.clear();
 	}
 	
 	/*public void addSectionInfo(SectionInfo sectionInfo)
@@ -225,6 +248,162 @@ public class BookInfo
 	{
 		this.imageOnly = imageOnly;
 	}
-
 	
+	////////////////////////////////////////////////////////////////
+	/** 先頭行から表題と著者を取得 */
+	public void setMetaInfo(TitleType titleType, String[] firstLines, int firstLineStart, int firstCommentLineNum)
+	{
+		if (titleType != TitleType.NONE) {
+			//バッファからタイトルと著者取得
+			//連続行数取得
+			int linesLength = 0;
+			for (int i=0; i<firstLines.length; i++) {
+				if (firstLines[i] == null || firstLines[i].length() == 0) {
+					linesLength = i; break;
+				}
+			}
+			boolean hasTitle = titleType==TitleType.TITLE_AUTHOR || titleType==TitleType.TITLE_ONLY || titleType==TitleType.AUTHOR_TITLE;
+			boolean hasAuthor = titleType==TitleType.TITLE_AUTHOR || titleType==TitleType.AUTHOR_TITLE;
+			boolean titleFirst = titleType==TitleType.TITLE_AUTHOR || titleType==TitleType.TITLE_ONLY;
+			
+			switch (linesLength) {
+			case 6:
+				if (titleFirst) {
+					this.titleLine = firstLineStart;
+					this.orgTitleLine = firstLineStart+1;
+					this.subTitleLine = firstLineStart+2;
+					this.subOrgTitleLine = firstLineStart+3;
+					this.title = firstLines[0]+" "+firstLines[2];
+					if (hasAuthor) {
+						this.creatorLine = firstLineStart+4;
+						this.subCreatorLine = firstLineStart+5;
+						this.creator = firstLines[4];
+					}
+				} else {
+					this.creatorLine = firstLineStart;
+					this.subCreatorLine = firstLineStart+1;
+					this.creator = firstLines[0];
+					if (hasTitle) {
+						this.titleLine = firstLineStart+2;
+						this.orgTitleLine = firstLineStart+3;
+						this.subTitleLine = firstLineStart+4;
+						this.subOrgTitleLine = firstLineStart+5;
+						this.title = firstLines[2]+" "+firstLines[4];
+					}
+				}
+				break;
+			case 5:
+				if (titleFirst) {
+					this.titleLine = firstLineStart;
+					this.orgTitleLine = firstLineStart+1;
+					this.subTitleLine = firstLineStart+2;
+					this.title = firstLines[0]+" "+firstLines[2];
+					if (hasAuthor) {
+						this.creatorLine = firstLineStart+3;
+						this.subCreatorLine = firstLineStart+4;
+						this.creator = firstLines[3];
+					}
+				} else {
+					this.creatorLine = firstLineStart;
+					this.creator = firstLines[0];
+					if (hasTitle) {
+						this.titleLine = firstLineStart+1;
+						this.orgTitleLine = firstLineStart+2;
+						this.subTitleLine = firstLineStart+3;
+						this.subOrgTitleLine = firstLineStart+4;
+						this.title = firstLines[1]+" "+firstLines[3];
+					}
+				}
+				break;
+			case 4:
+				if (titleFirst) {
+					this.titleLine = firstLineStart;
+					this.subTitleLine = firstLineStart+1;
+					this.title = firstLines[0]+" "+firstLines[1];
+					if (hasAuthor) {
+						this.creatorLine = firstLineStart+2;
+						this.subCreatorLine = firstLineStart+3;
+						this.creator = firstLines[2];
+					}
+				} else {
+					this.creatorLine = firstLineStart;
+					this.subCreatorLine = firstLineStart+1;
+					this.creator = firstLines[0];
+					if (hasTitle) {
+						this.titleLine = firstLineStart+2;
+						this.subTitleLine = firstLineStart+3;
+						this.title = firstLines[2]+" "+firstLines[3];
+					}
+				}
+				break;
+			case 3:
+				if (titleFirst) {
+					this.titleLine = firstLineStart;
+					this.subTitleLine = firstLineStart+1;
+					this.title = firstLines[0]+" "+firstLines[1];
+					if (hasAuthor) {
+						this.creatorLine = firstLineStart+2;
+						this.creator = firstLines[2];
+					}
+				} else {
+					this.creatorLine = firstLineStart;
+					this.creator = firstLines[0];
+					if (hasTitle) {
+						this.titleLine = firstLineStart+1;
+						this.subTitleLine = firstLineStart+2;
+						this.title = firstLines[1]+" "+firstLines[2];
+					}
+				}
+				break;
+			case 2: //表題+著者 すぐ後にコメント行がある場合のみ表題+副題+空行+著者
+				if (titleFirst) {
+					this.titleLine = firstLineStart;
+					this.title = firstLines[0];
+					if (hasAuthor) {
+						if (firstCommentLineNum > 0 && firstCommentLineNum <= 6 && firstLines[3] != null && firstLines[3].length() > 0 && (firstLines[4] == null || firstLines[4].length() == 0)) {
+							this.titleLine = firstLineStart;
+							this.subTitleLine = firstLineStart+1;
+							this.title = firstLines[0]+" "+firstLines[1];
+							this.creatorLine = firstLineStart+3;
+							this.creator = firstLines[3];
+						} else {
+							this.creatorLine = firstLineStart+1;
+							this.creator = firstLines[1];
+						}
+					}
+				} else {
+					this.creatorLine = firstLineStart;
+					this.creator = firstLines[0];
+					if (hasTitle) {
+						this.titleLine = firstLineStart+1;
+						this.title = firstLines[1];
+					}
+				}
+				break;
+			case 1: //表題 空行 著者名 空行 も許可
+				if (titleFirst) {
+					this.titleLine = firstLineStart;
+					this.title = firstLines[0];
+					if (hasAuthor) {
+						if (firstLines[2] != null && firstLines[2].length() > 0 && (firstLines[3] == null || firstLines[3].length() == 0)) {
+							this.creatorLine = firstLineStart+2;
+							this.creator = firstLines[2];
+						}
+					}
+				} else {
+					this.creatorLine = firstLineStart;
+					this.creator = firstLines[0];
+					if (hasTitle) {
+						if (firstLines[2] != null && firstLines[2].length() > 0 && (firstLines[3] == null || firstLines[3].length() == 0)) {
+							this.titleLine = firstLineStart+2;
+							this.title = firstLines[2];
+						}
+					}
+				}
+				break;
+			}
+			
+			if (this.creator != null && (this.creator.startsWith("―") || this.creator.startsWith("【"))) this.creator = null;
+		}
+	}
 }

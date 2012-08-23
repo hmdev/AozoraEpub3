@@ -14,7 +14,6 @@ import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 
 import com.github.hmdev.converter.AozoraEpub3Converter;
-import com.github.hmdev.converter.AozoraEpub3Converter.TitleType;
 import com.github.hmdev.info.BookInfo;
 import com.github.hmdev.util.LogAppender;
 import com.github.hmdev.writer.Epub3Writer;
@@ -52,7 +51,7 @@ public class AozoraEpub3
 			boolean overWrite = true;
 			String coverFileName = "";//先頭の挿絵
 			boolean insertCoverPage = false;
-			TitleType titleType = TitleType.TITLE_AUTHOR;
+			BookInfo.TitleType titleType = BookInfo.TitleType.TITLE_AUTHOR;
 			boolean useFileName = true;
 			
 			//propsから取得するオプション
@@ -108,7 +107,7 @@ public class AozoraEpub3
 	
 	/** 前処理で一度読み込んでタイトル等の情報を取得 */
 	static public BookInfo getBookInfo(File srcFile, AozoraEpub3Converter aozoraConverter,
-			String encType, TitleType titleType, String coverFileName)
+			String encType, BookInfo.TitleType titleType, String coverFileName)
 	{
 		try {
 			//Zip内テキストファイルのパス
@@ -195,6 +194,8 @@ public class AozoraEpub3
 			LogAppender.append("変換完了 : ");
 			LogAppender.append(outFile.getPath());
 			LogAppender.append("\n");
+			src.close();
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			LogAppender.append("エラーが発生しました : ");

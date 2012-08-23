@@ -163,9 +163,9 @@
 
 ##ルビとルビのように付く文字 → 未対応
 
-####縦横中
-縦中横	<div class="tcy"><span>		2
-縦中横終わり	</span></div>		3
+####縦横中 (前後の外字画像がずれるので外にspan追加)
+縦中横	<span class="tcy"><span>		2
+縦中横終わり	</span></span>		3
 
 ####割り注
 ## → 未対応
@@ -190,6 +190,8 @@
 上付き小文字終わり	</span>
 下付き小文字	<span class="sub">
 下付き小文字終わり	</span>
+小書き	<span class="kogaki">
+小書き終わり	</span>
 
 ####罫囲み
 罫囲み	<div class="border">
@@ -526,10 +528,10 @@
 
 改行	<br/>
 
-画像開始	<div class="img"><img src="
-画像終了	"/></div>
-外字画像開始	<div class="img gaiji"><img src="
-外字画像終了	"/></div>
+画像開始	<span class="img"><img src="
+画像終了	"/></span>
+外字画像開始	<span class="img gaiji"><img src="
+外字画像終了	"/></span>
 
 表題前	<div><span class="font5">
 表題後	</span></div>
