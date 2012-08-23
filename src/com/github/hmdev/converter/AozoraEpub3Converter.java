@@ -318,22 +318,26 @@ public class AozoraEpub3Converter
 			
 			//コメント除外
 			if (this.hideCommentBlock) {
-				if (line.startsWith("-------------------------------------------------------")) {
-					if (firstCommentLineNum == -1) firstCommentLineNum = this.lineNum;
-					//コメントブロックに入ったらタイトル著者終了
-					titleEnded = true;
-					if (inComment) {
-						if (commentLineNum > 20) LogAppender.append("[WARN] コメントが "+commentLineNum+" 行 ("+commentLineStart+"-"+this.lineNum+")\n");
-						commentLineNum = 0;
-						inComment = false; continue;
+				if (line.startsWith("--------------------------------")) {
+					if (!line.startsWith("-------------------------------------------------------")) {
+						LogAppender.append("[WARN] コメント行の文字数が足りません ("+this.lineNum+")\n");
+					} else {
+						if (firstCommentLineNum == -1) firstCommentLineNum = this.lineNum;
+						//コメントブロックに入ったらタイトル著者終了
+						titleEnded = true;
+						if (inComment) {
+							if (commentLineNum > 20) LogAppender.append("[WARN] コメントが "+commentLineNum+" 行 ("+commentLineStart+"-"+this.lineNum+")\n");
+							commentLineNum = 0;
+							inComment = false; continue;
+						}
+						else {
+							commentLineStart = this.lineNum;
+							inComment = true;
+							continue;
+						}
 					}
-					else {
-						commentLineStart = this.lineNum;
-						inComment = true;
-						continue;
-					}
+					if (inComment) commentLineNum++;
 				}
-				if (inComment) commentLineNum++;
 			}
 			
 			
@@ -671,12 +675,13 @@ public class AozoraEpub3Converter
 				
 			} else if (chuki.charAt(0) == '〔') {
 				//拡張ラテン文字変換
-				//〔の次が半角でなければそのまま〔を出力
-				if (!CharUtils.isHalf(chuki.charAt(1))) {
-					buf.append(chuki);
+				String inner = chuki.substring(1, chuki.length()-1);
+				//〔の次が半角でなければ〔の中を再度外字変換
+				if (!CharUtils.isHalfSpace(inner.toCharArray())) {
+					buf.append('〔').append(convertGaijiChuki(inner, true)).append('〕');
 				} else {
 					//System.out.println(chuki);
-					buf.append(latinConverter.toLatinString(chuki.substring(1, chuki.length()-1)));
+					buf.append(latinConverter.toLatinString(inner));
 				}
 			} else if (chuki.charAt(0) == '／') {
 				//くの字点

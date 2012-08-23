@@ -33,6 +33,31 @@ public class CharUtils
 	{
 		return (0x21 <= ch && ch <= 0x02AF);
 	}
+	/** 英字かどうかをチェック 拡張ラテン文字含む
+	 * 半角スペースは含まない */
+	static public boolean isHalf(char[] chars)
+	{
+		for (char ch : chars) {
+			if (!isHalf(ch)) return false;
+		}
+		return true;
+	}
+	
+	/** 英字かどうかをチェック 拡張ラテン文字含む
+	 * 半角スペースを含む */
+	static public boolean isHalfSpace(char ch)
+	{
+		return (0x20 <= ch && ch <= 0x02AF);
+	}
+	/** 英字かどうかをチェック 拡張ラテン文字含む
+	 * 半角スペースを含む */
+	static public boolean isHalfSpace(char[] chars)
+	{
+		for (char ch : chars) {
+			if (!isHalfSpace(ch)) return false;
+		}
+		return true;
+	}
 	
 	/** 英字かどうかをチェック 拡張ラテン文字含む */
 	static public boolean isAlpha(char ch)

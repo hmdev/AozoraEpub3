@@ -647,7 +647,7 @@ public class AozoraEpub3Applet extends JApplet
 		public void actionPerformed(ActionEvent e)
 		{
 			File path = currentPath;
-			File selectedPath = new File((String)jComboDstPath.getSelectedItem());
+			File selectedPath = new File((String)jComboDstPath.getEditor().getItem());
 			if (selectedPath.isDirectory()) path = selectedPath;
 			else if (selectedPath.isFile()) path = selectedPath.getParentFile();
 			JFileChooser fileChooser = new JFileChooser(path);
@@ -725,6 +725,29 @@ public class AozoraEpub3Applet extends JApplet
 		}
 	}
 	
+	/** 変換実行時出力先リストの先頭に追加または移動 */
+	protected void addDstPath()
+	{
+		//パス指定がなければ終了
+		if (this.jComboDstPath.getSelectedIndex() == 0) return;
+		String dstPath = this.jComboDstPath.getEditor().getItem().toString().trim();
+		if (dstPath.equals("")) return;
+		
+		int count = Math.min(10, this.jComboDstPath.getItemCount());
+		for (int i=1; i<count; i++) {
+			String item = (String)this.jComboDstPath.getItemAt(i);
+			if (dstPath.equals(item)) {
+				//先頭に移動して終了
+				this.jComboDstPath.removeItemAt(i);
+				this.jComboDstPath.insertItemAt(item, 1);
+				this.jComboDstPath.setSelectedIndex(1);
+				return;
+			}
+		}
+		//ファイルがあれば先頭に追加
+		this.jComboDstPath.insertItemAt(dstPath, 1);
+		this.jComboDstPath.setSelectedIndex(1);
+	}
 	
 	////////////////////////////////////////////////////////////////
 	/** 複数ファイルを変換 */
@@ -733,7 +756,9 @@ public class AozoraEpub3Applet extends JApplet
 		if (srcFiles.length == 0 ) return;
 		
 		//テキスト入力を確定
-		jComboCover.transferFocusUpCycle();
+		//jComboExt.transferFocusUpCycle();
+		//jComboCover.transferFocusUpCycle();
+		//jComboDstPath.transferFocusUpCycle();
 		
 		convertCanceled = false;
 		currentPath = srcFiles[0].getParentFile();
@@ -742,12 +767,15 @@ public class AozoraEpub3Applet extends JApplet
 		//出力先取得
 		File dstPath = null;
 		if (jComboDstPath.getSelectedIndex() != 0) {
-			dstPath = new File(jComboDstPath.getSelectedItem().toString());
+			dstPath = new File(jComboDstPath.getEditor().getItem().toString());
 			if (!dstPath.isDirectory()) {
-				JOptionPane.showMessageDialog(jDialogConfirm, "出力先がありません\n"+jComboDstPath.getSelectedItem().toString());
+				JOptionPane.showMessageDialog(jDialogConfirm, "出力先がありません\n"+jComboDstPath.getEditor().getItem().toString());
 				return;
 			}
 		}
+		//出力先と履歴保存
+		addDstPath();
+		
 		//自動改ページ
 		int forcePageBreak = 0;
 		int forcePageBreakEmpty = 2;
@@ -794,7 +822,7 @@ public class AozoraEpub3Applet extends JApplet
 		
 		LogAppender.append("----------------------------------------------------------------\n");
 		//表紙情報追加
-		String coverFileName = this.jComboCover.getSelectedItem().toString();
+		String coverFileName = this.jComboCover.getEditor().getItem().toString();
 		if (coverFileName.equals(this.jComboCover.getItemAt(0).toString())) coverFileName = ""; //先頭の挿絵
 		if (coverFileName.equals(this.jComboCover.getItemAt(1).toString())) coverFileName = "*"; //入力ファイルと同じ名前+.jpg/.png
 		if (coverFileName.equals(this.jComboCover.getItemAt(2).toString())) coverFileName = null; //表紙無し
@@ -893,7 +921,7 @@ public class AozoraEpub3Applet extends JApplet
 			this.aozoraConverter,
 			writer,
 			this.jCheckAutoFileName.isSelected(),
-			this.jComboExt.getSelectedItem().toString().trim(),
+			this.jComboExt.getEditor().getItem().toString().trim(),
 			this.jCheckOverWrite.isSelected(),
 			this.jComboEncType.getSelectedItem().toString(),
 			bookInfo, zipImageFileNames
@@ -1036,10 +1064,10 @@ public class AozoraEpub3Applet extends JApplet
 		this.props.setProperty("TitleType", ""+this.jComboTitle.getSelectedIndex());
 		this.props.setProperty("UseFileName", this.jCheckUserFileName.isSelected()?"1":"");
 		this.props.setProperty("AutoFileName", this.jCheckAutoFileName.isSelected()?"1":"");
-		//出力先と履歴
+		//出力先と履歴保存
 		if (this.jComboDstPath.getSelectedIndex() == 0) this.props.setProperty("DstPath","");
 		else {
-			String dstPath = this.jComboDstPath.getSelectedItem().toString().trim();
+			String dstPath = this.jComboDstPath.getEditor().getItem().toString().trim();
 			this.props.setProperty("DstPath", ""+dstPath);
 			//履歴
 			String dstPathList = this.props.getProperty("DstPathList");
@@ -1060,7 +1088,7 @@ public class AozoraEpub3Applet extends JApplet
 		this.props.setProperty("AutoYoko", this.jCheckAutoYoko.isSelected()?"1":"");
 		this.props.setProperty("Vertical", this.jRadioVertical.isSelected()?"1":"");
 		//this.props.setProperty("RtL", this.jRadioRtL.isSelected()?"1":"");
-		this.props.setProperty("Ext", ""+this.jComboExt.getSelectedItem().toString().trim());
+		this.props.setProperty("Ext", ""+this.jComboExt.getEditor().getItem().toString().trim());
 		this.props.setProperty("ChkConfirm", this.jCheckConfirm.isSelected()?"1":"");
 		//自動改行
 		//this.props.setProperty("PageBreak", ""+this.jComboxPageBreak.getSelectedItem().toString().trim());
@@ -1068,7 +1096,7 @@ public class AozoraEpub3Applet extends JApplet
 		//先頭の挿絵と表紙無しのみ記憶
 		this.props.setProperty("CoverPage", this.jCheckCoverPage.isSelected()?"1":"");
 		if (this.jComboCover.getSelectedIndex() == 0) this.props.setProperty("Cover","");
-		else if (this.jComboCover.getSelectedIndex() == 1) this.props.setProperty("Cover", ""+this.jComboCover.getSelectedItem().toString().trim());
+		else if (this.jComboCover.getSelectedIndex() == 1) this.props.setProperty("Cover", ""+this.jComboCover.getEditor().getItem().toString().trim());
 		
 		this.props.setProperty("EncType", ""+this.jComboEncType.getSelectedIndex());
 		this.props.setProperty("OverWrite", this.jCheckOverWrite.isSelected()?"1":"");
