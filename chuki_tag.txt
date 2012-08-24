@@ -63,7 +63,11 @@
 四	<span class="sub">四</span>
 レ	<span class="sub">レ</span>
 一レ	<span class="sub">一レ</span>
+二レ	<span class="sub">二レ</span>
+三レ	<span class="sub">三レ</span>
 上レ	<span class="sub">上レ</span>
+中レ	<span class="sub">中レ</span>
+下レ	<span class="sub">下レ</span>
 上	<span class="sub">上</span>
 中	<span class="sub">中</span>
 下	<span class="sub">下</span>

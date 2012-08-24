@@ -64,9 +64,8 @@ public class AozoraEpub3Converter
 	static Pattern chukiPattern = Pattern.compile("(［＃.+?］)|(<.+?>)");
 	/** 外字注記パターン */
 	static Pattern gaijiChukiPattern = Pattern.compile("(※［＃.+?］)|(〔.+?〕)|(／″?＼)");
-	/** 後述注記パターン */
-	static Pattern chukiSufPattern = Pattern.compile("［＃「([^」]+)」(.+?)］");
-	
+	/** 前方参照注記パターン */
+	static Pattern chukiSufPattern = Pattern. compile( "［＃「([^］]+)」([^］]+?)］" );
 	//---------------- 変換用テーブル ----------------//
 	/** 変換関連が初期化済みならtrue */
 	static boolean inited = false;
@@ -1214,7 +1213,8 @@ public class AozoraEpub3Converter
 	/** 注記ルビ等のない文字列に置換 */
 	public String replaceToPlain(String str)
 	{
-		return str.replaceAll("<[^>]+>", "").replaceAll("《[^》]+》", "").replaceAll("［＃.+?］", "").replaceAll("[｜|※]","").replaceAll("^[ |　]+","").replaceAll("[ |　]+$","");
+		return str.replaceAll("<[^>]+>", "").replaceAll("《[^》]+》", "").replaceAll("［＃.+?］", "").replaceAll("[｜|※]","").replaceAll("^[ |　]+","").replaceAll("[ |　]+$","")
+				.replaceAll("〳〵", "く").replaceAll("〴〵", "ぐ").replaceAll("〻", "々");
 	}
 	
 	/** ルビタグに変換して出力

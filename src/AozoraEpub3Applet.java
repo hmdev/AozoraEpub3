@@ -809,9 +809,9 @@ public class AozoraEpub3Applet extends JApplet
 				convertFile(srcFile, dstPath);
 			}
 			//キャンセル
-			if (convertCanceled) return;
+			if (convertCanceled)
+				return;
 		}
-		
 	}
 	
 	/** 内部用変換関数 Appletの設定を引数に渡す
@@ -926,8 +926,6 @@ public class AozoraEpub3Applet extends JApplet
 			this.jComboEncType.getSelectedItem().toString(),
 			bookInfo, zipImageFileNames
 		);
-		
-		zipImageFileNames.clear();
 		bookInfo.clear();
 	}
 	
