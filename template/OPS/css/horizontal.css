@@ -27,10 +27,13 @@ h6 { font: small-caps 100%; }
 
 p { margin: 0; }
 
-span.b { font-weight: bold; }
-span.i { font-style: italic; }
 span.strike { text-decoration:line-through; }
 span.dbl_strike { text-decoration:line-through; }
+span.b { font-weight: bold; }
+span.i { font-style: italic; }
+span.gtc {
+	font-family: 'ＭＳ ゴシック','MS UI Gothic',sans-serif;
+}
 
 /* 外字文字画像 */
 .gaiji {
@@ -150,7 +153,7 @@ span.font-2 { font-size: 80%; }
 span.font-3 { font-size: 70%; }
 span.font-4 { font-size: 60%; }
 span.font-5 { font-size: 50%; }
-span.kogaki { font-size: 50%; }
+span.kogaki { font-size: 70%; }
 
 /* 縦中横 */
 span.tcy {

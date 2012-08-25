@@ -320,7 +320,7 @@ public class Epub3Writer
 		if (srcFile.getName().toLowerCase().endsWith(".zip")) {
 			int zipPathLength = 0;
 			if (zipTextFileName != null) zipPathLength = zipTextFileName.indexOf('/')+1;
-			ZipArchiveInputStream zis = new ZipArchiveInputStream(new BufferedInputStream(new FileInputStream(srcFile)), "Shift_JIS", false);
+			ZipArchiveInputStream zis = new ZipArchiveInputStream(new BufferedInputStream(new FileInputStream(srcFile)), "MS932", false);
 			ArchiveEntry entry;
 			while( (entry = zis.getNextEntry()) != null ) {
 				String entryName = entry.getName().substring(zipPathLength);

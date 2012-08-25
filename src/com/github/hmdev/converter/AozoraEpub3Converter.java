@@ -40,8 +40,8 @@ public class AozoraEpub3Converter
 	/** コメントブロックを非表示 */
 	public boolean hideCommentBlock = true;
 	
-	/** UTF-32文字に小書き注記表示 */
-	boolean gaijiKogaki32 = false;
+	/** 4バイト文字を表示 */
+	boolean gaiji32 = false;
 	
 	/** 奥付を別ページ */
 	boolean separateColophon = true;
@@ -269,6 +269,12 @@ public class AozoraEpub3Converter
 	public void setAutoYoko(boolean autoYoko)
 	{
 		this.autoYoko = autoYoko;
+	}
+	/**  4バイト文字変換を設定
+	 * @param gaiji32 4バイト文字変換するならtrue */
+	public void setGaiji32(boolean gaiji32)
+	{
+		this.gaiji32 = gaiji32;
 	}
 	/** 自動強制改行設定 */
 	public void setForcePageBreak(int forcePageBreak, int emptyLine, Pattern pattern)
@@ -636,9 +642,13 @@ public class AozoraEpub3Converter
 				//未サポート外字
 				//if (unsupportGaiji.contains(gaiji)) {
 				//Unicode32文字なら後ろに小書きで注記追加
-				if (gaijiKogaki32 && gaiji != null && gaiji.getBytes().length ==4) {
-					if (!isInnerChuki(line, m.start())) {
-						gaiji += "［＃行右小書き］（"+chukiValues[0]+"）［＃行右小書き終わり］";
+				if (gaiji != null && gaiji.getBytes().length ==4) {
+					LogAppender.append("外字4バイト: ("+this.lineNum+") "+chuki+"\n");
+					if (!gaiji32) {
+						gaiji = "〓";
+						if (!isInnerChuki(line, m.start())) {
+							gaiji += "［＃行右小書き］（"+chukiValues[0]+"）［＃行右小書き終わり］";
+						}
 					}
 				}
 				//変換不可 画像指定付き外字なら画像注記に変更
@@ -954,9 +964,8 @@ public class AozoraEpub3Converter
 					if (inJisage >= 0) {
 						buf.append(chukiMap.get("字下げ省略")[0]);
 					}
-					if (tags.length > 1) {
-						inJisage = -1;//インライン
-					}
+					//タグが閉じていればインラインなのでフラグは立てない
+					if (tags.length > 1) inJisage = -1;//インライン
 					else inJisage = lineNum; //ブロック開始
 				}
 				else if (chukiTag.endsWith("字下げ終わり］")) {

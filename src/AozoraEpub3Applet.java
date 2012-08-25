@@ -98,6 +98,7 @@ public class AozoraEpub3Applet extends JApplet
 	
 	JCheckBox jCheckOverWrite;
 	JCheckBox jCheckAutoYoko;
+	JCheckBox jCheckGaiji32;
 	
 	JRadioButton jRadioVertical;
 	JRadioButton jRadioHorizontal;
@@ -293,6 +294,11 @@ public class AozoraEpub3Applet extends JApplet
 		jCheckAutoYoko = new JCheckBox("半角2文字縦中横", propValue==null||"1".equals(propValue));
 		jCheckAutoYoko.setFocusPainted(false);
 		panel.add(jCheckAutoYoko);
+		//4バイト文字を変換する
+		propValue = props.getProperty("Gaiji32");
+		jCheckGaiji32 = new JCheckBox("4バイト文字変換", "1".equals(propValue));
+		jCheckGaiji32.setFocusPainted(false);
+		panel.add(jCheckGaiji32);
 		//縦書き横書き
 		label = new JLabel("   ");
 		panel.add(label);
@@ -793,7 +799,8 @@ public class AozoraEpub3Applet extends JApplet
 		this.aozoraConverter.setWithMarkId(this.jCheckMarkId.isSelected());
 		//変換オプション設定
 		this.aozoraConverter.setAutoYoko(this.jCheckAutoYoko.isSelected());
-		
+		//4バイト文字出力
+		this.aozoraConverter.setGaiji32(this.jCheckGaiji32.isSelected());
 		//すべてのファイルの変換実行
 		_convertFiles(srcFiles, dstPath);
 		
@@ -892,7 +899,7 @@ public class AozoraEpub3Applet extends JApplet
 			this.jDialogConfirm.setVisible(true);
 			
 			if (this.convertCanceled) {
-				LogAppender.append("キャンセルしました\n");
+				LogAppender.append("変換処理をキャンセルしました\n");
 				return;
 			}
 			//確認ダイアログの値をBookInfoに設定
@@ -916,13 +923,37 @@ public class AozoraEpub3Applet extends JApplet
 			}
 		}
 		
+		boolean autoFileName = this.jCheckAutoFileName.isSelected();
+		boolean overWrite = this.jCheckOverWrite.isSelected();
+		String outExt = this.jComboExt.getEditor().getItem().toString().trim();
+		
+		//出力ファイル
+		File outFile = AozoraEpub3.getOutFile(srcFile, dstPath, bookInfo, autoFileName, outExt);
+		
+		//上書き確認
+		if (!overWrite &&  outFile.exists()) {
+			LogAppender.append("変換中止: "+srcFile.getAbsolutePath()+"\n");
+			LogAppender.append("ファイルが存在します: "+outFile.getAbsolutePath()+"\n");
+			return;
+		}
+		/*
+		if (overWrite &&  outFile.exists()) {
+			int ret = JOptionPane.showConfirmDialog(this, "ファイルが存在します\n上書きしますか？\n(取り消しで変換キャンセル)", "上書き確認", JOptionPane.YES_NO_CANCEL_OPTION);
+			if (ret == JOptionPane.NO_OPTION) {
+				LogAppender.append("変換中止: "+srcFile.getAbsolutePath()+"\n");
+				return;
+			} else if (ret == JOptionPane.CANCEL_OPTION) {
+				LogAppender.append("変換中止: "+srcFile.getAbsolutePath()+"\n");
+				convertCanceled = true;
+				LogAppender.append("変換処理をキャンセルしました\n");
+				return;
+			}
+		}*/
+		
 		AozoraEpub3.convertFile(
-			srcFile, dstPath,
+			srcFile, outFile,
 			this.aozoraConverter,
 			writer,
-			this.jCheckAutoFileName.isSelected(),
-			this.jComboExt.getEditor().getItem().toString().trim(),
-			this.jCheckOverWrite.isSelected(),
 			this.jComboEncType.getSelectedItem().toString(),
 			bookInfo, zipImageFileNames
 		);
@@ -1084,6 +1115,7 @@ public class AozoraEpub3Applet extends JApplet
 		//設定
 		this.props.setProperty("MarkId", this.jCheckMarkId.isSelected()?"1":"");
 		this.props.setProperty("AutoYoko", this.jCheckAutoYoko.isSelected()?"1":"");
+		this.props.setProperty("Gaiji32", this.jCheckGaiji32.isSelected()?"1":"");
 		this.props.setProperty("Vertical", this.jRadioVertical.isSelected()?"1":"");
 		//this.props.setProperty("RtL", this.jRadioRtL.isSelected()?"1":"");
 		this.props.setProperty("Ext", ""+this.jComboExt.getEditor().getItem().toString().trim());

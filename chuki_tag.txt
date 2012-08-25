@@ -139,6 +139,12 @@
 ここから斜体	<span class="i">		1
 ここで斜体終わり	</span>		1
 
+###ゴシック体
+ゴシック体	<span class="gtc">
+ゴシック体終わり	</span>
+ここからゴシック体	<span class="gtc">		1
+ここでゴシック体終わり	</span>		1
+
 ####取り消し線 二重は普通の取り消し線で代用
 取消線	<span class="strike">
 取消線終わり	</span>
@@ -309,6 +315,32 @@
 ここから改行天付き、折り返して２３字下げ	<div class="top23 idt-23">		1
 ここから改行天付き、折り返して２４字下げ	<div class="top24 idt-24">		1
 ここから改行天付き、折り返して２５字下げ	<div class="top25 idt-25">		1
+
+改行天付き、折り返して１字下げ	<div class="top1 idt-1">		1
+改行天付き、折り返して２字下げ	<div class="top2 idt-2">		1
+改行天付き、折り返して３字下げ	<div class="top3 idt-3">		1
+改行天付き、折り返して４字下げ	<div class="top4 idt-4">		1
+改行天付き、折り返して５字下げ	<div class="top5 idt-5">		1
+改行天付き、折り返して６字下げ	<div class="top6 idt-6">		1
+改行天付き、折り返して７字下げ	<div class="top7 idt-7">		1
+改行天付き、折り返して８字下げ	<div class="top8 idt-8">		1
+改行天付き、折り返して９字下げ	<div class="top9 idt-9">		1
+改行天付き、折り返して１０字下げ	<div class="top10 idt-10">		1
+改行天付き、折り返して１１字下げ	<div class="top11 idt-11">		1
+改行天付き、折り返して１２字下げ	<div class="top12 idt-12">		1
+改行天付き、折り返して１３字下げ	<div class="top13 idt-13">		1
+改行天付き、折り返して１４字下げ	<div class="top14 idt-14">		1
+改行天付き、折り返して１５字下げ	<div class="top15 idt-15">		1
+改行天付き、折り返して１６字下げ	<div class="top16 idt-16">		1
+改行天付き、折り返して１７字下げ	<div class="top17 idt-17">		1
+改行天付き、折り返して１８字下げ	<div class="top18 idt-18">		1
+改行天付き、折り返して１９字下げ	<div class="top19 idt-19">		1
+改行天付き、折り返して２０字下げ	<div class="top20 idt-20">		1
+改行天付き、折り返して２１字下げ	<div class="top21 idt-21">		1
+改行天付き、折り返して２２字下げ	<div class="top22 idt-22">		1
+改行天付き、折り返して２３字下げ	<div class="top23 idt-23">		1
+改行天付き、折り返して２４字下げ	<div class="top24 idt-24">		1
+改行天付き、折り返して２５字下げ	<div class="top25 idt-25">		1
 
 ここで字下げ終わり	</div>		1
 ここで字下げ終り	</div>		1
