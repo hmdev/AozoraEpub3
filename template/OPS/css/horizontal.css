@@ -29,11 +29,10 @@ p { margin: 0; }
 
 span.strike { text-decoration:line-through; }
 span.dbl_strike { text-decoration:line-through; }
-span.b { font-weight: bold; }
+
+span.b, span.gtc{ font-weight: bold; }
+span.gtc, span.b { font-family: 'ＭＳ ゴシック','MS Gothic',sans-serif; }
 span.i { font-style: italic; }
-span.gtc {
-	font-family: 'ＭＳ ゴシック','MS UI Gothic',sans-serif;
-}
 
 /* 外字文字画像 */
 .gaiji {

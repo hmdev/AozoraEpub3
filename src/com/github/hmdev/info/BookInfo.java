@@ -44,6 +44,9 @@ public class BookInfo
 	/** 複著作者行番号 */
 	public int subCreatorLine = -1;
 	
+	/** タイトル行の最後 */
+	public int titleEndLine = -1;
+	
 	/** 発刊日時 */
 	public Date published;
 	/** 更新日時 */
@@ -67,15 +70,18 @@ public class BookInfo
 	/** txtのない画像のみの場合 */
 	public boolean imageOnly = false;
 	
+	/** タイトルページの改ページ行 前に改ページがなければ0 表題がなければ-1 */
+	public int preTitlePageBreak = -1;
+	
 	/** 改ページ単位で区切られたセクションの情報を格納 */
 	//Vector<SectionInfo> vecSectionInfo;
 	
 	/** 画像単体ページ開始行 */
 	HashSet<Integer> mapImageSectionLine;
-	
-	/** 改行ページしない行 (［＃ページの左右中央］の前の［＃改ページ］) */
+	/** 強制改ページ行 */
+	HashSet<Integer> mapPageBreakLine;
+	/** 改ページしない行 (［＃ページの左右中央］の前の［＃改ページ］) */
 	HashSet<Integer> mapNoPageBreakLine;
-	
 	/** 出力ページしない行 (左右中央後の空行と改ページ前の空行) */
 	HashSet<Integer> mapIgnoreLine;
 	
@@ -84,6 +90,7 @@ public class BookInfo
 	{
 		//this.vecSectionInfo = new Vector<SectionInfo>();
 		this.mapImageSectionLine = new HashSet<Integer>();
+		this.mapPageBreakLine = new HashSet<Integer>();
 		this.mapNoPageBreakLine = new HashSet<Integer>();
 		this.mapIgnoreLine = new HashSet<Integer>();
 		
@@ -114,6 +121,17 @@ public class BookInfo
 	public boolean isImageSectionLine(int lineNum)
 	{
 		return this.mapImageSectionLine.contains(lineNum);
+	}
+	
+	/** 強制改ページ行数を保存 */
+	public void addPageBreakLine(int lineNum)
+	{
+		this.mapPageBreakLine.add(lineNum);
+	}
+	/** 強制改ページ行ならtrue */
+	public boolean isPageBreakLine(int lineNum)
+	{
+		return this.mapPageBreakLine.contains(lineNum);
 	}
 	
 	/** 改ページしない行数を保存 */
@@ -251,7 +269,7 @@ public class BookInfo
 	
 	////////////////////////////////////////////////////////////////
 	/** 先頭行から表題と著者を取得 */
-	public void setMetaInfo(TitleType titleType, String[] firstLines, int firstLineStart, int firstCommentLineNum)
+	public void setMetaInfo(TitleType titleType, String[] firstLines, int firstLineStart, int firstCommentLineNum, int preTitlePageBreak)
 	{
 		if (titleType != TitleType.NONE) {
 			//バッファからタイトルと著者取得
@@ -265,6 +283,8 @@ public class BookInfo
 			boolean hasTitle = titleType==TitleType.TITLE_AUTHOR || titleType==TitleType.TITLE_ONLY || titleType==TitleType.AUTHOR_TITLE;
 			boolean hasAuthor = titleType==TitleType.TITLE_AUTHOR || titleType==TitleType.AUTHOR_TITLE;
 			boolean titleFirst = titleType==TitleType.TITLE_AUTHOR || titleType==TitleType.TITLE_ONLY;
+			
+			if (linesLength > 0) this.preTitlePageBreak = preTitlePageBreak;
 			
 			switch (linesLength) {
 			case 6:
@@ -291,6 +311,7 @@ public class BookInfo
 						this.title = firstLines[2]+" "+firstLines[4];
 					}
 				}
+				titleEndLine = firstLineStart+5;
 				break;
 			case 5:
 				if (titleFirst) {
@@ -314,6 +335,7 @@ public class BookInfo
 						this.title = firstLines[1]+" "+firstLines[3];
 					}
 				}
+				titleEndLine = firstLineStart+4;
 				break;
 			case 4:
 				if (titleFirst) {
@@ -335,6 +357,7 @@ public class BookInfo
 						this.title = firstLines[2]+" "+firstLines[3];
 					}
 				}
+				titleEndLine = firstLineStart+3;
 				break;
 			case 3:
 				if (titleFirst) {
@@ -354,6 +377,7 @@ public class BookInfo
 						this.title = firstLines[1]+" "+firstLines[2];
 					}
 				}
+				titleEndLine = firstLineStart+2;
 				break;
 			case 2: //表題+著者 すぐ後にコメント行がある場合のみ表題+副題+空行+著者
 				if (titleFirst) {
@@ -366,9 +390,11 @@ public class BookInfo
 							this.title = firstLines[0]+" "+firstLines[1];
 							this.creatorLine = firstLineStart+3;
 							this.creator = firstLines[3];
+							titleEndLine = firstLineStart+3;
 						} else {
 							this.creatorLine = firstLineStart+1;
 							this.creator = firstLines[1];
+							titleEndLine = firstLineStart+1;
 						}
 					}
 				} else {
@@ -378,6 +404,7 @@ public class BookInfo
 						this.titleLine = firstLineStart+1;
 						this.title = firstLines[1];
 					}
+					titleEndLine = firstLineStart+1;
 				}
 				break;
 			case 1: //表題 空行 著者名 空行 も許可
@@ -400,6 +427,7 @@ public class BookInfo
 						}
 					}
 				}
+				titleEndLine = firstLineStart+2;
 				break;
 			}
 			
