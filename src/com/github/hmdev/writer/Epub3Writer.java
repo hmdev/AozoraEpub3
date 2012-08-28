@@ -363,8 +363,7 @@ public class Epub3Writer
 	/** 本文を出力する */
 	void writeSections(AozoraEpub3Converter converter, BufferedReader src, BufferedWriter bw) throws IOException
 	{
-		//0001CapterのZipArchiveEntryを設定
-		this.startSection(0, bookInfo.startMiddle);
+		//this.startSection(0, bookInfo.startMiddle);
 		
 		//ePub3変換して出力
 		//改ページ時にnextSection() を、画像出力時にgetImageFilePath() 呼び出し
@@ -377,22 +376,24 @@ public class Epub3Writer
 	/** 次のチャプター用のZipArchiveEntryに切替え 
 	 * チャプターのファイル名はcpaterFileNamesに追加される (0001)
 	 * @throws IOException */
-	public void nextSection(BufferedWriter bw, int lineNum, boolean isMiddle) throws IOException
+	public void nextSection(BufferedWriter bw, int lineNum, boolean isMiddle, boolean isImage) throws IOException
 	{
-		bw.flush();
-		this.endSection();
-		this.startSection(lineNum, isMiddle);
+		if (this.sectionIndex >0) {
+			bw.flush();
+			this.endSection();
+		}
+		this.startSection(lineNum, isMiddle, isImage);
 	}
 	/** セクション開始. 
 	 * @throws IOException */
-	void startSection(int lineNum, boolean isMiddle) throws IOException
+	void startSection(int lineNum, boolean isMiddle, boolean isImage) throws IOException
 	{
 		this.sectionIndex++;
 		String sectionId = decimalFormat.format(this.sectionIndex);
 		//package.opf用にファイル名
 		SectionInfo sectionInfo = new SectionInfo(sectionId);
 		//次の行が単一画像なら画像専用指定
-		if (this.bookInfo.isImageSectionLine(lineNum+1)) sectionInfo.setImageFit(true);
+		if (isImage) sectionInfo.setImageFit(true);
 		else if (isMiddle) sectionInfo.setMiddle(true);
 		this.sectionInfos.add(sectionInfo);
 		this.addChapter(sectionId, null); //章の名称はsectionIdを仮に設定

@@ -64,9 +64,6 @@ public class BookInfo
 	/** 先頭に表紙ページを追加 */
 	public boolean insertCoverPage = false;
 	
-	/** 先頭がページの左右中央ならtrue */
-	public boolean startMiddle = false; 
-	
 	/** txtのない画像のみの場合 */
 	public boolean imageOnly = false;
 	
@@ -407,14 +404,16 @@ public class BookInfo
 					titleEndLine = firstLineStart+1;
 				}
 				break;
-			case 1: //表題 空行 著者名 空行 も許可
+			case 1: //表題のみ または 表題 空行 著者名 空行 も許可 TODO 章番号とかは除外する
 				if (titleFirst) {
 					this.titleLine = firstLineStart;
 					this.title = firstLines[0];
+					titleEndLine = firstLineStart;
 					if (hasAuthor) {
 						if (firstLines[2] != null && firstLines[2].length() > 0 && (firstLines[3] == null || firstLines[3].length() == 0)) {
 							this.creatorLine = firstLineStart+2;
 							this.creator = firstLines[2];
+							titleEndLine = firstLineStart+2;
 						}
 					}
 				} else {
@@ -424,10 +423,10 @@ public class BookInfo
 						if (firstLines[2] != null && firstLines[2].length() > 0 && (firstLines[3] == null || firstLines[3].length() == 0)) {
 							this.titleLine = firstLineStart+2;
 							this.title = firstLines[2];
+							titleEndLine = firstLineStart+2;
 						}
 					}
 				}
-				titleEndLine = firstLineStart+2;
 				break;
 			}
 			
