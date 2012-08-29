@@ -17,7 +17,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.UUID;
 import java.util.Vector;
-import java.util.zip.CRC32;
 
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
@@ -196,17 +195,20 @@ public class Epub3Writer
 		ZipArchiveEntry mimeTypeEntry = new ZipArchiveEntry(MIMETYPE_PATH);
 		zos.putArchiveEntry(mimeTypeEntry);
 		FileInputStream fis = new FileInputStream(new File(templatePath+MIMETYPE_PATH));
+		/*//STOREで格納 → Readium等で読めなくなるので通常のDEFLATEDに戻す
 		byte[] b = new byte[256];
 		int len = fis.read(b);
 		fis.close();
-		mimeTypeEntry.setMethod(ZipArchiveEntry.STORED);
 		CRC32 crc32 = new CRC32();
 		crc32.update(b, 0, len);
+		mimeTypeEntry.setMethod(ZipArchiveEntry.STORED);
 		mimeTypeEntry.setCrc(crc32.getValue());
 		mimeTypeEntry.setSize(len);
 		zos.write(b, 0, len);
+		b = null;*/
+		IOUtils.copy(fis, zos);
+		fis.close();
 		zos.closeArchiveEntry();
-		b = null;
 		
 		zos.setLevel(9);
 		//テンプレートのファイルを格納
@@ -514,7 +516,6 @@ public class Epub3Writer
 					this.chapterInfos.remove(this.chapterInfos.size()-1);
 					this.sectionInfos.remove(this.sectionInfos.size()-1);
 				}*/
-				//画像タグを出力しない
 				LogAppender.append("画像なし: ("+lineNum+") "+srcImageFileName+"\n");
 				return null;
 			}
