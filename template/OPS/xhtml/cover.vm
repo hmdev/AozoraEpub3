@@ -3,9 +3,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="ja" lang="ja">
 <head>
 #if (${bookInfo.Vertical})
-	<link rel="stylesheet" type="text/css" href="../css/vertical_image.css" class="vertical_image" title="v image"/>
+	<link rel="stylesheet" type="text/css" href="../css/vertical_image.css"/>
 #else
-	<link rel="stylesheet" type="text/css" href="../css/horizontal_image.css" class="horizontal_image" title="h image"/>
+	<link rel="stylesheet" type="text/css" href="../css/horizontal_image.css"/>
 #end
 	<title>${bookInfo.Title}</title>
 </head>

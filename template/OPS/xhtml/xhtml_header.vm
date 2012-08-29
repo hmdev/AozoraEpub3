@@ -4,22 +4,22 @@
 <head>
 #if (${bookInfo.Vertical})
 #if (${sectionInfo.ImageFit})
-	<link rel="stylesheet" type="text/css" href="../css/vertical_image.css" class="v_image" title="vertical image only"/>
+	<link rel="stylesheet" type="text/css" href="../css/vertical_image.css"/>
 #elseif (${sectionInfo.Middle})
-	<link rel="stylesheet" type="text/css" href="../css/vertical_middle.css" class="v_middle" title="vertical middle"/>
+	<link rel="stylesheet" type="text/css" href="../css/vertical_middle.css"/>
 	<link rel="stylesheet" type="text/css" href="../css/vertical.css"/>
 #else
-	<link rel="stylesheet" type="text/css" href="../css/vertical_text.css" class="v_text" title="vertical layout"/>
+	<link rel="stylesheet" type="text/css" href="../css/vertical_text.css"/>
 	<link rel="stylesheet" type="text/css" href="../css/vertical.css"/>
 #end
 #else
 #if (${sectionInfo.ImageFit})
-	<link rel="stylesheet" type="text/css" href="../css/horizontal_image.css" class="h_image" title="horizontal image only"/>
+	<link rel="stylesheet" type="text/css" href="../css/horizontal_image.css"/>
 #elseif (${sectionInfo.Middle})
-	<link rel="stylesheet" type="text/css" href="../css/horizontal_middle.css" class="h_middle" title="horizontal middle"/>
+	<link rel="stylesheet" type="text/css" href="../css/horizontal_middle.css"/>
 	<link rel="stylesheet" type="text/css" href="../css/horizontal.css"/>
 #else
-	<link rel="stylesheet" type="text/css" href="../css/horizontal_text.css" class="h_text" title="horizontal layout"/>
+	<link rel="stylesheet" type="text/css" href="../css/horizontal_text.css"/>
 	<link rel="stylesheet" type="text/css" href="../css/horizontal.css"/>
 #end
 #end

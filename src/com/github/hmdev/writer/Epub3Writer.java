@@ -484,10 +484,10 @@ public class Epub3Writer
 			}
 			if (!exists) {
 				//画像単一ページの場合で画像がなければセクションと目次を出力しない
-				if (bookInfo.isImageSectionLine(lineNum)) {
+				/*if (bookInfo.isImageSectionLine(lineNum)) {
 					this.chapterInfos.remove(this.chapterInfos.size()-1);
 					this.sectionInfos.remove(this.sectionInfos.size()-1);
-				}
+				}*/
 				//画像タグを出力しない
 				LogAppender.append("画像なし: ("+lineNum+") "+srcImageFileName+"\n");
 				return null;

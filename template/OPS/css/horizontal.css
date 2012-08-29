@@ -27,12 +27,12 @@ h6 { font: small-caps 100%; }
 
 p { margin: 0; }
 
-span.strike { text-decoration:line-through; }
-span.dbl_strike { text-decoration:line-through; }
+.strike { text-decoration:line-through; }
+.dbl_strike { text-decoration:line-through; }
 
-span.b, span.gtc{ font-weight: bold; }
-span.gtc, span.b { font-family: 'ＭＳ ゴシック','MS Gothic',sans-serif; }
-span.i { font-style: italic; }
+.b, .gtc{ font-weight: bold; }
+.gtc, .b { font-family: 'ＭＳ ゴシック','MS Gothic',sans-serif; }
+.i { font-style: italic; }
 
 /* 外字文字画像 */
 .gaiji {
@@ -141,31 +141,29 @@ span.left_underline {
 }
 
 /* 文字サイズ 大 */
-span.font1 { font-size: 110%; }
-span.font2 { font-size: 120%; }
-span.font3 { font-size: 130%; }
-span.font4 { font-size: 140%; }
-span.font5 { font-size: 150%; }
+.font1 { font-size: 110%; }
+.font2 { font-size: 120%; }
+.font3 { font-size: 130%; }
+.font4 { font-size: 140%; }
+.font5 { font-size: 150%; }
 /* 文字サイズ 小 */
-span.font-1 { font-size: 90%; }
-span.font-2 { font-size: 80%; }
-span.font-3 { font-size: 70%; }
-span.font-4 { font-size: 60%; }
-span.font-5 { font-size: 50%; }
-span.kogaki { font-size: 70%; }
+.font-1 { font-size: 90%; }
+.font-2 { font-size: 80%; }
+.font-3 { font-size: 70%; }
+.font-4 { font-size: 60%; }
+.font-5 { font-size: 50%; }
+.kogaki { font-size: 70%; }
 
 /* 縦中横 */
-span.tcy {
-/*	text-combine: horizontal;*/
-}
+
 /* 行右小書き 上付き小文字 */
-span.sup {
+.sup {
 	vertical-align: super;
 	font-size: 0.5em;
 	letter-spacing: -2px;
 }
 /* 行左小書き 下付き小文字 */
-span.sub {
+.sub {
 	vertical-align: sub;
 	font-size: 0.5em;
 	letter-spacing: -2px;

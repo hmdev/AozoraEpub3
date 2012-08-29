@@ -22,12 +22,12 @@
 改ページ、ページの左右中央に			M
 
 ############# 見出し #############
-ここから大見出し	<span class="font5">		1
-ここで大見出し終わり	</span>		1
-ここから中見出し	<span class="font3">		1
-ここで中見出し終わり	</span>		1
-ここから小見出し	<span class="font1">		1
-ここで小見出し終わり	</span>		1
+ここから大見出し	<div class="font5">		1
+ここで大見出し終わり	</div>		1
+ここから中見出し	<div class="font3">		1
+ここで中見出し終わり	</div>		1
+ここから小見出し	<div class="font1">		1
+ここで小見出し終わり	</div>		1
 見出し	<span class="font5">	</span>
 見出し終わり
 大見出し	<span class="font5">	</span>
@@ -130,38 +130,38 @@
 ####太字
 太字	<span class="b">
 太字終わり	</span>
-ここから太字	<span class="b">		1
-ここで太字終わり	</span>		1
+ここから太字	<div class="b">		1
+ここで太字終わり	</div>		1
 
 ####斜体
 斜体	<span class="i">
 斜体終わり	</span>
-ここから斜体	<span class="i">		1
-ここで斜体終わり	</span>		1
+ここから斜体	<div class="i">		1
+ここで斜体終わり	</div>		1
 
 ###ゴシック体
 ゴシック体	<span class="gtc">
 ゴシック体終わり	</span>
-ここからゴシック体	<span class="gtc">		1
-ここでゴシック体終わり	</span>		1
+ここからゴシック体	<div class="gtc">		1
+ここでゴシック体終わり	</div>		1
 
 ####取り消し線 二重は普通の取り消し線で代用
 取消線	<span class="strike">
 取消線終わり	</span>
-ここから取消線	<span class="strike">		1
-ここで取消線終わり	</span>		1
+ここから取消線	<div class="strike">		1
+ここで取消線終わり	</div>		1
 取り消し線	<span class="strike">
 取り消し線終わり	</span>
-ここから取り消し線	<span class="strike">		1
-ここで取り消し線終わり	</span>		1
+ここから取り消し線	<div class="strike">		1
+ここで取り消し線終わり	</div>		1
 二重取り消し線	<span class="dbl_strike">
 二重取り消し線終わり	</span>
-ここから二重取り消し線	<span class="dbl_strike">		1
-ここで二重取り消し線終わり	</span>		1
+ここから二重取り消し線	<div class="dbl_strike">		1
+ここで二重取り消し線終わり	</div>		1
 二重取消線	<span class="dbl_strike">
 二重取消線終わり	</span>
-ここから二重取消線	<span class="dbl_strike">		1
-ここで二重取消線終わり	</span>		1
+ここから二重取消線	<div class="dbl_strike">		1
+ここで二重取消線終わり	</div>		1
 
 ############## 画像 ############## → 別処理
 #<img src="ファイル名"/> → 変換なし
@@ -204,14 +204,14 @@
 小書き終わり	</span>
 
 ####罫囲み
-罫囲み	<div class="border">
-罫囲み終わり	</div>
-破線罫囲み	<div class="dashed_border">
-破線罫囲み終わり	</div><br/>
-枠囲み	<div class="border">
-枠囲み終わり	</div>
-破線枠囲み	<div class="dashed_border">
-破線枠囲み終わり	</div>
+罫囲み	<span class="border">
+罫囲み終わり	</span>
+破線罫囲み	<span class="dashed_border">
+破線罫囲み終わり	</span>
+枠囲み	<span class="border">
+枠囲み終わり	</span>
+破線枠囲み	<span class="dashed_border">
+破線枠囲み終わり	</span>
 ここから罫囲み	<div class="border">		1
 ここで罫囲み終わり	</div>		1
 ここから破線罫囲み	<div class="dashed_border">		1
@@ -228,24 +228,24 @@
 ４段階大きな文字	<span class="font4">
 ５段階大きな文字	<span class="font5">
 大きな文字終わり	</span>
-ここから１段階大きな文字	<span class="font1">		1
-ここから２段階大きな文字	<span class="font2">		1
-ここから３段階大きな文字	<span class="font3">		1
-ここから４段階大きな文字	<span class="font4">		1
-ここから５段階大きな文字	<span class="font5">		1
-ここで大きな文字終わり	</span>		1
+ここから１段階大きな文字	<div class="font1">		1
+ここから２段階大きな文字	<div class="font2">		1
+ここから３段階大きな文字	<div class="font3">		1
+ここから４段階大きな文字	<div class="font4">		1
+ここから５段階大きな文字	<div class="font5">		1
+ここで大きな文字終わり	</div>		1
 １段階小さな文字	<span class="font-1">
 ２段階小さな文字	<span class="font-2">
 ３段階小さな文字	<span class="font-3">
 ４段階小さな文字	<span class="font-4">
 ５段階小さな文字	<span class="font-5">
 小さな文字終わり	</span>
-ここから１段階小さな文字	<span class="font-1">		1
-ここから２段階小さな文字	<span class="font-2">		1
-ここから３段階小さな文字	<span class="font-3">		1
-ここから４段階小さな文字	<span class="font-4">		1
-ここから５段階小さな文字	<span class="font-5">		1
-ここで小さな文字終わり	</span>		1
+ここから１段階小さな文字	<div class="font-1">		1
+ここから２段階小さな文字	<div class="font-2">		1
+ここから３段階小さな文字	<div class="font-3">		1
+ここから４段階小さな文字	<div class="font-4">		1
+ここから５段階小さな文字	<div class="font-5">		1
+ここで小さな文字終わり	</div>		1
 
 ####外字注記形式による代替表現 → 別処理
 
@@ -569,15 +569,15 @@
 外字画像開始	<span class="img gaiji"><img src="
 外字画像終了	"/></span>
 
-表題前	<div><span class="font5">
-表題後	</span></div>
-原題前	<div><span class="font4">
-原題後	</span></div>
-副題前	<div class="top2"><span class="font2">
-副題後	</span></div>
-副原題前	<div class="top2"><span class="font2">
-副原題後	</span></div>
-著者前	<div class="btm2"><span class="font1">
-著者後	</span></div>
-副著者前	<div class="btm2"><span class="font1">
-副著者後	</span></div>
+表題前	<div class="font5">
+表題後	</div>
+原題前	<div class="font4">
+原題後	</div>
+副題前	<div class="top2 font2">
+副題後	</div>
+副原題前	<div class="top2 font2">
+副原題後	</div>
+著者前	<div class="btm2 font1">
+著者後	</div>
+副著者前	<div class="btm2 font1">
+副著者後	</div>

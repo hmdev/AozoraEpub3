@@ -85,20 +85,15 @@ public class BookInfo
 	////////////////////////////////////////////////////////////////
 	public BookInfo()
 	{
-		//this.vecSectionInfo = new Vector<SectionInfo>();
-		this.mapImageSectionLine = new HashSet<Integer>();
-		this.mapPageBreakLine = new HashSet<Integer>();
-		this.mapNoPageBreakLine = new HashSet<Integer>();
-		this.mapIgnoreLine = new HashSet<Integer>();
-		
 		this.modified = new Date();
 	}
 	
 	public void clear()
 	{
-		this.mapImageSectionLine.clear();
-		this.mapNoPageBreakLine.clear();
-		this.mapIgnoreLine.clear();
+		if (this.mapImageSectionLine != null) this.mapImageSectionLine.clear();
+		if (this.mapPageBreakLine != null) this.mapPageBreakLine.clear();
+		if (this.mapNoPageBreakLine != null) this.mapNoPageBreakLine.clear();
+		if (this.mapIgnoreLine != null) this.mapIgnoreLine.clear();
 	}
 	
 	/*public void addSectionInfo(SectionInfo sectionInfo)
@@ -112,44 +107,52 @@ public class BookInfo
 	/** 画像単体ページの行数を保存 */
 	public void addImageSectionLine(int lineNum)
 	{
+		if (this.mapImageSectionLine == null) this.mapImageSectionLine = new HashSet<Integer>();
 		this.mapImageSectionLine.add(lineNum);
 	}
 	/** 画像単体ページの開始行ならtrue */
 	public boolean isImageSectionLine(int lineNum)
 	{
+		if (this.mapImageSectionLine == null) return false;
 		return this.mapImageSectionLine.contains(lineNum);
 	}
 	
 	/** 強制改ページ行数を保存 */
 	public void addPageBreakLine(int lineNum)
 	{
+		if (this.mapPageBreakLine == null) this.mapPageBreakLine = new HashSet<Integer>();
 		this.mapPageBreakLine.add(lineNum);
 	}
 	/** 強制改ページ行ならtrue */
 	public boolean isPageBreakLine(int lineNum)
 	{
+		if (this.mapPageBreakLine == null) return false;
 		return this.mapPageBreakLine.contains(lineNum);
 	}
 	
 	/** 改ページしない行数を保存 */
 	public void addNoPageBreakLine(int lineNum)
 	{
+		if (this.mapNoPageBreakLine == null) this.mapNoPageBreakLine = new HashSet<Integer>();
 		this.mapNoPageBreakLine.add(lineNum);
 	}
 	/** 改ページしない行ならtrue */
 	public boolean isNoPageBreakLine(int lineNum)
 	{
+		if (this.mapNoPageBreakLine == null) return false;
 		return this.mapNoPageBreakLine.contains(lineNum);
 	}
 	
 	/** 出力しない行数を保存 */
 	public void addIgnoreLine(int lineNum)
 	{
+		if (this.mapIgnoreLine == null) this.mapIgnoreLine = new HashSet<Integer>();
 		this.mapIgnoreLine.add(lineNum);
 	}
 	/** 出力しない行ならtrue */
 	public boolean isIgnoreLine(int lineNum)
 	{
+		if (this.mapIgnoreLine == null) return false;
 		return this.mapIgnoreLine.contains(lineNum);
 	}
 	
@@ -291,24 +294,27 @@ public class BookInfo
 					this.subTitleLine = firstLineStart+2;
 					this.subOrgTitleLine = firstLineStart+3;
 					this.title = firstLines[0]+" "+firstLines[2];
+					titleEndLine = firstLineStart+3;
 					if (hasAuthor) {
 						this.creatorLine = firstLineStart+4;
 						this.subCreatorLine = firstLineStart+5;
 						this.creator = firstLines[4];
+						titleEndLine = firstLineStart+5;
 					}
 				} else {
 					this.creatorLine = firstLineStart;
 					this.subCreatorLine = firstLineStart+1;
 					this.creator = firstLines[0];
+					titleEndLine = firstLineStart+1;
 					if (hasTitle) {
 						this.titleLine = firstLineStart+2;
 						this.orgTitleLine = firstLineStart+3;
 						this.subTitleLine = firstLineStart+4;
 						this.subOrgTitleLine = firstLineStart+5;
 						this.title = firstLines[2]+" "+firstLines[4];
+						titleEndLine = firstLineStart+5;
 					}
 				}
-				titleEndLine = firstLineStart+5;
 				break;
 			case 5:
 				if (titleFirst) {
@@ -316,14 +322,17 @@ public class BookInfo
 					this.orgTitleLine = firstLineStart+1;
 					this.subTitleLine = firstLineStart+2;
 					this.title = firstLines[0]+" "+firstLines[2];
+					titleEndLine = firstLineStart+2;
 					if (hasAuthor) {
 						this.creatorLine = firstLineStart+3;
 						this.subCreatorLine = firstLineStart+4;
 						this.creator = firstLines[3];
+						titleEndLine = firstLineStart+4;
 					}
 				} else {
 					this.creatorLine = firstLineStart;
 					this.creator = firstLines[0];
+					titleEndLine = firstLineStart;
 					if (hasTitle) {
 						this.titleLine = firstLineStart+1;
 						this.orgTitleLine = firstLineStart+2;
@@ -331,50 +340,67 @@ public class BookInfo
 						this.subOrgTitleLine = firstLineStart+4;
 						this.title = firstLines[1]+" "+firstLines[3];
 					}
+					titleEndLine = firstLineStart+4;
 				}
-				titleEndLine = firstLineStart+4;
 				break;
 			case 4:
 				if (titleFirst) {
 					this.titleLine = firstLineStart;
 					this.subTitleLine = firstLineStart+1;
 					this.title = firstLines[0]+" "+firstLines[1];
+					titleEndLine = firstLineStart+1;
 					if (hasAuthor) {
 						this.creatorLine = firstLineStart+2;
 						this.subCreatorLine = firstLineStart+3;
 						this.creator = firstLines[2];
+						titleEndLine = firstLineStart+3;
 					}
 				} else {
 					this.creatorLine = firstLineStart;
 					this.subCreatorLine = firstLineStart+1;
 					this.creator = firstLines[0];
+					titleEndLine = firstLineStart+1;
 					if (hasTitle) {
 						this.titleLine = firstLineStart+2;
 						this.subTitleLine = firstLineStart+3;
 						this.title = firstLines[2]+" "+firstLines[3];
+						titleEndLine = firstLineStart+3;
 					}
 				}
-				titleEndLine = firstLineStart+3;
 				break;
-			case 3:
+			case 3: //表題+副題+著者 または 表題+著者+翻訳者
 				if (titleFirst) {
 					this.titleLine = firstLineStart;
 					this.subTitleLine = firstLineStart+1;
 					this.title = firstLines[0]+" "+firstLines[1];
+					titleEndLine = firstLineStart+1;
 					if (hasAuthor) {
-						this.creatorLine = firstLineStart+2;
-						this.creator = firstLines[2];
+						//副著者を文字列で判断
+						if (!firstLines[1].startsWith("―") &&
+							(firstLines[2].endsWith("訳") || firstLines[2].endsWith("編纂") || firstLines[2].endsWith("校訂"))) {
+							this.titleLine = firstLineStart;
+							this.title = firstLines[0];
+							this.subTitleLine = -1;
+							this.creatorLine = firstLineStart+1;
+							this.creator = firstLines[1];
+							this.subCreatorLine = firstLineStart+2;
+						} else {
+							this.creatorLine = firstLineStart+2;
+							this.creator = firstLines[2];
+						}
+						titleEndLine = firstLineStart+2;
 					}
 				} else {
 					this.creatorLine = firstLineStart;
 					this.creator = firstLines[0];
+					titleEndLine = firstLineStart;
 					if (hasTitle) {
 						this.titleLine = firstLineStart+1;
 						this.subTitleLine = firstLineStart+2;
 						this.title = firstLines[1]+" "+firstLines[2];
+						titleEndLine = firstLineStart+2;
 					}
 				}
-				titleEndLine = firstLineStart+2;
 				break;
 			case 2: //表題+著者 すぐ後にコメント行がある場合のみ表題+副題+空行+著者
 				if (titleFirst) {
@@ -419,6 +445,7 @@ public class BookInfo
 				} else {
 					this.creatorLine = firstLineStart;
 					this.creator = firstLines[0];
+					titleEndLine = firstLineStart;
 					if (hasTitle) {
 						if (firstLines[2] != null && firstLines[2].length() > 0 && (firstLines[3] == null || firstLines[3].length() == 0)) {
 							this.titleLine = firstLineStart+2;
