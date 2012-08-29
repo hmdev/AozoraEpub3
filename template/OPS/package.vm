@@ -58,7 +58,7 @@
 	<spine page-progression-direction="ltr" toc="ncx">
 #end
 #if (${bookInfo.InsertCoverPage})
-		<itemref idref="cover-page" linear="no"/>
+		<itemref idref="cover-page" linear="yes"/>
 #end
 #foreach(${sectionInfo} in ${sections})
 		<itemref idref="sec${sectionInfo.SectionId}" linear="yes"/>
