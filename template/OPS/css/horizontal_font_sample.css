@@ -1,0 +1,14 @@
+@charset "utf-8";
+
+/** 横書きフォント変更 Reader用
+ vertical_font.css と置き換えて利用
+ READER/fonts/ の下にフォントファイルをおいてsrc:urlのフォントファイル名を変更する
+ フォントファイルが無い場合は標準フォントが利用される */
+
+@font-face {
+	font-family: "CustomFont";
+	src: url(res:///ebook/fonts/../../mnt/sdcard/fonts/Dfpaburi.ttc);
+}
+body {
+	font-family: "CustomFont", "ＭＳ 明朝", "MS Mincho", "ヒラギノ明朝 ProN W3", "HiraMinProN-W3", serif, sans-serif;
+}

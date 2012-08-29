@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.UUID;
 import java.util.Vector;
+import java.util.zip.CRC32;
 
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
@@ -39,6 +40,9 @@ import com.github.hmdev.util.LogAppender;
  */
 public class Epub3Writer
 {
+	/** MIMETYPEパス */
+	final static String MIMETYPE_PATH = "mimetype";
+	
 	/** ORBパス */
 	final static String OPS_PATH = "OPS/";
 	/** 画像格納パス */
@@ -74,21 +78,26 @@ public class Epub3Writer
 	final static String TOC_VM = "toc.ncx.vm";
 	
 	/** コピーのみのファイル */
-	final static String[] TEMPLATE_FILE_NAMES = new String[]{
-		"mimetype",
+	final static String[] TEMPLATE_FILE_NAMES_VERTICAL = new String[]{
 		"META-INF/container.xml",
 		OPS_PATH+CSS_PATH+"vertical_text.css",
 		OPS_PATH+CSS_PATH+"vertical_middle.css",
 		OPS_PATH+CSS_PATH+"vertical_image.css",
-		OPS_PATH+CSS_PATH+"vertical.css",
+		OPS_PATH+CSS_PATH+"vertical_font.css",
+		OPS_PATH+CSS_PATH+"vertical.css"
+	};
+	final static String[] TEMPLATE_FILE_NAMES_HORIZONTAL = new String[]{
+		"META-INF/container.xml",
 		OPS_PATH+CSS_PATH+"horizontal_text.css",
 		OPS_PATH+CSS_PATH+"horizontal_middle.css",
 		OPS_PATH+CSS_PATH+"horizontal_image.css",
+		OPS_PATH+CSS_PATH+"horizontal_font.css",
 		OPS_PATH+CSS_PATH+"horizontal.css"
 	};
 	String[] getTemplateFiles()
 	{
-		return TEMPLATE_FILE_NAMES;
+		if (this.bookInfo != null && this.bookInfo.vertical) return TEMPLATE_FILE_NAMES_VERTICAL;
+		return TEMPLATE_FILE_NAMES_HORIZONTAL;
 	}
 	
 	/** 出力先ePubのZipストリーム */
@@ -174,22 +183,39 @@ public class Epub3Writer
 		velocityContext.put("toc_name", "目次");
 		//表紙
 		velocityContext.put("cover_name", "表紙");
-		//書籍情報 タイトル、著作者、縦書き
+		//書籍情報
 		velocityContext.put("bookInfo", bookInfo);
+		//更新日時
 		velocityContext.put("modified", dateFormat.format(bookInfo.modified));
 		
 		//出力先ePubのZipストリーム生成
 		zos = new ZipArchiveOutputStream(new BufferedOutputStream(new FileOutputStream(epubFile)));
 		//mimetypeは非圧縮
+		//STOREDで格納しCRCとsizeを指定する必要がある
 		zos.setLevel(0);
+		ZipArchiveEntry mimeTypeEntry = new ZipArchiveEntry(MIMETYPE_PATH);
+		zos.putArchiveEntry(mimeTypeEntry);
+		FileInputStream fis = new FileInputStream(new File(templatePath+MIMETYPE_PATH));
+		byte[] b = new byte[256];
+		int len = fis.read(b);
+		fis.close();
+		mimeTypeEntry.setMethod(ZipArchiveEntry.STORED);
+		CRC32 crc32 = new CRC32();
+		crc32.update(b, 0, len);
+		mimeTypeEntry.setCrc(crc32.getValue());
+		mimeTypeEntry.setSize(len);
+		zos.write(b, 0, len);
+		zos.closeArchiveEntry();
+		b = null;
+		
+		zos.setLevel(9);
 		//テンプレートのファイルを格納
 		for (String fileName : getTemplateFiles()) {
 			zos.putArchiveEntry(new ZipArchiveEntry(fileName));
-			FileInputStream fis = new FileInputStream(new File(templatePath+fileName));
+			fis = new FileInputStream(new File(templatePath+fileName));
 			IOUtils.copy(fis, zos);
 			fis.close();
 			zos.closeArchiveEntry();
-			zos.setLevel(9);
 		}
 		
 		//zip出力用Writer
@@ -346,7 +372,7 @@ public class Epub3Writer
 				File imageFile = new File(srcFilePath+srImagecFileName);
 				if (imageFile.exists()) {
 					zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+dstImageFileName));
-					FileInputStream fis = new FileInputStream(imageFile);
+					fis = new FileInputStream(imageFile);
 					IOUtils.copy(fis, zos);
 					zos.closeArchiveEntry();
 					fis.close();

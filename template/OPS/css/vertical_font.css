@@ -1,0 +1,6 @@
+@charset "utf-8";
+
+/** 縦書きフォント */
+body {
+	font-family: "@ＭＳ 明朝", "@MS Mincho", "ヒラギノ明朝 ProN W3", "HiraMinProN-W3", serif, sans-serif;
+}
