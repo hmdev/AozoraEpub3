@@ -15,8 +15,6 @@ public class PageBreakTrigger
 	/** 目次に出力しない */
 	boolean noChapter = false;
 	
-	/** 改ページの後ろに文字があれば改行を出力 */
-	boolean noBr = true;
 	/**
 	 * @param ignoreEmptyPage
 	 * @param isMiddle

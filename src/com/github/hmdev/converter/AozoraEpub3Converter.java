@@ -138,17 +138,19 @@ public class AozoraEpub3Converter
 	public BookInfo bookInfo;
 	
 	////////////////////////////////
-	//改ページフラグ
+	//改ページトリガ
+	/** 改ページ通常 */
 	final static PageBreakTrigger PAGEBREAK_NORMAL = new PageBreakTrigger(true, false, false);
+	/** 改ページ左右中央 */
 	final static PageBreakTrigger PAGEBREAK_MIDDLE = new PageBreakTrigger(true, true, false);
+	/** 改ページ画像単一ページ */
 	final static PageBreakTrigger PAGEBREAK_IMAGE = new PageBreakTrigger(true, false, true);
+	/** 改ページ「底本：」の前 */
 	final static PageBreakTrigger PAGEBREAK_COLOPHON = new PageBreakTrigger(true, false, false, true);
 	
 	/** 見出し仮対応出力用
 	 * 章の最初の本文をsetChapterNameでセットしたらtrue */
 	boolean chapterStarted = true;
-	/** 画像名がページ先頭に設定されている */
-	boolean chapterIsImageTitle = false;
 	
 	/** コンストラクタ
 	 * 変換テーブルやクラスがstaticで初期化されていなければ初期化
@@ -493,7 +495,7 @@ public class AozoraEpub3Converter
 		lineNum = -1;
 		idNum = 0;
 		//最初のページの改ページフラグを設定
-		this.setPageBreakTrigger(PAGEBREAK_NORMAL, true);
+		this.setPageBreakTrigger(PAGEBREAK_NORMAL);
 		////////////////////////////////
 		
 		//コメントブロック内
@@ -501,15 +503,15 @@ public class AozoraEpub3Converter
 		
 		//最初のセクション出力処理でfalseになる
 		this.chapterStarted = true;
-		this.chapterIsImageTitle= true;
+		//this.chapterFirstImageTitle = null;
 		
 		while ((line = src.readLine()) != null) {
 			lineNum++;
 			pageLineNum++;
 			
 			//強制改ページ行なら先頭で改ページ 空のページなら出力しない
-			if (this.middleTitle && bookInfo.preTitlePageBreak == lineNum) this.setPageBreakTrigger(PAGEBREAK_MIDDLE, true);
-			else if (bookInfo.isPageBreakLine(lineNum) && sectionCharLength > 0) this.setPageBreakTrigger(PAGEBREAK_NORMAL, true);
+			if (this.middleTitle && bookInfo.preTitlePageBreak == lineNum) this.setPageBreakTrigger(PAGEBREAK_MIDDLE);
+			else if (bookInfo.isPageBreakLine(lineNum) && sectionCharLength > 0) this.setPageBreakTrigger(PAGEBREAK_NORMAL);
 			
 			//コメント除外
 			if (hideCommentBlock) {
@@ -929,24 +931,24 @@ public class AozoraEpub3Converter
 					//改ページの前に文字があれば出力
 					if (buf.length() > 0) this.printLineBuffer(out, buf, lineNum, true);
 					
-					boolean pageNoBr = true;
+					noBr = true;
 					//改ページの後ろに文字があれば</br>は出力
-					if (ch.length > begin+chukiTag.length()) pageNoBr = false;
+					if (ch.length > begin+chukiTag.length()) noBr = false;
 					
 					//改ページフラグ設定
 					if (chukiFlagMiddle.contains(chukiName)) {
 						//左右中央
-						this.setPageBreakTrigger(PAGEBREAK_MIDDLE, pageNoBr);
+						this.setPageBreakTrigger(PAGEBREAK_MIDDLE);
 					} else if (bookInfo.isImageSectionLine(lineNum+1)) {
 						//次の行が画像単ページ
 						if (writer.getImageIndex() == 0 && "".equals(bookInfo.coverFileName) && bookInfo.insertCoverPage) {
 							//先頭画像で表紙に移動なら改ページしない
-							this.setPageBreakTrigger(null, true);
+							this.setPageBreakTrigger(null);
 						} else {
-							this.setPageBreakTrigger(PAGEBREAK_IMAGE, pageNoBr);
+							this.setPageBreakTrigger(PAGEBREAK_IMAGE);
 						}
 					} else {
-						this.setPageBreakTrigger(PAGEBREAK_NORMAL, pageNoBr);
+						this.setPageBreakTrigger(PAGEBREAK_NORMAL);
 					}
 				}
 				////////////////////////////////////////////////////////////////
@@ -1001,8 +1003,6 @@ public class AozoraEpub3Converter
 						else imageEndIdx = Math.min(imageEndIdx, chukiTag.indexOf('）', imageStartIdx+1));
 						if (imageStartIdx < imageEndIdx) {
 							String srcFilePath = chukiTag.substring(imageStartIdx+1, imageEndIdx);
-							String imageTitle = srcFilePath.substring(srcFilePath.lastIndexOf('/')+1);
-							if (imageStartIdx > 0) imageTitle = chukiTag.substring(2, imageStartIdx);
 							//LogAppender.append("[画像注記]: "+chukiTag+"\n");
 							//単ページ画像の場合は<p>タグを出さない
 							if (bookInfo.isImageSectionLine(lineNum)) noBr = true;
@@ -1013,11 +1013,12 @@ public class AozoraEpub3Converter
 								buf.append(fileName);
 								buf.append(chukiMap.get("画像終了")[0]);
 								//本文がなければ画像ファイル名が目次になる
-								if (!this.chapterStarted && this.chapterIsImageTitle) {
+								/*if (!this.chapterStarted && this.chapterFirstImageTitle == null) {
+									String imageTitle = srcFilePath.substring(srcFilePath.lastIndexOf('/')+1);
+									if (imageStartIdx > 0) imageTitle = chukiTag.substring(2, imageStartIdx);
 									String chapterName = imageTitle;
-									this.writer.updateChapterName(chapterName.length()>64 ? chapterName.substring(0, 64) : chapterName);
-									this.chapterIsImageTitle = true;
-								}
+									this.chapterFirstImageTitle = chapterName.length()>64 ? chapterName.substring(0, 64) : chapterName;
+								}*/
 							}
 						} else {
 							LogAppender.append("注記エラー: ("+lineNum+") "+chukiTag+"\n");
@@ -1048,7 +1049,7 @@ public class AozoraEpub3Converter
 								buf.append(fileName);
 								buf.append(chukiMap.get("画像終了")[0]);
 								//本文がなければ画像ファイル名が目次になる
-								if (!this.chapterStarted && !this.chapterIsImageTitle) {
+								/*if (!this.chapterStarted && this.chapterFirstImageTitle == null) {
 									String imageTitle = srcFilePath.substring(srcFilePath.lastIndexOf('/')+1);
 									int altIdx = lowerChukiTag.indexOf(" alt=");
 									if (altIdx > -1) {
@@ -1059,9 +1060,8 @@ public class AozoraEpub3Converter
 										if (end > -1) imageTitle = chukiTag.substring(start+1, end);
 									}
 									String chapterName = imageTitle;
-									this.writer.updateChapterName(chapterName.length()>64 ? chapterName.substring(0, 64) : chapterName);
-									this.chapterIsImageTitle = true;
-								}
+									this.chapterFirstImageTitle = chapterName.length()>64 ? chapterName.substring(0, 64) : chapterName;
+								}*/
 							}
 						}
 					}
@@ -1161,7 +1161,7 @@ public class AozoraEpub3Converter
 				if (inJisage >= 0) {
 					LogAppender.append("字下げ注記エラー : "+(inJisage+1)+"\n");
 				} else {
-					this.setPageBreakTrigger(PAGEBREAK_COLOPHON, true);
+					this.setPageBreakTrigger(PAGEBREAK_COLOPHON);
 					/*this.writer.nextSection(out, lineNum, false, false);
 					//this.writer.updateChapterName("奥付");
 					this.writer.updateChapterName(null);
@@ -1516,12 +1516,12 @@ public class AozoraEpub3Converter
 	 * 設定済みだが連続行で書かれていたり空行除外で改行されていない場合は上書きされて無視される
 	 * @param trigger 改ページトリガ nullなら改ページ設定キャンセル
 	 * @param 改ページの後ろに文字がある場合に改行を出すならfalse */
-	void setPageBreakTrigger(PageBreakTrigger trigger, boolean noBr)
+	void setPageBreakTrigger(PageBreakTrigger trigger)
 	{
 		//改ページ前の空行は無視
 		this.printEmptyLines = 0;
 		this.pageBreakTrigger = trigger;
-		if (trigger != null) this.pageBreakTrigger.noBr = noBr;
+		if (this.pageBreakTrigger != null && this.pageBreakTrigger.isMiddle) this.skipMiddleEmpty = true;
 	}
 	
 	/** 行の文字列を出力
@@ -1565,27 +1565,21 @@ public class AozoraEpub3Converter
 					if (this.pageBreakTrigger.isMiddle) {
 						//左右中央
 						this.writer.nextSection(out, lineNum, true, false);
-						this.skipMiddleEmpty = true;
 					} else {
 						//その他
 						this.writer.nextSection(out, lineNum, false, this.pageBreakTrigger.isImage);
-						this.skipMiddleEmpty = false;
 					}
+					
 					//ページ情報初期化
 					this.pageLineNum = 0;
 					this.sectionCharLength = 0;
 					this.chapterStarted = false;
-					this.chapterIsImageTitle= false;
-					this.printEmptyLines = 0;
 					
 					//改ページ目次非表示
 					if (this.pageBreakTrigger.noChapter) {
 						this.writer.updateChapterName(null);
 						this.chapterStarted = true;
 					}
-					//ブロック注記フラグ設定
-					noBr = this.pageBreakTrigger.noBr;
-					
 					this.pageBreakTrigger = null;
 				}
 			}
