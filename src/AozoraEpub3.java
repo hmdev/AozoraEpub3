@@ -272,13 +272,11 @@ public class AozoraEpub3
 		HashMap<String, ImageInfo> zipImageInfos = new HashMap<String, ImageInfo>();
 		ZipArchiveInputStream zis = new ZipArchiveInputStream(new BufferedInputStream(new FileInputStream(srcFile)), "MS932", false);
 		ArchiveEntry entry;
-		//int zipIndex = 0;
+		int zipIndex = 0;
 		while ((entry = zis.getNextEntry()) != null) {
 			String fileName = entry.getName();
 			String lowerName = entry.getName().toLowerCase();
 			if (lowerName.endsWith(".png") || lowerName.endsWith(".jpg") || lowerName.endsWith(".jpeg") || lowerName.endsWith(".gif")) {
-				zipImageInfos.put(fileName, new ImageInfo(null, fileName, ""));//仮
-				/*
 				ImageInfo imageInfo = null;
 				try {
 					imageInfo = ImageInfo.getImageInfo(null, fileName, zis, zipIndex);
@@ -289,9 +287,8 @@ public class AozoraEpub3
 					e.printStackTrace();
 				}
 				if (imageInfo != null) zipImageInfos.put(fileName, imageInfo);
-				*/
 			}
-			//zipIndex++;
+			zipIndex++;
 		}
 		zis.close();
 		
