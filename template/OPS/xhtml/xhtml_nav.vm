@@ -5,6 +5,15 @@
 <head>
 	<title>${bookInfo.Title}</title>
 	<style type="text/css">ol { list-style: none; }</style>
+#if (${bookInfo.Vertical})
+	<link rel="stylesheet" type="text/css" href="../css/vertical_font.css"/>
+	<link rel="stylesheet" type="text/css" href="../css/vertical_text.css"/>
+	<link rel="stylesheet" type="text/css" href="../css/vertical.css"/>
+#else
+	<link rel="stylesheet" type="text/css" href="../css/horizontal_font.css"/>
+	<link rel="stylesheet" type="text/css" href="../css/horizontal_text.css"/>
+	<link rel="stylesheet" type="text/css" href="../css/horizontal.css"/>
+#end
 </head>
 <body>
 	<nav xmlns:epub="http://www.idpf.org/2007/ops" epub:type="toc" id="toc">

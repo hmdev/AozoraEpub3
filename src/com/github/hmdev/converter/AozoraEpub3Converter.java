@@ -24,9 +24,6 @@ import com.github.hmdev.writer.Epub3Writer;
  */
 public class AozoraEpub3Converter
 {
-	/** ファイル名 [著作者] 表題.txt から抽出するパターン */
-	Pattern fileNamePattern = Pattern.compile("\\[(.+?)\\]( |　)*(.+?)(\\(|（|\\.)");
-	
 	//---------------- Properties ----------------//
 	/** UTF-8以外の文字を代替文字に変換 */
 	boolean userAlterCharEscape = false;
@@ -73,6 +70,9 @@ public class AozoraEpub3Converter
 	
 	/** 先頭注記内側のパターン */
 	final static Pattern chukiLeftPattern = Pattern.compile("^［＃(.+?)］");
+	/** ファイル名 [著作者] 表題.txt から抽出するパターン */
+	final static Pattern fileNamePattern = Pattern.compile("\\[(.+?)\\]( |　)*(.+?)(\\(|（|\\.)");
+	
 	//---------------- 変換用テーブル ----------------//
 	/** 変換関連が初期化済みならtrue */
 	static boolean inited = false;
@@ -530,22 +530,34 @@ public class AozoraEpub3Converter
 			if (bookInfo.isIgnoreLine(lineNum)) continue;
 			
 			if (lineNum == bookInfo.titleLine) {
-				convertTextLineToEpub3(out, "［＃表題前］"+convertGaijiChuki(line, true)+"［＃表題後］");
+				convertTextLineToEpub3(out, "［＃表題前］");
+				convertTextLineToEpub3(out, convertGaijiChuki(line, true));
+				convertTextLineToEpub3(out, "［＃表題後］");
 			}
 			else if (lineNum == bookInfo.orgTitleLine) {
-				convertTextLineToEpub3(out, "［＃原題前］"+convertGaijiChuki(line, true)+"［＃原題後］");
+				convertTextLineToEpub3(out, "［＃原題前］");
+				convertTextLineToEpub3(out, convertGaijiChuki(line, true));
+				convertTextLineToEpub3(out, "［＃原題後］");
 			}
 			else if (lineNum == bookInfo.subTitleLine) {
-				convertTextLineToEpub3(out, "［＃副題前］"+convertGaijiChuki(line, true)+"［＃副題後］");
+				convertTextLineToEpub3(out, "［＃副題前］");
+				convertTextLineToEpub3(out, convertGaijiChuki(line, true));
+				convertTextLineToEpub3(out, "［＃副題後］");
 			}
 			else if (lineNum == bookInfo.subOrgTitleLine) {
-				convertTextLineToEpub3(out, "［＃副原題前］"+convertGaijiChuki(line, true)+"［＃副原題後］");
+				convertTextLineToEpub3(out, "［＃副原題前］");
+				convertTextLineToEpub3(out, convertGaijiChuki(line, true));
+				convertTextLineToEpub3(out, "［＃副原題後］");
 			}
 			else if (lineNum == bookInfo.creatorLine) {
-				convertTextLineToEpub3(out, "［＃著者前］"+convertGaijiChuki(line, true)+"［＃著者後］");
+				convertTextLineToEpub3(out, "［＃著者前］");
+				convertTextLineToEpub3(out, convertGaijiChuki(line, true));
+				convertTextLineToEpub3(out, "［＃著者後］");
 			}
 			else if (lineNum == bookInfo.subCreatorLine) {
-				convertTextLineToEpub3(out, "［＃副著者前］"+convertGaijiChuki(line, true)+"［＃副著者後］");
+				convertTextLineToEpub3(out, "［＃副著者前］");
+				convertTextLineToEpub3(out, convertGaijiChuki(line, true));
+				convertTextLineToEpub3(out, "［＃副著者後］");
 			}
 			else {
 				//強制改行
@@ -1539,9 +1551,9 @@ public class AozoraEpub3Converter
 					inJisage = -1;
 				}
 				
-				if (sectionCharLength == 0) {
-					out.write(chukiMap.get("改行")[0]);
-				}
+				//if (sectionCharLength == 0) {
+				//	out.write(chukiMap.get("改行")[0]);
+				//}
 				
 				//改ページ処理
 				if (this.pageBreakTrigger.isMiddle) {

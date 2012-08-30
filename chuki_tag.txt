@@ -569,15 +569,15 @@
 外字画像開始	<span class="img gaiji"><img src="
 外字画像終了	"/></span>
 
-表題前	<div class="font5">
-表題後	</div>
-原題前	<div class="font4">
-原題後	</div>
-副題前	<div class="top2 font2">
-副題後	</div>
-副原題前	<div class="top2 font2">
-副原題後	</div>
-著者前	<div class="btm2 font1">
-著者後	</div>
-副著者前	<div class="btm2 font1">
-副著者後	</div>
+表題前	<div class="font5">		1
+表題後	</div>		1
+原題前	<div class="font4">		1
+原題後	</div>		1
+副題前	<div class="top2 font2">		1
+副題後	</div>		1
+副原題前	<div class="top2 font2">		1
+副原題後	</div>		1
+著者前	<div class="btm2 font1">		1
+著者後	</div>		1
+副著者前	<div class="btm2 font1">		1
+副著者後	</div>		1

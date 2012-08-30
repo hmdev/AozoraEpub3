@@ -13,7 +13,6 @@ import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.UUID;
 import java.util.Vector;
@@ -133,8 +132,8 @@ public class Epub3Writer
 	
 	boolean imageMode = false;
 	
-	HashSet<String> zipImageFileNames;
-	
+	/** Zip内の画像情報 */
+	HashMap<String, ImageInfo> zipImageFileInfos;
 	
 	String srcFilePath;
 	String zipTextFileName;
@@ -154,12 +153,12 @@ public class Epub3Writer
 	 * @param epubFile 出力ファイル .epub拡張子
 	 * @param bookInfo 書籍情報と縦横書き指定
 	 * @throws IOException */
-	public void write(AozoraEpub3Converter converter, BufferedReader src, File srcFile, String zipTextFileName, File epubFile, BookInfo bookInfo, HashSet<String> zipImageFileNames) throws IOException
+	public void write(AozoraEpub3Converter converter, BufferedReader src, File srcFile, String zipTextFileName, File epubFile, BookInfo bookInfo, HashMap<String, ImageInfo> zipImageFileInfos) throws IOException
 	{
 		this.bookInfo = bookInfo;
 		this.srcFilePath = srcFile.getParent()+"/";
 		this.zipTextFileName = zipTextFileName;
-		this.zipImageFileNames = zipImageFileNames;
+		this.zipImageFileInfos = zipImageFileInfos;
 		
 		//インデックス初期化
 		this.sectionIndex = 0;
@@ -474,7 +473,7 @@ public class Epub3Writer
 		if (imageFileName == null) {
 			//画像があるかチェック
 			boolean exists = false;
-			if (this.zipImageFileNames == null) {
+			if (this.zipImageFileInfos == null) {
 				File imageFile = new File(srcFilePath+srcImageFileName);
 				exists = imageFile.exists();
 				//拡張子変更
@@ -494,16 +493,16 @@ public class Epub3Writer
 			} else {
 				//Zipの場合
 				String zipTextParent = zipTextFileName.substring(0, zipTextFileName.indexOf('/')+1);
-				exists = this.zipImageFileNames.contains(zipTextParent+srcImageFileName);
+				exists = this.zipImageFileInfos.containsKey(zipTextParent+srcImageFileName);
 				//拡張子変更
 				if (!exists) {
-					if (this.zipImageFileNames.contains(zipTextParent+srcImageFileName.replaceFirst("\\.\\w+$", ".png"))) {
+					if (this.zipImageFileInfos.containsKey(zipTextParent+srcImageFileName.replaceFirst("\\.\\w+$", ".png"))) {
 						exists = true;
 						srcImageFileName = srcImageFileName.replaceFirst("\\.\\w+$", ".png");
-					} else if (this.zipImageFileNames.contains(zipTextParent+srcImageFileName.replaceFirst("\\.\\w+$", ".jpg"))) {
+					} else if (this.zipImageFileInfos.containsKey(zipTextParent+srcImageFileName.replaceFirst("\\.\\w+$", ".jpg"))) {
 						exists = true;
 						srcImageFileName = srcImageFileName.replaceFirst("\\.\\w+$", ".jpg");
-					} else if (this.zipImageFileNames.contains(zipTextParent+srcImageFileName.replaceFirst("\\.\\w+$", ".jpeg"))) {
+					} else if (this.zipImageFileInfos.containsKey(zipTextParent+srcImageFileName.replaceFirst("\\.\\w+$", ".jpeg"))) {
 						exists = true;
 						srcImageFileName = srcImageFileName.replaceFirst("\\.\\w+$", ".jpeg");
 					}

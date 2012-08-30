@@ -18,10 +18,10 @@ span.img {
 a:active { color: #C00; background: transparent; }
 a:link img, a:visited img { border-style: none; }
 
-h1 { font-size: 200%; margin-top: 2em; }
-h2, h3, h4, h5, h6 { margin-top: 3em; }
-h2 { font-size: 150%;}
-h3 { font-size: 120%;}
+h1 { font-size: 150%; margin-top: 1em; }
+h2, h3, h4, h5, h6 { margin-top: 1em; }
+h2 { font-size: 130%;}
+h3 { font-size: 115%;}
 h4 { font: bold 100%; }
 h5 { font: italic 100%; }
 h6 { font: small-caps 100%; }

@@ -49,8 +49,8 @@ public class Epub3ImageWriter extends Epub3Writer
 	void writeSections(AozoraEpub3Converter converter, BufferedReader src, BufferedWriter bw) throws IOException
 	{
 		//ファイルをソート
-		String[] fileNames = new String[this.zipImageFileNames.size()];
-		this.zipImageFileNames.toArray(fileNames);
+		String[] fileNames = new String[this.zipImageFileInfos.size()];
+		this.zipImageFileInfos.keySet().toArray(fileNames);
 		Arrays.sort(fileNames, new FileNameComparator());
 		
 		//画像xhtmlを出力
@@ -96,12 +96,12 @@ public class Epub3ImageWriter extends Epub3Writer
 		boolean isCover = false;
 		this.imageIndex++;
 		String ext = "";
-		try { ext = srcImageFileName.substring(srcImageFileName.lastIndexOf('.')+1); } catch (Exception e) {}
+		try { ext = srcImageFileName.substring(srcImageFileName.lastIndexOf('.')+1).toLowerCase(); } catch (Exception e) {}
 		String imageId = decimalFormat.format(this.imageIndex);
 		String imageFileName = IMAGES_PATH+imageId+"."+ext;
 		this.imageFileNames.put(srcImageFileName, imageFileName);
-		String format = "image/"+ext.toLowerCase();
-		if ("image/jpg".equals(format)) format = "image/jpeg";
+		String format = "image/"+ext;
+		if ("jpg".equals(ext)) format = "image/jpeg";
 		if (!format.matches("^image\\/(png|jpeg|gif)$")) LogAppender.append("画像フォーマットエラー: ("+lineNum+") "+srcImageFileName+"\n");
 		else {
 			ImageInfo imageInfo = new ImageInfo(imageId, imageId+"."+ext, format);
