@@ -151,7 +151,7 @@ public class AozoraEpub3Converter
 	/** 改ページ画像単一ページ 高さ100% */
 	final static PageBreakTrigger PAGEBREAK_IMAGE_H = new PageBreakTrigger(true, false, PageBreakTrigger.IMAGE_PAGE_H);
 	/** 改ページ「底本：」の前 */
-	final static PageBreakTrigger PAGEBREAK_COLOPHON = new PageBreakTrigger(true, false, PageBreakTrigger.IMAGE_PAGE_NONE, true);
+	final static PageBreakTrigger PAGEBREAK_NOCHAPTER = new PageBreakTrigger(true, false, PageBreakTrigger.IMAGE_PAGE_NONE, true);
 	
 	/** 見出し仮対応出力用
 	 * 章の最初の本文をsetChapterNameでセットしたらtrue */
@@ -1210,7 +1210,7 @@ public class AozoraEpub3Converter
 				if (inJisage >= 0) {
 					LogAppender.append("字下げ注記エラー : "+(inJisage+1)+"\n");
 				} else {
-					this.setPageBreakTrigger(PAGEBREAK_COLOPHON);
+					this.setPageBreakTrigger(PAGEBREAK_NOCHAPTER);
 					/*this.writer.nextSection(out, lineNum, false, false);
 					//this.writer.updateChapterName("奥付");
 					this.writer.updateChapterName(null);
@@ -1573,7 +1573,7 @@ public class AozoraEpub3Converter
 		}
 		printLineBuffer(out, buf, lineNum, true);
 		
-		this.setPageBreakTrigger(PAGEBREAK_NORMAL);
+		this.setPageBreakTrigger(PAGEBREAK_NOCHAPTER);
 	}
 	
 	////////////////////////////////////////////////////////////////
