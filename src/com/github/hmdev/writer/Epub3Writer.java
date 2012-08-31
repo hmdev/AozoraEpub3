@@ -26,6 +26,7 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 
 import com.github.hmdev.converter.AozoraEpub3Converter;
+import com.github.hmdev.converter.PageBreakTrigger;
 import com.github.hmdev.info.BookInfo;
 import com.github.hmdev.info.ChapterInfo;
 import com.github.hmdev.info.ImageInfo;
@@ -403,43 +404,45 @@ public class Epub3Writer
 	/** 次のチャプター用のZipArchiveEntryに切替え 
 	 * チャプターのファイル名はcpaterFileNamesに追加される (0001)
 	 * @throws IOException */
-	public void nextSection(BufferedWriter bw, int lineNum, boolean isMiddle, boolean isImage, String srcImageFilePath) throws IOException
+	public void nextSection(BufferedWriter bw, int lineNum, boolean isMiddle, int imagePageType, String srcImageFilePath) throws IOException
 	{
 		if (this.sectionIndex >0) {
 			bw.flush();
 			this.endSection();
 		}
-		this.startSection(lineNum, isMiddle, isImage, srcImageFilePath);
+		this.startSection(lineNum, isMiddle, imagePageType, srcImageFilePath);
 	}
 	/** セクション開始. 
 	 * @throws IOException */
-	void startSection(int lineNum, boolean isMiddle, boolean isImage, String srcImageFilePath) throws IOException
+	void startSection(int lineNum, boolean isMiddle, int imagePageType, String srcImageFilePath) throws IOException
 	{
 		this.sectionIndex++;
 		String sectionId = decimalFormat.format(this.sectionIndex);
 		//package.opf用にファイル名
 		SectionInfo sectionInfo = new SectionInfo(sectionId);
 		//次の行が単一画像なら画像専用指定
-		if (isImage) {
+		switch (imagePageType) {
+		case PageBreakTrigger.IMAGE_PAGE_AUTO:
 			sectionInfo.setImageFit(true);
 			//画像サイズが横長なら幅に合わせる
-			ImageInfo imageInfo = null;
-			if (this.zipImageFileInfos != null) {
-				imageInfo = this.zipImageFileInfos.get(srcFilePath);
-			} else {
-				//ファイルシステムから取得
-				File imageFile = new File(this.srcFilePath+srcImageFilePath);
-				if (imageFile.exists()) {
-					BufferedInputStream bis = new BufferedInputStream(new FileInputStream(imageFile));
-					imageInfo = ImageInfo.getImageInfo(null, srcImageFilePath, bis, -1);
-					bis.close();
-				}
-			}
+			ImageInfo imageInfo = this.getImageInfo(srcImageFilePath);
 			if (imageInfo != null) {
+				//横長ならwidth100％
 				if (imageInfo.getWidth()/imageInfo.getHeight()>3/4) sectionInfo.setImageFitW(true);
+				//縦がはみ出すならheight:100%
+				else if (imageInfo.getHeight() >= 600) sectionInfo.setImageFitH(true);
 			}
+			break;
+		case PageBreakTrigger.IMAGE_PAGE_W:
+			sectionInfo.setImageFit(true);
+			sectionInfo.setImageFitW(true);
+			break;
+		case PageBreakTrigger.IMAGE_PAGE_H:
+			sectionInfo.setImageFit(true);
+			sectionInfo.setImageFitH(true);
+			break;
 		}
-		else if (isMiddle) sectionInfo.setMiddle(true);
+		if (isMiddle) sectionInfo.setMiddle(true);
 		this.sectionInfos.add(sectionInfo);
 		this.addChapter(sectionId, null); //章の名称はsectionIdを仮に設定
 		
@@ -568,5 +571,21 @@ public class Epub3Writer
 	public int getImageIndex()
 	{
 		return this.imageIndex;
+	}
+	
+	/** ImageInfoを取得 */
+	public ImageInfo getImageInfo(String srcImageFilePath) throws IOException
+	{
+		if (this.zipImageFileInfos != null) {
+			return this.zipImageFileInfos.get(srcImageFilePath);
+			
+		} else {
+			//ファイルシステムから取得
+			File imageFile = new File(this.srcFilePath+srcImageFilePath);
+			if (imageFile.exists()) {
+				return ImageInfo.getImageInfo(null, srcImageFilePath, imageFile);
+			}
+		}
+		return null;
 	}
 }

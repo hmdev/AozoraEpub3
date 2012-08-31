@@ -1,5 +1,8 @@
 package com.github.hmdev.info;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
@@ -49,6 +52,15 @@ public class ImageInfo
 		this.width = width;
 		this.height = height;
 		this.zipIndex = zipIndex;
+	}
+	
+	/** ファイルから画像情報を生成 */
+	static public ImageInfo getImageInfo(String id, String fileName, File imageFile) throws IOException
+	{
+		BufferedInputStream bis = new BufferedInputStream(new FileInputStream(imageFile));
+		ImageInfo imageInfo = ImageInfo.getImageInfo(null, fileName, bis, -1);
+		bis.close();
+		return imageInfo;
 	}
 	
 	/** 画像ストリームから画像情報を生成 */

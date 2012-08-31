@@ -33,12 +33,10 @@
 <body class="fit_w">
 #elseif (${sectionInfo.ImageFitH})
 <body class="fit_h">
-#else
-#if (${bookInfo.ImageOnly})
+#elseif (${sectionInfo.ImageFit})
 <body class="fit">
 #else
 <body>
-#end
 #end
 #if (${sectionInfo.Middle})
 <table class="middle"><tr><td>
