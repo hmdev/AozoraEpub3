@@ -203,18 +203,18 @@ public class AozoraEpub3Applet extends JApplet
 		panel.add(label);
 		jComboTitle = new JComboBox(BookInfo.TitleType.titleTypeNames);
 		jComboTitle.setFocusable(false);
-		jComboTitle.setPreferredSize(new Dimension(110, 22));
+		jComboTitle.setPreferredSize(new Dimension(130, 22));
 		try { jComboTitle.setSelectedIndex(Integer.parseInt(props.getProperty("TitleType"))); } catch (Exception e) {}
 		((JLabel)jComboTitle.getRenderer()).setBorder(zeroPadding);
 		panel.add(jComboTitle);
 		//入力ファイル名優先
 		propValue = props.getProperty("UseFileName");
-		jCheckUserFileName = new JCheckBox("ファイル名優先 ", propValue==null||"1".equals(propValue));
+		jCheckUserFileName = new JCheckBox("ファイル名優先 ", "1".equals(propValue));
 		jCheckUserFileName.setFocusPainted(false);
 		panel.add(jCheckUserFileName);
 		//左右中央
 		propValue = props.getProperty("MiddleTitle");
-		jCheckMiddleTitle = new JCheckBox("表題左右中央", propValue!=null&&"1".equals(propValue));
+		jCheckMiddleTitle = new JCheckBox("表題左右中央", propValue==null||"1".equals(propValue));
 		jCheckMiddleTitle.setFocusPainted(false);
 		panel.add(jCheckMiddleTitle);
 		

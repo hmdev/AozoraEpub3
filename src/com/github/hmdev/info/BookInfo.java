@@ -6,18 +6,31 @@ import java.util.HashSet;
 public class BookInfo
 {
 	/** タイトル記載種別 */
-	//final static public String[] titleType = {"表題+著者名", "著者名＋表題", "表題のみ", "なし", "ファイル名から"};
 	public enum TitleType {
-		TITLE_AUTHOR, AUTHOR_TITLE, TITLE_ONLY, NONE;
-		final static public String[] titleTypeNames = {"表題＋著者名", "著者名＋表題", "表題のみ", "なし"};
+		TITLE_AUTHOR, AUTHOR_TITLE, SUBTITLE_AUTHOR, TITLE_ONLY, NONE;
+		final static public String[] titleTypeNames = {"表題→著者名", "著者名→表題", "表題→著者名(副題優先)", "表題のみ", "なし"};
 		boolean hasTitleAuthor() {
 			switch (this) {
-			case TITLE_AUTHOR:
-			case AUTHOR_TITLE:
-			case TITLE_ONLY:
-				return true;
-			default:
-				return false;
+			case TITLE_AUTHOR: case SUBTITLE_AUTHOR: case AUTHOR_TITLE: return true;
+			default: return false;
+			}
+		}
+		boolean hasTitle() {
+			switch (this) {
+			case TITLE_AUTHOR: case SUBTITLE_AUTHOR: case AUTHOR_TITLE: case TITLE_ONLY: return true;
+			default: return false;
+			}
+		}
+		boolean hasAuthor() {
+			switch (this) {
+			case TITLE_AUTHOR: case SUBTITLE_AUTHOR: case AUTHOR_TITLE: return true;
+			default: return false;
+			}
+		}
+		boolean titleFirst() {
+			switch (this) {
+			case TITLE_AUTHOR: case SUBTITLE_AUTHOR: case TITLE_ONLY: return true;
+			default: return false;
 			}
 		}
 	}
@@ -280,22 +293,27 @@ public class BookInfo
 					linesLength = i; break;
 				}
 			}
-			boolean hasTitle = titleType==TitleType.TITLE_AUTHOR || titleType==TitleType.TITLE_ONLY || titleType==TitleType.AUTHOR_TITLE;
-			boolean hasAuthor = titleType==TitleType.TITLE_AUTHOR || titleType==TitleType.AUTHOR_TITLE;
-			boolean titleFirst = titleType==TitleType.TITLE_AUTHOR || titleType==TitleType.TITLE_ONLY;
 			
 			if (linesLength > 0) this.preTitlePageBreak = preTitlePageBreak;
 			
+			//表題のみ
+			if (linesLength > 0 && titleType == TitleType.TITLE_ONLY) {
+				this.titleLine = firstLineStart;
+				this.title = firstLines[0];
+				titleEndLine = firstLineStart;
+				return;
+			}
+			
 			switch (linesLength) {
 			case 6:
-				if (titleFirst) {
+				if (titleType.titleFirst()) {
 					this.titleLine = firstLineStart;
 					this.orgTitleLine = firstLineStart+1;
 					this.subTitleLine = firstLineStart+2;
 					this.subOrgTitleLine = firstLineStart+3;
 					this.title = firstLines[0]+" "+firstLines[2];
 					titleEndLine = firstLineStart+3;
-					if (hasAuthor) {
+					if (titleType.hasAuthor()) {
 						this.creatorLine = firstLineStart+4;
 						this.subCreatorLine = firstLineStart+5;
 						this.creator = firstLines[4];
@@ -306,7 +324,7 @@ public class BookInfo
 					this.subCreatorLine = firstLineStart+1;
 					this.creator = firstLines[0];
 					titleEndLine = firstLineStart+1;
-					if (hasTitle) {
+					if (titleType.hasTitle()) {
 						this.titleLine = firstLineStart+2;
 						this.orgTitleLine = firstLineStart+3;
 						this.subTitleLine = firstLineStart+4;
@@ -317,13 +335,13 @@ public class BookInfo
 				}
 				break;
 			case 5:
-				if (titleFirst) {
+				if (titleType.titleFirst()) {
 					this.titleLine = firstLineStart;
 					this.orgTitleLine = firstLineStart+1;
 					this.subTitleLine = firstLineStart+2;
 					this.title = firstLines[0]+" "+firstLines[2];
 					titleEndLine = firstLineStart+2;
-					if (hasAuthor) {
+					if (titleType.hasAuthor()) {
 						this.creatorLine = firstLineStart+3;
 						this.subCreatorLine = firstLineStart+4;
 						this.creator = firstLines[3];
@@ -333,7 +351,7 @@ public class BookInfo
 					this.creatorLine = firstLineStart;
 					this.creator = firstLines[0];
 					titleEndLine = firstLineStart;
-					if (hasTitle) {
+					if (titleType.hasTitle()) {
 						this.titleLine = firstLineStart+1;
 						this.orgTitleLine = firstLineStart+2;
 						this.subTitleLine = firstLineStart+3;
@@ -344,12 +362,12 @@ public class BookInfo
 				}
 				break;
 			case 4:
-				if (titleFirst) {
+				if (titleType.titleFirst()) {
 					this.titleLine = firstLineStart;
 					this.subTitleLine = firstLineStart+1;
 					this.title = firstLines[0]+" "+firstLines[1];
 					titleEndLine = firstLineStart+1;
-					if (hasAuthor) {
+					if (titleType.hasAuthor()) {
 						this.creatorLine = firstLineStart+2;
 						this.subCreatorLine = firstLineStart+3;
 						this.creator = firstLines[2];
@@ -360,7 +378,7 @@ public class BookInfo
 					this.subCreatorLine = firstLineStart+1;
 					this.creator = firstLines[0];
 					titleEndLine = firstLineStart+1;
-					if (hasTitle) {
+					if (titleType.hasTitle()) {
 						this.titleLine = firstLineStart+2;
 						this.subTitleLine = firstLineStart+3;
 						this.title = firstLines[2]+" "+firstLines[3];
@@ -369,14 +387,14 @@ public class BookInfo
 				}
 				break;
 			case 3: //表題+副題+著者 または 表題+著者+翻訳者
-				if (titleFirst) {
+				if (titleType.titleFirst()) {
 					this.titleLine = firstLineStart;
 					this.subTitleLine = firstLineStart+1;
 					this.title = firstLines[0]+" "+firstLines[1];
 					titleEndLine = firstLineStart+1;
-					if (hasAuthor) {
+					if (titleType.hasAuthor()) {
 						//副著者を文字列で判断
-						if (!firstLines[1].startsWith("―") &&
+						if (titleType != TitleType.SUBTITLE_AUTHOR && !firstLines[1].startsWith("―") &&
 							(firstLines[2].endsWith("訳") || firstLines[2].endsWith("編纂") || firstLines[2].endsWith("校訂"))) {
 							this.titleLine = firstLineStart;
 							this.title = firstLines[0];
@@ -394,7 +412,7 @@ public class BookInfo
 					this.creatorLine = firstLineStart;
 					this.creator = firstLines[0];
 					titleEndLine = firstLineStart;
-					if (hasTitle) {
+					if (titleType.hasTitle()) {
 						this.titleLine = firstLineStart+1;
 						this.subTitleLine = firstLineStart+2;
 						this.title = firstLines[1]+" "+firstLines[2];
@@ -403,10 +421,10 @@ public class BookInfo
 				}
 				break;
 			case 2: //表題+著者 すぐ後にコメント行がある場合のみ表題+副題+空行+著者
-				if (titleFirst) {
+				if (titleType.titleFirst()) {
 					this.titleLine = firstLineStart;
 					this.title = firstLines[0];
-					if (hasAuthor) {
+					if (titleType.hasAuthor()) {
 						if (firstCommentLineNum > 0 && firstCommentLineNum <= 6 && firstLines[3] != null && firstLines[3].length() > 0 && (firstLines[4] == null || firstLines[4].length() == 0)) {
 							this.titleLine = firstLineStart;
 							this.subTitleLine = firstLineStart+1;
@@ -423,7 +441,7 @@ public class BookInfo
 				} else {
 					this.creatorLine = firstLineStart;
 					this.creator = firstLines[0];
-					if (hasTitle) {
+					if (titleType.hasTitle()) {
 						this.titleLine = firstLineStart+1;
 						this.title = firstLines[1];
 					}
@@ -431,11 +449,11 @@ public class BookInfo
 				}
 				break;
 			case 1: //表題のみ または 表題 空行 著者名 空行 も許可 TODO 章番号とかは除外する
-				if (titleFirst) {
+				if (titleType.titleFirst()) {
 					this.titleLine = firstLineStart;
 					this.title = firstLines[0];
 					titleEndLine = firstLineStart;
-					if (hasAuthor) {
+					if (titleType.hasAuthor()) {
 						if (firstLines[2] != null && firstLines[2].length() > 0 && (firstLines[3] == null || firstLines[3].length() == 0)) {
 							this.creatorLine = firstLineStart+2;
 							this.creator = firstLines[2];
@@ -446,7 +464,7 @@ public class BookInfo
 					this.creatorLine = firstLineStart;
 					this.creator = firstLines[0];
 					titleEndLine = firstLineStart;
-					if (hasTitle) {
+					if (titleType.hasTitle()) {
 						if (firstLines[2] != null && firstLines[2].length() > 0 && (firstLines[3] == null || firstLines[3].length() == 0)) {
 							this.titleLine = firstLineStart+2;
 							this.title = firstLines[2];
