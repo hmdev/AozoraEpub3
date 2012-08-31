@@ -1,5 +1,6 @@
 package com.github.hmdev.info;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 
 /** タイトル著作者等のメタ情報を格納 */
@@ -87,7 +88,7 @@ public class BookInfo
 	//Vector<SectionInfo> vecSectionInfo;
 	
 	/** 画像単体ページ開始行 */
-	HashSet<Integer> mapImageSectionLine;
+	HashMap<Integer, String> mapImageSectionLine;
 	/** 強制改ページ行 */
 	HashSet<Integer> mapPageBreakLine;
 	/** 改ページしない行 (［＃ページの左右中央］の前の［＃改ページ］) */
@@ -118,16 +119,22 @@ public class BookInfo
 		return vecSectionInfo.lastElement();
 	}*/
 	/** 画像単体ページの行数を保存 */
-	public void addImageSectionLine(int lineNum)
+	public void addImageSectionLine(int lineNum, String imageFileName)
 	{
-		if (this.mapImageSectionLine == null) this.mapImageSectionLine = new HashSet<Integer>();
-		this.mapImageSectionLine.add(lineNum);
+		if (this.mapImageSectionLine == null) this.mapImageSectionLine = new HashMap<Integer, String>();
+		this.mapImageSectionLine.put(lineNum, imageFileName);
 	}
-	/** 画像単体ページの開始行ならtrue */
+	/** 画像単体ページの行ならtrue */
 	public boolean isImageSectionLine(int lineNum)
 	{
 		if (this.mapImageSectionLine == null) return false;
-		return this.mapImageSectionLine.contains(lineNum);
+		return this.mapImageSectionLine.containsKey(lineNum);
+	}
+	/** 画像単体ページの行の画像ファイル名を返却 */
+	public String getImageSectionFileName(int lineNum)
+	{
+		if (this.mapImageSectionLine == null) return null;
+		return this.mapImageSectionLine.get(lineNum);
 	}
 	
 	/** 強制改ページ行数を保存 */

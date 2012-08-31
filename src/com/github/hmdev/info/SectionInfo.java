@@ -8,6 +8,8 @@ public class SectionInfo
 	
 	/** 画像のみのページ時をページ内に合わせる場合にtrue */
 	public boolean imageFit = false;
+	/** 画像のみのページで幅に合わる場合にtrue */
+	public boolean imageFitW = false;
 	/** 画像のみのページで高さに合わる場合にtrue */
 	public boolean imageFitH = false;
 	
@@ -43,6 +45,16 @@ public class SectionInfo
 	public void setImageFit(boolean imageFit)
 	{
 		this.imageFit = imageFit;
+	}
+
+	public boolean isImageFitW()
+	{
+		return imageFitW;
+	}
+
+	public void setImageFitW(boolean imageFitW)
+	{
+		this.imageFitW = imageFitW;
 	}
 
 	public boolean isImageFitH()

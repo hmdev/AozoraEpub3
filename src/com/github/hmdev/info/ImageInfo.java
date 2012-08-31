@@ -111,4 +111,28 @@ public class ImageInfo
 	{
 		this.isCover = isCover;
 	}
+	public int getWidth()
+	{
+		return width;
+	}
+	public void setWidth(int width)
+	{
+		this.width = width;
+	}
+	public int getHeight()
+	{
+		return height;
+	}
+	public void setHeight(int height)
+	{
+		this.height = height;
+	}
+	public int getZipIndex()
+	{
+		return zipIndex;
+	}
+	public void setZipIndex(int zipIndex)
+	{
+		this.zipIndex = zipIndex;
+	}
 }

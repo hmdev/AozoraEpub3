@@ -57,9 +57,10 @@ public class Epub3ImageWriter extends Epub3Writer
 		int pageNum = 0;
 		for (String srcFilePath : fileNames) {
 			pageNum++;
-			String fileName = this.getImageFilePath(srcFilePath.trim(), pageNum);
+			srcFilePath = srcFilePath.trim();
+			String fileName = this.getImageFilePath(srcFilePath, pageNum);
 			if (fileName != null) {
-				this.startImageSection();
+				this.startImageSection(srcFilePath);
 				bw.write(converter.getChukiValue("画像開始")[0]);
 				bw.write(fileName);
 				bw.write(converter.getChukiValue("画像終了")[0]);
@@ -71,14 +72,21 @@ public class Epub3ImageWriter extends Epub3Writer
 	
 	/** セクション開始. 
 	 * @throws IOException */
-	private void startImageSection() throws IOException
+	private void startImageSection(String srcImageFilePath) throws IOException
 	{
 		this.sectionIndex++;
 		String sectionId = decimalFormat.format(this.sectionIndex);
 		//package.opf用にファイル名
 		SectionInfo sectionInfo = new SectionInfo(sectionId);
+		
 		//画像専用指定
 		sectionInfo.setImageFit(true);
+		//画像サイズが横長なら幅に合わせる
+		ImageInfo imageInfo = this.zipImageFileInfos.get(srcImageFilePath);
+		if (imageInfo != null) {
+			if (imageInfo.getWidth()/imageInfo.getHeight()>3/4) sectionInfo.setImageFitW(true);
+		}
+		
 		this.sectionInfos.add(sectionInfo);
 		if (this.sectionIndex ==1 || this.sectionIndex % 5 == 0) this.addChapter(sectionId, ""+this.sectionIndex); //目次追加
 		super.zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+XHTML_PATH+sectionId+".xhtml"));

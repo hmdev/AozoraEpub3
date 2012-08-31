@@ -15,6 +15,9 @@ public class PageBreakTrigger
 	/** 目次に出力しない */
 	boolean noChapter = false;
 	
+	/** 画像単一ページの場合の画像ファイル名 */
+	String imageFileName = null;
+	
 	/**
 	 * @param ignoreEmptyPage
 	 * @param isMiddle

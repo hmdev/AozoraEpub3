@@ -29,12 +29,16 @@
 #end
 	<title>${bookInfo.Title}</title>
 </head>
-#if (${bookInfo.ImageOnly})
+#if (${sectionInfo.ImageFitW})
+<body class="fit_w">
+#elseif (${sectionInfo.ImageFitH})
 <body class="fit_h">
-#elseif (${sectionInfo.ImageFit})
+#else
+#if (${bookInfo.ImageOnly})
 <body class="fit">
-#else 
+#else
 <body>
+#end
 #end
 #if (${sectionInfo.Middle})
 <table class="middle"><tr><td>

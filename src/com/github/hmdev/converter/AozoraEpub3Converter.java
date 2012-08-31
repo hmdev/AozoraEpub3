@@ -470,10 +470,42 @@ public class AozoraEpub3Converter
 					(preLines[0].toLowerCase().startsWith("<img") && preLines[0].indexOf('>') == preLines[0].length()-1)
 				) {
 					//画像単一ページの画像行に設定
-					bookInfo.addImageSectionLine(lineNum-1);
+					String fileName = null;
+					if (preLines[0].toLowerCase().startsWith("<img")) {
+						fileName = getImageTagFileName(preLines[0]);
+					} else {
+						fileName = getImageChukiFileName(preLines[0], preLines[0].indexOf('（'));
+					}
+					bookInfo.addImageSectionLine(lineNum-1, fileName);
 				}
 			}
 		}
+	}
+	
+	/** imgタグからファイル名取得 */
+	public String getImageTagFileName(String imgTag)
+	{
+		String lowerTag = imgTag.toLowerCase();
+		int srcIdx = lowerTag.indexOf(" src=");
+		if (srcIdx == -1) return null;
+		int start = srcIdx+5;
+		int end = -1;
+		if (imgTag.charAt(start) == '"') end = imgTag.indexOf('"', start+1);
+		else if (imgTag.charAt(start) == '\'') end = imgTag.indexOf('\'', start+1);
+		if (end == -1) { end = imgTag.indexOf('>', start); start--; }
+		if (end == -1) { end = imgTag.indexOf(' ', start); start--; }
+		if (end != -1) return imgTag.substring(start+1, end).trim();
+		return null;
+	}
+	/** 画像注記からファイル名取得
+	 * @param imageStartIdx 画像注記の'（'の位置 */
+	public String getImageChukiFileName(String chukiTag, int imageStartIdx)
+	{
+		int imageEndIdx = chukiTag.indexOf('、', imageStartIdx+1);
+		if (imageEndIdx == -1) imageEndIdx = chukiTag.indexOf('）', imageStartIdx+1);
+		else imageEndIdx = Math.min(imageEndIdx, chukiTag.indexOf('）', imageStartIdx+1));
+		if (imageStartIdx < imageEndIdx) return chukiTag.substring(imageStartIdx+1, imageEndIdx);
+		return null;
 	}
 	
 	/** 青空テキストをePub3のXHTMLに変換
@@ -952,6 +984,7 @@ public class AozoraEpub3Converter
 							this.setPageBreakTrigger(null);
 						} else {
 							this.setPageBreakTrigger(PAGEBREAK_IMAGE);
+							PAGEBREAK_IMAGE.imageFileName = bookInfo.getImageSectionFileName(lineNum+1);
 						}
 					} else {
 						this.setPageBreakTrigger(PAGEBREAK_NORMAL);
@@ -1003,18 +1036,15 @@ public class AozoraEpub3Converter
 						//拡張子を含まない
 						LogAppender.append("注記未変換: ("+lineNum+") "+chukiTag+"\n");
 					} else {
-						//画像注記
-						int imageEndIdx = chukiTag.indexOf('、', imageStartIdx+1);
-						if (imageEndIdx == -1) imageEndIdx = chukiTag.indexOf('）', imageStartIdx+1);
-						else imageEndIdx = Math.min(imageEndIdx, chukiTag.indexOf('）', imageStartIdx+1));
-						if (imageStartIdx < imageEndIdx) {
-							String srcFilePath = chukiTag.substring(imageStartIdx+1, imageEndIdx);
-							//LogAppender.append("[画像注記]: "+chukiTag+"\n");
-							//単ページ画像の場合は<p>タグを出さない
-							if (bookInfo.isImageSectionLine(lineNum)) noBr = true;
-							//画像ファイル名置換処理実行
+						//画像ファイル名置換処理実行
+						String srcFilePath = this.getImageChukiFileName(chukiTag, imageStartIdx);
+						if (srcFilePath == null) {
+							LogAppender.append("注記エラー: ("+lineNum+") "+chukiTag+"\n");
+						} else {
 							String fileName = writer.getImageFilePath(srcFilePath.trim(), lineNum);
 							if (fileName != null) { //先頭に移動してここで出力しない場合はnull
+								//単ページ画像の場合は<p>タグを出さない
+								if (bookInfo.isImageSectionLine(lineNum)) noBr = true;
 								buf.append(chukiMap.get("画像開始")[0]);
 								buf.append(fileName);
 								buf.append(chukiMap.get("画像終了")[0]);
@@ -1026,49 +1056,35 @@ public class AozoraEpub3Converter
 									this.chapterFirstImageTitle = chapterName.length()>64 ? chapterName.substring(0, 64) : chapterName;
 								}*/
 							}
-						} else {
-							LogAppender.append("注記エラー: ("+lineNum+") "+chukiTag+"\n");
 						}
 					}
 				} else if (lowerChukiTag.startsWith("<img")) {
 					//src=の値抽出
-					int srcIdx = lowerChukiTag.indexOf(" src=");
-					if (srcIdx == -1) {
+					String srcFilePath = this.getImageTagFileName(chukiTag);
+					if (srcFilePath == null) {
 						LogAppender.append("画像注記エラー: ("+lineNum+") "+chukiTag+"\n");
 					} else {
-						int start = srcIdx + 5;
-						int end = -1;
-						if (chukiTag.charAt(start) == '"') end = chukiTag.indexOf('"', start+1);
-						else if (chukiTag.charAt(start) == '\'') end = chukiTag.indexOf('\'', start+1);
-						if (end == -1) { end = chukiTag.indexOf('>', start); start--; }
-						if (end == -1) { end = chukiTag.indexOf(' ', start); start--; }
-						if (end == -1) {
-							LogAppender.append("画像注記エラー: ("+lineNum+") "+chukiTag+"\n");
-						} else {
-							String srcFilePath = chukiTag.substring(start+1, end);
-							//LogAppender.append("[画像注記]: "+chukiTag+"\n");
-							if (bookInfo.isImageSectionLine(lineNum)) noBr = true;
-							//画像ファイル名置換処理実行
-							String fileName = writer.getImageFilePath(srcFilePath.trim(), lineNum);
-							if (fileName != null) { //先頭に移動してここで出力しない場合はnull
-								buf.append(chukiMap.get("画像開始")[0]);
-								buf.append(fileName);
-								buf.append(chukiMap.get("画像終了")[0]);
-								//本文がなければ画像ファイル名が目次になる
-								/*if (!this.chapterStarted && this.chapterFirstImageTitle == null) {
-									String imageTitle = srcFilePath.substring(srcFilePath.lastIndexOf('/')+1);
-									int altIdx = lowerChukiTag.indexOf(" alt=");
-									if (altIdx > -1) {
-										start = altIdx + 5;
-										end = -1;
-										if (chukiTag.charAt(start) == '"') end = chukiTag.indexOf('"', start+1);
-										if (chukiTag.charAt(start) == '\'') end = chukiTag.indexOf('\'', start+1);
-										if (end > -1) imageTitle = chukiTag.substring(start+1, end);
-									}
-									String chapterName = imageTitle;
-									this.chapterFirstImageTitle = chapterName.length()>64 ? chapterName.substring(0, 64) : chapterName;
-								}*/
-							}
+						//単ページ画像の場合は<p>タグを出さない
+						if (bookInfo.isImageSectionLine(lineNum)) noBr = true;
+						String fileName = writer.getImageFilePath(srcFilePath.trim(), lineNum);
+						if (fileName != null) { //先頭に移動してここで出力しない場合はnull
+							buf.append(chukiMap.get("画像開始")[0]);
+							buf.append(fileName);
+							buf.append(chukiMap.get("画像終了")[0]);
+							//本文がなければ画像ファイル名が目次になる
+							/*if (!this.chapterStarted && this.chapterFirstImageTitle == null) {
+								String imageTitle = srcFilePath.substring(srcFilePath.lastIndexOf('/')+1);
+								int altIdx = lowerChukiTag.indexOf(" alt=");
+								if (altIdx > -1) {
+									start = altIdx + 5;
+									end = -1;
+									if (chukiTag.charAt(start) == '"') end = chukiTag.indexOf('"', start+1);
+									if (chukiTag.charAt(start) == '\'') end = chukiTag.indexOf('\'', start+1);
+									if (end > -1) imageTitle = chukiTag.substring(start+1, end);
+								}
+								String chapterName = imageTitle;
+								this.chapterFirstImageTitle = chapterName.length()>64 ? chapterName.substring(0, 64) : chapterName;
+							}*/
 						}
 					}
 				}
@@ -1558,10 +1574,10 @@ public class AozoraEpub3Converter
 				//改ページ処理
 				if (this.pageBreakTrigger.isMiddle) {
 					//左右中央
-					this.writer.nextSection(out, lineNum, true, false);
+					this.writer.nextSection(out, lineNum, true, false, null);
 				} else {
 					//その他
-					this.writer.nextSection(out, lineNum, false, this.pageBreakTrigger.isImage);
+					this.writer.nextSection(out, lineNum, false, this.pageBreakTrigger.isImage, this.pageBreakTrigger.imageFileName);
 				}
 				
 				//ページ情報初期化
