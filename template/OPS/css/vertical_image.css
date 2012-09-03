@@ -1,16 +1,16 @@
 @charset "utf-8";
 @namespace "http://www.w3.org/1999/xhtml";
 
-/* 画像用 左右中央にするために横書きでcenter */
+/* 画像用 */
 @page {
 	margin: 0;
 	padding: 0;
 }
 
 html {
-	writing-mode: horizontal-tb;
-	-webkit-writing-mode: horizontal-tb;
-	-epub-writing-mode: horizontal-tb;
+	writing-mode: vertical-rl;
+	-webkit-writing-mode: vertical-rl;
+	-epub-writing-mode: vertical-rl;
 	margin: 0;
 	padding: 0;
 	width: 100%;
@@ -20,15 +20,27 @@ html {
 body {
 	margin: 0;
 	padding: 0;
-	text-align: center;
 	width: 100%;
 	height: 100%;
 }
 
-/* ページ内 */
-body img {
+/* ページ内 画像は縮小のみ */
+body.fit, body.fit_h {
+	display: table;
+}
+body .img {
+	width: 100%;
+	height: 100%;
+}
+body.fit .img,
+body.fit_h .img {
+	display: table-cell;
+	vertical-align: middle;
+}
+body.fit img {
 	max-width: 100%;
 	max-height: 100%;
+	display: block;
 }
 
 /* 表紙画像は小さければ拡大 */
@@ -43,7 +55,6 @@ body.fit_w img {
 	height: auto;
 }
 /* 高さを合わせる */
-body.fit img,
 body.fit_h img {
 	width: auto;
 	height: 100%;
