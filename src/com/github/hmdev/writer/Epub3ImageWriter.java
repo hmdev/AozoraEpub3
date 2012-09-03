@@ -123,5 +123,4 @@ public class Epub3ImageWriter extends Epub3Writer
 		if (bookInfo.insertCoverPage && isCover) return null;
 		return "../"+imageFileName;
 	}
-	
 }

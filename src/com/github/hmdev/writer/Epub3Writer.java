@@ -136,8 +136,12 @@ public class Epub3Writer
 	/** Zip内の画像情報 */
 	HashMap<String, ImageInfo> zipImageFileInfos;
 	
-	String srcFilePath;
-	String zipTextFileName;
+	/** ソースのtxtまたはzipファイルの親の絶対パス 後ろに"/"が付く */
+	String srcParentPath = null;
+	/** zip内のテキストのパス付きファイル名 */
+	String zipTextFileName = null;
+	/** zip内のテキストの親のパス 後ろに"/"が付く フォルダがなければnull */
+	String zipTextParentPath = null;
 	
 	/** コンストラクタ
 	 * @param templatePath epubテンプレート格納パス文字列 最後は"/"
@@ -148,17 +152,26 @@ public class Epub3Writer
 	}
 	
 	/** epubファイルを出力
-	 * @param converter 青空文庫テキスト変換クラス
+	 * @param converter 青空文庫テキスト変換クラス 画像のみの場合と切り替えて利用する
 	 * @param src 青空文庫テキストファイルの入力Stream
 	 * @param srcFile 青空文庫テキストファイル zip時の画像取得用
+	 * @param zipTextFileName zipの場合はzip内のテキストファイルのパス付きファイル名
 	 * @param epubFile 出力ファイル .epub拡張子
 	 * @param bookInfo 書籍情報と縦横書き指定
+	 * @param zipImageFileInfos zipの場合はzip内画像の情報 key=サブフォルダ付きの画像ファイル名
 	 * @throws IOException */
 	public void write(AozoraEpub3Converter converter, BufferedReader src, File srcFile, String zipTextFileName, File epubFile, BookInfo bookInfo, HashMap<String, ImageInfo> zipImageFileInfos) throws IOException
 	{
 		this.bookInfo = bookInfo;
-		this.srcFilePath = srcFile.getParent()+"/";
+		this.srcParentPath = srcFile.getParent()+"/";
 		this.zipTextFileName = zipTextFileName;
+		if (this.zipTextFileName != null) {
+			int idx = this.zipTextFileName.lastIndexOf('/');
+			if (idx > -1) {
+				//Zipのテキストのパスを画像パスに追加
+				this.zipTextParentPath = this.zipTextFileName.substring(0, idx+1);
+			}
+		}
 		this.zipImageFileInfos = zipImageFileInfos;
 		
 		//インデックス初期化
@@ -369,9 +382,9 @@ public class Epub3Writer
 		} else {
 			//TODO 出力順をimageFiles順にする?
 			for(Map.Entry<String, String> e : imageFileNames.entrySet()) {
-				String srImagecFileName = e.getKey();
+				String srcImageFileName = e.getKey();
 				String dstImageFileName = e.getValue();
-				File imageFile = new File(srcFilePath+srImagecFileName);
+				File imageFile = new File(srcParentPath+srcImageFileName);
 				if (imageFile.exists()) {
 					zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+dstImageFileName));
 					fis = new FileInputStream(imageFile);
@@ -379,7 +392,7 @@ public class Epub3Writer
 					zos.closeArchiveEntry();
 					fis.close();
 				} else {
-					LogAppender.append("[WARN] 画像ファイルなし: "+srImagecFileName+"\n");
+					LogAppender.append("[WARN] 画像ファイルなし: "+srcImageFileName+"\n");
 				}
 			}
 		}
@@ -495,17 +508,17 @@ public class Epub3Writer
 			//画像があるかチェック
 			boolean exists = false;
 			if (this.zipImageFileInfos == null) {
-				File imageFile = new File(srcFilePath+srcImageFileName);
+				File imageFile = new File(srcParentPath+srcImageFileName);
 				exists = imageFile.exists();
 				//拡張子変更
 				if (!exists) {
-					if (new File(srcFilePath+srcImageFileName.replaceFirst("\\.\\w+$", ".png")).exists()) {
+					if (new File(srcParentPath+srcImageFileName.replaceFirst("\\.\\w+$", ".png")).exists()) {
 						exists = true;
 						srcImageFileName = srcImageFileName.replaceFirst("\\.\\w+$", ".png");
-					} else if (new File(srcFilePath+srcImageFileName.replaceFirst("\\.\\w+$", ".jpg")).exists()) {
+					} else if (new File(srcParentPath+srcImageFileName.replaceFirst("\\.\\w+$", ".jpg")).exists()) {
 						exists = true;
 						srcImageFileName = srcImageFileName.replaceFirst("\\.\\w+$", ".jpg");
-					} else if (new File(srcFilePath+srcImageFileName.replaceFirst("\\.\\w+$", ".jpeg")).exists()) {
+					} else if (new File(srcParentPath+srcImageFileName.replaceFirst("\\.\\w+$", ".jpeg")).exists()) {
 						exists = true;
 						srcImageFileName = srcImageFileName.replaceFirst("\\.\\w+$", ".jpeg");
 					}
@@ -573,19 +586,44 @@ public class Epub3Writer
 		return this.imageIndex;
 	}
 	
-	/** ImageInfoを取得 */
+	/** ImageInfoを取得
+	 * zip内テキストファイルがサブフォルダ以下にある場合はnullになるので本文中のパスに親のパスをつけて再取得 */
 	public ImageInfo getImageInfo(String srcImageFilePath) throws IOException
 	{
 		if (this.zipImageFileInfos != null) {
-			return this.zipImageFileInfos.get(srcImageFilePath);
+			ImageInfo imageInfo = this.zipImageFileInfos.get(srcImageFilePath);
+			if (imageInfo != null) return imageInfo;
+			if (this.zipTextParentPath != null) {
+				//Zipのテキストのパスを画像パスに追加して画像情報取得
+				return this.zipImageFileInfos.get(this.zipTextParentPath+srcImageFilePath);
+			}
 			
 		} else {
 			//ファイルシステムから取得
-			File imageFile = new File(this.srcFilePath+srcImageFilePath);
+			File imageFile = new File(this.srcParentPath+srcImageFilePath);
 			if (imageFile.exists()) {
 				return ImageInfo.getImageInfo(null, srcImageFilePath, imageFile);
 			}
 		}
 		return null;
+	}
+	
+	/** 画像が単一ページ画像にできるかチェック
+	 * @param srcFilePath テキスト内の画像相対パス文字列
+	 * @throws IOException */
+	public int getImagePageType(String srcFilePath, int tagLevel)
+	{
+		//タグ内はfalse
+		if (tagLevel > 0) return PageBreakTrigger.IMAGE_PAGE_NONE;
+		try {
+			ImageInfo imageInfo = this.getImageInfo(srcFilePath);
+			if (imageInfo == null) return PageBreakTrigger.IMAGE_PAGE_NONE;
+			
+			if (imageInfo.getWidth() > 400 && imageInfo.getHeight() >= 600) {
+				if (imageInfo.getWidth()/imageInfo.getHeight() > 3/4) return PageBreakTrigger.IMAGE_PAGE_W;
+				else return PageBreakTrigger.IMAGE_PAGE_H;
+			}
+		} catch (Exception e) { e.printStackTrace(); }
+		return PageBreakTrigger.IMAGE_PAGE_NONE;
 	}
 }

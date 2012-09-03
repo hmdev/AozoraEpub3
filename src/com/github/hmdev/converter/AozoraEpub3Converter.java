@@ -13,7 +13,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.github.hmdev.info.BookInfo;
-import com.github.hmdev.info.ImageInfo;
 import com.github.hmdev.info.BookInfo.TitleType;
 import com.github.hmdev.util.CharUtils;
 import com.github.hmdev.util.LogAppender;
@@ -503,13 +502,13 @@ public class AozoraEpub3Converter
 		return null;
 	}
 	/** 画像注記からファイル名取得
-	 * @param imageStartIdx 画像注記の'（'の位置 */
-	public String getImageChukiFileName(String chukiTag, int imageStartIdx)
+	 * @param startIdx 画像注記の'（'の位置 */
+	public String getImageChukiFileName(String chukiTag, int startIdx)
 	{
-		int imageEndIdx = chukiTag.indexOf('、', imageStartIdx+1);
-		if (imageEndIdx == -1) imageEndIdx = chukiTag.indexOf('）', imageStartIdx+1);
-		else imageEndIdx = Math.min(imageEndIdx, chukiTag.indexOf('）', imageStartIdx+1));
-		if (imageStartIdx < imageEndIdx) return chukiTag.substring(imageStartIdx+1, imageEndIdx);
+		int endIdx = chukiTag.indexOf('、', startIdx+1);
+		if (endIdx == -1) endIdx = chukiTag.indexOf('）', startIdx+1);
+		else endIdx = Math.min(endIdx, chukiTag.indexOf('）', startIdx+1));
+		if (startIdx < endIdx) return chukiTag.substring(startIdx+1, endIdx);
 		return null;
 	}
 	
@@ -1029,7 +1028,6 @@ public class AozoraEpub3Converter
 				// <img src="img/filename"/> → <object src="filename"/>
 				// ［＃表紙（表紙.jpg）］［＃（表紙.jpg）］［＃「キャプション」（表紙.jpg、横321×縦123）入る）］
 				// 
-				//訓点と区別するため3文字目から（チェック
 				int imageStartIdx = chukiTag.indexOf('（', 2);
 				if (imageStartIdx > -1) {
 					//訓点送り仮名チェック ＃の次が（で.を含まない
@@ -1057,7 +1055,7 @@ public class AozoraEpub3Converter
 								} else if (chukiTag.length() == ch.length) {
 									//画像注記のみの行
 									//画像ページ種別取得
-									int imagePageType = this.getImagePageType(srcFilePath);
+									int imagePageType = this.writer.getImagePageType(srcFilePath, this.tagLevel);
 									if (imagePageType != PageBreakTrigger.IMAGE_PAGE_NONE) {
 										//単一ページ出力
 										this.printImagePage(out, buf, lineNum, fileName, imagePageType);
@@ -1092,7 +1090,7 @@ public class AozoraEpub3Converter
 							} else if (chukiTag.length() == ch.length) {
 								//画像注記のみの行
 								//画像ページ種別取得
-								int imagePageType = this.getImagePageType(srcFilePath);
+								int imagePageType = this.writer.getImagePageType(srcFilePath, this.tagLevel);
 								if (imagePageType != PageBreakTrigger.IMAGE_PAGE_NONE) {
 									//単一ページ出力
 									this.printImagePage(out, buf, lineNum, fileName, imagePageType);
@@ -1211,15 +1209,6 @@ public class AozoraEpub3Converter
 					LogAppender.append("字下げ注記エラー : "+(inJisage+1)+"\n");
 				} else {
 					this.setPageBreakTrigger(PAGEBREAK_NOCHAPTER);
-					/*this.writer.nextSection(out, lineNum, false, false);
-					//this.writer.updateChapterName("奥付");
-					this.writer.updateChapterName(null);
-					this.pageLineNum = 0;
-					this.sectionCharLength = 0;
-					this.chapterStarted = true;
-					this.chapterIsImageTitle= false;
-					//ブロック注記フラグoff
-					noBr = false;*/
 				}
 			}
 		}
@@ -1249,7 +1238,7 @@ public class AozoraEpub3Converter
 	private void convertRubyText(StringBuilder buf, char[] ch, int begin, int end, boolean noRuby) throws IOException
 	{
 		//事前に《》の代替文字をエスケープ済※《 ※》 に変換
-		//全角ひらがな漢字スペースがあるかもついでにチェック
+		//全角ひらがな漢字スペースの存在もついでにチェック
 		for (int i = begin+1; i < end; i++) {
 			switch (ch[i]) {
 			case '<':
@@ -1485,27 +1474,13 @@ public class AozoraEpub3Converter
 		}
 		if (this.bookInfo.vertical) {
 			switch (ch[idx]) {
-			case '&':
-				buf.append("&amp;");
-				break;
-			case '<':
-				buf.append("&lt;");
-				break;
-			case '>':
-				buf.append("&gt;");
-				break;
-			case '≪':
-				buf.append("《");
-				break;
-			case '≫':
-				buf.append("》");
-				break;
-			case '“':
-				buf.append("〝");
-				break;
-			case '”':
-				buf.append("〟");
-				break;
+			case '&': buf.append("&amp;"); break;
+			case '<': buf.append("&lt;"); break;
+			case '>': buf.append("&gt;"); break;
+			case '≪': buf.append("《"); break;
+			case '≫': buf.append("》"); break;
+			case '“': buf.append("〝"); break;
+			case '”': buf.append("〟"); break;
 			//ローマ数字
 			case 'Ⅰ': case 'Ⅱ': case 'Ⅲ': case 'Ⅳ': case 'Ⅴ': case 'Ⅵ': case 'Ⅶ': case 'Ⅷ': case 'Ⅸ': case 'Ⅹ': case 'Ⅺ': case 'Ⅻ':
 			case 'ⅰ': case 'ⅱ': case 'ⅲ': case 'ⅳ': case 'ⅴ': case 'ⅵ': case 'ⅶ': case 'ⅷ': case 'ⅸ': case 'ⅹ': case 'ⅺ': case 'ⅻ':
@@ -1518,47 +1493,20 @@ public class AozoraEpub3Converter
 					buf.append(ch[idx]);
 				}
 				break;
-			default:
-				buf.append(ch[idx]);
+			default: buf.append(ch[idx]);
 			}
 		} else {
 			switch (ch[idx]) {
-			case '&':
-				buf.append("&amp;");
-				break;
-			case '<':
-				buf.append("&lt;");
-				break;
-			case '>':
-				buf.append("&gt;");
-				break;
-			default:
-				buf.append(ch[idx]);
+			case '&': buf.append("&amp;"); break;
+			case '<': buf.append("&lt;"); break;
+			case '>': buf.append("&gt;"); break;
+			default: buf.append(ch[idx]);
 			}
 		}
 	}
 	
 	////////////////////////////////////////////////////////////////
 	// 画像単一ページチェック
-	/** 画像が単一ページ画像にできるかチェック
-	 * @param srcFilePath テキスト内の画像相対パス文字列
-	 * @throws IOException */
-	private int getImagePageType(String srcFilePath)
-	{
-		//タグ内はfalse
-		if (tagLevel > 0) return PageBreakTrigger.IMAGE_PAGE_NONE;
-		try {
-			ImageInfo imageInfo = this.writer.getImageInfo(srcFilePath);
-			if (imageInfo == null) return PageBreakTrigger.IMAGE_PAGE_NONE;
-			
-			if (imageInfo.getWidth() > 400 && imageInfo.getHeight() >= 600) {
-				if (imageInfo.getWidth()/imageInfo.getHeight() > 3/4) return PageBreakTrigger.IMAGE_PAGE_W;
-				else return PageBreakTrigger.IMAGE_PAGE_H;
-			}
-		} catch (Exception e) { e.printStackTrace(); }
-		return PageBreakTrigger.IMAGE_PAGE_NONE;
-	}
-	
 	/** 前後に改ページを入れて画像を出力 
 	 * @throws IOException */
 	private void printImagePage(BufferedWriter out, StringBuilder buf, int lineNum,  String fileName, int imagePageType) throws IOException
