@@ -930,6 +930,15 @@ public class AozoraEpub3Converter
 					//改ページの後ろに文字があれば</br>は出力
 					if (ch.length > begin+chukiTag.length()) noBr = false;
 					
+					//字下げ状態エラー出力
+					if (inJisage >= 0) {
+						LogAppender.append("字下げ注記エラー: ("+inJisage+") \n");
+						//字下げ省略処理
+						//字下げフラグ処理
+						buf.append(chukiMap.get("字下げ省略")[0]);
+						inJisage = -1;
+					}
+					
 					//改ページフラグ設定
 					if (this.middleTitle && bookInfo.preTitlePageBreak == lineNum)
 						this.setPageBreakTrigger(PAGEBREAK_MIDDLE);
@@ -1542,15 +1551,6 @@ public class AozoraEpub3Converter
 			//改ページフラグが設定されていて、空行で無い場合
 			if (this.pageBreakTrigger != null) {
 				//空ページでの改ページ
-				//字下げ状態エラー出力
-				if (inJisage >= 0) {
-					LogAppender.append("字下げ注記エラー: ("+inJisage+") \n");
-					//字下げ省略処理
-					//字下げフラグ処理
-					buf.append(chukiMap.get("字下げ省略")[0]);
-					inJisage = -1;
-				}
-				
 				//if (sectionCharLength == 0) {
 				//	out.write(chukiMap.get("改行")[0]);
 				//}

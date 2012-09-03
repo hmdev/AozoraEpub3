@@ -20,13 +20,11 @@ html {
 	width:100%;
 	height:100%;
 }
-
 body {
 	margin: 0;
 	padding: 0;
 	display: block;
 	color: #000;
-	border: none;
 	font-size: 1em;
 	line-height: 1.75;
 	vertical-align: baseline;
@@ -38,14 +36,10 @@ body {
 div.middle {
 	width:100%;
 	height:100%;
-	display: table-cell;
-	vertical-align: middle;
-}
-/* NetFront */
-table.middle {
-	width:100%;
-	height:100%;
 }
 table.middle td {
+	width:100%;
+	height:100%;
+	display: table-cell;
 	vertical-align: middle;
 }
