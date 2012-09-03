@@ -613,14 +613,15 @@ public class Epub3Writer
 	 * @throws IOException */
 	public int getImagePageType(String srcFilePath, int tagLevel)
 	{
-		//タグ内はfalse
+		//タグ内ならそのまま出力
 		if (tagLevel > 0) return PageBreakTrigger.IMAGE_PAGE_NONE;
 		try {
 			ImageInfo imageInfo = this.getImageInfo(srcFilePath);
 			if (imageInfo == null) return PageBreakTrigger.IMAGE_PAGE_NONE;
 			
-			if (imageInfo.getWidth() > 400 && imageInfo.getHeight() >= 600) {
-				if (imageInfo.getWidth()/imageInfo.getHeight() > 3/4) return PageBreakTrigger.IMAGE_PAGE_W;
+			if (imageInfo.getWidth() >= 400 && imageInfo.getHeight() >= 600) {
+				if (imageInfo.getWidth()/(float)imageInfo.getHeight() > 3/4f)
+					return PageBreakTrigger.IMAGE_PAGE_W;
 				else return PageBreakTrigger.IMAGE_PAGE_H;
 			}
 		} catch (Exception e) { e.printStackTrace(); }
