@@ -109,11 +109,11 @@ public class Epub3Writer
 	////////////////////////////////
 	//Properties
 	/** 画像最大幅 0は指定なし */
-	int maxImageW = 1600;
+	int maxImageW = 0;
 	/** 画像最大高さ 0は指定なし */
-	int maxImageH = 1600;
+	int maxImageH = 0;
 	/** 最大画素数 10000未満は指定なし */
-	int maxImagePixels = 1600*1600;
+	int maxImagePixels = 0;
 	////////////////////////////////
 	
 	
@@ -171,6 +171,14 @@ public class Epub3Writer
 	{
 		this.templatePath = templatePath;
 		this.imageFileInfos = new HashMap<String, ImageInfo>();
+	}
+	
+	/** 画像のリサイズ用パラメータを設定 */
+	public void setResizeParam(int resizeW, int resizeH, int pixels)
+	{
+		this.maxImageW = resizeW;
+		this.maxImageH = resizeH;
+		this.maxImagePixels = pixels;
 	}
 	
 	/** epubファイルを出力
@@ -375,7 +383,7 @@ public class Epub3Writer
 					bis = new BufferedInputStream(new FileInputStream(new File(bookInfo.coverFileName)));
 				}
 				zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+IMAGES_PATH+imageInfos.get(0).getFile()));
-				IOUtils.copy(bis, zos);
+				this.writeImage(bis, zos, coverImageInfo);
 				zos.closeArchiveEntry();
 				bis.close();
 				imageInfos.remove(0);//カバー画像情報削除
@@ -431,38 +439,32 @@ public class Epub3Writer
 	 * @throws IOException */
 	void writeImage(InputStream is, ZipArchiveOutputStream zos, ImageInfo imageInfo) throws IOException
 	{
-		if (imageInfo.getWidth()*imageInfo.getHeight() > maxImageW*maxImageH) {
-			BufferedImage srcImage = ImageIO.read(is);
-			int w = imageInfo.getWidth();
-			int h = imageInfo.getHeight();
-			
-			double scale = 1;
-			if (this.maxImagePixels >= 10000) scale = Math.sqrt((double)this.maxImagePixels/(w*h)); //最大画素数指定
-			if (this.maxImageW > 0) scale = Math.min(scale, (double)this.maxImageW/w); //最大幅指定
-			if (this.maxImageH > 0) scale = Math.min(scale, (double)this.maxImageH/h); //最大高さ指定
-			
-			if (scale >= 1) {
-				//TODO 画像回転対応
-				IOUtils.copy(is, zos);
-			} else {
-				int scaledW = (int)(imageInfo.getWidth()*scale);
-				int scaledH = (int)(imageInfo.getHeight()*scale);
-				//TODO 画像回転対応
-				BufferedImage outImage = new BufferedImage(scaledW, scaledH, BufferedImage.TYPE_INT_RGB);
-				Graphics2D g = outImage.createGraphics();
-				try {
-					AffineTransformOp ato = new AffineTransformOp(AffineTransform.getScaleInstance(scale, scale), AffineTransformOp.TYPE_BICUBIC);
-					g.drawImage(srcImage, ato, 0, 0);
-				} finally {
-					g.dispose();
-				}
-				ImageIO.write(outImage, imageInfo.getExt(), zos);
-				zos.flush();
-				LogAppender.append("画像縮小: "+imageInfo.getFile()+" ("+w+","+h+")→("+scaledW+","+scaledH+")\n");
-			}
-		} else {
+		double scale = 1;
+		int w = imageInfo.getWidth();
+		int h = imageInfo.getHeight();
+		if (this.maxImagePixels >= 10000) scale = Math.sqrt((double)this.maxImagePixels/(w*h)); //最大画素数指定
+		if (this.maxImageW > 0) scale = Math.min(scale, (double)this.maxImageW/w); //最大幅指定
+		if (this.maxImageH > 0) scale = Math.min(scale, (double)this.maxImageH/h); //最大高さ指定
+		
+		if (scale >= 1) {
 			//TODO 画像回転対応
 			IOUtils.copy(is, zos);
+		} else {
+			int scaledW = (int)(imageInfo.getWidth()*scale);
+			int scaledH = (int)(imageInfo.getHeight()*scale);
+			//TODO 画像回転対応
+			BufferedImage outImage = new BufferedImage(scaledW, scaledH, BufferedImage.TYPE_INT_RGB);
+			Graphics2D g = outImage.createGraphics();
+			try {
+				AffineTransformOp ato = new AffineTransformOp(AffineTransform.getScaleInstance(scale, scale), AffineTransformOp.TYPE_BICUBIC);
+				BufferedImage srcImage = ImageIO.read(is);
+				g.drawImage(srcImage, ato, 0, 0);
+			} finally {
+				g.dispose();
+			}
+			ImageIO.write(outImage, imageInfo.getExt(), zos);
+			zos.flush();
+			LogAppender.append("画像縮小: "+imageInfo.getFile()+" ("+w+","+h+")→("+scaledW+","+scaledH+")\n");
 		}
 	}
 	
