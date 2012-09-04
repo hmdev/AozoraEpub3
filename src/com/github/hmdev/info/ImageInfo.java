@@ -19,8 +19,8 @@ public class ImageInfo
 	String id;
 	/** ファイル名拡張子付き 0001.png */
 	String file;
-	/** 画像フォーマット image/png */
-	String format;
+	/** 画像フォーマット png jpg gif */
+	String ext;
 	
 	/** 画像幅 */
 	int width = -1;
@@ -34,21 +34,18 @@ public class ImageInfo
 	boolean isCover;
 	
 	/** 幅高さ無しの画像情報を生成 */
-	public ImageInfo(String id, String fileName, String format)
+	public ImageInfo(String id, String fileName, String ext)
 	{
-		this(id, fileName, format, -1, -1, -1);
+		this(id, fileName, ext, -1, -1, -1);
 	}
 	/** 画像の情報を生成
-	 * @param fotmat image/png の形式に自動的に変換する 拡張子の場合は自動的に変換される */
-	public ImageInfo(String id, String fileName, String format, int width, int height, int zipIndex)
+	 * @param ext png jpg gif の文字列 */
+	public ImageInfo(String id, String fileName, String ext, int width, int height, int zipIndex)
 	{
 		super();
 		this.id = id;
 		this.file = fileName;
-		this.format = format.toLowerCase();
-		if (!this.format.startsWith("image/")) {
-			this.format = "image/"+(this.format.equals("jpg")?"jpeg":this.format);
-		}
+		this.ext = ext.toLowerCase();
 		this.width = width;
 		this.height = height;
 		this.zipIndex = zipIndex;
@@ -78,8 +75,8 @@ public class ImageInfo
 		if (readers.hasNext()) {
 			ImageReader reader = readers.next();
 			reader.setInput(iis);
-			String format = reader.getFormatName();
-			return new ImageInfo(id, fileName, format, reader.getWidth(0), reader.getHeight(0), zipIndex);
+			String ext = reader.getFormatName();
+			return new ImageInfo(id, fileName, ext, reader.getWidth(0), reader.getHeight(0), zipIndex);
 		}
 		return null;
 	}
@@ -104,14 +101,18 @@ public class ImageInfo
 		this.file = file;
 	}
 	
+	public void setExt(String ext)
+	{
+		this.ext = ext;
+	}
+	public String getExt()
+	{
+		return this.ext;
+	}
+	/** mime形式(image/png)の形式フォーマット文字列を返却 */
 	public String getFormat()
 	{
-		return format;
-	}
-	
-	public void setFormat(String format)
-	{
-		this.format = format;
+		return "image/"+(this.ext.equals("jpg")?"jpeg":this.ext);
 	}
 	
 	public boolean getIsCover()

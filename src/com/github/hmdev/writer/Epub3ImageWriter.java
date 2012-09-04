@@ -82,7 +82,7 @@ public class Epub3ImageWriter extends Epub3Writer
 		//画像専用指定
 		sectionInfo.setImageFit(true);
 		//画像サイズが横長なら幅に合わせる
-		ImageInfo imageInfo = this.zipImageFileInfos.get(srcImageFilePath);
+		ImageInfo imageInfo = this.getImageInfo(srcImageFilePath);
 		if (imageInfo != null) {
 			if (imageInfo.getWidth()/imageInfo.getHeight()>3/4) sectionInfo.setImageFitW(true);
 		}
@@ -108,17 +108,16 @@ public class Epub3ImageWriter extends Epub3Writer
 		String imageId = decimalFormat.format(this.imageIndex);
 		String imageFileName = IMAGES_PATH+imageId+"."+ext;
 		this.imageFileNames.put(srcImageFileName, imageFileName);
-		String format = "image/"+ext;
-		if ("jpg".equals(ext)) format = "image/jpeg";
-		if (!format.matches("^image\\/(png|jpeg|gif)$")) LogAppender.append("画像フォーマットエラー: ("+lineNum+") "+srcImageFileName+"\n");
-		else {
-			ImageInfo imageInfo = new ImageInfo(imageId, imageId+"."+ext, format);
-			if (this.imageIndex == 1 &&  "".equals(bookInfo.coverFileName)) {
-				imageInfo.setIsCover(true);
-				isCover = true;
-			}
-			this.imageInfos.add(imageInfo);
+		ImageInfo imageInfo = new ImageInfo(imageId, imageId+"."+ext, ext);
+		if (!imageInfo.getExt().matches("^(png|jpg|gif)$")) {
+			LogAppender.append("画像フォーマットエラー: ("+lineNum+") "+srcImageFileName+"\n");
+			return null;
 		}
+		if (this.imageIndex == 1 &&  "".equals(bookInfo.coverFileName)) {
+			imageInfo.setIsCover(true);
+			isCover = true;
+		}
+		this.imageInfos.add(imageInfo);
 		//先頭に表紙ページ移動の場合でカバーページならnullを返して本文中から削除
 		if (bookInfo.insertCoverPage && isCover) return null;
 		return "../"+imageFileName;
