@@ -76,7 +76,9 @@ public class AozoraEpub3
 			
 			for (int i=0; i<args.length; i++) {
 				File srcFile = new File(args[i]);
-				BookInfo bookInfo = AozoraEpub3.getBookInfo(srcFile, aozoraConverter, encType, titleType, coverFileName, insertCoverPage);
+				String ext = srcFile.getName();
+				ext = ext.substring(ext.lastIndexOf('.')+1).toLowerCase();
+				BookInfo bookInfo = AozoraEpub3.getBookInfo(srcFile, ext, aozoraConverter, encType, titleType, coverFileName, insertCoverPage);
 				bookInfo.coverFileName = coverFileName;
 				bookInfo.insertCoverPage = insertCoverPage;
 				bookInfo.vertical = vertical;
@@ -89,7 +91,7 @@ public class AozoraEpub3
 				
 				HashMap<String, ImageInfo> zipImageFileInfos = null;
 				try {
-					if (srcFile.getName().toLowerCase().endsWith("zip")) {
+					if (!"txt".equals(ext)) {
 						zipImageFileInfos = AozoraEpub3.getZipImageInfos(srcFile);
 					}
 				} catch (Exception e) {
@@ -99,7 +101,7 @@ public class AozoraEpub3
 				
 				File outFile = getOutFile(srcFile, null, bookInfo, autoFileName, outExt);
 				AozoraEpub3.convertFile(
-						srcFile, outFile,
+						srcFile, ext, outFile,
 						aozoraConverter, epub3Writer,
 						encType, bookInfo, zipImageFileInfos);
 			}
@@ -137,13 +139,12 @@ public class AozoraEpub3
 	}
 	
 	/** 前処理で一度読み込んでタイトル等の情報を取得 */
-	static public BookInfo getBookInfo(File srcFile, AozoraEpub3Converter aozoraConverter,
+	static public BookInfo getBookInfo(File srcFile, String ext, AozoraEpub3Converter aozoraConverter,
 			String encType, BookInfo.TitleType titleType, String coverFileName, boolean insertCoverPage)
 	{
 		try {
 			//Zip内テキストファイルのパス
 			String[] textEntryNames = new String[1];
-			String ext = srcFile.getName().substring(srcFile.getName().lastIndexOf('.')+1).toLowerCase();
 			
 			InputStream is = getInputStream(srcFile, ext, textEntryNames);
 			if (is == null) {
@@ -168,7 +169,7 @@ public class AozoraEpub3
 	/** ファイルを変換
 	 * @param srcFile 変換するファイル
 	 * @param dstPath 出力先パス */
-	static public void convertFile(File srcFile, File outFile, AozoraEpub3Converter aozoraConverter, Epub3Writer epubWriter,
+	static public void convertFile(File srcFile, String ext, File outFile, AozoraEpub3Converter aozoraConverter, Epub3Writer epubWriter,
 			String encType, BookInfo bookInfo, HashMap<String, ImageInfo> zipImageFileInfos)
 	{
 		try {
@@ -178,7 +179,6 @@ public class AozoraEpub3
 			
 			//Zip内テキストファイルのパス
 			String[] textEntryNames = new String[1];
-			String ext = srcFile.getName().substring(srcFile.getName().lastIndexOf('.')+1).toLowerCase();
 			
 			//入力Stream再オープン
 			BufferedReader src = null;

@@ -752,7 +752,7 @@ public class AozoraEpub3Applet extends JApplet
 			
 			JFileChooser fileChooser = new JFileChooser(currentPath);
 			fileChooser.setDialogTitle("変換する青空文庫テキストを開く");
-			fileChooser.setFileFilter(new FileNameExtensionFilter("青空文庫テキスト(txt,zip)", new String[]{"txt","zip"}));
+			fileChooser.setFileFilter(new FileNameExtensionFilter("青空文庫テキスト(txt,zip,cbz)", new String[]{"txt","zip","cbz"}));
 			fileChooser.setMultiSelectionEnabled(true);
 			int state = fileChooser.showOpenDialog(parent);
 			switch (state) {
@@ -911,19 +911,31 @@ public class AozoraEpub3Applet extends JApplet
 		if (coverFileName.equals(this.jComboCover.getItemAt(0).toString())) coverFileName = ""; //先頭の挿絵
 		if (coverFileName.equals(this.jComboCover.getItemAt(1).toString())) coverFileName = "*"; //入力ファイルと同じ名前+.jpg/.png
 		if (coverFileName.equals(this.jComboCover.getItemAt(2).toString())) coverFileName = null; //表紙無し
+		
+		//拡張子
+		String ext = srcFile.getName();
+		ext = ext.substring(ext.lastIndexOf('.')+1).toLowerCase();
+		
 		//BookInfo取得
-		BookInfo bookInfo = AozoraEpub3.getBookInfo(
-			srcFile, this.aozoraConverter,
-			this.jComboEncType.getSelectedItem().toString(),
-			BookInfo.TitleType.values()[this.jComboTitle.getSelectedIndex()],
-			coverFileName, this.jCheckCoverPage.isSelected()
-		);
+		BookInfo bookInfo = null;
+		//cbzは画像のみ
+		if (!"cbz".equals(ext)) {
+			//テキストファイルからメタ情報や画像単独ページ情報を取得
+			bookInfo = AozoraEpub3.getBookInfo(
+				srcFile, ext, this.aozoraConverter,
+				this.jComboEncType.getSelectedItem().toString(),
+				BookInfo.TitleType.values()[this.jComboTitle.getSelectedIndex()],
+				coverFileName, this.jCheckCoverPage.isSelected()
+			);
+		}
 		
 		Epub3Writer writer = this.epub3Writer;
 		//Zip内の画像ファイル一覧を取得
 		HashMap<String, ImageInfo> zipImageFileInfos = null;
 		try {
-			if (srcFile.getName().toLowerCase().endsWith("zip")) {
+			if (!"txt".equals(ext)) {
+				if (bookInfo == null) LogAppender.append("画像のみのePubファイルを生成します\n");
+				//zip内の画像情報読み込み
 				zipImageFileInfos = AozoraEpub3.getZipImageInfos(srcFile);
 				if (bookInfo == null) {
 					//画像出力用のBookInfo生成
@@ -934,7 +946,6 @@ public class AozoraEpub3Applet extends JApplet
 					if (titleCreator[1] != null) bookInfo.creator = titleCreator[1];
 					//Writerを画像出力用派生クラスに入れ替え
 					writer = this.epub3ImageWriter;
-					LogAppender.append("画像のみのePubファイルを生成します\n");
 				}
 			}
 		} catch (Exception e) {
@@ -1033,7 +1044,7 @@ public class AozoraEpub3Applet extends JApplet
 		}*/
 		
 		AozoraEpub3.convertFile(
-			srcFile, outFile,
+			srcFile, ext, outFile,
 			this.aozoraConverter,
 			writer,
 			this.jComboEncType.getSelectedItem().toString(),

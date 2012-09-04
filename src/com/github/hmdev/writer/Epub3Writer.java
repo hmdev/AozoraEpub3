@@ -358,7 +358,23 @@ public class Epub3Writer
 				LogAppender.append("[ERROR] 表紙画像取得エラー: "+bookInfo.coverFileName+"\n");
 			}
 		}
-		if (srcFile.getName().toLowerCase().endsWith(".zip")) {
+		if (srcFile.getName().toLowerCase().endsWith(".txt")) {
+			//TODO 出力順をimageFiles順にする?
+			for(Map.Entry<String, String> e : imageFileNames.entrySet()) {
+				String srcImageFileName = e.getKey();
+				String dstImageFileName = e.getValue();
+				File imageFile = new File(srcParentPath+srcImageFileName);
+				if (imageFile.exists()) {
+					zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+dstImageFileName));
+					fis = new FileInputStream(imageFile);
+					IOUtils.copy(fis, zos);
+					zos.closeArchiveEntry();
+					fis.close();
+				} else {
+					LogAppender.append("[WARN] 画像ファイルなし: "+srcImageFileName+"\n");
+				}
+			}
+		} else {
 			int zipPathLength = 0;
 			if (zipTextFileName != null) zipPathLength = zipTextFileName.indexOf('/')+1;
 			ZipArchiveInputStream zis = new ZipArchiveInputStream(new BufferedInputStream(new FileInputStream(srcFile)), "MS932", false);
@@ -378,22 +394,6 @@ public class Epub3Writer
 			//出力されなかった画像をログ出力
 			for(Map.Entry<String, String> e : imageFileNames.entrySet()) {
 				LogAppender.append("[WARN] 画像ファイルなし: "+e.getKey()+"\n");
-			}
-		} else {
-			//TODO 出力順をimageFiles順にする?
-			for(Map.Entry<String, String> e : imageFileNames.entrySet()) {
-				String srcImageFileName = e.getKey();
-				String dstImageFileName = e.getValue();
-				File imageFile = new File(srcParentPath+srcImageFileName);
-				if (imageFile.exists()) {
-					zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+dstImageFileName));
-					fis = new FileInputStream(imageFile);
-					IOUtils.copy(fis, zos);
-					zos.closeArchiveEntry();
-					fis.close();
-				} else {
-					LogAppender.append("[WARN] 画像ファイルなし: "+srcImageFileName+"\n");
-				}
 			}
 		}
 		
