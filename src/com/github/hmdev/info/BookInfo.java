@@ -77,6 +77,8 @@ public class BookInfo
 	
 	/** 先頭に表紙ページを追加 */
 	public boolean insertCoverPage = false;
+	/** 表紙の次に目次を追加 */
+	public boolean insertTocPage = false;
 	
 	/** txtのない画像のみの場合 */
 	public boolean imageOnly = false;
@@ -277,6 +279,16 @@ public class BookInfo
 		this.insertCoverPage = insertCoverPage;
 	}
 	
+	public boolean isInsertTocPage()
+	{
+		return insertTocPage;
+	}
+
+	public void setInsertTocPage(boolean insertTocPage)
+	{
+		this.insertTocPage = insertTocPage;
+	}
+
 	public boolean isImageOnly()
 	{
 		return imageOnly;

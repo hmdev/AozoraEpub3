@@ -1,24 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
-<?oxygen RNGSchema="file:/C:/EPub/epub-revision/build/30/schema/epub-nav-30.rnc" type="compact"?>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
 <head>
-	<title>${bookInfo.Title}</title>
-	<style type="text/css">ol { list-style: none; }</style>
-#if (${bookInfo.Vertical})
-	<link rel="stylesheet" type="text/css" href="../css/vertical_font.css"/>
-	<link rel="stylesheet" type="text/css" href="../css/vertical_text.css"/>
-	<link rel="stylesheet" type="text/css" href="../css/vertical.css"/>
-#else
-	<link rel="stylesheet" type="text/css" href="../css/horizontal_font.css"/>
-	<link rel="stylesheet" type="text/css" href="../css/horizontal_text.css"/>
-	<link rel="stylesheet" type="text/css" href="../css/horizontal.css"/>
-#end
+<title>${bookInfo.Title}</title>
+<style type="text/css">
+.center {text-align:center;}
+h1 {font-size:1.5em;}
+ol {text-decoration:underline;line-height:1.5em;}
+</style>
 </head>
 <body>
 	<nav xmlns:epub="http://www.idpf.org/2007/ops" epub:type="toc" id="toc">
-		<h1>${toc_name}</h1>
-		<ol>
+		<div class="center"><h1>${toc_name}</h1></div>
+		<ul>
 #if (${bookInfo.InsertCoverPage})
 			<li class="chapter" id="toccover"><a href="cover.xhtml">${cover_name}</a></li>
 #end
@@ -27,7 +21,7 @@
 			<li class="chapter" id="toc${chapter.SectionId}"><a href="${chapter.SectionId}.xhtml">${chapter.ChapterName}</a></li>
 #end
 #end
-		</ol>
+		</ul>
 	</nav>
 </body>
 </html>

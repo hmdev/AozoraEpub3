@@ -22,16 +22,19 @@ import com.github.hmdev.util.LogAppender;
 public class Epub3ImageWriter extends Epub3Writer
 {
 	/** コピーのみのファイル */
-	/*final static String[] TEMPLATE_FILE_NAMES = new String[]{
-		"mimetype",
+	final static String[] TEMPLATE_FILE_NAMES_VERTICAL = new String[]{
 		"META-INF/container.xml",
-		OPS_PATH+CSS_PATH+"vertical_image.css",
+		OPS_PATH+CSS_PATH+"vertical_image.css"
+	};
+	final static String[] TEMPLATE_FILE_NAMES_HORIZONTAL = new String[]{
+		"META-INF/container.xml",
 		OPS_PATH+CSS_PATH+"horizontal_image.css"
 	};
 	String[] getTemplateFiles()
 	{
-		return TEMPLATE_FILE_NAMES;
-	}*/
+		if (this.bookInfo != null && this.bookInfo.vertical) return TEMPLATE_FILE_NAMES_VERTICAL;
+		return TEMPLATE_FILE_NAMES_HORIZONTAL;
+	}
 	
 	/** 出力先ePubのZipストリーム */
 	ZipArchiveOutputStream zos;
