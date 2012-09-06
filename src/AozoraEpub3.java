@@ -50,7 +50,6 @@ public class AozoraEpub3
 			boolean withIdSpan = true;
 			boolean autoYoko = true;
 			boolean gaiji32 = false;
-			String coverFileName = null;//表紙
 			boolean insertCoverPage = false;//表紙追加
 			boolean useFileName = false;//表題に入力ファイル名利用
 			BookInfo.TitleType titleType = BookInfo.TitleType.TITLE_AUTHOR;//表題
@@ -78,6 +77,9 @@ public class AozoraEpub3
 				File srcFile = new File(args[i]);
 				String ext = srcFile.getName();
 				ext = ext.substring(ext.lastIndexOf('.')+1).toLowerCase();
+				String coverFileName = null;//表紙なし
+				//String coverFileName = "";//先頭画像
+				//String coverFileName = AozoraEpub3.getSameCoverFileName(srcFile); //ファイル名と同じ
 				BookInfo bookInfo = AozoraEpub3.getBookInfo(srcFile, ext, aozoraConverter, encType, titleType, coverFileName, insertCoverPage);
 				bookInfo.coverFileName = coverFileName;
 				bookInfo.insertCoverPage = insertCoverPage;
@@ -295,4 +297,26 @@ public class AozoraEpub3
 		return zipImageInfos;
 	}
 	
+	/** 入力ファイルと同じ名前の画像を取得
+	 * png, jpg, jpegの順で探す  */
+	static public String getSameCoverFileName(File srcFile)
+	{
+		String coverFileName = null;
+		String baseFileName = srcFile.getPath();
+		baseFileName = baseFileName.substring(0, baseFileName.lastIndexOf('.'));
+		if (new File (baseFileName+".png").exists()) {
+			coverFileName = baseFileName+".png";
+		} else if (new File (baseFileName+".jpg").exists()) {
+			coverFileName = baseFileName+".jpg";
+		} else if (new File (baseFileName+".jpeg").exists()) {
+			coverFileName = baseFileName+".jpeg";
+		} else if (new File (baseFileName+".PNG").exists()) {
+			coverFileName = baseFileName+".PNG";
+		} else if (new File (baseFileName+".JPG").exists()) {
+			coverFileName = baseFileName+".JPG";
+		} else if (new File (baseFileName+".JPEG").exists()) {
+			coverFileName = baseFileName+".JPEG";
+		}
+		return coverFileName;
+	}
 }

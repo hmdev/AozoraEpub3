@@ -441,6 +441,8 @@ public class AozoraEpub3Converter
 				/*for (int i=preTitlePageBreak+1; i<firstLineStart; i++) {
 					bookInfo.addIgnoreLine(i);
 				}*/
+				//左右中央のタイトルページを目次より前に出す 出力前にsectionInfosからは削除しておく
+				bookInfo.insertTitlePage = true;
 			}
 		}
 		return bookInfo;

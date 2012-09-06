@@ -77,8 +77,12 @@ public class BookInfo
 	
 	/** 先頭に表紙ページを追加 */
 	public boolean insertCoverPage = false;
+	/** 左右中央で表しページにした場合は目次より前に出力 */
+	public boolean insertTitlePage = false;
 	/** 表紙の次に目次を追加 */
 	public boolean insertTocPage = false;
+	/** 目次縦書き */
+	public boolean tocVertical = false;
 	
 	/** txtのない画像のみの場合 */
 	public boolean imageOnly = false;
@@ -279,6 +283,16 @@ public class BookInfo
 		this.insertCoverPage = insertCoverPage;
 	}
 	
+	public boolean isInsertTitlePage()
+	{
+		return insertTitlePage;
+	}
+
+	public void setInsertTitlePage(boolean insertTitlePage)
+	{
+		this.insertTitlePage = insertTitlePage;
+	}
+
 	public boolean isInsertTocPage()
 	{
 		return insertTocPage;
@@ -287,6 +301,16 @@ public class BookInfo
 	public void setInsertTocPage(boolean insertTocPage)
 	{
 		this.insertTocPage = insertTocPage;
+	}
+
+	public boolean isTocVertical()
+	{
+		return tocVertical;
+	}
+
+	public void setTocVertical(boolean tocVertical)
+	{
+		this.tocVertical = tocVertical;
 	}
 
 	public boolean isImageOnly()

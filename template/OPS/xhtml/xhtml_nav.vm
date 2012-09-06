@@ -4,9 +4,24 @@
 <head>
 <title>${bookInfo.Title}</title>
 <style type="text/css">
+#if (${bookInfo.TocVertical})
+@page {	margin:.5em .5em 0 0; }
+html {
+	writing-mode: vertical-rl;
+	-webkit-writing-mode: vertical-rl;
+	-epub-writing-mode: vertical-rl;
+}
+h1 {font-size:1.5em;padding-top:1em;}
+ol {list-style:disc;}
+li {padding:0 .5em 0 0;}
+li a {text-decoration:none; border-right-width:1px;border-right-style:solid;padding-right: 1px;}
+#else
+@page {	margin:.5em 0 0 .5em; }
 h1 {font-size:1.5em;text-align:center;}
-ol {list-style:disc;text-decoration:underline;}
-li {padding:0.25em 0;}
+ol {list-style:disc;}
+li {padding:.5em 0 0 0;}
+li a {text-decoration:none; border-bottom-width:1px;border-bottom-style:solid;padding-right: 1px;}
+#end
 </style>
 </head>
 <body>
