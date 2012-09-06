@@ -223,6 +223,7 @@ public class Epub3Writer
 		//IDはタイトル著作者のハッシュで適当に生成
 		String title = bookInfo.title==null?"":bookInfo.title;
 		String creator = bookInfo.creator==null?"":bookInfo.creator;
+		if ("".equals(bookInfo.creator)) bookInfo.creator = null;
 		//固有ID
 		velocityContext.put("identifier", UUID.nameUUIDFromBytes((title+"-"+creator).getBytes()));
 		//目次名称

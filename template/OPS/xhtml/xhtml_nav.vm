@@ -4,15 +4,15 @@
 <head>
 <title>${bookInfo.Title}</title>
 <style type="text/css">
-.center {text-align:center;}
-h1 {font-size:1.5em;}
-ol {text-decoration:underline;line-height:1.5em;}
+h1 {font-size:1.5em;text-align:center;}
+ol {list-style:disc;text-decoration:underline;}
+li {padding:0.25em 0;}
 </style>
 </head>
 <body>
 	<nav xmlns:epub="http://www.idpf.org/2007/ops" epub:type="toc" id="toc">
-		<div class="center"><h1>${toc_name}</h1></div>
-		<ul>
+		<h1>${toc_name}</h1>
+		<ol>
 #if (${bookInfo.InsertCoverPage})
 			<li class="chapter" id="toccover"><a href="cover.xhtml">${cover_name}</a></li>
 #end
@@ -21,7 +21,7 @@ ol {text-decoration:underline;line-height:1.5em;}
 			<li class="chapter" id="toc${chapter.SectionId}"><a href="${chapter.SectionId}.xhtml">${chapter.ChapterName}</a></li>
 #end
 #end
-		</ul>
+		</ol>
 	</nav>
 </body>
 </html>

@@ -2,12 +2,14 @@
 <package xmlns="http://www.idpf.org/2007/opf" unique-identifier="pub-id" xml:lang="ja" version="3.0">
 	<metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
 		<dc:title id="title">${bookInfo.Title}</dc:title>
-		<dc:creator id="creator">${bookInfo.Creator}</dc:creator>
-		<dc:language id="pub-lang">ja</dc:language>
-		<dc:identifier id="pub-id">urn:uuid:${identifier}</dc:identifier>
 		<meta refines="#title" property="dcterms:title">${bookInfo.Title}</meta>
+#if (${bookInfo.Creator})
+		<dc:creator id="creator">${bookInfo.Creator}</dc:creator>
 		<meta refines="#creator" property="dcterms:creator">${bookInfo.Creator}</meta>
+#end
+		<dc:language id="pub-lang">ja</dc:language>
 		<meta refines="#pub-lang" property="dcterms:language">ja</meta>
+		<dc:identifier id="pub-id">urn:uuid:${identifier}</dc:identifier>
 		<meta refines="#pub-id" property="dcterms:identifier">urn:uuid:${identifier}</meta>
 		<meta property="dcterms:modified">${modified}</meta>
 #if (${bookInfo.InsertCoverPage})
