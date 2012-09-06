@@ -1,3 +1,4 @@
+import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -9,6 +10,8 @@ import java.util.HashMap;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.imageio.ImageIO;
 
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
@@ -80,7 +83,7 @@ public class AozoraEpub3
 				String coverFileName = null;//表紙なし
 				//String coverFileName = "";//先頭画像
 				//String coverFileName = AozoraEpub3.getSameCoverFileName(srcFile); //ファイル名と同じ
-				BookInfo bookInfo = AozoraEpub3.getBookInfo(srcFile, ext, aozoraConverter, encType, titleType, coverFileName, insertCoverPage);
+				BookInfo bookInfo = AozoraEpub3.getBookInfo(srcFile, ext, aozoraConverter, encType, titleType, "".equals(coverFileName), insertCoverPage);
 				bookInfo.coverFileName = coverFileName;
 				bookInfo.insertCoverPage = insertCoverPage;
 				bookInfo.vertical = vertical;
@@ -94,7 +97,7 @@ public class AozoraEpub3
 				HashMap<String, ImageInfo> zipImageFileInfos = null;
 				try {
 					if (!"txt".equals(ext)) {
-						zipImageFileInfos = AozoraEpub3.getZipImageInfos(srcFile);
+						zipImageFileInfos = AozoraEpub3.getZipImageInfos(srcFile, null, null);
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -142,7 +145,7 @@ public class AozoraEpub3
 	
 	/** 前処理で一度読み込んでタイトル等の情報を取得 */
 	static public BookInfo getBookInfo(File srcFile, String ext, AozoraEpub3Converter aozoraConverter,
-			String encType, BookInfo.TitleType titleType, String coverFileName, boolean insertCoverPage)
+			String encType, BookInfo.TitleType titleType, boolean firstImageIsCover, boolean insertCoverPage)
 	{
 		try {
 			//Zip内テキストファイルのパス
@@ -155,8 +158,10 @@ public class AozoraEpub3
 			
 			//タイトル取得
 			BufferedReader src = new BufferedReader(new InputStreamReader(is, (String)encType));
-			BookInfo bookInfo = aozoraConverter.getBookInfo(src, titleType, coverFileName, insertCoverPage);
+			BookInfo bookInfo = aozoraConverter.getBookInfo(src, titleType, firstImageIsCover, insertCoverPage);
+			bookInfo.textEntryName = textEntryNames[0];
 			is.close();
+			
 			return bookInfo;
 			
 		} catch (Exception e) {
@@ -179,17 +184,14 @@ public class AozoraEpub3
 			LogAppender.append(srcFile.getPath());
 			LogAppender.append("\n");
 			
-			//Zip内テキストファイルのパス
-			String[] textEntryNames = new String[1];
-			
 			//入力Stream再オープン
 			BufferedReader src = null;
 			if (!bookInfo.imageOnly) {
-				src = new BufferedReader(new InputStreamReader(getInputStream(srcFile, ext, textEntryNames), encType));
+				src = new BufferedReader(new InputStreamReader(getInputStream(srcFile, ext, null), encType));
 			}
 			
 			//ePub書き出し srcは中でクローズされる
-			epubWriter.write(aozoraConverter, src, srcFile, textEntryNames[0], outFile, bookInfo, zipImageFileInfos);
+			epubWriter.write(aozoraConverter, src, srcFile, outFile, bookInfo, zipImageFileInfos);
 			
 			LogAppender.append("変換完了 : ");
 			LogAppender.append(outFile.getPath());
@@ -246,7 +248,7 @@ public class AozoraEpub3
 			ArchiveEntry entry;
 			while ((entry = zis.getNextEntry()) != null) {
 				if (entry.getName().toLowerCase().endsWith(".txt")) {
-					textEntryNames[0] = entry.getName();
+					if (textEntryNames != null) textEntryNames[0] = entry.getName();
 					is = zis; break;
 				}
 			}
@@ -267,9 +269,11 @@ public class AozoraEpub3
 		return is;
 	}
 	
-	/** zip内の画像ファイルパスを取得 
+	/** zip内の画像ファイルパスを取得
+	 * @param bookInfo 表紙を保存するBookInfo
+	 * @param 表紙のエントリ名 
 	 * @throws IOException */
-	static public HashMap<String, ImageInfo> getZipImageInfos(File srcFile) throws IOException
+	static public HashMap<String, ImageInfo> getZipImageInfos(File srcFile, BookInfo bookInfo, String coverEntryName) throws IOException
 	{
 		HashMap<String, ImageInfo> zipImageInfos = new HashMap<String, ImageInfo>();
 		ZipArchiveInputStream zis = new ZipArchiveInputStream(new BufferedInputStream(new FileInputStream(srcFile)), "MS932", false);
@@ -281,7 +285,12 @@ public class AozoraEpub3
 			if (lowerName.endsWith(".png") || lowerName.endsWith(".jpg") || lowerName.endsWith(".jpeg") || lowerName.endsWith(".gif")) {
 				ImageInfo imageInfo = null;
 				try {
-					imageInfo = ImageInfo.getImageInfo(null, fileName, zis, zipIndex);
+					if (coverEntryName != null && coverEntryName.equals(fileName)) {
+						bookInfo.coverImage = ImageIO.read(zis);
+						imageInfo = ImageInfo.getImageInfo(null, fileName, bookInfo.coverImage, zipIndex);
+					} else {
+						imageInfo = ImageInfo.getImageInfo(null, fileName, zis, zipIndex);
+					}
 				} catch (Exception e) {
 					LogAppender.append("[ERROR] 画像が読み込めませんでした: ");
 					LogAppender.append(srcFile.getPath());
@@ -296,6 +305,28 @@ public class AozoraEpub3
 		
 		return zipImageInfos;
 	}
+	
+	/** Zipファイルから指定されたEntryの画像を取得
+	 * ※先頭からシークされるので遅い */
+	static public BufferedImage getZipImage(File srcFile, String coverEntryName) throws IOException
+	{
+		BufferedImage image = null;
+		ZipArchiveInputStream zis = new ZipArchiveInputStream(new BufferedInputStream(new FileInputStream(srcFile)), "MS932", false);
+		ArchiveEntry entry;
+		while ((entry = zis.getNextEntry()) != null) {
+			String fileName = entry.getName();
+			try {
+				if (coverEntryName != null && coverEntryName.equals(fileName)) {
+					image = ImageIO.read(zis);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		zis.close();
+		return image;
+	}
+	
 	
 	/** 入力ファイルと同じ名前の画像を取得
 	 * png, jpg, jpegの順で探す  */

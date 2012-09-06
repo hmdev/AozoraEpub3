@@ -5,6 +5,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.Arrays;
+import java.util.HashMap;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
@@ -39,12 +40,25 @@ public class Epub3ImageWriter extends Epub3Writer
 	/** 出力先ePubのZipストリーム */
 	ZipArchiveOutputStream zos;
 	
+	String[] sortedFileNames = null;
+	
 	/** コンストラクタ
 	 * @param templatePath epubテンプレート格納パス文字列 最後は"/"
 	 */
 	public Epub3ImageWriter(String templatePath)
 	{
 		super(templatePath);
+	}
+	
+	public void setFileNames(HashMap<String, ImageInfo> zipImageFileInfos)
+	{
+		this.sortedFileNames = new String[zipImageFileInfos.size()];
+		zipImageFileInfos.keySet().toArray(this.sortedFileNames);
+		Arrays.sort(this.sortedFileNames, new FileNameComparator());
+	}
+	public String[] getSortedFileNames()
+	{
+		return this.sortedFileNames;
 	}
 	
 	/** 本文を出力する */

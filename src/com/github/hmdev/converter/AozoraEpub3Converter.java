@@ -313,7 +313,7 @@ public class AozoraEpub3Converter
 	 * @param src 青空テキストファイルのReader
 	 * @param titleType 表題種別
 	 * @param coverFileName 表紙ファイル名 nullなら表紙無し ""は先頭ファイル "*"は同じファイル名 */
-	public BookInfo getBookInfo(BufferedReader src, TitleType titleType, String coverFileName, boolean insertCoverPage) throws IOException
+	public BookInfo getBookInfo(BufferedReader src, TitleType titleType, boolean firstImageIsCover, boolean insertCoverPage) throws IOException
 	{
 		BookInfo bookInfo = new BookInfo();
 		
@@ -337,6 +337,8 @@ public class AozoraEpub3Converter
 		String[] firstLines = new String[7];
 		//先頭行の開始行番号
 		int firstLineStart = -1;
+		
+		String firstImageFileName = null;
 		
 		//タイトルページ開始行 画像等がなければ0 タイトルなしは-1
 		int preTitlePageBreak = titleType==TitleType.NONE ? -1 : 0;
@@ -397,7 +399,29 @@ public class AozoraEpub3Converter
 			//emptyLineStart = -1;
 			
 			//2行前が改ページと画像の行かをチェックして行番号をbookInfoに保存
-			this.checkImageOnly(bookInfo, preLines, line, this.lineNum, coverFileName, insertCoverPage);
+			this.checkImageOnly(bookInfo, preLines, line, this.lineNum, insertCoverPage);
+			
+			//先頭の画像のファイル名を取得
+			if (firstImageIsCover && firstImageFileName == null) {
+				Matcher m = chukiPattern.matcher(line);
+				while (m.find()) {
+					String chukiTag = m.group();
+					String lowerChukiTag = chukiTag.toLowerCase();
+					int imageStartIdx = chukiTag.indexOf('（', 2);
+					if (imageStartIdx > -1) {
+						int imageEndIdx = chukiTag.indexOf("）");
+						int imageDotIdx = chukiTag.indexOf('.', 2);
+						//訓点送り仮名チェック ＃の次が（で.を含まない
+						if (imageDotIdx > -1 && imageDotIdx < imageEndIdx) {
+							//画像ファイル名取得
+							firstImageFileName = this.getImageChukiFileName(chukiTag, imageStartIdx);
+						}
+					} else if (lowerChukiTag.startsWith("<img")) {
+						//src=の値抽出
+						firstImageFileName = this.getImageTagFileName(chukiTag);
+					}
+				}
+			}
 			
 			//コメント行の後はタイトル取得はしない
 			if (!firstCommentStarted) {
@@ -432,6 +456,11 @@ public class AozoraEpub3Converter
 		//表題と著者を先頭行から設定
 		bookInfo.setMetaInfo(titleType, firstLines, firstLineStart, firstCommentLineNum, preTitlePageBreak);
 		
+		//先頭画像名を設定 画像がなければnullになる
+		if (firstImageIsCover) {
+			bookInfo.coverFileName = firstImageFileName;
+		}
+		
 		//左右中央指定で先頭がタイトルなら左右中央に設定
 		if (this.middleTitle) {
 			if (bookInfo.preTitlePageBreak > -1 && firstLineStart > -1) {
@@ -459,7 +488,7 @@ public class AozoraEpub3Converter
 	}
 	
 	/** 改ページ処理があったら次のセクションの情報をbookInfoに追加 */
-	private void checkImageOnly(BookInfo bookInfo, String[] preLines, String line, int lineNum, String coverFileName, boolean insertCoverPage)
+	private void checkImageOnly(BookInfo bookInfo, String[] preLines, String line, int lineNum, boolean insertCoverPage)
 	{
 		//現在の行が改ページ
 		if (preLines[0] == null) return;

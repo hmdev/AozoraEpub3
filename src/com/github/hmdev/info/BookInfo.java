@@ -1,7 +1,15 @@
 package com.github.hmdev.info;
+import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+
+import javax.imageio.ImageIO;
 
 /** タイトル著作者等のメタ情報を格納 */
 public class BookInfo
@@ -74,6 +82,8 @@ public class BookInfo
 	
 	/** 表紙ファイル名 フルパスかURL ""なら先頭の挿絵 nullなら表紙無し */
 	public String coverFileName;
+	/** 表紙イメージファイルがあれば設定され、coverFileNameより優先される */
+	public BufferedImage coverImage = null;
 	
 	/** 先頭に表紙ページを追加 */
 	public boolean insertCoverPage = false;
@@ -89,6 +99,9 @@ public class BookInfo
 	
 	/** タイトルページの改ページ行 前に改ページがなければ0 表題がなければ-1 */
 	public int preTitlePageBreak = -1;
+	
+	/** 圧縮ファイル内のテキストファイルエントリー名 */
+	public String textEntryName = null;
 	
 	/** 改ページ単位で区切られたセクションの情報を格納 */
 	//Vector<SectionInfo> vecSectionInfo;
@@ -521,4 +534,29 @@ public class BookInfo
 			if (this.creator != null && (this.creator.startsWith("―") || this.creator.startsWith("【"))) this.creator = null;
 		}
 	}
+	
+	/** ファイルまたはURLの文字列から画像を読み込んで表紙イメージとして設定 */
+	public boolean loadCoverImage(String path)
+	{
+		try {
+			InputStream is;
+			if (path.startsWith("http")) {
+				is = new BufferedInputStream(new URL(path).openStream());
+			} else {
+				File file = new File(path);
+				if (!file.exists()) return false;
+				is = new BufferedInputStream(new FileInputStream(file));
+			}
+			return loadCoverImage(is);
+		} catch (Exception e) { return false; }
+	}
+	/** 画像を読み込んで表紙イメージとして設定 */
+	public boolean loadCoverImage(InputStream is)
+	{
+		try {
+			this.coverImage = ImageIO.read(is);
+		} catch (Exception e) { e.printStackTrace(); return false; }
+		return true;
+	}
+	
 }

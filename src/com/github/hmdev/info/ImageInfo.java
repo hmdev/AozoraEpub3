@@ -1,5 +1,6 @@
 package com.github.hmdev.info;
 
+import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -79,6 +80,13 @@ public class ImageInfo
 			return new ImageInfo(id, fileName, ext, reader.getWidth(0), reader.getHeight(0), zipIndex);
 		}
 		return null;
+	}
+	
+	static public ImageInfo getImageInfo(String id, String fileName, BufferedImage image, int zipIndex) throws IOException
+	{
+		String lowerName = fileName.toLowerCase();
+		String ext = lowerName.substring(lowerName.lastIndexOf('.')+1).replaceAll("jpeg", "jpg");
+		return new ImageInfo(id, fileName, ext, image.getWidth(), image.getHeight(), zipIndex);
 	}
 	
 	public String getId()
