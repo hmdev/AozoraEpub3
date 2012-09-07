@@ -956,14 +956,18 @@ public class AozoraEpub3Applet extends JApplet
 			LogAppender.append("txt, zip, cbz 以外は変換できません\n");
 			return;
 		}
-		
+		//表紙にする挿絵の位置-1なら挿絵は使わない
+		int coverImageIndex = -1;
 		//表紙情報追加
 		String coverFileName = this.jComboCover.getEditor().getItem().toString();
-		if (coverFileName.equals(this.jComboCover.getItemAt(0).toString())) coverFileName = ""; //先頭の挿絵
-		else if (coverFileName.equals(this.jComboCover.getItemAt(1).toString())) {
+		if (coverFileName.equals(this.jComboCover.getItemAt(0).toString())) {
+			coverFileName = ""; //先頭の挿絵
+			coverImageIndex = 0;
+		} else if (coverFileName.equals(this.jComboCover.getItemAt(1).toString())) {
 			coverFileName = AozoraEpub3.getSameCoverFileName(srcFile); //入力ファイルと同じ名前+.jpg/.png
+		} else if (coverFileName.equals(this.jComboCover.getItemAt(2).toString())) {
+			coverFileName = null; //表紙無し
 		}
-		else if (coverFileName.equals(this.jComboCover.getItemAt(2).toString())) coverFileName = null; //表紙無し
 		
 		//BookInfo取得
 		BookInfo bookInfo = null;
@@ -971,15 +975,14 @@ public class AozoraEpub3Applet extends JApplet
 		//cbzは画像のみ
 		if (!"cbz".equals(ext)) {
 			//テキストファイルからメタ情報や画像単独ページ情報を取得
-			boolean firstImageIsCover = "".equals(coverFileName);
 			bookInfo = AozoraEpub3.getBookInfo(
 				srcFile, ext, this.aozoraConverter,
 				this.jComboEncType.getSelectedItem().toString(),
 				BookInfo.TitleType.values()[this.jComboTitle.getSelectedIndex()],
-				firstImageIsCover, this.jCheckCoverPage.isSelected()
+				coverImageIndex != -1, this.jCheckCoverPage.isSelected()
 			);
 			//先頭画像をテキスト内の最初の画像から取得
-			if (bookInfo != null && firstImageIsCover && bookInfo.coverFileName != null) {
+			if (bookInfo != null && coverImageIndex != -1 && bookInfo.coverFileName != null) {
 				if ("txt".equals(ext)) {
 					//txtならファイル絶対パスに変換
 					File coverImageFile = new File(srcFile.getParent()+"/"+bookInfo.coverFileName);
@@ -1030,7 +1033,7 @@ public class AozoraEpub3Applet extends JApplet
 					this.epub3ImageWriter.setFileNames(zipImageFileInfos);
 					
 					//先頭画像を取得してbookInfoに設定
-					if ("".equals(coverFileName)) {
+					if (coverImageIndex != -1) {
 						String[] fileNames = this.epub3ImageWriter.getSortedFileNames();
 						if (fileNames.length > 0) {
 							bookInfo.coverImage = AozoraEpub3.getZipImage(srcFile, fileNames[0]);
@@ -1056,8 +1059,9 @@ public class AozoraEpub3Applet extends JApplet
 		//縦書き横書き設定追加
 		bookInfo.vertical = this.jRadioVertical.isSelected();
 		
-		//表紙ページのURLを設定
+		//表紙ページの情報をbookInfoに設定
 		bookInfo.coverFileName = coverFileName;
+		bookInfo.coverImageIndex = coverImageIndex;
 		
 		//確認ページ 変換ボタン押下時にbookInfo更新
 		if (this.jCheckConfirm.isSelected()) {
@@ -1091,6 +1095,7 @@ public class AozoraEpub3Applet extends JApplet
 			bookInfo.creator = this.jConfirmDialog.jTextCreator.getText().trim();
 			//著者が空欄なら著者行もクリア
 			if (bookInfo.creator.length() == 0) bookInfo.creatorLine = -1;
+			
 		} else {
 			//確認なしなのでnullでなければbookInfo上書き
 			String[] titleCreator = AozoraEpub3.getFileTitleCreator(srcFile.getName());

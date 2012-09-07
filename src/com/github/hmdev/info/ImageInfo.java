@@ -34,18 +34,11 @@ public class ImageInfo
 	/** カバー画像ならtrue */
 	boolean isCover;
 	
-	/** 幅高さ無しの画像情報を生成 */
-	public ImageInfo(String id, String fileName, String ext)
-	{
-		this(id, fileName, ext, -1, -1, -1);
-	}
 	/** 画像の情報を生成
 	 * @param ext png jpg gif の文字列 */
-	public ImageInfo(String id, String fileName, String ext, int width, int height, int zipIndex)
+	public ImageInfo(String ext, int width, int height, int zipIndex)
 	{
 		super();
-		this.id = id;
-		this.file = fileName;
 		this.ext = ext.toLowerCase();
 		this.width = width;
 		this.height = height;
@@ -53,23 +46,23 @@ public class ImageInfo
 	}
 	
 	/** ファイルから画像情報を生成 */
-	static public ImageInfo getImageInfo(String id, String fileName, File imageFile) throws IOException
+	static public ImageInfo getImageInfo(File imageFile) throws IOException
 	{
 		BufferedInputStream bis = new BufferedInputStream(new FileInputStream(imageFile));
-		ImageInfo imageInfo = ImageInfo.getImageInfo(id, fileName, bis, -1);
+		ImageInfo imageInfo = ImageInfo.getImageInfo(bis, -1);
 		bis.close();
 		return imageInfo;
 	}
 	
 	/** 画像ストリームから画像情報を生成 */
-	static public ImageInfo getImageInfo(String id, String fileName, InputStream is) throws IOException
+	static public ImageInfo getImageInfo(InputStream is) throws IOException
 	{
-		return getImageInfo(id, fileName, is, -1);
+		return getImageInfo(is, -1);
 	}
 	/** 画像ストリームから画像情報を生成
 	 * @param zipIndex Zipファイルの場合はエントリの位置 (再読込や読み飛ばし時のファイル名比較の省略用)
 	 * @throws IOException */
-	static public ImageInfo getImageInfo(String id, String fileName, InputStream is, int zipIndex) throws IOException
+	static public ImageInfo getImageInfo(InputStream is, int zipIndex) throws IOException
 	{
 		ImageInputStream iis = ImageIO.createImageInputStream(is);
 		Iterator<ImageReader> readers = ImageIO.getImageReaders(iis);
@@ -77,16 +70,14 @@ public class ImageInfo
 			ImageReader reader = readers.next();
 			reader.setInput(iis);
 			String ext = reader.getFormatName();
-			return new ImageInfo(id, fileName, ext, reader.getWidth(0), reader.getHeight(0), zipIndex);
+			return new ImageInfo(ext, reader.getWidth(0), reader.getHeight(0), zipIndex);
 		}
 		return null;
 	}
 	
-	static public ImageInfo getImageInfo(String id, String fileName, BufferedImage image, int zipIndex) throws IOException
+	static public ImageInfo getImageInfo(String ext, BufferedImage image, int zipIndex) throws IOException
 	{
-		String lowerName = fileName.toLowerCase();
-		String ext = lowerName.substring(lowerName.lastIndexOf('.')+1).replaceAll("jpeg", "jpg");
-		return new ImageInfo(id, fileName, ext, image.getWidth(), image.getHeight(), zipIndex);
+		return new ImageInfo(ext, image.getWidth(), image.getHeight(), zipIndex);
 	}
 	
 	public String getId()

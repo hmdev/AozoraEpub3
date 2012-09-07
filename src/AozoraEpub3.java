@@ -287,9 +287,10 @@ public class AozoraEpub3
 				try {
 					if (coverEntryName != null && coverEntryName.equals(fileName)) {
 						bookInfo.coverImage = ImageIO.read(zis);
-						imageInfo = ImageInfo.getImageInfo(null, fileName, bookInfo.coverImage, zis.getCount());
+						String ext = lowerName.substring(lowerName.lastIndexOf('.')+1).replaceAll("jpeg", "jpg");
+						imageInfo = ImageInfo.getImageInfo(ext, bookInfo.coverImage, zis.getCount());
 					} else {
-						imageInfo = ImageInfo.getImageInfo(null, fileName, zis, zis.getCount());
+						imageInfo = ImageInfo.getImageInfo(zis, zis.getCount());
 					}
 				} catch (Exception e) {
 					LogAppender.append("[ERROR] 画像が読み込めませんでした: ");

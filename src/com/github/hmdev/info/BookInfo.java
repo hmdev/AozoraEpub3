@@ -84,6 +84,8 @@ public class BookInfo
 	public String coverFileName;
 	/** 表紙イメージファイルがあれば設定され、coverFileNameより優先される */
 	public BufferedImage coverImage = null;
+	/** 表紙に使う挿絵の本文愛Index -1なら使わない */
+	public int coverImageIndex = -1;
 	
 	/** 先頭に表紙ページを追加 */
 	public boolean insertCoverPage = false;

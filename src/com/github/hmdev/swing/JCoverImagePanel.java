@@ -110,10 +110,9 @@ public class JCoverImagePanel extends JPanel implements MouseMotionListener, Dro
 				@SuppressWarnings("unchecked")
 				List<File> files = (List<File>)transfer.getTransferData(DataFlavor.javaFileListFlavor);
 				if (files.size() > 0) {
-					if (bookInfo != null) {
-						bookInfo.coverFileName = files.get(0).getAbsolutePath();
-						bookInfo.loadCoverImage(bookInfo.coverFileName);
-					}
+					bookInfo.coverFileName = files.get(0).getAbsolutePath();
+					bookInfo.loadCoverImage(bookInfo.coverFileName);
+					bookInfo.coverImageIndex = -1;
 					repaint();
 				}
 			} else {
@@ -121,6 +120,7 @@ public class JCoverImagePanel extends JPanel implements MouseMotionListener, Dro
 					if (flavar.isFlavorTextType()) {
 						bookInfo.coverFileName = transfer.getTransferData(DataFlavor.stringFlavor).toString();
 						bookInfo.loadCoverImage(bookInfo.coverFileName);
+						bookInfo.coverImageIndex = -1;
 						repaint();
 					}
 				}

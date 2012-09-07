@@ -54,6 +54,7 @@ public class JConfirmDialog extends JDialog
 	{
 		JButton jButton;
 		JPanel panel;
+		Border padding0 = BorderFactory.createEmptyBorder(0, 0, 0, 0);
 		Border padding4 = BorderFactory.createEmptyBorder(4, 4, 4, 4);
 		Border titlePadding4 = BorderFactory.createEmptyBorder(0, 4, 4, 4);
 		
@@ -203,6 +204,13 @@ public class JConfirmDialog extends JDialog
 		buttonPanel.add(panel);
 		previewLeft.add(buttonPanel);
 		
+		
+		//右側プレビューパネル
+		JPanel previewRight = new JPanel();
+		previewRight.setLayout(new BoxLayout(previewRight, BoxLayout.Y_AXIS));
+		previewRight.setBorder(padding0);
+		previewOuter.add(previewRight);
+		
 		//プレビューパネル
 		panel = new JPanel();
 		panel.setBorder(BorderFactory.createEtchedBorder(1));
@@ -210,12 +218,16 @@ public class JConfirmDialog extends JDialog
 		//panel.setMaximumSize(new Dimension(150, 200));
 		panel.setPreferredSize(new Dimension(154, 200));
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-		previewOuter.add(panel);
+		previewRight.add(panel);
 		jCoverImagePanel = new JCoverImagePanel();
 		jCoverImagePanel.setMinimumSize(new Dimension(150, 200));
 		jCoverImagePanel.setMaximumSize(new Dimension(150, 200));
 		jCoverImagePanel.setPreferredSize(new Dimension(150, 200));
 		panel.add(jCoverImagePanel);
+		
+		//プレビュー操作ボタン
+		
+		
 		
 	}
 	

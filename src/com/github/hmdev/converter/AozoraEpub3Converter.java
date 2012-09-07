@@ -456,7 +456,7 @@ public class AozoraEpub3Converter
 		//表題と著者を先頭行から設定
 		bookInfo.setMetaInfo(titleType, firstLines, firstLineStart, firstCommentLineNum, preTitlePageBreak);
 		
-		//先頭画像名を設定 画像がなければnullになる
+		//先頭画像名を返却用に一時的に設定 画像がなければnullになる
 		if (firstImageIsCover) {
 			bookInfo.coverFileName = firstImageFileName;
 		}
