@@ -15,6 +15,7 @@ import javax.imageio.ImageIO;
 
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
+import org.apache.commons.compress.archivers.zip.ZipFile;
 
 import com.github.hmdev.converter.AozoraEpub3Converter;
 import com.github.hmdev.info.BookInfo;
@@ -244,7 +245,7 @@ public class AozoraEpub3
 		InputStream is = null;
 		if ("zip".equals(ext)) {
 			//Zipなら最初のtxt
-			ZipArchiveInputStream zis = new ZipArchiveInputStream(new BufferedInputStream(new FileInputStream(srcFile)), "MS932", false);
+			ZipArchiveInputStream zis = new ZipArchiveInputStream(new BufferedInputStream(new FileInputStream(srcFile), 65536), "MS932", false);
 			ArchiveEntry entry;
 			while ((entry = zis.getNextEntry()) != null) {
 				if (entry.getName().toLowerCase().endsWith(".txt")) {
@@ -276,9 +277,8 @@ public class AozoraEpub3
 	static public HashMap<String, ImageInfo> getZipImageInfos(File srcFile, BookInfo bookInfo, String coverEntryName) throws IOException
 	{
 		HashMap<String, ImageInfo> zipImageInfos = new HashMap<String, ImageInfo>();
-		ZipArchiveInputStream zis = new ZipArchiveInputStream(new BufferedInputStream(new FileInputStream(srcFile)), "MS932", false);
+		ZipArchiveInputStream zis = new ZipArchiveInputStream(new BufferedInputStream(new FileInputStream(srcFile), 65536), "MS932", false);
 		ArchiveEntry entry;
-		int zipIndex = 0;
 		while ((entry = zis.getNextEntry()) != null) {
 			String fileName = entry.getName();
 			String lowerName = entry.getName().toLowerCase();
@@ -287,9 +287,9 @@ public class AozoraEpub3
 				try {
 					if (coverEntryName != null && coverEntryName.equals(fileName)) {
 						bookInfo.coverImage = ImageIO.read(zis);
-						imageInfo = ImageInfo.getImageInfo(null, fileName, bookInfo.coverImage, zipIndex);
+						imageInfo = ImageInfo.getImageInfo(null, fileName, bookInfo.coverImage, zis.getCount());
 					} else {
-						imageInfo = ImageInfo.getImageInfo(null, fileName, zis, zipIndex);
+						imageInfo = ImageInfo.getImageInfo(null, fileName, zis, zis.getCount());
 					}
 				} catch (Exception e) {
 					LogAppender.append("[ERROR] 画像が読み込めませんでした: ");
@@ -299,7 +299,6 @@ public class AozoraEpub3
 				}
 				if (imageInfo != null) zipImageInfos.put(fileName, imageInfo);
 			}
-			zipIndex++;
 		}
 		zis.close();
 		
@@ -310,23 +309,36 @@ public class AozoraEpub3
 	 * ※先頭からシークされるので遅い */
 	static public BufferedImage getZipImage(File srcFile, String coverEntryName) throws IOException
 	{
-		BufferedImage image = null;
-		ZipArchiveInputStream zis = new ZipArchiveInputStream(new BufferedInputStream(new FileInputStream(srcFile)), "MS932", false);
-		ArchiveEntry entry;
-		while ((entry = zis.getNextEntry()) != null) {
-			String fileName = entry.getName();
-			try {
-				if (coverEntryName != null && coverEntryName.equals(fileName)) {
-					image = ImageIO.read(zis);
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+		ZipFile zf = new ZipFile(srcFile);
+		InputStream is = zf.getInputStream(zf.getEntry(coverEntryName));
+		try {
+			return ImageIO.read(is);
+		} catch (Exception e) {
+			e.printStackTrace(); 
+		} finally {
+			is.close();
 		}
-		zis.close();
-		return image;
+		return null;
+		
+		/*ZipArchiveInputStream zis = new ZipArchiveInputStream(new BufferedInputStream(new FileInputStream(srcFile), 65536), "MS932", false);
+		try {
+			ArchiveEntry entry;
+			while ((entry = zis.getNextEntry()) != null) {
+				String fileName = entry.getName();
+				try {
+					if (coverEntryName != null && coverEntryName.equals(fileName)) {
+						return ImageIO.read(zis);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		} finally {
+			zis.close();
+		}
+		return null;
+		*/
 	}
-	
 	
 	/** 入力ファイルと同じ名前の画像を取得
 	 * png, jpg, jpegの順で探す  */

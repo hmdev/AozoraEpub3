@@ -56,7 +56,7 @@ public class ImageInfo
 	static public ImageInfo getImageInfo(String id, String fileName, File imageFile) throws IOException
 	{
 		BufferedInputStream bis = new BufferedInputStream(new FileInputStream(imageFile));
-		ImageInfo imageInfo = ImageInfo.getImageInfo(null, fileName, bis, -1);
+		ImageInfo imageInfo = ImageInfo.getImageInfo(id, fileName, bis, -1);
 		bis.close();
 		return imageInfo;
 	}

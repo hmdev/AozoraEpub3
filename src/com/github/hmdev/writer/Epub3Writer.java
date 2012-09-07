@@ -304,6 +304,7 @@ public class Epub3Writer
 		//表紙ページ出力 先頭画像表示時は先頭画像は出力しない
 		if (bookInfo.insertCoverPage) {
 			ImageInfo coverPageImage = coverImageInfo;
+			//先頭画像から取得
 			if (coverPageImage == null) {
 				for (ImageInfo imageInfo2 : imageInfos) {
 					if (imageInfo2.getIsCover()) {
@@ -313,7 +314,11 @@ public class Epub3Writer
 				}
 			}
 			if (coverPageImage != null) {
-				velocityContext.put("coverImage", coverPageImage);
+				//画像が横長なら幅100% それ以外は高さ100%
+				SectionInfo sectionInfo = new SectionInfo("cover-page");
+				if (coverPageImage.getWidth()/coverPageImage.getHeight()>3/4) sectionInfo.setImageFitW(true);
+				this.velocityContext.put("sectionInfo", sectionInfo);
+				this.velocityContext.put("coverImage", coverPageImage);
 				zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+XHTML_PATH+COVER_FILE));
 				bw = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"));
 				Velocity.getTemplate(templatePath+OPS_PATH+XHTML_PATH+COVER_VM).merge(velocityContext, bw);
@@ -364,14 +369,14 @@ public class Epub3Writer
 				ImageInfo imageInfo = imageInfos.get(0);
 				if (bookInfo.coverImage != null) {
 					zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+IMAGES_PATH+imageInfo.getFile()));
-					ImageIO.write(bookInfo.coverImage, imageInfo.getExt(), zos);
+					ImageIO.write(bookInfo.coverImage, coverImageInfo.getExt(), zos);
 					zos.closeArchiveEntry();
 				} else {
 					BufferedInputStream bis;
 					if (bookInfo.coverFileName.startsWith("http")) {
-						bis = new BufferedInputStream(new URL(bookInfo.coverFileName).openStream());
+						bis = new BufferedInputStream(new URL(bookInfo.coverFileName).openStream(), 8192);
 					} else {
-						bis = new BufferedInputStream(new FileInputStream(new File(bookInfo.coverFileName)));
+						bis = new BufferedInputStream(new FileInputStream(new File(bookInfo.coverFileName)), 65536);
 					}
 					zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+IMAGES_PATH+imageInfo.getFile()));
 					this.writeImage(bis, zos, coverImageInfo);
@@ -393,13 +398,13 @@ public class Epub3Writer
 				if (imageFile.exists()) {
 					fis = new FileInputStream(imageFile);
 					zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+dstImageFileName));
-					ImageInfo imageInfo = this.getImageInfo(srcImageFileName);
+					ImageInfo imageInfo = this.getImageInfo(null, null, srcImageFileName);
 					if (imageInfo.getIsCover() && bookInfo.coverImage != null) {
 						//プレビューで編集されている場合
-						ImageIO.write(bookInfo.coverImage, "png", zos);
+						ImageIO.write(bookInfo.coverImage, imageInfo.getExt(), zos);
 					} else {
 						//イメージがなければファイルコピー
-						this.writeImage(fis, zos, imageInfo);
+						this.writeImage(new BufferedInputStream(fis, 8192), zos, imageInfo);
 					}
 					zos.closeArchiveEntry();
 					fis.close();
@@ -410,17 +415,17 @@ public class Epub3Writer
 		} else {
 			int zipPathLength = 0;
 			if (this.bookInfo.textEntryName != null) zipPathLength = this.bookInfo.textEntryName.indexOf('/')+1;
-			ZipArchiveInputStream zis = new ZipArchiveInputStream(new BufferedInputStream(new FileInputStream(srcFile)), "MS932", false);
+			ZipArchiveInputStream zis = new ZipArchiveInputStream(new BufferedInputStream(new FileInputStream(srcFile), 65536), "MS932", false);
 			ArchiveEntry entry;
 			while( (entry = zis.getNextEntry()) != null ) {
 				String entryName = entry.getName().substring(zipPathLength);
 				String dstImageFileName = imageFileNames.get(entryName);
 				if (dstImageFileName != null) {
 					zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+dstImageFileName));
-					ImageInfo imageInfo = this.getImageInfo(entryName);
+					ImageInfo imageInfo = this.getImageInfo(null, null, entryName);
 					if (imageInfo.getIsCover() && bookInfo.coverImage != null) {
 						//プレビューで編集されている場合
-						ImageIO.write(bookInfo.coverImage, "png", zos);
+						ImageIO.write(bookInfo.coverImage, imageInfo.getExt(), zos);
 					} else {
 						//イメージがなければファイルコピー
 						this.writeImage(zis, zos, imageInfo);
@@ -511,7 +516,7 @@ public class Epub3Writer
 		case PageBreakTrigger.IMAGE_PAGE_AUTO:
 			sectionInfo.setImageFit(true);
 			//画像サイズが横長なら幅に合わせる
-			ImageInfo imageInfo = this.getImageInfo(srcImageFilePath);
+			ImageInfo imageInfo = this.getImageInfo(null, null, srcImageFilePath);
 			if (imageInfo != null) {
 				//横長ならwidth100％
 				if (imageInfo.getWidth()/imageInfo.getHeight()>3/4) sectionInfo.setImageFitW(true);
@@ -634,12 +639,18 @@ public class Epub3Writer
 				String imageId = decimalFormat.format(this.imageIndex);
 				imageFileName = IMAGES_PATH+imageId+"."+ext;
 				this.imageFileNames.put(srcImageFileName, imageFileName);
-				ImageInfo imageInfo = new ImageInfo(imageId, imageId+"."+ext, ext);
-				if (this.imageIndex == 1 &&  "".equals(bookInfo.coverFileName)) {
-					imageInfo.setIsCover(true);
-					isCover = true;
+				ImageInfo imageInfo;
+				try {
+					imageInfo = this.getImageInfo(imageId, imageId+"."+ext, srcImageFileName);
+					this.imageFileInfos.put(srcImageFileName, imageInfo);
+					if (this.imageIndex == 1 &&  "".equals(bookInfo.coverFileName)) {
+						imageInfo.setIsCover(true);
+						isCover = true;
+					}
+					this.imageInfos.add(imageInfo);
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
-				this.imageInfos.add(imageInfo);
 			}
 		}
 		//先頭に表紙ページ移動の場合でカバーページならnullを返して本文中から削除
@@ -655,7 +666,7 @@ public class Epub3Writer
 	
 	/** ImageInfoを取得
 	 * zip内テキストファイルがサブフォルダ以下にある場合はnullになるので本文中のパスに親のパスをつけて再取得 */
-	public ImageInfo getImageInfo(String srcImageFilePath) throws IOException
+	public ImageInfo getImageInfo(String imageId, String imageFileName, String srcImageFilePath) throws IOException
 	{
 		ImageInfo imageInfo = null;
 		if (this.zipImageFileInfos != null) {
@@ -670,7 +681,7 @@ public class Epub3Writer
 			if (imageInfo == null) {
 				File imageFile = new File(this.srcParentPath+srcImageFilePath);
 				if (imageFile.exists()) {
-					imageInfo = ImageInfo.getImageInfo(null, srcImageFilePath, imageFile);
+					imageInfo = ImageInfo.getImageInfo(imageId, imageFileName, imageFile);
 					if (imageInfo != null) this.imageFileInfos.put(srcImageFilePath, imageInfo);
 				}
 			}
@@ -686,7 +697,7 @@ public class Epub3Writer
 		//タグ内ならそのまま出力
 		if (tagLevel > 0) return PageBreakTrigger.IMAGE_PAGE_NONE;
 		try {
-			ImageInfo imageInfo = this.getImageInfo(srcFilePath);
+			ImageInfo imageInfo = this.getImageInfo(null, srcFilePath, srcFilePath);
 			if (imageInfo == null) return PageBreakTrigger.IMAGE_PAGE_NONE;
 			
 			if (imageInfo.getWidth() >= 400 && imageInfo.getHeight() >= 600) {

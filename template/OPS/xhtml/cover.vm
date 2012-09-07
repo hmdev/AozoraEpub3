@@ -9,7 +9,11 @@
 #end
 	<title>${bookInfo.Title}</title>
 </head>
-<body class="cover">
+#if (${sectionInfo.ImageFitW})
+<body class="fit_w">
+#else
+<body class="fit_h">
+#end
 <span class="img"><img src="../images/${coverImage.File}"/></span>
 </body>
 </html>

@@ -61,18 +61,14 @@ public class Epub3ImageWriter extends Epub3Writer
 		return this.sortedFileNames;
 	}
 	
-	/** 本文を出力する */
+	/** 本文を出力する
+	 * setFileNamesで sortedFileNames が設定されている必要がある */
 	@Override
 	void writeSections(AozoraEpub3Converter converter, BufferedReader src, BufferedWriter bw) throws IOException
 	{
-		//ファイルをソート
-		String[] fileNames = new String[this.zipImageFileInfos.size()];
-		this.zipImageFileInfos.keySet().toArray(fileNames);
-		Arrays.sort(fileNames, new FileNameComparator());
-		
 		//画像xhtmlを出力
 		int pageNum = 0;
-		for (String srcFilePath : fileNames) {
+		for (String srcFilePath : this.sortedFileNames) {
 			pageNum++;
 			srcFilePath = srcFilePath.trim();
 			String fileName = this.getImageFilePath(srcFilePath, pageNum);
@@ -99,7 +95,7 @@ public class Epub3ImageWriter extends Epub3Writer
 		//画像専用指定
 		sectionInfo.setImageFit(true);
 		//画像サイズが横長なら幅に合わせる
-		ImageInfo imageInfo = this.getImageInfo(srcImageFilePath);
+		ImageInfo imageInfo = this.getImageInfo(null, null, srcImageFilePath);
 		if (imageInfo != null) {
 			if (imageInfo.getWidth()/imageInfo.getHeight()>3/4) sectionInfo.setImageFitW(true);
 		}
