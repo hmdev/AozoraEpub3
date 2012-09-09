@@ -821,6 +821,7 @@ public class AozoraEpub3Converter
 			
 			//System.out.println(m.group());
 			String target = m.group(1);
+			target = target.replaceAll("《[^》]+》", "");
 			String chuki = m.group(2);
 			String[] tags = sufChukiMap.get(chuki);
 			if (tags  == null) continue;
