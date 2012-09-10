@@ -18,7 +18,7 @@ public class ImageInfo
 {
 	/** ファイルのID 0001 */
 	String id;
-	/** ファイル名拡張子付き 0001.png */
+	/** 出力ファイル名 拡張子付き 0001.png */
 	String file;
 	/** 画像フォーマット png jpg gif */
 	String ext;

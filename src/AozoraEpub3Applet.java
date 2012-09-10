@@ -22,13 +22,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Properties;
 import java.util.Vector;
 import java.util.regex.Pattern;
 
-import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -59,8 +58,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.github.hmdev.converter.AozoraEpub3Converter;
 import com.github.hmdev.info.BookInfo;
-import com.github.hmdev.info.ImageInfo;
 import com.github.hmdev.swing.JConfirmDialog;
+import com.github.hmdev.util.ImageInfoReader;
 import com.github.hmdev.util.LogAppender;
 import com.github.hmdev.writer.Epub3ImageWriter;
 import com.github.hmdev.writer.Epub3Writer;
@@ -971,50 +970,34 @@ public class AozoraEpub3Applet extends JApplet
 		
 		//BookInfo取得
 		BookInfo bookInfo = null;
-		String zipCoverEntryName = null;
-		//cbzは画像のみ
-		if (!"cbz".equals(ext)) {
-			//テキストファイルからメタ情報や画像単独ページ情報を取得
-			bookInfo = AozoraEpub3.getBookInfo(
-				srcFile, ext, this.aozoraConverter,
-				this.jComboEncType.getSelectedItem().toString(),
-				BookInfo.TitleType.values()[this.jComboTitle.getSelectedIndex()],
-				coverImageIndex != -1, this.jCheckCoverPage.isSelected()
-			);
-			//先頭画像をテキスト内の最初の画像から取得
-			if (bookInfo != null && coverImageIndex != -1 && bookInfo.coverFileName != null) {
-				if ("txt".equals(ext)) {
-					//txtならファイル絶対パスに変換
-					File coverImageFile = new File(srcFile.getParent()+"/"+bookInfo.coverFileName);
-					if (coverImageFile.exists()) {
-						try {
-							bookInfo.coverImage = ImageIO.read(coverImageFile);
-						} catch (IOException e) { e.printStackTrace(); }
-					}
-				} else {
-					//zip,cbzならgetZipImageInfosで画像を取得するフラグを設定
-					String parent = "";
-					int idx = bookInfo.textEntryName.lastIndexOf('/');
-					if (idx > -1) {
-						//Zipのテキストのパスを画像パスに追加
-						parent = bookInfo.textEntryName.substring(0, idx+1);
-					}
-					zipCoverEntryName = parent+bookInfo.coverFileName;
-				}
-				//先頭ページ用の処理をするため元に戻しておく
-				bookInfo.coverFileName = "";
+		
+		boolean isFile = "txt".equals(ext);
+		ImageInfoReader imageInfoReader = new ImageInfoReader(isFile, srcFile);
+		try {
+			InputStream is = AozoraEpub3.getInputStream(srcFile, ext, imageInfoReader);
+			
+			//cbzは画像のみ
+			if (!"cbz".equals(ext)) {
+				//テキストファイルからメタ情報や画像単独ページ情報を取得
+				bookInfo = AozoraEpub3.getBookInfo(
+					is, imageInfoReader, this.aozoraConverter,
+					this.jComboEncType.getSelectedItem().toString(),
+					BookInfo.TitleType.values()[this.jComboTitle.getSelectedIndex()],
+					coverImageIndex != -1, this.jCheckCoverPage.isSelected()
+				);
 			}
+		} catch (Exception e) {
+			LogAppender.append("[ERROR] ファイルが読み込めませんでした\n");
+			return;
 		}
 		
 		Epub3Writer writer = this.epub3Writer;
-		//Zip内の画像ファイル一覧を取得
-		HashMap<String, ImageInfo> zipImageFileInfos = null;
 		try {
 			if (!"txt".equals(ext)) {
-				if (bookInfo == null) LogAppender.append("画像のみのePubファイルを生成します\n");
-				//zip内の画像情報読み込み
-				zipImageFileInfos = AozoraEpub3.getZipImageInfos(srcFile, bookInfo, zipCoverEntryName);
+				//Zip内の画像情報読み込み
+				imageInfoReader.loadZipImageInfos(srcFile, bookInfo == null);
 				if (bookInfo == null) {
+					LogAppender.append("画像のみのePubファイルを生成します\n");
 					//画像出力用のBookInfo生成
 					bookInfo = new BookInfo();
 					bookInfo.imageOnly = true;
@@ -1024,20 +1007,16 @@ public class AozoraEpub3Applet extends JApplet
 					//Writerを画像出力用派生クラスに入れ替え
 					writer = this.epub3ImageWriter;
 					
-					if (zipImageFileInfos.size() == 0) {
-						LogAppender.append("[ERROR] 画像が読み込めませんでした\n");
+					if (imageInfoReader.countImageFiles() == 0) {
+						LogAppender.append("[ERROR] 画像がありませんでした\n");
 						return;
 					}
 					
-					//ファイルをソート
-					this.epub3ImageWriter.setFileNames(zipImageFileInfos);
-					
+					//名前順で並び替え
+					imageInfoReader.sortImageFileNames();
 					//先頭画像を取得してbookInfoに設定
 					if (coverImageIndex != -1) {
-						String[] fileNames = this.epub3ImageWriter.getSortedFileNames();
-						if (fileNames.length > 0) {
-							bookInfo.coverImage = AozoraEpub3.getZipImage(srcFile, fileNames[0]);
-						}
+						bookInfo.coverImage = imageInfoReader.getImage(0);
 					}
 				}
 			}
@@ -1078,7 +1057,7 @@ public class AozoraEpub3Applet extends JApplet
 			this.jConfirmDialog.showDialog(
 				srcFile.getName(),
 				(dstPath!=null ? dstPath.getAbsolutePath() : srcFile.getParentFile().getAbsolutePath())+File.separator,
-				title, creator, bookInfo, coverFileName, this.jFrameParent.getLocation()
+				title, creator, bookInfo, imageInfoReader, this.jFrameParent.getLocation()
 			);
 			
 			//ダイアログが閉じた後に再開
@@ -1144,7 +1123,7 @@ public class AozoraEpub3Applet extends JApplet
 			this.aozoraConverter,
 			writer,
 			this.jComboEncType.getSelectedItem().toString(),
-			bookInfo, zipImageFileInfos
+			bookInfo, imageInfoReader
 		);
 		bookInfo.clear();
 	}

@@ -4,8 +4,6 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.util.Arrays;
-import java.util.HashMap;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
@@ -14,7 +12,6 @@ import org.apache.velocity.app.Velocity;
 import com.github.hmdev.converter.AozoraEpub3Converter;
 import com.github.hmdev.info.ImageInfo;
 import com.github.hmdev.info.SectionInfo;
-import com.github.hmdev.util.FileNameComparator;
 import com.github.hmdev.util.LogAppender;
 
 /** ePub3用のファイル一式をZipで固めたファイルを生成.
@@ -40,25 +37,12 @@ public class Epub3ImageWriter extends Epub3Writer
 	/** 出力先ePubのZipストリーム */
 	ZipArchiveOutputStream zos;
 	
-	String[] sortedFileNames = null;
-	
 	/** コンストラクタ
 	 * @param templatePath epubテンプレート格納パス文字列 最後は"/"
 	 */
 	public Epub3ImageWriter(String templatePath)
 	{
 		super(templatePath);
-	}
-	
-	public void setFileNames(HashMap<String, ImageInfo> zipImageFileInfos)
-	{
-		this.sortedFileNames = new String[zipImageFileInfos.size()];
-		zipImageFileInfos.keySet().toArray(this.sortedFileNames);
-		Arrays.sort(this.sortedFileNames, new FileNameComparator());
-	}
-	public String[] getSortedFileNames()
-	{
-		return this.sortedFileNames;
 	}
 	
 	/** 本文を出力する
@@ -68,7 +52,7 @@ public class Epub3ImageWriter extends Epub3Writer
 	{
 		//画像xhtmlを出力
 		int pageNum = 0;
-		for (String srcFilePath : this.sortedFileNames) {
+		for (String srcFilePath : this.imageInfoReader.getImageFileNames()) {
 			pageNum++;
 			srcFilePath = srcFilePath.trim();
 			String fileName = this.getImageFilePath(srcFilePath, pageNum);
@@ -95,7 +79,7 @@ public class Epub3ImageWriter extends Epub3Writer
 		//画像専用指定
 		sectionInfo.setImageFit(true);
 		//画像サイズが横長なら幅に合わせる
-		ImageInfo imageInfo = this.getImageInfo(srcImageFilePath);
+		ImageInfo imageInfo = this.imageInfoReader.getImageInfo(srcImageFilePath);
 		if (imageInfo != null) {
 			if ((double)imageInfo.getWidth()/imageInfo.getHeight() >= 3.0/4) sectionInfo.setImageFitW(true);
 		}
@@ -115,22 +99,21 @@ public class Epub3ImageWriter extends Epub3Writer
 	public String getImageFilePath(String srcImageFileName, int lineNum)
 	{
 		boolean isCover = false;
-		this.imageIndex++;
+		this.imageIndex++; //xhtmlと画像ファイル名の番号を合わせるため先に++
 		String ext = "";
 		try { ext = srcImageFileName.substring(srcImageFileName.lastIndexOf('.')+1).toLowerCase(); } catch (Exception e) {}
 		String imageId = decimalFormat.format(this.imageIndex);
 		String imageFileName = IMAGES_PATH+imageId+"."+ext;
-		this.imageFileNames.put(srcImageFileName, imageFileName);
 		ImageInfo imageInfo;
 		try {
-			imageInfo = this.getImageInfo(srcImageFileName);
+			imageInfo = this.imageInfoReader.getImageInfo(srcImageFileName);
 			imageInfo.setId(imageId);
-			imageInfo.setId(imageId+"."+ext);
-			if (!imageInfo.getExt().matches("^(png|jpg|gif)$")) {
+			imageInfo.setFile(imageId+"."+ext);
+			if (!imageInfo.getExt().matches("^(png|jpeg|gif)$")) {
 				LogAppender.append("画像フォーマットエラー: ("+lineNum+") "+srcImageFileName+"\n");
 				return null;
 			}
-			if (this.imageIndex == 1 &&  "".equals(bookInfo.coverFileName)) {
+			if (this.imageIndex == bookInfo.coverImageIndex) {
 				imageInfo.setIsCover(true);
 				isCover = true;
 			}

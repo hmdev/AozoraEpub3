@@ -25,6 +25,7 @@ import javax.swing.JTextField;
 import javax.swing.border.Border;
 
 import com.github.hmdev.info.BookInfo;
+import com.github.hmdev.util.ImageInfoReader;
 
 /**
  * 変換前確認ダイアログ
@@ -232,7 +233,7 @@ public class JConfirmDialog extends JDialog
 	}
 	
 	/** 確認ダイアログを表示 */
-	public void showDialog(String srcFile, String dstPath, String title, String creator, BookInfo bookInfo, String coverFileName, Point location)
+	public void showDialog(String srcFile, String dstPath, String title, String creator, BookInfo bookInfo, ImageInfoReader imageInfoReader, Point location)
 	{
 		this.jTextSrcFileName.setText(srcFile);
 		this.jTextSrcFileName.setCaretPosition(0);
@@ -246,9 +247,11 @@ public class JConfirmDialog extends JDialog
 		
 		//プレビュー表示
 		this.jCoverImagePanel.clear();
-		if (bookInfo.coverImage == null && coverFileName != null && !"".equals(coverFileName)) {
-			bookInfo.loadCoverImage(coverFileName);
-		}
+		try {
+			if (bookInfo.coverImageIndex >= 0) {
+				bookInfo.coverImage = imageInfoReader.getImage(0);
+			}
+		} catch (Exception e) { e.printStackTrace(); }
 		this.jCoverImagePanel.setBookInfo(bookInfo);
 		
 		//本情報設定ダイアログ表示
