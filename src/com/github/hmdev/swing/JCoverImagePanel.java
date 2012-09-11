@@ -35,13 +35,14 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 	private BufferedImage previewImage; 
 	
 	private double scale = -1;
-	private int offsetX = Integer.MIN_VALUE;
-	private int offsetY = Integer.MIN_VALUE;
+	private int offsetX = 0;
+	private int offsetY = 0;
 	
 	private int fitType = 0;
 	final static int FIT_ALL = 0;
 	final static int FIT_W = 1;
 	final static int FIT_H = 2;
+	final static int FIT_ZOOM = 3;
 	
 	private int startX = 0;
 	private int startY = 0;
@@ -60,56 +61,27 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 		super.paint(g);
 		//g.clearRect(0, 0, this.getWidth(), this.getHeight());
 		if (this.bookInfo != null && this.bookInfo.coverImage != null) {
-			double scale = 1;
-			switch (this.fitType) {
-			case FIT_ALL:
-				scale = Math.min((double)this.getWidth()/bookInfo.coverImage.getWidth(), (double)this.getHeight()/this.bookInfo.coverImage.getHeight()); break;
-			case FIT_W:
-				scale = (double)this.getWidth()/bookInfo.coverImage.getWidth(); break;
-			case FIT_H:
-				scale = (double)this.getHeight()/this.bookInfo.coverImage.getHeight(); break;
-			}
-			if (this.previewImage == null || this.scale != scale) {
-				this.scale = scale;
-				this.createPreviewImage(scale);
+			if (this.scale <= 0) this.setScale();
+			if (this.previewImage == null) {
+				this.createPreviewImage(this.scale);
 			}
 			if (this.previewImage != null) {
 				int minX = this.getWidth()-this.previewImage.getWidth();
 				int maxX = 0;
 				int x = minX/2;
-				if (minX >= 0) {
-					this.offsetX = Integer.MIN_VALUE;
-				} else if (this.offsetX != Integer.MIN_VALUE) {
-					x = Math.max(minX, Math.min(maxX, this.offsetX));
-					this.offsetX = x;
-				}
+				if (minX < 0) x = Math.max(minX, Math.min(maxX, this.offsetX));
+				this.offsetX = x;
 				int minY = this.getHeight()-this.previewImage.getHeight();
 				int maxY = 0;
 				int y = minY/2;
-				if (minY >= 0) {
-					y = 0;
-					this.offsetY = Integer.MIN_VALUE;
-				} else if (this.offsetY != Integer.MIN_VALUE) {
-					y = Math.max(minY,  Math.min(maxY, this.offsetY));
-					this.offsetY = y;
-				}
+				if (minY < 0) y = Math.max(minY,  Math.min(maxY, this.offsetY));
+				else y = 0;
+				this.offsetY = y;
 				g.drawImage(this.previewImage, x, y, this);
 			}
 		}
 	}
 	
-	/** 画像ファイルを設定
-	 * 画像入れ替え時もこれで行う
-	 * プレビューはpaintで生成 */
-	public void setBookInfo(BookInfo bookInfo)
-	{
-		this.bookInfo = bookInfo;
-		this.previewImage = null;
-		this.scale = -1;
-		this.offsetX = Integer.MIN_VALUE;
-		this.offsetY = Integer.MIN_VALUE;
-		this.repaint();
-	}
 	/** プレビュー用の小さい画像を生成 */
 	private void createPreviewImage(double scale)
 	{
@@ -124,22 +96,67 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 		this.previewImage = previewImage;
 	}
 	
+	/** 画像ファイルを設定
+	 * 画像入れ替え時もこれで行う
+	 * プレビューはpaintで生成 */
+	public void setBookInfo(BookInfo bookInfo)
+	{
+		this.bookInfo = bookInfo;
+		this.previewImage = null;
+		this.offsetX = 0;
+		this.offsetY = 0;
+		if (this.fitType == FIT_ZOOM) this.fitType = FIT_ALL;
+		this.setScale();
+		this.repaint();
+	}
+	/** 幅高さに合わせる */
 	public void setFitType(int fitType)
 	{
 		this.fitType = fitType;
 		this.previewImage = null;
-		this.scale = -1;
-		this.offsetX = Integer.MIN_VALUE;
-		this.offsetY = Integer.MIN_VALUE;
+		this.offsetX = 0;
+		this.offsetY = 0;
+		this.setScale();
+		this.repaint();
+	}
+	/** 倍率変更 */
+	public void setZoom(double zoom)
+	{
+		this.fitType = FIT_ZOOM;
+		this.previewImage = null;
+		this.scale *= zoom;
+		this.offsetX *= zoom;
+		this.offsetY *= zoom;
 		this.repaint();
 	}
 	
+	private void setScale()
+	{
+		if (bookInfo.coverImage == null) return;
+		switch (this.fitType) {
+		case FIT_ALL:
+			this.scale = Math.min((double)this.getWidth()/bookInfo.coverImage.getWidth(), (double)this.getHeight()/this.bookInfo.coverImage.getHeight()); break;
+		case FIT_W:
+			this.scale = (double)this.getWidth()/bookInfo.coverImage.getWidth(); break;
+		case FIT_H:
+			this.scale = (double)this.getHeight()/this.bookInfo.coverImage.getHeight(); break;
+		}
+	}
+	
+	/** 画像範囲が変更されているか 表紙がなければfalse */
+	public boolean isModified()
+	{
+		if (bookInfo.coverImage == null) return false;
+		//トリミングなし
+		double scale = Math.min((double)this.getWidth()/bookInfo.coverImage.getWidth(), (double)this.getHeight()/this.bookInfo.coverImage.getHeight());
+		return this.scale != scale;
+		
+	}
 	/** 編集された表紙を取得 */
 	public BufferedImage getModifiedImage()
 	{
 		//表紙なし
 		if (this.bookInfo.coverFileName == null && this.bookInfo.coverImageIndex == -1) return null;
-		
 		//トリミングなし
 		double scale = Math.min((double)this.getWidth()/bookInfo.coverImage.getWidth(), (double)this.getHeight()/this.bookInfo.coverImage.getHeight());
 		if (this.scale == scale) return null;
@@ -149,9 +166,9 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 		int coverH = 800;
 		double coverScale = (double)coverW/this.getWidth() * this.scale;
 		int x = 0;
-		if (this.offsetX != Integer.MIN_VALUE && this.getWidth() < this.previewImage.getWidth()) x = (int)(this.offsetX * (double)coverW/this.getWidth());
+		if (this.getWidth() < this.previewImage.getWidth()) x = (int)(this.offsetX * (double)coverW/this.getWidth());
 		int y = 0;
-		if (this.offsetY != Integer.MIN_VALUE && this.getHeight() < this.previewImage.getHeight()) y = (int)(this.offsetY * (double)coverH/this.getHeight());
+		if (this.getHeight() < this.previewImage.getHeight()) y = (int)(this.offsetY * (double)coverH/this.getHeight());
 		BufferedImage coverImage = new BufferedImage(coverW, coverH, BufferedImage.TYPE_INT_RGB);
 		Graphics2D g2 = coverImage.createGraphics();
 		try {
@@ -226,13 +243,9 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 	public void mousePressed(MouseEvent e)
 	{
 		this.startX = e.getX();
-		if (this.offsetX == Integer.MIN_VALUE) {
-			this.startX -= (this.getWidth()-this.previewImage.getWidth())/2;
-		} else {
-			this.startX -= this.offsetX;
-		}
+		this.startX -= this.offsetX;
 		this.startY = e.getY();
-		if (this.offsetY != Integer.MIN_VALUE) this.startY -= this.offsetY;
+		if (this.offsetY != 0) this.startY -= this.offsetY;
 	}
 	@Override
 	public void mouseReleased(MouseEvent e)

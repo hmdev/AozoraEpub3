@@ -573,7 +573,7 @@ public class AozoraEpub3Applet extends JApplet
 		////////////////////////////////////////////////////////////////
 		//確認ダイアログ
 		jConfirmDialog = new JConfirmDialog((JApplet)this,
-			iconImage, AozoraEpub3Applet.class.getResource("images")
+			iconImage, AozoraEpub3Applet.class.getResource("images/icon.png").toString().replaceFirst("/icon\\.png", "/")
 		);
 		
 		////////////////////////////////////////////////////////////////
@@ -1077,7 +1077,7 @@ public class AozoraEpub3Applet extends JApplet
 				bookInfo.coverImage = coverImage;
 				bookInfo.coverFileName = null;
 				//元の表紙は残す
-				bookInfo.coverImageIndex = -1;
+				if (this.jConfirmDialog.jCheckReplaceCover.isSelected()) bookInfo.coverImageIndex = -1;
 			} else {
 				bookInfo.coverImage = null;
 			}

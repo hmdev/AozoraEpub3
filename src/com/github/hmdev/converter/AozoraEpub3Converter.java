@@ -1550,7 +1550,10 @@ public class AozoraEpub3Converter
 		}
 		printLineBuffer(out, buf, lineNum, true);
 		
-		this.setPageBreakTrigger(PAGEBREAK_NOCHAPTER);
+		//タイトル寄り前なら別処理
+		if (this.lineNum < this.bookInfo.titleLine && this.middleTitle)
+			this.setPageBreakTrigger(PAGEBREAK_MIDDLE);
+		else this.setPageBreakTrigger(PAGEBREAK_NOCHAPTER);
 	}
 	
 	////////////////////////////////////////////////////////////////
