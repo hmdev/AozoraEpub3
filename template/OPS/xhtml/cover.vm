@@ -14,6 +14,6 @@
 #else
 <body class="fit_h">
 #end
-<span class="img"><img src="../images/${coverImage.File}"/></span>
+<span class="img"><img src="../images/${coverImage.OutFileName}"/></span>
 </body>
 </html>

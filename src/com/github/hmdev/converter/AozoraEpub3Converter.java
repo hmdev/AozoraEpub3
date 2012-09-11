@@ -315,7 +315,7 @@ public class AozoraEpub3Converter
 	 * @param imageInfos テキスト内の画像ファイル名を格納して返却
 	 * @param titleType 表題種別
 	 * @param coverFileName 表紙ファイル名 nullなら表紙無し ""は先頭ファイル "*"は同じファイル名 */
-	public BookInfo getBookInfo(BufferedReader src, ImageInfoReader imageInfoReader, TitleType titleType, boolean firstImageIsCover, boolean insertCoverPage) throws IOException
+	public BookInfo getBookInfo(BufferedReader src, ImageInfoReader imageInfoReader, TitleType titleType) throws IOException
 	{
 		BookInfo bookInfo = new BookInfo();
 		
@@ -399,7 +399,7 @@ public class AozoraEpub3Converter
 			//emptyLineStart = -1;
 			
 			//2行前が改ページと画像の行かをチェックして行番号をbookInfoに保存
-			this.checkImageOnly(bookInfo, preLines, line, this.lineNum, insertCoverPage);
+			this.checkImageOnly(bookInfo, preLines, line, this.lineNum);
 			
 			//画像のファイル名の順番を格納
 			Matcher m = chukiPattern.matcher(line);
@@ -485,7 +485,7 @@ public class AozoraEpub3Converter
 	}
 	
 	/** 改ページ処理があったら次のセクションの情報をbookInfoに追加 */
-	private void checkImageOnly(BookInfo bookInfo, String[] preLines, String line, int lineNum, boolean insertCoverPage)
+	private void checkImageOnly(BookInfo bookInfo, String[] preLines, String line, int lineNum)
 	{
 		//現在の行が改ページ
 		if (preLines[0] == null) return;
@@ -1012,7 +1012,7 @@ public class AozoraEpub3Converter
 						this.setPageBreakTrigger(PAGEBREAK_MIDDLE);
 					} else if (bookInfo.isImageSectionLine(lineNum+1)) {
 						//次の行が画像単ページの表紙
-						if (writer.getImageIndex() == 0 && "".equals(bookInfo.coverFileName) && bookInfo.insertCoverPage) {
+						if (writer.getImageIndex() == bookInfo.coverImageIndex && bookInfo.insertCoverPage) {
 							//先頭画像で表紙に移動なら改ページしない
 							this.setPageBreakTrigger(null);
 						} else {

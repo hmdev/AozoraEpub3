@@ -5,6 +5,8 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Vector;
@@ -12,9 +14,10 @@ import java.util.Vector;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.compress.archivers.ArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
+import org.apache.commons.compress.archivers.zip.ZipFile;
 
-import com.github.hmdev.converter.PageBreakTrigger;
 import com.github.hmdev.info.ImageInfo;
 
 /**
@@ -35,9 +38,9 @@ public class ImageInfoReader
 	String srcParentPath = null;
 	
 	/** Zipならzip内テキストのentry */
-	String zipTextEntry = null;
+	public String zipTextEntry = null;
 	/** Zipならzip内テキストの親entry ルートならnull */
-	String zipTextParentPath = "";
+	public String zipTextParentPath = "";
 	
 	/** 出力順にファイル名を格納 imageFileInfosのkeyと同じ文字列 */
 	Vector<String> imageFileNames;
@@ -180,19 +183,21 @@ public class ImageInfoReader
 	
 	
 	/** ファイル名から画像を取得
+	 * 拡張子変更等は外側で修正しておく
+	 * ファイルシステムまたはZipファイルから指定されたファイル名の画像を取得
 	 * @param srcImageFileName ファイル名 Zipならエントリ名
-	 * 
-	 * Zipファイルから指定されたEntryの画像を取得
 	 * ※先頭からシークされるので遅い */
 	public BufferedImage getImage(String srcImageFileName) throws IOException
 	{
 		if (this.isFile) {
-			BufferedInputStream bis = new BufferedInputStream(new FileInputStream(new File(this.srcParentPath+srcImageFileName)), 65536);
+			File file = new File(this.srcParentPath+srcImageFileName);
+			if (!file.exists()) return null; 
+			BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file), 8192);
 			try {
 				return ImageIO.read(bis);
 			} finally { bis.close(); }
 		} else {
-			ZipArchiveInputStream zis = new ZipArchiveInputStream(new BufferedInputStream(new FileInputStream(srcFile), 65536), "MS932", false);
+			/*ZipArchiveInputStream zis = new ZipArchiveInputStream(new BufferedInputStream(new FileInputStream(srcFile), 65536), "MS932", false);
 			try {
 				ArchiveEntry entry;
 				while ((entry = zis.getNextEntry()) != null) {
@@ -207,39 +212,36 @@ public class ImageInfoReader
 				}
 			} finally {
 				zis.close();
-			}
-			/*ZipFile zf = new ZipFile(this.srcFile);
-			ZipArchiveEntry entry = zf.getEntry(this.zipTextParentPath+srcImageFileName);
+			}*/
+			ZipFile zf = new ZipFile(this.srcFile, "MS932");
+			ZipArchiveEntry entry = zf.getEntry(srcImageFileName);
+			if (entry == null) return null;
 			InputStream is = zf.getInputStream(entry);
 			try {
 				return ImageIO.read(is);
 			} catch (Exception e) {
-				e.printStackTrace(); 
+				e.printStackTrace();
 			} finally {
 				is.close();
-			}*/
+			}
 		}
 		return null;
 	}
 	
-	/** 画像が単一ページ画像にできるかチェック
-	 * @param srcFilePath テキスト内の画像相対パス文字列
-	 * @throws IOException */
-	public int getImagePageType(String srcFilePath, int tagLevel)
+	/** ファイルまたはURLの文字列から画像を読み込む
+	 * 読み込めなければnull */
+	static public BufferedImage loadImage(String path)
 	{
-		//タグ内ならそのまま出力
-		if (tagLevel > 0) return PageBreakTrigger.IMAGE_PAGE_NONE;
 		try {
-			ImageInfo imageInfo = this.getImageInfo(srcFilePath);
-			if (imageInfo == null) return PageBreakTrigger.IMAGE_PAGE_NONE;
-			
-			if (imageInfo.getWidth() >= 400 && imageInfo.getHeight() >= 600) {
-				if ((double)imageInfo.getWidth()/imageInfo.getHeight() > 3.0/4)
-					return PageBreakTrigger.IMAGE_PAGE_W;
-				else return PageBreakTrigger.IMAGE_PAGE_H;
+			InputStream is;
+			if (path.startsWith("http")) {
+				is = new BufferedInputStream(new URL(path).openStream(), 8192);
+			} else {
+				File file = new File(path);
+				if (!file.exists()) return null;
+				is = new BufferedInputStream(new FileInputStream(file), 8192);
 			}
-		} catch (Exception e) { e.printStackTrace(); }
-		return PageBreakTrigger.IMAGE_PAGE_NONE;
+			return ImageIO.read(is);
+		} catch (Exception e) { return null; }
 	}
-	
 }

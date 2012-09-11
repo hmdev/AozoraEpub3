@@ -50,9 +50,9 @@
 #end
 #foreach($image in ${images})
 #if ($image.IsCover)
-		<item id="img$image.Id" href="images/$image.File" media-type="$image.Format" properties="cover-image"/>
+		<item id="img${image.Id}" href="images/${image.OutFileName}" media-type="${image.Format}" properties="cover-image"/>
 #else
-		<item id="img$image.Id" href="images/$image.File" media-type="$image.Format"/>
+		<item id="img${image.Id}" href="images/${image.OutFileName}" media-type="${image.Format}"/>
 #end
 #end
 		<item href="toc.ncx" id="ncx" media-type="application/x-dtbncx+xml"/>

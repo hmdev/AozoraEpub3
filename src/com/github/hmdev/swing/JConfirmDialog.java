@@ -9,6 +9,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.swing.BorderFactory;
@@ -51,7 +53,31 @@ public class JConfirmDialog extends JDialog
 	/** 変更前確認チェック */
 	public JCheckBox jCheckConfirm2;
 	
-	public JConfirmDialog(final JApplet applet, Image iconImage, URL replaceImage, URL applyImage, URL cancelImage)
+	////////////////////////////////
+	//Preview
+	/** 前の画像 */
+	JButton jButtonPrev;
+	/** 次の画像 */
+	JButton jButtonNext;
+	
+	/** プレビュー全体を表示 */
+	//JButton jButtonFit;
+	/** 横を合せる */
+	JButton jButtonFitW;
+	/** 縦を合せる */
+	JButton jButtonFitH;
+	
+	/** 移動モード */
+	//JButton jButtonMove;
+	/** 範囲選択モード */
+	//JButton jButtonRange;
+	/** 表紙削除 */
+	JButton jButtonDelete;
+	
+	BookInfo bookInfo;
+	ImageInfoReader imageInfoReader;
+	
+	public JConfirmDialog(final JApplet applet, Image iconImage, URL imageURL)
 	{
 		JButton jButton;
 		JPanel panel;
@@ -152,7 +178,7 @@ public class JConfirmDialog extends JDialog
 		panel.setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0));
 		jButton = new JButton();
 		jButton.setPreferredSize(new Dimension(32, 32));
-		jButton.setIcon(new ImageIcon(replaceImage));
+		try { jButton.setIcon(new ImageIcon(new URL(imageURL.toString()+"/replace.png"))); } catch (MalformedURLException e1) {}
 		jButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -178,7 +204,7 @@ public class JConfirmDialog extends JDialog
 		buttonPanel.add(panel);
 		//変換実行
 		jButton = new JButton("変換実行");
-		jButton.setIcon(new ImageIcon(applyImage));
+		try { jButton.setIcon(new ImageIcon(new URL(imageURL.toString()+"/apply.png"))); } catch (MalformedURLException e1) {}
 		jButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (jTextTitle.getText().replaceFirst("^[ |　]+", "").replaceFirst("[ |　]+$", "").length() == 0) {
@@ -194,7 +220,7 @@ public class JConfirmDialog extends JDialog
 		//キャンセル
 		panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		jButton = new JButton("キャンセル");
-		jButton.setIcon(new ImageIcon(cancelImage));
+		try { jButton.setIcon(new ImageIcon(new URL(imageURL.toString()+"/cancel.png"))); } catch (MalformedURLException e1) {}
 		jButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				canceled = true;
@@ -215,8 +241,6 @@ public class JConfirmDialog extends JDialog
 		//プレビューパネル
 		panel = new JPanel();
 		panel.setBorder(BorderFactory.createEtchedBorder(1));
-		//panel.setMinimumSize(new Dimension(150, 200));
-		//panel.setMaximumSize(new Dimension(150, 200));
 		panel.setPreferredSize(new Dimension(154, 200));
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 		previewRight.add(panel);
@@ -226,13 +250,134 @@ public class JConfirmDialog extends JDialog
 		jCoverImagePanel.setPreferredSize(new Dimension(150, 200));
 		panel.add(jCoverImagePanel);
 		
+		//操作パネル
+		panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		previewRight.add(panel);
 		//プレビュー操作ボタン
+		jButtonPrev = new JButton();
+		jButtonPrev.setBorder(padding0);
+		jButtonPrev.setPreferredSize(new Dimension(24, 24));
+		try { jButtonPrev.setIcon(new ImageIcon(new URL(imageURL.toString()+"/prev.png"))); } catch (MalformedURLException e1) {}
+		jButtonPrev.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) { movePreviewImage(-1); }
+		});
+		panel.add(jButtonPrev);
+		jButtonNext = new JButton();
+		jButtonNext.setBorder(padding0);
+		jButtonNext.setPreferredSize(new Dimension(24, 24));
+		try { jButtonNext.setIcon(new ImageIcon(new URL(imageURL.toString()+"/next.png"))); } catch (MalformedURLException e1) {}
+		jButtonNext.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) { movePreviewImage(1); }
+		});
+		panel.add(jButtonNext);
+		///表示範囲調整
+		/*jButtonFit = new JButton();
+		jButtonFit.setBorder(padding0);
+		jButtonFit.setPreferredSize(new Dimension(24, 24));
+		try { jButtonFit.setIcon(new ImageIcon(new URL(imageURL.toString()+"/arrow_out.png"))); } catch (MalformedURLException e1) {}
+		jButtonFit.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) { fitPreviewImage(JCoverImagePanel.FIT_ALL); }
+		});
+		panel.add(jButtonFit);*/
+		jButtonFitW = new JButton();
+		jButtonFitW.setBorder(padding0);
+		jButtonFitW.setPreferredSize(new Dimension(24, 24));
+		try { jButtonFitW.setIcon(new ImageIcon(new URL(imageURL.toString()+"/arrow_horizontal.png"))); } catch (MalformedURLException e1) {}
+		jButtonFitW.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) { fitPreviewImage(JCoverImagePanel.FIT_W); }
+		});
+		panel.add(jButtonFitW);
+		jButtonFitH = new JButton();
+		jButtonFitH.setBorder(padding0);
+		jButtonFitH.setPreferredSize(new Dimension(24, 24));
+		try { jButtonFitH.setIcon(new ImageIcon(new URL(imageURL.toString()+"/arrow_vertical.png"))); } catch (MalformedURLException e1) {}
+		jButtonFitH.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) { fitPreviewImage(JCoverImagePanel.FIT_H); }
+		});
+		panel.add(jButtonFitH);
+		//移動
+		/*jButtonMove = new JButton("＋");
+		jButtonMove.setBorder(padding0);
+		jButtonMove.setPreferredSize(new Dimension(28, 24));
+		jButtonMove.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {  }
+		});
+		panel.add(jButtonMove);
 		
+		//範囲拡大
+		jButtonRange = new JButton("□");
+		jButtonRange.setBorder(padding0);
+		jButtonRange.setPreferredSize(new Dimension(28, 24));
+		jButtonRange.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {  }
+		});
+		panel.add(jButtonRange);*/
 		
+		//拡大
 		
+		//縮小
+		
+		//削除
+		jButtonDelete = new JButton();
+		jButtonDelete.setBorder(padding0);
+		jButtonDelete.setPreferredSize(new Dimension(24, 24));
+		try { jButtonDelete.setIcon(new ImageIcon(new URL(imageURL.toString()+"/delete.png"))); } catch (MalformedURLException e1) {}
+		jButtonDelete.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) { deleteCover(); }
+		});
+		panel.add(jButtonDelete);
 	}
 	
-	/** 確認ダイアログを表示 */
+	void checkPreviewControlEnabled()
+	{
+		int count = this.imageInfoReader.countImageFiles();
+		this.jButtonPrev.setEnabled(count > 0 && this.bookInfo.coverImageIndex > 0);
+		this.jButtonNext.setEnabled(count > 0 && this.bookInfo.coverImageIndex < count-1);
+		//this.jButtonMove.setEnabled(this.bookInfo.coverImage != null || this.bookInfo.coverImageIndex > 0);
+		//this.jButtonRange.setEnabled(this.bookInfo.coverImage != null || this.bookInfo.coverImageIndex > 0);
+		//this.jButtonDelete.setEnabled(this.bookInfo.coverImage != null || this.bookInfo.coverImageIndex > 0);
+	}
+	
+	void movePreviewImage(int offset)
+	{
+		this.bookInfo.coverImageIndex += offset;
+		try {
+			bookInfo.coverImage = imageInfoReader.getImage(bookInfo.coverImageIndex);
+			jCoverImagePanel.setBookInfo(bookInfo);
+		} catch (IOException e) {
+			e.printStackTrace();
+			this.bookInfo.coverImage = null;
+			this.bookInfo.coverImageIndex = -1;
+			this.jCoverImagePanel.setBookInfo(this.bookInfo);
+		}
+		this.checkPreviewControlEnabled();
+	}
+	
+	void fitPreviewImage(int fitType)
+	{
+		this.jCoverImagePanel.setFitType(fitType);
+	}
+	
+	/** 表紙削除 */
+	void deleteCover()
+	{
+		this.bookInfo.coverFileName = null;
+		this.bookInfo.coverImage = null;
+		this.bookInfo.coverImageIndex = -1;
+		this.jCoverImagePanel.setBookInfo(this.bookInfo);
+		this.checkPreviewControlEnabled();
+	}
+	
+	/** 確認ダイアログを表示
+	 * @param location ダイアログ表示位置 */
 	public void showDialog(String srcFile, String dstPath, String title, String creator, BookInfo bookInfo, ImageInfoReader imageInfoReader, Point location)
 	{
 		this.jTextSrcFileName.setText(srcFile);
@@ -242,17 +387,24 @@ public class JConfirmDialog extends JDialog
 		this.jTextTitle.setText(title);
 		this.jTextCreator.setText(creator);
 		
+		this.bookInfo = bookInfo;
+		this.imageInfoReader = imageInfoReader;
+		
 		//変更前確認設定用
 		this.jCheckConfirm2.setSelected(true);
 		
 		//プレビュー表示
-		this.jCoverImagePanel.clear();
 		try {
-			if (bookInfo.coverImageIndex >= 0) {
+			if (bookInfo.coverImageIndex >= 0 && imageInfoReader.countImageFiles() > 0) {
 				bookInfo.coverImage = imageInfoReader.getImage(0);
+			} else if (bookInfo.coverImage == null && bookInfo.coverFileName != null) {
+				bookInfo.loadCoverImage(bookInfo.coverFileName);
 			}
 		} catch (Exception e) { e.printStackTrace(); }
 		this.jCoverImagePanel.setBookInfo(bookInfo);
+		this.jCoverImagePanel.setFitType(JCoverImagePanel.FIT_ALL);
+		
+		this.checkPreviewControlEnabled();
 		
 		//本情報設定ダイアログ表示
 		this.setLocation(location.x+20, location.y+20);

@@ -1,15 +1,10 @@
 package com.github.hmdev.info;
 import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import javax.imageio.ImageIO;
+import com.github.hmdev.util.ImageInfoReader;
 
 /** タイトル著作者等のメタ情報を格納 */
 public class BookInfo
@@ -18,6 +13,10 @@ public class BookInfo
 	public enum TitleType {
 		TITLE_AUTHOR, AUTHOR_TITLE, SUBTITLE_AUTHOR, TITLE_ONLY, NONE;
 		final static public String[] titleTypeNames = {"表題→著者名", "著者名→表題", "表題→著者名(副題優先)", "表題のみ", "なし"};
+		static public TitleType indexOf(int idx)
+		{
+			return values()[idx];
+		}
 		boolean hasTitleAuthor() {
 			switch (this) {
 			case TITLE_AUTHOR: case SUBTITLE_AUTHOR: case AUTHOR_TITLE: return true;
@@ -82,18 +81,18 @@ public class BookInfo
 	
 	/** 表紙ファイル名 フルパスかURL ""なら先頭の挿絵 nullなら表紙無し */
 	public String coverFileName;
-	/** 表紙イメージファイルがあれば設定され、coverFileNameより優先される */
+	/** 表紙イメージがトリミングされた場合に設定される coverFileNameより優先される */
 	public BufferedImage coverImage = null;
-	/** 表紙に使う挿絵の本文愛Index -1なら使わない */
+	/** 表紙に使う挿絵の本文内Index -1なら本文内の挿絵は使わない */
 	public int coverImageIndex = -1;
 	
 	/** 先頭に表紙ページを追加 */
 	public boolean insertCoverPage = false;
-	/** 左右中央で表しページにした場合は目次より前に出力 */
+	/** 表紙ページを追加した場合は表紙は目次より前に出力 */
 	public boolean insertTitlePage = false;
-	/** 表紙の次に目次を追加 */
+	/** 目次ページを追加 */
 	public boolean insertTocPage = false;
-	/** 目次縦書き */
+	/** 目次縦書きならtrue */
 	public boolean tocVertical = false;
 	
 	/** txtのない画像のみの場合 */
@@ -538,27 +537,8 @@ public class BookInfo
 	}
 	
 	/** ファイルまたはURLの文字列から画像を読み込んで表紙イメージとして設定 */
-	public boolean loadCoverImage(String path)
+	public void loadCoverImage(String path)
 	{
-		try {
-			InputStream is;
-			if (path.startsWith("http")) {
-				is = new BufferedInputStream(new URL(path).openStream());
-			} else {
-				File file = new File(path);
-				if (!file.exists()) return false;
-				is = new BufferedInputStream(new FileInputStream(file));
-			}
-			return loadCoverImage(is);
-		} catch (Exception e) { return false; }
+		this.coverImage = ImageInfoReader.loadImage(path);
 	}
-	/** 画像を読み込んで表紙イメージとして設定 */
-	public boolean loadCoverImage(InputStream is)
-	{
-		try {
-			this.coverImage = ImageIO.read(is);
-		} catch (Exception e) { e.printStackTrace(); return false; }
-		return true;
-	}
-	
 }

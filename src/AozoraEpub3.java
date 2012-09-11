@@ -84,7 +84,7 @@ public class AozoraEpub3
 				ImageInfoReader imageInfoReader = new ImageInfoReader(isFile, srcFile);
 				InputStream is = AozoraEpub3.getInputStream(srcFile, ext, imageInfoReader);
 				
-				BookInfo bookInfo = AozoraEpub3.getBookInfo(is, imageInfoReader, aozoraConverter, encType, titleType, "".equals(coverFileName), insertCoverPage);
+				BookInfo bookInfo = AozoraEpub3.getBookInfo(is, imageInfoReader, aozoraConverter, encType, titleType);
 				bookInfo.coverFileName = coverFileName;
 				bookInfo.insertCoverPage = insertCoverPage;
 				bookInfo.vertical = vertical;
@@ -136,7 +136,7 @@ public class AozoraEpub3
 	
 	/** 前処理で一度読み込んでタイトル等の情報を取得 */
 	static public BookInfo getBookInfo(InputStream is, ImageInfoReader imageInfoReader, AozoraEpub3Converter aozoraConverter,
-			String encType, BookInfo.TitleType titleType, boolean firstImageIsCover, boolean insertCoverPage)
+			String encType, BookInfo.TitleType titleType)
 	{
 		try {
 			//Zip内テキストファイルのパス
@@ -148,7 +148,7 @@ public class AozoraEpub3
 			
 			//タイトル取得
 			BufferedReader src = new BufferedReader(new InputStreamReader(is, (String)encType));
-			BookInfo bookInfo = aozoraConverter.getBookInfo(src, imageInfoReader, titleType, firstImageIsCover, insertCoverPage);
+			BookInfo bookInfo = aozoraConverter.getBookInfo(src, imageInfoReader, titleType);
 			bookInfo.textEntryName = textEntryNames[0];
 			is.close();
 			

@@ -108,12 +108,12 @@ public class Epub3ImageWriter extends Epub3Writer
 		try {
 			imageInfo = this.imageInfoReader.getImageInfo(srcImageFileName);
 			imageInfo.setId(imageId);
-			imageInfo.setFile(imageId+"."+ext);
+			imageInfo.setOutFileName(imageId+"."+ext);
 			if (!imageInfo.getExt().matches("^(png|jpeg|gif)$")) {
 				LogAppender.append("画像フォーマットエラー: ("+lineNum+") "+srcImageFileName+"\n");
 				return null;
 			}
-			if (this.imageIndex == bookInfo.coverImageIndex) {
+			if (this.imageIndex-1 == bookInfo.coverImageIndex) {
 				imageInfo.setIsCover(true);
 				isCover = true;
 			}

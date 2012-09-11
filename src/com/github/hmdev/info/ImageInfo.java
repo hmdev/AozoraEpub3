@@ -19,7 +19,7 @@ public class ImageInfo
 	/** ファイルのID 0001 */
 	String id;
 	/** 出力ファイル名 拡張子付き 0001.png */
-	String file;
+	String outFileName;
 	/** 画像フォーマット png jpg gif */
 	String ext;
 	
@@ -90,14 +90,14 @@ public class ImageInfo
 		this.id = id;
 	}
 	
-	public String getFile()
+	public String getOutFileName()
 	{
-		return file;
+		return outFileName;
 	}
 	
-	public void setFile(String file)
+	public void setOutFileName(String file)
 	{
-		this.file = file;
+		this.outFileName = file;
 	}
 	
 	public void setExt(String ext)

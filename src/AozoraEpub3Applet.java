@@ -18,6 +18,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -471,8 +472,6 @@ public class AozoraEpub3Applet extends JApplet
 		buttonGroup.add(jRadioHorizontal);
 		
 		////////////////////////////////
-		//自動改ページ
-		////////////////////////////////
 		/*group = new ButtonGroup();
 		propValue = props.getProperty("RtL");
 		boolean propLtR = propValue==null||"1".equals(propValue);
@@ -486,7 +485,8 @@ public class AozoraEpub3Applet extends JApplet
 		group.add(jRadioLtR);*/
 		
 		////////////////////////////////
-		//3段目
+		//自動改ページ
+		////////////////////////////////
 		/*panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		panel.setMaximumSize(new Dimension(1920, 26));
 		panel.setBorder(panelPadding);
@@ -519,10 +519,10 @@ public class AozoraEpub3Applet extends JApplet
 		////////////////////////////////
 		panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-		panel.setMinimumSize(new Dimension(1920, 26));
-		panel.setMaximumSize(new Dimension(1920, 26));
-		panel.setPreferredSize(new Dimension(1920, 36));
-		panel.setBorder(BorderFactory.createEmptyBorder(0, 4, 4, 0));
+		panel.setMinimumSize(new Dimension(1920, 28));
+		panel.setMaximumSize(new Dimension(1920, 28));
+		panel.setPreferredSize(new Dimension(1920, 34));
+		panel.setBorder(BorderFactory.createEmptyBorder(0, 4, 6, 0));
 		this.add(panel);
 		//左パネル
 		JPanel panel1 = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -573,10 +573,7 @@ public class AozoraEpub3Applet extends JApplet
 		////////////////////////////////////////////////////////////////
 		//確認ダイアログ
 		jConfirmDialog = new JConfirmDialog((JApplet)this,
-			iconImage,
-			AozoraEpub3Applet.class.getResource("images/replace.png"),
-			AozoraEpub3Applet.class.getResource("images/apply.png"),
-			AozoraEpub3Applet.class.getResource("images/cancel.png")
+			iconImage, AozoraEpub3Applet.class.getResource("images")
 		);
 		
 		////////////////////////////////////////////////////////////////
@@ -974,16 +971,14 @@ public class AozoraEpub3Applet extends JApplet
 		boolean isFile = "txt".equals(ext);
 		ImageInfoReader imageInfoReader = new ImageInfoReader(isFile, srcFile);
 		try {
-			InputStream is = AozoraEpub3.getInputStream(srcFile, ext, imageInfoReader);
-			
 			//cbzは画像のみ
 			if (!"cbz".equals(ext)) {
+				InputStream is = AozoraEpub3.getInputStream(srcFile, ext, imageInfoReader);
 				//テキストファイルからメタ情報や画像単独ページ情報を取得
 				bookInfo = AozoraEpub3.getBookInfo(
 					is, imageInfoReader, this.aozoraConverter,
 					this.jComboEncType.getSelectedItem().toString(),
-					BookInfo.TitleType.values()[this.jComboTitle.getSelectedIndex()],
-					coverImageIndex != -1, this.jCheckCoverPage.isSelected()
+					BookInfo.TitleType.indexOf(this.jComboTitle.getSelectedIndex())
 				);
 			}
 		} catch (Exception e) {
@@ -1074,6 +1069,18 @@ public class AozoraEpub3Applet extends JApplet
 			bookInfo.creator = this.jConfirmDialog.jTextCreator.getText().trim();
 			//著者が空欄なら著者行もクリア
 			if (bookInfo.creator.length() == 0) bookInfo.creatorLine = -1;
+			
+			//プレビューでトリミングされていたらbookInfo.coverImageにBufferedImageを設定 それ以外はnullにする
+			BufferedImage coverImage = this.jConfirmDialog.jCoverImagePanel.getModifiedImage();
+			if (coverImage != null) {
+				//Epub3Writerでイメージを出力
+				bookInfo.coverImage = coverImage;
+				bookInfo.coverFileName = null;
+				//元の表紙は残す
+				bookInfo.coverImageIndex = -1;
+			} else {
+				bookInfo.coverImage = null;
+			}
 			
 		} else {
 			//確認なしなのでnullでなければbookInfo上書き
