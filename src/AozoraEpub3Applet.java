@@ -869,17 +869,17 @@ public class AozoraEpub3Applet extends JApplet
 			dstPath = new File(jComboDstPath.getEditor().getItem().toString());
 			if (!dstPath.isDirectory()) {
 				int ret = JOptionPane.showConfirmDialog(jConfirmDialog, "出力先がありません\nフォルダを作成しますか？", "出力先確認", JOptionPane.YES_NO_OPTION);
-				if (ret == JOptionPane.NO_OPTION) {
-					LogAppender.append("変換処理をキャンセルしました\n");
-					return;
-				} else {
+				if (ret == JOptionPane.YES_OPTION) {
 					//フォルダ作成
 					dstPath.mkdirs();
+				} else {
+					LogAppender.append("変換処理をキャンセルしました\n");
+					return;
 				}
 			}
 		}
-		//出力先と履歴保存
-		addDstPath();
+		//jComboDstPathに出力先履歴保存
+		this.addDstPath();
 		
 		//自動改ページ
 		int forcePageBreak = 0;
@@ -1210,6 +1210,7 @@ public class AozoraEpub3Applet extends JApplet
 		
 		this.jCheckMarkId.setEnabled(enabled);
 		this.jCheckAutoYoko.setEnabled(enabled);
+		this.jCheckGaiji32.setEnabled(enabled);
 		this.jRadioVertical.setEnabled(enabled);
 		this.jRadioHorizontal.setEnabled(enabled);
 		

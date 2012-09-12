@@ -156,7 +156,7 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 	public BufferedImage getModifiedImage()
 	{
 		//表紙なし
-		if (this.bookInfo.coverFileName == null && this.bookInfo.coverImageIndex == -1) return null;
+		if (this.bookInfo.coverImage == null) return null;
 		//トリミングなし
 		double scale = Math.min((double)this.getWidth()/bookInfo.coverImage.getWidth(), (double)this.getHeight()/this.bookInfo.coverImage.getHeight());
 		if (this.scale == scale) return null;

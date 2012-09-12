@@ -67,7 +67,7 @@ public class AozoraEpub3Converter
 	/** 外字注記パターン */
 	final static Pattern gaijiChukiPattern = Pattern.compile("(※［＃.+?］)|(〔.+?〕)|(／″?＼)");
 	/** 前方参照注記パターン */
-	final static Pattern chukiSufPattern = Pattern. compile( "［＃「([^］]+)」([^］]+?)］" );
+	final static Pattern chukiSufPattern = Pattern. compile("［＃「([^］]+)」([^］]+?)］" );
 	
 	/** 先頭注記内側のパターン */
 	final static Pattern chukiLeftPattern = Pattern.compile("^［＃(.+?)］");
@@ -821,14 +821,23 @@ public class AozoraEpub3Converter
 			target = target.replaceAll("《[^》]+》", "");
 			String chuki = m.group(2);
 			String[] tags = sufChukiMap.get(chuki);
-			if (tags  == null) continue;
-			
 			int targetLength = target.length();
-			int chukiStart = m.start();
-			int chukiEnd = m.end();
+			int chukiTagStart = m.start();
+			int chukiTagEnd = m.end();
+			if (tags == null) {
+				//の注記付き終わりの例外処理
+				//［＃左に（はパターンにマッチしないので処理されない
+				if (chuki.endsWith("の注記付き終わり")) {
+					//ルビに置換
+					buf.delete(chukiTagStart+chOffset, chukiTagEnd+chOffset);
+					buf.insert(chukiTagStart+chOffset, "《"+target+"》");
+					chOffset += targetLength+2 - (chukiTagEnd-chukiTagStart);
+				}
+				continue;
+			}
 			
 			//置換済みの文字列で注記追加位置を探す
-			int idx = chukiStart-1+chOffset;
+			int idx = chukiTagStart-1+chOffset;
 			boolean inTag = false;
 			//間にあるタグをスタック
 			Stack<String> tagStack = new Stack<String>();
@@ -900,12 +909,12 @@ public class AozoraEpub3Converter
 			int targetBegin = idx + 1;
 			
 			//後ろタグ置換
-			buf.delete(chukiStart+chOffset, chukiEnd+chOffset);
-			buf.insert(chukiStart+chOffset, "［＃"+tags[1]+"］");
+			buf.delete(chukiTagStart+chOffset, chukiTagEnd+chOffset);
+			buf.insert(chukiTagStart+chOffset, "［＃"+tags[1]+"］");
 			//前タグinsert
 			buf.insert(targetBegin, "［＃"+tags[0]+"］");
 			
-			chOffset += tags[0].length() + tags[1].length() +6 - (chukiEnd-chukiStart);
+			chOffset += tags[0].length() + tags[1].length() +6 - (chukiTagEnd-chukiTagStart);
 		}
 		//置換なし
 		if (buf == null) return line;
@@ -1051,8 +1060,9 @@ public class AozoraEpub3Converter
 				}
 				//ブロック注記チェック
 				if (chukiFlagNoBr.contains(chukiName)) noBr = true;
-				
+			
 			} else {
+				
 				//画像 (訓点 ［＃（ス）］ は . があるかで判断)
 				// <img src="img/filename"/> → <object src="filename"/>
 				// ［＃表紙（表紙.jpg）］［＃（表紙.jpg）］［＃「キャプション」（表紙.jpg、横321×縦123）入る）］
