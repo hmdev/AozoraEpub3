@@ -519,8 +519,8 @@ public class AozoraEpub3Applet extends JApplet
 		////////////////////////////////
 		panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-		panel.setMinimumSize(new Dimension(1920, 28));
-		panel.setMaximumSize(new Dimension(1920, 28));
+		panel.setMinimumSize(new Dimension(1920, 34));
+		panel.setMaximumSize(new Dimension(1920, 34));
 		panel.setPreferredSize(new Dimension(1920, 34));
 		panel.setBorder(BorderFactory.createEmptyBorder(0, 4, 6, 0));
 		this.add(panel);
@@ -1052,7 +1052,7 @@ public class AozoraEpub3Applet extends JApplet
 			this.jConfirmDialog.showDialog(
 				srcFile.getName(),
 				(dstPath!=null ? dstPath.getAbsolutePath() : srcFile.getParentFile().getAbsolutePath())+File.separator,
-				title, creator, bookInfo, imageInfoReader, this.jFrameParent.getLocation()
+				title, creator, bookInfo, imageInfoReader, this.jFrameParent.getLocation() 
 			);
 			
 			//ダイアログが閉じた後に再開

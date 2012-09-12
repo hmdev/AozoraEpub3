@@ -32,9 +32,11 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 	private static final long serialVersionUID = 1L;
 	
 	BookInfo bookInfo;
-	private BufferedImage previewImage; 
+	private BufferedImage previewImage;
 	
-	private double scale = -1;
+	private double minScale = 0;
+	
+	private double scale = 0;
 	private int offsetX = 0;
 	private int offsetY = 0;
 	
@@ -124,6 +126,7 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 	{
 		this.fitType = FIT_ZOOM;
 		this.previewImage = null;
+		if (this.scale*zoom < this.minScale) zoom = this.minScale/this.scale; 
 		this.scale *= zoom;
 		this.offsetX *= zoom;
 		this.offsetY *= zoom;
@@ -132,10 +135,14 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 	
 	private void setScale()
 	{
-		if (bookInfo.coverImage == null) return;
+		if (bookInfo.coverImage == null) {
+			this.minScale = 0;
+			return;
+		}
+		this.minScale = Math.min((double)this.getWidth()/bookInfo.coverImage.getWidth(), (double)this.getHeight()/this.bookInfo.coverImage.getHeight());
 		switch (this.fitType) {
 		case FIT_ALL:
-			this.scale = Math.min((double)this.getWidth()/bookInfo.coverImage.getWidth(), (double)this.getHeight()/this.bookInfo.coverImage.getHeight()); break;
+			this.scale = minScale; break;
 		case FIT_W:
 			this.scale = (double)this.getWidth()/bookInfo.coverImage.getWidth(); break;
 		case FIT_H:
@@ -217,6 +224,7 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 					bookInfo.coverFileName = files.get(0).getAbsolutePath();
 					bookInfo.loadCoverImage(bookInfo.coverFileName);
 					bookInfo.coverImageIndex = -1;
+					setFitType(FIT_ALL);
 					repaint();
 				}
 			} else {
@@ -225,7 +233,9 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 						bookInfo.coverFileName = transfer.getTransferData(DataFlavor.stringFlavor).toString();
 						bookInfo.loadCoverImage(bookInfo.coverFileName);
 						bookInfo.coverImageIndex = -1;
+						setFitType(FIT_ALL);
 						repaint();
+						return;
 					}
 				}
 			}

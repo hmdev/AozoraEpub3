@@ -23,7 +23,10 @@ import java.util.HashSet;
 import java.util.UUID;
 import java.util.Vector;
 
+import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
 
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
@@ -116,6 +119,17 @@ public class Epub3Writer
 	int maxImageH = 0;
 	/** 最大画素数 10000未満は指定なし */
 	int maxImagePixels = 0;
+	
+	/** 縦横指定サイズ以上を単ページ化する時の横 */
+	int singlePageSizeW = 400;
+	/** 縦横指定サイズ以上を単ページ化する時の縦 */
+	int singlePageSizeH = 600;
+	/** 縦に関係なく横がこれ以上なら単ページ化 */
+	int singlePageWidth = 550;
+	
+	/** jpeg圧縮率 */
+	float jpegQuality = 0.8f;
+	
 	////////////////////////////////
 	
 	
@@ -471,7 +485,14 @@ public class Epub3Writer
 			if (srcImage == null) {
 				IOUtils.copy(is, zos);
 			} else {
-				ImageIO.write(srcImage, imageInfo.getExt(), zos);
+				ImageWriter imageWriter = ImageIO.getImageWritersByFormatName(imageInfo.getExt()).next();
+				ImageWriteParam iwp = imageWriter.getDefaultWriteParam();
+				if (iwp.canWriteCompressed()) {
+					iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+					if (imageInfo.getExt().indexOf('j') == 0) iwp.setCompressionQuality(this.jpegQuality);
+				}
+				imageWriter.setOutput(ImageIO.createImageOutputStream(zos));
+				imageWriter.write(null, new IIOImage(srcImage, null, null), iwp);
 				zos.flush();
 			}
 		} else {
@@ -656,7 +677,7 @@ public class Epub3Writer
 			ImageInfo imageInfo = this.imageInfoReader.getImageInfo(srcFilePath);
 			if (imageInfo == null) return PageBreakTrigger.IMAGE_PAGE_NONE;
 			
-			if (imageInfo.getWidth() >= 400 && imageInfo.getHeight() >= 600) {
+			if (imageInfo.getWidth() >= this.singlePageWidth || imageInfo.getWidth() >= singlePageSizeW && imageInfo.getHeight() >= singlePageSizeH) {
 				if ((double)imageInfo.getWidth()/imageInfo.getHeight() > 3.0/4)
 					return PageBreakTrigger.IMAGE_PAGE_W;
 				else return PageBreakTrigger.IMAGE_PAGE_H;

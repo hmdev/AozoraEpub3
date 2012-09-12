@@ -803,7 +803,7 @@ public class AozoraEpub3Converter
 		return chukiStartCount > chukiEndCount;
 	}
 	
-	/** 後述注記をインライン注記変換
+	/** 前方参照注記をインライン注記に変換
 	 * 重複等の法則が変則すぎるのでバッファを利用
 	 * kentenの中にルビ、font、yokoが入る場合の入れ替えは後でやる */
 	private String replaceChukiSufTag(String line)
@@ -825,94 +825,38 @@ public class AozoraEpub3Converter
 			int chukiTagStart = m.start();
 			int chukiTagEnd = m.end();
 			if (tags == null) {
-				//の注記付き終わりの例外処理
-				//［＃左に（はパターンにマッチしないので処理されない
 				if (chuki.endsWith("の注記付き終わり")) {
+					//［＃「」の注記付き終わり］の例外処理
+					//［＃左に（はパターンにマッチしないので処理されない
 					//ルビに置換
 					buf.delete(chukiTagStart+chOffset, chukiTagEnd+chOffset);
 					buf.insert(chukiTagStart+chOffset, "《"+target+"》");
 					chOffset += targetLength+2 - (chukiTagEnd-chukiTagStart);
+				} else if (chuki.endsWith("のルビ")) {
+					if (target.indexOf("」に「") > -1) {
+						targetLength = target.indexOf('」');
+						//［＃「青空文庫」に「あおぞらぶんこ」のルビ］
+						int targetStart = this.getTargetStart(buf, chukiTagStart, chOffset, targetLength);
+						//後ろタグ置換
+						buf.delete(chukiTagStart+chOffset, chukiTagEnd+chOffset);
+						buf.insert(chukiTagStart+chOffset, "《"+target.substring(target.indexOf('「')+1)+"》");
+						//前に ｜ insert
+						buf.insert(targetStart, "｜");
+					} else {
+						//［＃「青空文庫」の左に「あおぞらぶんこ」のルビ］
+					}
 				}
 				continue;
 			}
 			
 			//置換済みの文字列で注記追加位置を探す
-			int idx = chukiTagStart-1+chOffset;
-			boolean inTag = false;
-			//間にあるタグをスタック
-			Stack<String> tagStack = new Stack<String>();
-			boolean isEndTag = false;
-			int tagEnd = -1;
-			while (targetLength > 0 && idx >= 0) {
-				switch (buf.charAt(idx)) {
-				case '※':
-				case '|':
-					break;
-				case '》':
-					inTag = true;
-					break;
-				case '］':
-					inTag = true;
-					isEndTag = (idx-3 > 0 && "終わり".equals(buf.substring(idx-3, idx)));
-					tagEnd = idx;
-					break;
-				case '《':
-					inTag = false;
-					break;
-				case '［':
-					inTag = false;
-					if (isEndTag) {
-						String tag = buf.substring(idx+2, tagEnd-3);
-						tagStack.push(tag);
-						//System.out.println("push: "+tag);
-					} else {
-						String tag = buf.substring(idx+2, tagEnd);
-						//System.out.println("pop: "+tag);
-						if (tagStack.size() > 0 && tag.equals(tagStack.peek())) {
-							tagStack.pop();
-						}
-					}
-					break;
-				default:
-					if (!inTag) {
-						targetLength--;
-					}
-				}
-				idx--;
-			}
-			
-			//前のタグがStackにあれば含む
-			boolean exit = false;
-			while (idx >= 0) {
-				switch (buf.charAt(idx)) {
-				case '］':
-					inTag = true;
-					tagEnd = idx;
-					break;
-				case '［':
-					inTag = false;
-					String tag = buf.substring(idx+2, tagEnd);
-					if (tagStack.size() > 0 && tag.equals(tagStack.peek())) {
-						tagStack.pop();
-					} else {
-						idx = tagEnd;
-						exit = true;
-					}
-					break;
-				default:
-					if (!inTag) exit = true; //注記外で文字があったら終了
-				}
-				if (exit) break;
-				idx--;
-			}
-			//一つ戻す
-			int targetBegin = idx + 1;
+			int targetStart = this.getTargetStart(buf, chukiTagStart, chOffset, targetLength);
 			
 			//後ろタグ置換
 			buf.delete(chukiTagStart+chOffset, chukiTagEnd+chOffset);
 			buf.insert(chukiTagStart+chOffset, "［＃"+tags[1]+"］");
 			//前タグinsert
-			buf.insert(targetBegin, "［＃"+tags[0]+"］");
+			buf.insert(targetStart, "［＃"+tags[0]+"］");
 			
 			chOffset += tags[0].length() + tags[1].length() +6 - (chukiTagEnd-chukiTagStart);
 		}
@@ -920,6 +864,81 @@ public class AozoraEpub3Converter
 		if (buf == null) return line;
 		//置換後文字列
 		return buf.toString();
+	}
+	/** 前方参照注記の前タグ挿入位置を取得 */
+	private int getTargetStart(StringBuilder buf, int chukiTagStart, int chOffset, int targetLength)
+	{
+		//置換済みの文字列で注記追加位置を探す
+		int idx = chukiTagStart-1+chOffset;
+		boolean inTag = false;
+		//間にあるタグをスタック
+		Stack<String> tagStack = new Stack<String>();
+		boolean isEndTag = false;
+		int tagEnd = -1;
+		while (targetLength > 0 && idx >= 0) {
+			switch (buf.charAt(idx)) {
+			case '※':
+			case '|':
+				break;
+			case '》':
+				inTag = true;
+				break;
+			case '］':
+				inTag = true;
+				isEndTag = (idx-3 > 0 && "終わり".equals(buf.substring(idx-3, idx)));
+				tagEnd = idx;
+				break;
+			case '《':
+				inTag = false;
+				break;
+			case '［':
+				inTag = false;
+				if (isEndTag) {
+					String tag = buf.substring(idx+2, tagEnd-3);
+					tagStack.push(tag);
+					//System.out.println("push: "+tag);
+				} else {
+					String tag = buf.substring(idx+2, tagEnd);
+					//System.out.println("pop: "+tag);
+					if (tagStack.size() > 0 && tag.equals(tagStack.peek())) {
+						tagStack.pop();
+					}
+				}
+				break;
+			default:
+				if (!inTag) {
+					targetLength--;
+				}
+			}
+			idx--;
+		}
+		
+		//前のタグがStackにあれば含む
+		boolean exit = false;
+		while (idx >= 0) {
+			switch (buf.charAt(idx)) {
+			case '］':
+				inTag = true;
+				tagEnd = idx;
+				break;
+			case '［':
+				inTag = false;
+				String tag = buf.substring(idx+2, tagEnd);
+				if (tagStack.size() > 0 && tag.equals(tagStack.peek())) {
+					tagStack.pop();
+				} else {
+					idx = tagEnd;
+					exit = true;
+				}
+				break;
+			default:
+				if (!inTag) exit = true; //注記外で文字があったら終了
+			}
+			if (exit) break;
+			idx--;
+		}
+		//一つ戻す
+		return idx + 1;
 	}
 	
 	/** 青空テキスト行をePub3のXHTMLで出力
