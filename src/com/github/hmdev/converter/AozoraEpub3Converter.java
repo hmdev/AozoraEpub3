@@ -351,9 +351,9 @@ public class AozoraEpub3Converter
 		while ((line = src.readLine()) != null) {
 			this.lineNum++;
 			
-			//コメント除外
+			//コメント除外 50文字以上をコメントにする
 			if (line.startsWith("--------------------------------")) {
-				if (!line.startsWith("-------------------------------------------------------")) {
+				if (!line.startsWith("--------------------------------------------------")) {
 					LogAppender.append("[WARN] コメント行の文字数が足りません ("+this.lineNum+")\n");
 				} else {
 					if (firstCommentLineNum == -1) firstCommentLineNum = this.lineNum;
@@ -580,7 +580,7 @@ public class AozoraEpub3Converter
 			
 			//コメント除外
 			if (hideCommentBlock) {
-				if (line.startsWith("-------------------------------------------------------")) {
+				if (line.startsWith("--------------------------------------------------")) {
 					if (inComment) { inComment = false; continue;
 					} else {
 						//コメント開始

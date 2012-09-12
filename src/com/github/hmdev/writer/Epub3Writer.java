@@ -274,8 +274,8 @@ public class Epub3Writer
 				ByteArrayInputStream bais = new ByteArrayInputStream(coverImageBytes);
 				coverImageInfo = ImageInfo.getImageInfo(bais);
 				bais.close();
-				coverImageInfo.setId("imgcover");
-				coverImageInfo.setOutFileName("imgcover."+ext);
+				coverImageInfo.setId("0000");
+				coverImageInfo.setOutFileName("0000."+ext);
 				if (!coverImageInfo.getExt().matches("^(png|jpg|jpeg|gif)$")) {
 					LogAppender.append("表紙画像フォーマットエラー: "+bookInfo.coverFileName+"\n");
 					coverImageInfo = null;
@@ -293,8 +293,8 @@ public class Epub3Writer
 				ext = imageInfoReader.getImageInfo(bookInfo.coverImageIndex).getExt();
 			}
 			coverImageInfo = ImageInfo.getImageInfo(ext, bookInfo.coverImage, -1);
-			coverImageInfo.setId("imgcover");
-			coverImageInfo.setOutFileName("imgcover."+ext);
+			coverImageInfo.setId("0000");
+			coverImageInfo.setOutFileName("0000."+ext);
 			coverImageInfo.setIsCover(true);
 			this.imageInfos.add(0, coverImageInfo);
 		}
@@ -613,13 +613,14 @@ public class Epub3Writer
 			}
 		}
 		if (imageInfo != null) {
+			this.imageIndex++; //0001から開始
 			String imageId = imageInfo.getId();
 			//画像は未だ出力されていない
 			if (imageId == null) {
 				imageId = decimalFormat.format(this.imageIndex);
 				this.imageInfos.add(imageInfo);
 				this.outImageFileNames.add(srcImageFileName);
-				if (this.imageIndex == this.bookInfo.coverImageIndex) {
+				if (this.imageIndex-1 == this.bookInfo.coverImageIndex) {
 					imageInfo.setIsCover(true);
 					isCover = true;
 				}
@@ -628,7 +629,6 @@ public class Epub3Writer
 			imageInfo.setId(imageId);
 			imageInfo.setOutFileName(outImageFileName);
 			
-			this.imageIndex++;
 			//先頭に表紙ページ移動の場合でカバーページならnullを返して本文中から削除
 			if (bookInfo.insertCoverPage && isCover) return null;
 			return "../"+IMAGES_PATH+outImageFileName;

@@ -943,7 +943,7 @@ public class AozoraEpub3Applet extends JApplet
 	{
 		//パラメータ設定
 		
-		LogAppender.append("----------------------------------------------------------------\n");
+		LogAppender.append("--------\n");
 		//拡張子
 		String ext = srcFile.getName();
 		ext = ext.substring(ext.lastIndexOf('.')+1).toLowerCase();

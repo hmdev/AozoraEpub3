@@ -165,6 +165,14 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 		int coverW = 600;
 		int coverH = 800;
 		double coverScale = (double)coverW/this.getWidth() * this.scale;
+		coverW = (int)Math.min(coverW, bookInfo.coverImage.getWidth()*coverScale);
+		coverH = (int)Math.min(coverH, this.bookInfo.coverImage.getHeight()*coverScale);
+		if (coverScale > 1) {
+			coverW /= coverScale;
+			coverH /= coverScale;
+			coverScale = 1;
+		}
+		
 		int x = 0;
 		if (this.getWidth() < this.previewImage.getWidth()) x = (int)(this.offsetX * (double)coverW/this.getWidth());
 		int y = 0;
