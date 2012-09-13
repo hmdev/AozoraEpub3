@@ -1,6 +1,5 @@
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -39,7 +38,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -47,6 +45,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingWorker;
@@ -81,9 +80,6 @@ public class AozoraEpub3Applet extends JApplet
 	/** 変換前確認ダイアログ */
 	JConfirmDialog jConfirmDialog;
 	
-	/** 設定ダイアログ */
-	JDialog jDialogSetting;
-	
 	JComboBox jComboTitle;
 	JCheckBox jCheckUserFileName;
 	JCheckBox jCheckAutoFileName;
@@ -105,15 +101,6 @@ public class AozoraEpub3Applet extends JApplet
 	JRadioButton jRadioLtR;
 	JRadioButton jRadioRtL;
 	
-	//画像リサイズ
-	JCheckBox jCheckResizeW;
-	JTextField jTextResizeW;
-	JCheckBox jCheckResizeH;
-	JTextField jTextResizeH;
-	JCheckBox jCheckPixel;
-	JTextField jTextPixelW;
-	JTextField jTextPixelH;
-	
 	//入力ファイルエンコード
 	JComboBox jComboEncType;
 	
@@ -132,6 +119,28 @@ public class AozoraEpub3Applet extends JApplet
 	JButton jButtonCover;
 	JButton jButtonDstPath;
 	
+	JTextField jTextImageRateW;
+	JTextField jTextImageRateH;
+	
+	JTextField jTextSinglePageSizeW;
+	JTextField jTextSinglePageSizeH;
+	JTextField jTextSinglePageWidth;
+	
+	//画像縮小
+	JCheckBox jCheckResizeW;
+	JTextField jTextResizeW;
+	JCheckBox jCheckResizeH;
+	JTextField jTextResizeH;
+	JCheckBox jCheckPixel;
+	JTextField jTextPixelW;
+	JTextField jTextPixelH;
+	//表紙サイズ
+	JTextField jTextCoverW;
+	JTextField jTextCoverH;
+	//Jpeg圧縮率
+	JTextField jTextJpegQuality;
+	
+	//テキストエリア
 	JScrollPane jScrollPane;
 	JTextArea jTextArea;
 	
@@ -186,15 +195,30 @@ public class AozoraEpub3Applet extends JApplet
 		} catch(Exception e) { e.printStackTrace(); }
 		
 		String propValue;
+		JPanel tabPanel;
 		JPanel panel;
 		JLabel label;
+		Dimension size;
 		Border padding0 = BorderFactory.createEmptyBorder(0, 0, 0, 0);
 		Border padding3 = BorderFactory.createEmptyBorder(3, 3, 3, 3);
 		Border padding2H = BorderFactory.createEmptyBorder(0, 2, 0, 2);
 		Border padding4H = BorderFactory.createEmptyBorder(0, 4, 0, 4);
-		Border padding9H = BorderFactory.createEmptyBorder(0, 9, 0, 9);
+		Border padding4H2V = BorderFactory.createEmptyBorder(2, 4, 2, 4);
 		//アップレットのレイアウト設定
 		this.setLayout(new BoxLayout(this.getContentPane(), BoxLayout.Y_AXIS));
+		
+		JTabbedPane jTabbedPane = new JTabbedPane();
+		jTabbedPane.setMaximumSize(new Dimension(1920, 220));
+		jTabbedPane.setPreferredSize(new Dimension(1920, 220));
+		jTabbedPane.setBorder(padding2H);
+		this.add(jTabbedPane);
+		
+		////////////////////////////////////////////////////////////////
+		//Tab 変換
+		////////////////////////////////////////////////////////////////
+		tabPanel = new JPanel();
+		tabPanel.setLayout(new BoxLayout(tabPanel, BoxLayout.Y_AXIS));
+		jTabbedPane.add(" 変換 ", tabPanel);
 		
 		////////////////////////////////
 		//表題
@@ -204,11 +228,12 @@ public class AozoraEpub3Applet extends JApplet
 		panel.setMinimumSize(new Dimension(1920, 26));
 		panel.setMaximumSize(new Dimension(1920, 26));
 		panel.setPreferredSize(new Dimension(1920, 30));
-		panel.setBorder(BorderFactory.createEmptyBorder(4, 9, 0, 9));
-		this.add(panel);
-		
-		//表題行
-		label = new JLabel("表題: 本文内");
+		panel.setBorder(padding4H2V);
+		tabPanel.add(panel);
+		label = new JLabel("表題: ");
+		panel.add(label);
+		label = new JLabel("本文内");
+		label.setBorder(padding2H);
 		panel.add(label);
 		jComboTitle = new JComboBox(BookInfo.TitleType.titleTypeNames);
 		jComboTitle.setFocusable(false);
@@ -230,8 +255,8 @@ public class AozoraEpub3Applet extends JApplet
 		panel.setMinimumSize(new Dimension(1920, 26));
 		panel.setMaximumSize(new Dimension(1920, 26));
 		panel.setPreferredSize(new Dimension(1920, 26));
-		panel.setBorder(padding9H);
-		this.add(panel);
+		panel.setBorder(padding4H2V);
+		tabPanel.add(panel);
 		//表紙
 		label = new JLabel("表紙: ");
 		panel.add(label);
@@ -256,8 +281,8 @@ public class AozoraEpub3Applet extends JApplet
 		panel.setMinimumSize(new Dimension(1920, 26));
 		panel.setMaximumSize(new Dimension(1920, 26));
 		panel.setPreferredSize(new Dimension(1920, 26));
-		panel.setBorder(padding9H);
-		this.add(panel);
+		panel.setBorder(padding4H2V);
+		tabPanel.add(panel);
 		//ページ出力
 		label = new JLabel("ページ出力:");
 		panel.add(label);
@@ -299,8 +324,8 @@ public class AozoraEpub3Applet extends JApplet
 		panel.setMinimumSize(new Dimension(1920, 26));
 		panel.setMaximumSize(new Dimension(1920, 26));
 		panel.setPreferredSize(new Dimension(1920, 26));
-		panel.setBorder(padding9H);
-		this.add(panel);
+		panel.setBorder(padding4H2V);
+		tabPanel.add(panel);
 		//拡張子
 		label = new JLabel("拡張子");
 		panel.add(label);
@@ -329,8 +354,8 @@ public class AozoraEpub3Applet extends JApplet
 		panel.setMinimumSize(new Dimension(1920, 26));
 		panel.setMaximumSize(new Dimension(1920, 26));
 		panel.setPreferredSize(new Dimension(1920, 26));
-		panel.setBorder(padding9H);
-		this.add(panel);
+		panel.setBorder(padding4H2V);
+		tabPanel.add(panel);
 		//出力先
 		label = new JLabel("出力先: ");
 		panel.add(label);
@@ -357,82 +382,6 @@ public class AozoraEpub3Applet extends JApplet
 		panel.add(jButtonDstPath);
 		
 		////////////////////////////////
-		//画像サイズ指定
-		////////////////////////////////
-		ChangeListener resizeChangeLister = new ChangeListener() {
-			public void stateChanged(ChangeEvent e) { setResizeTextEnabled(true);  }
-		};
-		panel = new JPanel();
-		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-		panel.setMinimumSize(new Dimension(1920, 26));
-		panel.setMaximumSize(new Dimension(1920, 26));
-		panel.setPreferredSize(new Dimension(1920, 26));
-		panel.setBorder(padding9H);
-		this.add(panel);
-		label = new JLabel("画像縮小: ");
-		panel.add(label);
-		//横
-		propValue = props.getProperty("ResizeW");
-		jCheckResizeW = new JCheckBox("横", propValue!=null&&"1".equals(propValue));
-		jCheckResizeW.setFocusPainted(false);
-		jCheckResizeW.setBorder(padding2H);
-		jCheckResizeW.addChangeListener(resizeChangeLister);
-		panel.add(jCheckResizeW);
-		propValue = props.getProperty("ResizeNumW");
-		jTextResizeW = new JTextField(propValue==null?"1600":propValue);
-		jTextResizeW.setHorizontalAlignment(JTextField.RIGHT);
-		jTextResizeW.setInputVerifier(new IntegerInputVerifier());
-		jTextResizeW.setMaximumSize(new Dimension(35, 20));
-		jTextResizeW.setEditable(jCheckResizeW.isSelected());
-		panel.add(jTextResizeW);
-		label = new JLabel("以下  ");
-		label.setBorder(padding2H);
-		panel.add(label);
-		//縦
-		propValue = props.getProperty("ResizeH");
-		jCheckResizeH = new JCheckBox("縦", propValue!=null&"1".equals(propValue));
-		jCheckResizeH.setFocusPainted(false);
-		jCheckResizeH.setBorder(padding2H);
-		jCheckResizeH.addChangeListener(resizeChangeLister);
-		panel.add(jCheckResizeH);
-		propValue = props.getProperty("ResizeNumH");
-		jTextResizeH = new JTextField(propValue==null?"1600":propValue);
-		jTextResizeH.setHorizontalAlignment(JTextField.RIGHT);
-		jTextResizeH.setInputVerifier(new IntegerInputVerifier());
-		jTextResizeH.setMaximumSize(new Dimension(35, 20));
-		panel.add(jTextResizeH);
-		label = new JLabel("以下  ");
-		label.setBorder(padding2H);
-		panel.add(label);
-		//ピクセル
-		//縦
-		propValue = props.getProperty("Pixel");
-		jCheckPixel = new JCheckBox("画素数", propValue==null||"1".equals(propValue));
-		jCheckPixel.setFocusPainted(false);
-		jCheckPixel.setBorder(padding2H);
-		jCheckPixel.addChangeListener(resizeChangeLister);
-		panel.add(jCheckPixel);
-		propValue = props.getProperty("PixelW");
-		jTextPixelW = new JTextField(propValue==null?"1600":propValue);
-		jTextPixelW.setHorizontalAlignment(JTextField.RIGHT);
-		jTextPixelW.setInputVerifier(new IntegerInputVerifier());
-		jTextPixelW.setMaximumSize(new Dimension(35, 20));
-		panel.add(jTextPixelW);
-		label = new JLabel("x");
-		label.setBorder(padding2H);
-		panel.add(label);
-		propValue = props.getProperty("PixelH");
-		jTextPixelH = new JTextField(propValue==null?"1600":propValue);
-		jTextPixelH.setHorizontalAlignment(JTextField.RIGHT);
-		jTextPixelH.setInputVerifier(new IntegerInputVerifier());
-		jTextPixelH.setMaximumSize(new Dimension(35, 20));
-		panel.add(jTextPixelH);
-		label = new JLabel("以下");
-		label.setBorder(padding2H);
-		panel.add(label);
-		this.setResizeTextEnabled(true);
-		
-		////////////////////////////////
 		//変換オプション
 		////////////////////////////////
 		panel = new JPanel();
@@ -440,8 +389,8 @@ public class AozoraEpub3Applet extends JApplet
 		panel.setMinimumSize(new Dimension(1920, 26));
 		panel.setMaximumSize(new Dimension(1920, 26));
 		panel.setPreferredSize(new Dimension(1920, 26));
-		panel.setBorder(padding9H);
-		this.add(panel);
+		panel.setBorder(padding4H2V);
+		tabPanel.add(panel);
 		//栞用ID出力
 		propValue = props.getProperty("MarkId");
 		jCheckMarkId = new JCheckBox("栞用ID出力", propValue==null||"1".equals(propValue));
@@ -490,7 +439,7 @@ public class AozoraEpub3Applet extends JApplet
 		/*panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		panel.setMaximumSize(new Dimension(1920, 26));
 		panel.setBorder(panelPadding);
-		this.add(panel);
+		tabPanel.add(panel);
 		//入力文字コード
 		label = new JLabel(" 自動改ページ : ");
 		panel.add(label);
@@ -523,7 +472,7 @@ public class AozoraEpub3Applet extends JApplet
 		panel.setMaximumSize(new Dimension(1920, 34));
 		panel.setPreferredSize(new Dimension(1920, 34));
 		panel.setBorder(BorderFactory.createEmptyBorder(0, 4, 6, 0));
-		this.add(panel);
+		tabPanel.add(panel);
 		//左パネル
 		JPanel panel1 = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		panel1.setPreferredSize(new Dimension(1920, 24));
@@ -558,8 +507,225 @@ public class AozoraEpub3Applet extends JApplet
 		panel2.add(jCheckConfirm);
 		panel.add(panel2);
 		
+		////////////////////////////////////////////////////////////////
+		//Tab 画像設定
+		////////////////////////////////////////////////////////////////
+		tabPanel = new JPanel();
+		//tabPanel.setLayout(new BoxLayout(tabPanel, BoxLayout.Y_AXIS));
+		tabPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 1, 1));
+		jTabbedPane.add("画像設定", tabPanel);
+		
 		////////////////////////////////
+		//画像縦横比
+		////////////////////////////////
+		panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		size = new Dimension(220, 46);
+		panel.setMinimumSize(size);
+		panel.setMaximumSize(size);
+		panel.setPreferredSize(size);
+		panel.setBorder(BorderFactory.createTitledBorder("画面縦横比 (これより横長なら幅100%)"));
+		tabPanel.add(panel);
+		//横
+		label = new JLabel("横 : 縦 = ");
+		label.setBorder(padding2H);
+		panel.add(label);
+		propValue = props.getProperty("ImageRateW");
+		jTextImageRateW = new JTextField(propValue==null?"600":propValue);
+		jTextImageRateW.setHorizontalAlignment(JTextField.RIGHT);
+		jTextImageRateW.setInputVerifier(new IntegerInputVerifier());
+		jTextImageRateW.setMaximumSize(new Dimension(35, 20));
+		panel.add(jTextImageRateW);
+		label = new JLabel(" : ");
+		label.setBorder(padding2H);
+		panel.add(label);
+		propValue = props.getProperty("ImageRateH");
+		jTextImageRateH = new JTextField(propValue==null?"800":propValue);
+		jTextImageRateH.setHorizontalAlignment(JTextField.RIGHT);
+		jTextImageRateH.setInputVerifier(new IntegerInputVerifier());
+		jTextImageRateH.setMaximumSize(new Dimension(35, 20));
+		panel.add(jTextImageRateH);
+		
+		////////////////////////////////
+		//画像単ページ
+		////////////////////////////////
+		panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		size = new Dimension(300, 46);
+		panel.setMinimumSize(size);
+		panel.setMaximumSize(size);
+		panel.setPreferredSize(size);
+		panel.setBorder(BorderFactory.createTitledBorder("画像単ページ化"));
+		tabPanel.add(panel);
+		//横
+		label = new JLabel("横 x 縦");
+		label.setBorder(padding2H);
+		panel.add(label);
+		propValue = props.getProperty("SinglePageSizeW");
+		jTextSinglePageSizeW = new JTextField(propValue==null?"400":propValue);
+		jTextSinglePageSizeW.setHorizontalAlignment(JTextField.RIGHT);
+		jTextSinglePageSizeW.setInputVerifier(new IntegerInputVerifier());
+		jTextSinglePageSizeW.setMaximumSize(new Dimension(35, 20));
+		panel.add(jTextSinglePageSizeW);
+		label = new JLabel("x");
+		label.setBorder(padding2H);
+		panel.add(label);
+		propValue = props.getProperty("SinglePageSizeH");
+		jTextSinglePageSizeH = new JTextField(propValue==null?"600":propValue);
+		jTextSinglePageSizeH.setHorizontalAlignment(JTextField.RIGHT);
+		jTextSinglePageSizeH.setInputVerifier(new IntegerInputVerifier());
+		jTextSinglePageSizeH.setMaximumSize(new Dimension(35, 20));
+		panel.add(jTextSinglePageSizeH);
+		label = new JLabel("px以上  ");
+		label.setBorder(padding2H);
+		panel.add(label);
+		//縦
+		label = new JLabel("横のみ");
+		label.setBorder(padding2H);
+		panel.add(label);
+		propValue = props.getProperty("SinglePageWidth");
+		jTextSinglePageWidth = new JTextField(propValue==null?"550":propValue);
+		jTextSinglePageWidth.setHorizontalAlignment(JTextField.RIGHT);
+		jTextSinglePageWidth.setInputVerifier(new IntegerInputVerifier());
+		jTextSinglePageWidth.setMaximumSize(new Dimension(35, 20));
+		panel.add(jTextSinglePageWidth);
+		label = new JLabel("px以上");
+		label.setBorder(padding2H);
+		panel.add(label);
+		
+		////////////////////////////////
+		//画像縮小指定
+		////////////////////////////////
+		ChangeListener resizeChangeLister = new ChangeListener() {
+			public void stateChanged(ChangeEvent e) { setResizeTextEnabled(true);  }
+		};
+		panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		size = new Dimension(420, 46);
+		panel.setMinimumSize(size);
+		panel.setMaximumSize(size);
+		panel.setPreferredSize(size);
+		panel.setBorder(BorderFactory.createTitledBorder("画像縮小"));
+		tabPanel.add(panel);
+		//ピクセル
+		propValue = props.getProperty("Pixel");
+		jCheckPixel = new JCheckBox("画素数", propValue==null||"1".equals(propValue));
+		jCheckPixel.setFocusPainted(false);
+		jCheckPixel.setBorder(padding2H);
+		jCheckPixel.addChangeListener(resizeChangeLister);
+		panel.add(jCheckPixel);
+		propValue = props.getProperty("PixelW");
+		jTextPixelW = new JTextField(propValue==null?"1600":propValue);
+		jTextPixelW.setHorizontalAlignment(JTextField.RIGHT);
+		jTextPixelW.setInputVerifier(new IntegerInputVerifier());
+		jTextPixelW.setMaximumSize(new Dimension(35, 20));
+		panel.add(jTextPixelW);
+		label = new JLabel("x");
+		label.setBorder(padding2H);
+		panel.add(label);
+		propValue = props.getProperty("PixelH");
+		jTextPixelH = new JTextField(propValue==null?"1600":propValue);
+		jTextPixelH.setHorizontalAlignment(JTextField.RIGHT);
+		jTextPixelH.setInputVerifier(new IntegerInputVerifier());
+		jTextPixelH.setMaximumSize(new Dimension(35, 20));
+		panel.add(jTextPixelH);
+		label = new JLabel("px以下  ");
+		label.setBorder(padding2H);
+		panel.add(label);
+		//横
+		propValue = props.getProperty("ResizeW");
+		jCheckResizeW = new JCheckBox("横", propValue!=null&&"1".equals(propValue));
+		jCheckResizeW.setFocusPainted(false);
+		jCheckResizeW.setBorder(padding2H);
+		jCheckResizeW.addChangeListener(resizeChangeLister);
+		panel.add(jCheckResizeW);
+		propValue = props.getProperty("ResizeNumW");
+		jTextResizeW = new JTextField(propValue==null?"1600":propValue);
+		jTextResizeW.setHorizontalAlignment(JTextField.RIGHT);
+		jTextResizeW.setInputVerifier(new IntegerInputVerifier());
+		jTextResizeW.setMaximumSize(new Dimension(35, 20));
+		jTextResizeW.setEditable(jCheckResizeW.isSelected());
+		panel.add(jTextResizeW);
+		label = new JLabel("px以下  ");
+		label.setBorder(padding2H);
+		panel.add(label);
+		//縦
+		propValue = props.getProperty("ResizeH");
+		jCheckResizeH = new JCheckBox("縦", propValue!=null&"1".equals(propValue));
+		jCheckResizeH.setFocusPainted(false);
+		jCheckResizeH.setBorder(padding2H);
+		jCheckResizeH.addChangeListener(resizeChangeLister);
+		panel.add(jCheckResizeH);
+		propValue = props.getProperty("ResizeNumH");
+		jTextResizeH = new JTextField(propValue==null?"1600":propValue);
+		jTextResizeH.setHorizontalAlignment(JTextField.RIGHT);
+		jTextResizeH.setInputVerifier(new IntegerInputVerifier());
+		jTextResizeH.setMaximumSize(new Dimension(35, 20));
+		panel.add(jTextResizeH);
+		label = new JLabel("px以下  ");
+		label.setBorder(padding2H);
+		panel.add(label);
+		this.setResizeTextEnabled(true);
+		
+		////////////////////////////////
+		//表紙サイズ
+		////////////////////////////////
+		panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		size = new Dimension(180, 46);
+		panel.setMinimumSize(size);
+		panel.setMaximumSize(size);
+		panel.setPreferredSize(size);
+		panel.setBorder(BorderFactory.createTitledBorder("表紙サイズ (縮小のみ)"));
+		tabPanel.add(panel);
+		//横
+		label = new JLabel("横 x 縦");
+		label.setBorder(padding2H);
+		panel.add(label);
+		propValue = props.getProperty("CoverW");
+		jTextCoverW = new JTextField(propValue==null?"600":propValue);
+		jTextCoverW.setHorizontalAlignment(JTextField.RIGHT);
+		jTextCoverW.setInputVerifier(new IntegerInputVerifier());
+		jTextCoverW.setMaximumSize(new Dimension(35, 20));
+		panel.add(jTextCoverW);
+		label = new JLabel("x");
+		label.setBorder(padding2H);
+		panel.add(label);
+		propValue = props.getProperty("CoverH");
+		jTextCoverH = new JTextField(propValue==null?"800":propValue);
+		jTextCoverH.setHorizontalAlignment(JTextField.RIGHT);
+		jTextCoverH.setInputVerifier(new IntegerInputVerifier());
+		jTextCoverH.setMaximumSize(new Dimension(35, 20));
+		panel.add(jTextCoverH);
+		label = new JLabel("px以下");
+		label.setBorder(padding2H);
+		panel.add(label);
+		
+		////////////////////////////////
+		//Jpeg圧縮率
+		////////////////////////////////
+		panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		size = new Dimension(160, 46);
+		panel.setMinimumSize(size);
+		panel.setMaximumSize(size);
+		panel.setPreferredSize(size);
+		panel.setBorder(BorderFactory.createTitledBorder("縮小時のJpeg圧縮率"));
+		tabPanel.add(panel);
+		//横
+		propValue = props.getProperty("JpegQuality");
+		jTextJpegQuality = new JTextField(propValue==null?"80":propValue);
+		jTextJpegQuality.setHorizontalAlignment(JTextField.RIGHT);
+		jTextJpegQuality.setInputVerifier(new IntegerInputVerifier());
+		jTextJpegQuality.setMaximumSize(new Dimension(35, 20));
+		panel.add(jTextJpegQuality);
+		label = new JLabel("(10～100)");
+		label.setBorder(padding2H);
+		panel.add(label);
+		
+		////////////////////////////////////////////////////////////////
 		//テキストエリア
+		////////////////////////////////////////////////////////////////
 		jTextArea = new JTextArea("青空文庫テキストをここにドラッグ＆ドロップまたは「ファイル選択」で変換します。\n");
 		jTextArea.setEditable(false);
 		jTextArea.setFont(new Font("Default", Font.PLAIN, 12));
@@ -575,33 +741,6 @@ public class AozoraEpub3Applet extends JApplet
 		jConfirmDialog = new JConfirmDialog((JApplet)this,
 			iconImage, AozoraEpub3Applet.class.getResource("images/icon.png").toString().replaceFirst("/icon\\.png", "/")
 		);
-		
-		////////////////////////////////////////////////////////////////
-		//設定ダイアログ
-		jDialogSetting = new JDialog();
-		jDialogSetting.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
-		jDialogSetting.setSize(new Dimension(480, 220));
-		jDialogSetting.setResizable(false);
-		jDialogSetting.setTitle("詳細設定");
-		jDialogSetting.setLayout(new BoxLayout(jDialogSetting.getContentPane(), BoxLayout.Y_AXIS));
-		/*jDialogSetting.addWindowListener(new WindowAdapter() {
-			public void windowClosing(WindowEvent evt) { restoreSetting(); }
-		});*/
-		
-		////////////////////////////////////////////////////////////////
-		//DnDの前にテキストを確定させる
-		/*this.addMouseListener(new MouseListener() {
-			@Override
-			public void mouseReleased(MouseEvent arg0) {}
-			@Override
-			public void mousePressed(MouseEvent arg0) {}
-			@Override
-			public void mouseExited(MouseEvent arg0) { jComboCover.transferFocusUpCycle(); }
-			@Override
-			public void mouseEntered(MouseEvent arg0) {}
-			@Override
-			public void mouseClicked(MouseEvent arg0) {}
-		});*/
 		
 		////////////////////////////////////////////////////////////////
 		//ログ出力先を設定
@@ -900,8 +1039,12 @@ public class AozoraEpub3Applet extends JApplet
 		if (jCheckResizeH.isSelected()) try { resizeH = Integer.parseInt(jTextResizeH.getText()); } catch (Exception e) {}
 		int pixels = 0;
 		if (jCheckPixel.isSelected()) try { pixels = Integer.parseInt(jTextPixelW.getText())*Integer.parseInt(jTextPixelH.getText()); } catch (Exception e) {}
-		this.epub3Writer.setResizeParam(resizeW, resizeH, pixels);
-		this.epub3ImageWriter.setResizeParam(resizeW, resizeH, pixels);
+		int singlePageSizeW = Integer.parseInt(jTextSinglePageSizeW.getText());
+		int singlePageSizeH = Integer.parseInt(jTextSinglePageSizeH.getText());
+		int singlePageWidth = Integer.parseInt(jTextSinglePageWidth.getText());
+		float jpegQualty = Integer.parseInt(jTextJpegQuality.getText())/100f;
+		this.epub3Writer.setImageParam(resizeW, resizeH, pixels, singlePageSizeW, singlePageSizeH, singlePageWidth, jpegQualty);
+		this.epub3ImageWriter.setImageParam(resizeW, resizeH, pixels, singlePageSizeW, singlePageSizeH, singlePageWidth, jpegQualty);
 		
 		this.aozoraConverter.setForcePageBreak(forcePageBreak, forcePageBreakEmpty, pattern);
 		//栞用ID出力
@@ -1203,11 +1346,6 @@ public class AozoraEpub3Applet extends JApplet
 		this.jComboDstPath.setEnabled(enabled);
 		this.jButtonDstPath.setEnabled(enabled);
 		
-		this.jCheckResizeW.setEnabled(enabled);
-		this.jCheckResizeH.setEnabled(enabled);
-		this.jCheckPixel.setEnabled(enabled);
-		this.setResizeTextEnabled(enabled);
-		
 		this.jCheckMarkId.setEnabled(enabled);
 		this.jCheckAutoYoko.setEnabled(enabled);
 		this.jCheckGaiji32.setEnabled(enabled);
@@ -1216,6 +1354,19 @@ public class AozoraEpub3Applet extends JApplet
 		
 		this.jComboEncType.setEnabled(enabled);
 		this.jButtonFile.setEnabled(enabled);
+		
+		this.jTextImageRateW.setEnabled(enabled);
+		this.jTextImageRateH.setEnabled(enabled);
+		this.jTextSinglePageSizeW.setEnabled(enabled);
+		this.jTextSinglePageSizeH.setEnabled(enabled);
+		this.jTextSinglePageWidth.setEnabled(enabled);
+		this.jCheckResizeW.setEnabled(enabled);
+		this.jCheckResizeH.setEnabled(enabled);
+		this.jCheckPixel.setEnabled(enabled);
+		this.setResizeTextEnabled(enabled);
+		this.jTextCoverW.setEnabled(enabled);
+		this.jTextCoverH.setEnabled(enabled);
+		this.jTextJpegQuality.setEnabled(enabled);
 	}
 	
 	private void setResizeTextEnabled(boolean enabled)
@@ -1333,6 +1484,13 @@ public class AozoraEpub3Applet extends JApplet
 		this.props.setProperty("TocPage", this.jCheckTocPage.isSelected()?"1":"");
 		this.props.setProperty("TocVertical", this.jRadioTocV.isSelected()?"1":"");
 		
+		this.props.setProperty("ImageRateW", this.jTextImageRateW.getText());
+		this.props.setProperty("ImageRateH", this.jTextImageRateH.getText());
+		
+		this.props.setProperty("SinglePageSizeW", this.jTextSinglePageSizeW.getText());
+		this.props.setProperty("SinglePageSizeH", this.jTextSinglePageSizeH.getText());
+		this.props.setProperty("SinglePageWidth", this.jTextSinglePageWidth.getText());
+		
 		this.props.setProperty("ResizeW", this.jCheckResizeW.isSelected()?"1":"");
 		this.props.setProperty("ResizeH", this.jCheckResizeH.isSelected()?"1":"");
 		this.props.setProperty("Pixel", this.jCheckPixel.isSelected()?"1":"");
@@ -1340,6 +1498,11 @@ public class AozoraEpub3Applet extends JApplet
 		this.props.setProperty("ResizeNumH", this.jTextResizeH.getText());
 		this.props.setProperty("PixelW", this.jTextPixelW.getText());
 		this.props.setProperty("PixelH", this.jTextPixelH.getText());
+		
+		this.props.setProperty("CoverW", this.jTextCoverW.getText());
+		this.props.setProperty("CoverH", this.jTextCoverH.getText());
+		
+		this.props.setProperty("JpegQuality", this.jTextJpegQuality.getText());
 		
 		this.props.setProperty("EncType", ""+this.jComboEncType.getSelectedIndex());
 		this.props.setProperty("OverWrite", this.jCheckOverWrite.isSelected()?"1":"");

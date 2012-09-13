@@ -81,7 +81,7 @@ public class Epub3ImageWriter extends Epub3Writer
 		//画像サイズが横長なら幅に合わせる
 		ImageInfo imageInfo = this.imageInfoReader.getImageInfo(srcImageFilePath);
 		if (imageInfo != null) {
-			if ((double)imageInfo.getWidth()/imageInfo.getHeight() >= 3.0/4) sectionInfo.setImageFitW(true);
+			if ((double)imageInfo.getWidth()/imageInfo.getHeight() >= this.imageRate) sectionInfo.setImageFitW(true);
 		}
 		
 		this.sectionInfos.add(sectionInfo);

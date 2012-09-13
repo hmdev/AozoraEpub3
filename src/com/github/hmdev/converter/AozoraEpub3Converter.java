@@ -1110,7 +1110,7 @@ public class AozoraEpub3Converter
 								//単ページ画像の場合は<p>タグを出さない
 								if (bookInfo.isImageSectionLine(lineNum)) {
 									noBr = true;
-								} else if (chukiTag.length() == ch.length) {
+								} else {
 									//画像注記のみの行
 									//画像ページ種別取得
 									int imagePageType = this.writer.getImagePageType(srcFilePath, this.tagLevel);
@@ -1145,7 +1145,7 @@ public class AozoraEpub3Converter
 							//単ページ画像の場合は<p>タグを出さない
 							if (bookInfo.isImageSectionLine(lineNum)) {
 								noBr = true;
-							} else if (chukiTag.length() == ch.length) {
+							} else {
 								//画像注記のみの行
 								//画像ページ種別取得
 								int imagePageType = this.writer.getImagePageType(srcFilePath, this.tagLevel);

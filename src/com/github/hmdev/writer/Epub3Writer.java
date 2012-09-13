@@ -113,6 +113,8 @@ public class Epub3Writer
 	
 	////////////////////////////////
 	//Properties
+	/** 縦横比 */
+	double imageRate = 3.0/4;
 	/** 画像最大幅 0は指定なし */
 	int maxImageW = 0;
 	/** 画像最大高さ 0は指定なし */
@@ -176,11 +178,17 @@ public class Epub3Writer
 	}
 	
 	/** 画像のリサイズ用パラメータを設定 */
-	public void setResizeParam(int resizeW, int resizeH, int pixels)
+	public void setImageParam(int resizeW, int resizeH, int pixels, int singlePageSizeW, int singlePageSizeH, int singlePageWidth, float jpegQuality)
 	{
 		this.maxImageW = resizeW;
 		this.maxImageH = resizeH;
 		this.maxImagePixels = pixels;
+		
+		this.singlePageSizeW = singlePageSizeW;
+		this.singlePageSizeH = singlePageSizeH;
+		this.singlePageWidth = singlePageWidth;
+		
+		this.jpegQuality = jpegQuality;
 	}
 	
 	/** epubファイルを出力
@@ -549,14 +557,15 @@ public class Epub3Writer
 		//次の行が単一画像なら画像専用指定
 		switch (imagePageType) {
 		case PageBreakTrigger.IMAGE_PAGE_AUTO:
+			//未使用
 			sectionInfo.setImageFit(true);
 			//画像サイズが横長なら幅に合わせる
 			ImageInfo imageInfo = this.imageInfoReader.getImageInfo(srcImageFilePath);
 			if (imageInfo != null) {
 				//横長ならwidth100％
-				if ((double)imageInfo.getWidth()/imageInfo.getHeight() >= 3.0/4) sectionInfo.setImageFitW(true);
+				if ((double)imageInfo.getWidth()/imageInfo.getHeight() >= this.imageRate) sectionInfo.setImageFitW(true);
 				//縦がはみ出すならheight:100%
-				else if (imageInfo.getHeight() >= 600) sectionInfo.setImageFitH(true);
+				else sectionInfo.setImageFitH(true);
 			}
 			break;
 		case PageBreakTrigger.IMAGE_PAGE_W:
@@ -678,7 +687,7 @@ public class Epub3Writer
 			if (imageInfo == null) return PageBreakTrigger.IMAGE_PAGE_NONE;
 			
 			if (imageInfo.getWidth() >= this.singlePageWidth || imageInfo.getWidth() >= singlePageSizeW && imageInfo.getHeight() >= singlePageSizeH) {
-				if ((double)imageInfo.getWidth()/imageInfo.getHeight() > 3.0/4)
+				if ((double)imageInfo.getWidth()/imageInfo.getHeight() > this.imageRate)
 					return PageBreakTrigger.IMAGE_PAGE_W;
 				else return PageBreakTrigger.IMAGE_PAGE_H;
 			}
