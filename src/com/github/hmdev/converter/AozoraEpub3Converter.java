@@ -1574,6 +1574,9 @@ public class AozoraEpub3Converter
 	 * @throws IOException */
 	private void printImagePage(BufferedWriter out, StringBuilder buf, int lineNum,  String fileName, int imagePageType) throws IOException
 	{
+		//画像の前に改ページがある場合
+		boolean hasPageBreakTriger = this.pageBreakTrigger != null && !this.pageBreakTrigger.noChapter;
+		
 		//画像単ページとしてセクション出力
 		if (imagePageType == PageBreakTrigger.IMAGE_PAGE_W) {
 			this.setPageBreakTrigger(PAGEBREAK_IMAGE_W);
@@ -1587,6 +1590,7 @@ public class AozoraEpub3Converter
 		//タイトル寄り前なら別処理
 		if (this.lineNum < this.bookInfo.titleLine && this.middleTitle)
 			this.setPageBreakTrigger(PAGEBREAK_MIDDLE);
+		else if (hasPageBreakTriger) this.setPageBreakTrigger(PAGEBREAK_NORMAL);
 		else this.setPageBreakTrigger(PAGEBREAK_NOCHAPTER);
 	}
 	
