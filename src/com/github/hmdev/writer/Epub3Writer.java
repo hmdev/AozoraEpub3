@@ -507,7 +507,7 @@ public class Epub3Writer
 				ImageWriteParam iwp = imageWriter.getDefaultWriteParam();
 				if (iwp.canWriteCompressed()) {
 					iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-					if (imageInfo.getExt().indexOf('j') == 0) iwp.setCompressionQuality(this.jpegQuality);
+					if (imageInfo.getExt().indexOf('j') == 0) iwp.setCompressionQuality(1.0f-this.jpegQuality);
 				}
 				imageWriter.setOutput(ImageIO.createImageOutputStream(zos));
 				imageWriter.write(null, new IIOImage(srcImage, null, null), iwp);
@@ -520,15 +520,18 @@ public class Epub3Writer
 			BufferedImage outImage = new BufferedImage(scaledW, scaledH, BufferedImage.TYPE_INT_RGB);
 			Graphics2D g = outImage.createGraphics();
 			try {
-				AffineTransformOp ato = new AffineTransformOp(AffineTransform.getScaleInstance(scale, scale), AffineTransformOp.TYPE_BICUBIC);
 				if (srcImage == null) srcImage = ImageIO.read(is);
+				AffineTransformOp ato = new AffineTransformOp(AffineTransform.getScaleInstance(scale, scale), AffineTransformOp.TYPE_BICUBIC);
 				g.drawImage(srcImage, ato, 0, 0);
+				ImageIO.write(outImage, imageInfo.getExt(), zos);
+				LogAppender.append("画像縮小: "+imageInfo.getOutFileName()+" ("+w+","+h+")→("+scaledW+","+scaledH+")\n");
+			} catch (Exception e) {
+				LogAppender.append("画像読み込みエラー: "+imageInfo.getOutFileName()+"\n");
+				e.printStackTrace();
 			} finally {
 				g.dispose();
 			}
-			ImageIO.write(outImage, imageInfo.getExt(), zos);
 			zos.flush();
-			LogAppender.append("画像縮小: "+imageInfo.getOutFileName()+" ("+w+","+h+")→("+scaledW+","+scaledH+")\n");
 		}
 	}
 	

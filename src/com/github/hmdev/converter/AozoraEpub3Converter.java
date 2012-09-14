@@ -846,7 +846,17 @@ public class AozoraEpub3Converter
 						buf.insert(targetStart, "｜");
 					} else {
 						//［＃「青空文庫」の左に「あおぞらぶんこ」のルビ］
+						//左ルビ未対応 TODO 行左小書き？
 					}
+				} else if (chuki.endsWith("に×傍点")) {
+					int targetStart = this.getTargetStart(buf, chukiTagStart, chOffset, targetLength);
+					//後ろタグ置換
+					buf.delete(chukiTagStart+chOffset, chukiTagEnd+chOffset);
+					buf.insert(chukiTagStart+chOffset, "》");
+					for (int i=0; i<targetLength; i++) buf.insert(chukiTagStart+chOffset, "×");
+					buf.insert(chukiTagStart+chOffset, "《");
+					//前に ｜ insert
+					buf.insert(targetStart, "｜");
 				}
 				continue;
 			}

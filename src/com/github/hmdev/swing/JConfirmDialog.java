@@ -222,6 +222,7 @@ public class JConfirmDialog extends JDialog
 		//変換実行
 		jButton = new JButton("変換実行");
 		jButton.setBorder(paddingButton);
+		jButton.setPreferredSize(new Dimension(80, 26));
 		try { jButton.setIcon(new ImageIcon(new URL(imageURLPath+"apply.png"))); } catch (MalformedURLException e1) {}
 		jButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -239,6 +240,7 @@ public class JConfirmDialog extends JDialog
 		panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		jButton = new JButton("スキップ");
 		jButton.setBorder(paddingButton);
+		jButton.setPreferredSize(new Dimension(80, 26));
 		try { jButton.setIcon(new ImageIcon(new URL(imageURLPath+"skip.png"))); } catch (MalformedURLException e1) {}
 		jButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -253,6 +255,7 @@ public class JConfirmDialog extends JDialog
 		panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		jButton = new JButton("処理中止");
 		jButton.setBorder(paddingButton);
+		jButton.setPreferredSize(new Dimension(80, 26));
 		try { jButton.setIcon(new ImageIcon(new URL(imageURLPath+"cancel.png"))); } catch (MalformedURLException e1) {}
 		jButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -469,12 +472,10 @@ public class JConfirmDialog extends JDialog
 		
 		//プレビュー表示
 		try {
-			if (imageInfoReader.countImageFiles() > 0) {
-				if (bookInfo.coverImageIndex >= 0) {
-					bookInfo.coverImage = imageInfoReader.getImage(0);
-				} else if (bookInfo.coverImage == null && bookInfo.coverFileName != null) {
-					bookInfo.loadCoverImage(bookInfo.coverFileName);
-				}
+			if (imageInfoReader.countImageFiles() > 0 && bookInfo.coverImageIndex >= 0) {
+				bookInfo.coverImage = imageInfoReader.getImage(0);
+			} else if (bookInfo.coverImage == null && bookInfo.coverFileName != null) {
+				bookInfo.loadCoverImage(bookInfo.coverFileName);
 			}
 		} catch (Exception e) { e.printStackTrace(); }
 		this.jCoverImagePanel.setBookInfo(bookInfo);

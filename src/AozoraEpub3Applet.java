@@ -218,7 +218,7 @@ public class AozoraEpub3Applet extends JApplet
 		////////////////////////////////////////////////////////////////
 		tabPanel = new JPanel();
 		tabPanel.setLayout(new BoxLayout(tabPanel, BoxLayout.Y_AXIS));
-		jTabbedPane.add(" 変換 ", tabPanel);
+		jTabbedPane.add("  変換  ", tabPanel);
 		
 		////////////////////////////////
 		//表題
@@ -290,11 +290,15 @@ public class AozoraEpub3Applet extends JApplet
 		jCheckCoverPage = new JCheckBox("表紙", propValue==null||"1".equals(propValue));
 		jCheckCoverPage.setFocusPainted(false);
 		panel.add(jCheckCoverPage);
+		label = new JLabel("  ");
+		panel.add(label);
 		//左右中央
 		propValue = props.getProperty("MiddleTitle");
 		jCheckMiddleTitle = new JCheckBox("表題左右中央", propValue==null||"1".equals(propValue));
 		jCheckMiddleTitle.setFocusPainted(false);
 		panel.add(jCheckMiddleTitle);
+		label = new JLabel("  ");
+		panel.add(label);
 		propValue = props.getProperty("TocPage");
 		jCheckTocPage = new JCheckBox("目次", propValue!=null&"1".equals(propValue));
 		jCheckTocPage.setFocusPainted(false);
@@ -327,7 +331,7 @@ public class AozoraEpub3Applet extends JApplet
 		panel.setBorder(padding4H2V);
 		tabPanel.add(panel);
 		//拡張子
-		label = new JLabel("拡張子");
+		label = new JLabel("拡張子: ");
 		panel.add(label);
 		propValue = props.getProperty("Ext");
 		jComboExt = new JComboBox(new String[]{".epub", ".kepub.epub"});
@@ -335,11 +339,15 @@ public class AozoraEpub3Applet extends JApplet
 		jComboExt.setMaximumSize(new Dimension(90, 22));
 		jComboExt.setSelectedItem(propValue==null||propValue.length()==0?".epub":propValue);
 		panel.add(jComboExt);
+		label = new JLabel("  ");
+		panel.add(label);
 		//出力ファイル名設定
 		propValue = props.getProperty("AutoFileName");
 		jCheckAutoFileName = new JCheckBox("出力ファイル名に表題利用", propValue==null||"1".equals(propValue));
 		jCheckAutoFileName.setFocusPainted(false);
 		panel.add(jCheckAutoFileName);
+		label = new JLabel("  ");
+		panel.add(label);
 		//ファイルの上書き許可
 		propValue = props.getProperty("OverWrite");
 		jCheckOverWrite = new JCheckBox("ePubファイル上書き", propValue==null||"1".equals(propValue));
@@ -520,14 +528,16 @@ public class AozoraEpub3Applet extends JApplet
 		////////////////////////////////
 		panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-		size = new Dimension(220, 46);
+		size = new Dimension(150, 46);
 		panel.setMinimumSize(size);
 		panel.setMaximumSize(size);
 		panel.setPreferredSize(size);
-		panel.setBorder(BorderFactory.createTitledBorder("画面縦横比 (これより横長なら幅100%)"));
+		panel.setBorder(BorderFactory.createTitledBorder(" 画面縦横比"));
 		tabPanel.add(panel);
 		//横
-		label = new JLabel("横 : 縦 =");
+		label = new JLabel("横 : 縦");
+		panel.add(label);
+		label = new JLabel("=");
 		label.setBorder(padding2H);
 		panel.add(label);
 		propValue = props.getProperty("ImageRateW");
@@ -555,10 +565,17 @@ public class AozoraEpub3Applet extends JApplet
 		panel.setMinimumSize(size);
 		panel.setMaximumSize(size);
 		panel.setPreferredSize(size);
-		panel.setBorder(BorderFactory.createTitledBorder("画像単ページ化"));
+		panel.setBorder(BorderFactory.createTitledBorder(" 画像単ページ化  (画面縦横比より横長なら幅100%)"));
 		tabPanel.add(panel);
-		//横
-		label = new JLabel("横 x 縦 =");
+		//横x縦
+		label = new JLabel("横");
+		panel.add(label);
+		label = new JLabel("x");
+		label.setBorder(padding2H);
+		panel.add(label);
+		label = new JLabel("縦");
+		panel.add(label);
+		label = new JLabel("=");
 		label.setBorder(padding2H);
 		panel.add(label);
 		propValue = props.getProperty("SinglePageSizeW");
@@ -605,7 +622,7 @@ public class AozoraEpub3Applet extends JApplet
 		panel.setMinimumSize(size);
 		panel.setMaximumSize(size);
 		panel.setPreferredSize(size);
-		panel.setBorder(BorderFactory.createTitledBorder("画像縮小"));
+		panel.setBorder(BorderFactory.createTitledBorder(" 画像縮小"));
 		tabPanel.add(panel);
 		//ピクセル
 		propValue = props.getProperty("Pixel");
@@ -676,10 +693,17 @@ public class AozoraEpub3Applet extends JApplet
 		panel.setMinimumSize(size);
 		panel.setMaximumSize(size);
 		panel.setPreferredSize(size);
-		panel.setBorder(BorderFactory.createTitledBorder("表紙サイズ (縮小のみ)"));
+		panel.setBorder(BorderFactory.createTitledBorder(" 表紙サイズ (縮小のみ)"));
 		tabPanel.add(panel);
-		//横
-		label = new JLabel("横 x 縦 =");
+		//横x縦
+		label = new JLabel("横");
+		panel.add(label);
+		label = new JLabel("x");
+		label.setBorder(padding2H);
+		panel.add(label);
+		label = new JLabel("縦");
+		panel.add(label);
+		label = new JLabel("=");
 		label.setBorder(padding2H);
 		panel.add(label);
 		propValue = props.getProperty("CoverW");
@@ -710,16 +734,16 @@ public class AozoraEpub3Applet extends JApplet
 		panel.setMinimumSize(size);
 		panel.setMaximumSize(size);
 		panel.setPreferredSize(size);
-		panel.setBorder(BorderFactory.createTitledBorder("縮小時のJpeg圧縮率"));
+		panel.setBorder(BorderFactory.createTitledBorder(" 縮小時のJpeg画質"));
 		tabPanel.add(panel);
 		//横
 		propValue = props.getProperty("JpegQuality");
 		jTextJpegQuality = new JTextField(propValue==null?"80":propValue);
 		jTextJpegQuality.setHorizontalAlignment(JTextField.RIGHT);
-		jTextJpegQuality.setInputVerifier(new IntegerInputVerifier(10, 100));
+		jTextJpegQuality.setInputVerifier(new IntegerInputVerifier(30, 100));
 		jTextJpegQuality.setMaximumSize(new Dimension(35, 20));
 		panel.add(jTextJpegQuality);
-		label = new JLabel("(10～100)");
+		label = new JLabel("(30～100)");
 		label.setBorder(padding2H);
 		panel.add(label);
 		
