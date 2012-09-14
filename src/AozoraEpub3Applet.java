@@ -222,8 +222,8 @@ public class AozoraEpub3Applet extends JApplet
 		//2段目
 		panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-		panel.setPreferredSize(new Dimension(1920, 26));
-		panel.setMaximumSize(new Dimension(1920, 26));
+		panel.setPreferredSize(new Dimension(1920, 24));
+		panel.setMaximumSize(new Dimension(1920, 24));
 		panel.setBorder(padding9H);
 		this.add(panel);
 		//表紙
@@ -234,7 +234,7 @@ public class AozoraEpub3Applet extends JApplet
 		jComboCover.setEditable(true);
 		if (propValue==null||propValue.length()==0) jComboCover.setSelectedIndex(0);
 		else jComboCover.setSelectedItem(propValue);
-		jComboCover.setMaximumSize(new Dimension(1920, 22));
+		jComboCover.setPreferredSize(new Dimension(320, 22));
 		panel.add(jComboCover);
 		new DropTarget(jComboCover.getEditor().getEditorComponent(), DnDConstants.ACTION_COPY_OR_MOVE, new DropCoverListener(), true);
 		jButtonCover = new JButton("選択");
@@ -280,8 +280,8 @@ public class AozoraEpub3Applet extends JApplet
 		//4段目
 		panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-		panel.setPreferredSize(new Dimension(1920, 26));
-		panel.setMaximumSize(new Dimension(1920, 26));
+		panel.setPreferredSize(new Dimension(1920, 24));
+		panel.setMaximumSize(new Dimension(1920, 24));
 		panel.setBorder(padding9H);
 		this.add(panel);
 		//出力先
@@ -295,7 +295,7 @@ public class AozoraEpub3Applet extends JApplet
 		}
 		jComboDstPath = new JComboBox(vecDstPath);
 		jComboDstPath.setEditable(true);
-		jComboDstPath.setMaximumSize(new Dimension(1920, 22));
+		jComboDstPath.setPreferredSize(new Dimension(320, 22));
 		propValue = props.getProperty("DstPath");
 		if (propValue==null||propValue.length()==0) jComboDstPath.setSelectedIndex(0);
 		else jComboDstPath.setSelectedItem(propValue);
