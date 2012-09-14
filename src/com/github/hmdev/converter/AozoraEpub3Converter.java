@@ -878,7 +878,7 @@ public class AozoraEpub3Converter
 		while (targetLength > 0 && idx >= 0) {
 			switch (buf.charAt(idx)) {
 			case '※':
-			case '|':
+			case '｜':
 				break;
 			case '》':
 				inTag = true;

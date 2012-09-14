@@ -217,4 +217,4 @@ Java 6 / Java 7 の動作環境 ( http://www.java.com/ja/ )
 
 更新予定と更新履歴
 ------------
-Changes.txt
+README_Changes.txt

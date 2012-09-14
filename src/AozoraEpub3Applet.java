@@ -265,7 +265,7 @@ public class AozoraEpub3Applet extends JApplet
 		jComboCover.setEditable(true);
 		if (propValue==null||propValue.length()==0) jComboCover.setSelectedIndex(0);
 		else jComboCover.setSelectedItem(propValue);
-		jComboCover.setMaximumSize(new Dimension(1920, 22));
+		jComboCover.setPreferredSize(new Dimension(320, 22));
 		panel.add(jComboCover);
 		new DropTarget(jComboCover.getEditor().getEditorComponent(), DnDConstants.ACTION_COPY_OR_MOVE, new DropCoverListener(), true);
 		jButtonCover = new JButton("選択");
@@ -367,7 +367,7 @@ public class AozoraEpub3Applet extends JApplet
 		}
 		jComboDstPath = new JComboBox(vecDstPath);
 		jComboDstPath.setEditable(true);
-		jComboDstPath.setMaximumSize(new Dimension(1920, 22));
+		jComboDstPath.setPreferredSize(new Dimension(320, 22));
 		propValue = props.getProperty("DstPath");
 		if (propValue==null||propValue.length()==0) jComboDstPath.setSelectedIndex(0);
 		else jComboDstPath.setSelectedItem(propValue);
@@ -597,7 +597,7 @@ public class AozoraEpub3Applet extends JApplet
 		//画像縮小指定
 		////////////////////////////////
 		ChangeListener resizeChangeLister = new ChangeListener() {
-			public void stateChanged(ChangeEvent e) { setResizeTextEnabled(true);  }
+			public void stateChanged(ChangeEvent e) { setResizeTextEditable(true);  }
 		};
 		panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
@@ -665,7 +665,7 @@ public class AozoraEpub3Applet extends JApplet
 		label = new JLabel("px以下  ");
 		label.setBorder(padding2H);
 		panel.add(label);
-		this.setResizeTextEnabled(true);
+		this.setResizeTextEditable(true);
 		
 		////////////////////////////////
 		//表紙サイズ
@@ -1022,12 +1022,14 @@ public class AozoraEpub3Applet extends JApplet
 		if (jComboDstPath.getSelectedIndex() != 0) {
 			dstPath = new File(jComboDstPath.getEditor().getItem().toString());
 			if (!dstPath.isDirectory()) {
-				int ret = JOptionPane.showConfirmDialog(jConfirmDialog, "出力先がありません\nフォルダを作成しますか？", "出力先確認", JOptionPane.YES_NO_OPTION);
+				String dstPathName = dstPath.getAbsolutePath();
+				if (dstPathName.length() > 70) dstPathName = dstPathName.substring(0, 32)+" ... "+dstPathName.substring(dstPathName.length()-32);
+				int ret = JOptionPane.showConfirmDialog(jConfirmDialog, "出力先がありません\n"+dstPathName+"\nにフォルダを作成しますか？", "出力先確認", JOptionPane.YES_NO_OPTION);
 				if (ret == JOptionPane.YES_OPTION) {
 					//フォルダ作成
 					dstPath.mkdirs();
 				} else {
-					LogAppender.append("変換処理をキャンセルしました\n");
+					LogAppender.append("変換処理を中止しました\n");
 					return;
 				}
 			}
@@ -1216,9 +1218,14 @@ public class AozoraEpub3Applet extends JApplet
 			//ダイアログが閉じた後に再開
 			if (this.jConfirmDialog.canceled) {
 				this.convertCanceled = true;
-				LogAppender.append("変換処理をキャンセルしました\n");
+				LogAppender.append("変換処理を中止しました : "+srcFile.getAbsolutePath()+"\n");
 				return;
 			}
+			if (this.jConfirmDialog.skipped) {
+				LogAppender.append("変換をスキップしました : "+srcFile.getAbsolutePath()+"\n");
+				return;
+			}
+			
 			//変換前確認のチェックを反映
 			if (!this.jConfirmDialog.jCheckConfirm2.isSelected()) jCheckConfirm.setSelected(false);
 			
@@ -1375,16 +1382,22 @@ public class AozoraEpub3Applet extends JApplet
 		this.jTextSinglePageSizeW.setEnabled(enabled);
 		this.jTextSinglePageSizeH.setEnabled(enabled);
 		this.jTextSinglePageWidth.setEnabled(enabled);
+		
 		this.jCheckResizeW.setEnabled(enabled);
 		this.jCheckResizeH.setEnabled(enabled);
 		this.jCheckPixel.setEnabled(enabled);
-		this.setResizeTextEnabled(enabled);
+		this.setResizeTextEditable(enabled);
+		this.jTextResizeW.setEnabled(enabled);
+		this.jTextResizeH.setEnabled(enabled);
+		this.jTextPixelW.setEnabled(enabled);
+		this.jTextPixelH.setEnabled(enabled);
+		
 		this.jTextCoverW.setEnabled(enabled);
 		this.jTextCoverH.setEnabled(enabled);
 		this.jTextJpegQuality.setEnabled(enabled);
 	}
 	
-	private void setResizeTextEnabled(boolean enabled)
+	private void setResizeTextEditable(boolean enabled)
 	{
 		if (enabled) {
 			this.jTextResizeW.setEditable(jCheckResizeW.isSelected());

@@ -36,9 +36,14 @@ public class JConfirmDialog extends JDialog
 {
 	private static final long serialVersionUID = 1L;
 	
+	////////////////////////////////
 	/** キャンセルボタンが押されたらtrue */
 	public boolean canceled = false;
 	
+	/** スキップボタンが押されたらtrue */
+	public boolean skipped = false;
+	
+	////////////////////////////////
 	/** 入力ファイル名 */
 	public JTextField jTextSrcFileName;
 	/** 出力ファイル名 */
@@ -89,6 +94,7 @@ public class JConfirmDialog extends JDialog
 		JButton jButton;
 		JPanel panel;
 		Border padding0 = BorderFactory.createEmptyBorder(0, 0, 0, 0);
+		Border paddingButton = BorderFactory.createEmptyBorder(3, 6, 3, 6);
 		Border padding4 = BorderFactory.createEmptyBorder(4, 4, 4, 4);
 		Border titlePadding4 = BorderFactory.createEmptyBorder(0, 4, 4, 4);
 		
@@ -215,6 +221,7 @@ public class JConfirmDialog extends JDialog
 		buttonPanel.add(panel);
 		//変換実行
 		jButton = new JButton("変換実行");
+		jButton.setBorder(paddingButton);
 		try { jButton.setIcon(new ImageIcon(new URL(imageURLPath+"apply.png"))); } catch (MalformedURLException e1) {}
 		jButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -228,9 +235,24 @@ public class JConfirmDialog extends JDialog
 		});
 		panel.add(jButton);
 		buttonPanel.add(panel);
+		//スキップ
+		panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		jButton = new JButton("スキップ");
+		jButton.setBorder(paddingButton);
+		try { jButton.setIcon(new ImageIcon(new URL(imageURLPath+"skip.png"))); } catch (MalformedURLException e1) {}
+		jButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				skipped = true;
+				setVisible(false);
+			}
+		});
+		panel.add(jButton);
+		buttonPanel.add(panel);
+		
 		//キャンセル
 		panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		jButton = new JButton("キャンセル");
+		jButton = new JButton("処理中止");
+		jButton.setBorder(paddingButton);
 		try { jButton.setIcon(new ImageIcon(new URL(imageURLPath+"cancel.png"))); } catch (MalformedURLException e1) {}
 		jButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -437,6 +459,10 @@ public class JConfirmDialog extends JDialog
 		this.jCheckReplaceCover.setSelected(false);
 		//変更前確認設定用
 		this.jCheckConfirm2.setSelected(true);
+		
+		//フラグ初期化
+		this.canceled = false;
+		this.skipped = false;
 		
 		this.bookInfo = bookInfo;
 		this.imageInfoReader = imageInfoReader;
