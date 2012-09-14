@@ -139,9 +139,9 @@ public class Epub3Writer
 	ZipArchiveOutputStream zos;
 	
 	/** ファイル名桁揃え用 */
-	public static DecimalFormat decimalFormat = new DecimalFormat("0000");
+	final static DecimalFormat decimalFormat = new DecimalFormat("0000");
 	/** 更新日時フォーマット 2011-06-29T12:00:00Z */
-	SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+	final static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 	
 	/** セクション番号自動追加用インデックス */
 	int sectionIndex = 0;
@@ -156,6 +156,7 @@ public class Epub3Writer
 	/** 画像情報リスト Velocity埋め込み */
 	Vector<ImageInfo> imageInfos;
 	
+	/** 出力済みのファイル名 (画像なしチェック用) */
 	HashSet<String> outImageFileNames; 
 	
 	/** Velocity変数格納コンテキスト */
@@ -175,6 +176,8 @@ public class Epub3Writer
 	public Epub3Writer(String templatePath)
 	{
 		this.templatePath = templatePath;
+		//初回実行時のみ有効
+		Velocity.init();
 	}
 	
 	/** 画像のリサイズ用パラメータを設定 */
@@ -212,10 +215,9 @@ public class Epub3Writer
 		this.imageInfos = new Vector<ImageInfo>();
 		this.outImageFileNames = new HashSet<String>();
 		
-		//初回実行時のみ有効
-		Velocity.init();
 		//Velocity用 共通コンテキスト設定
 		this.velocityContext = new VelocityContext();
+		
 		//IDはタイトル著作者のハッシュで適当に生成
 		String title = bookInfo.title==null?"":bookInfo.title;
 		String creator = bookInfo.creator==null?"":bookInfo.creator;
@@ -341,7 +343,7 @@ public class Epub3Writer
 				this.velocityContext.put("coverImage", coverPageImage);
 				zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+XHTML_PATH+COVER_FILE));
 				bw = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"));
-				Velocity.getTemplate(templatePath+OPS_PATH+XHTML_PATH+COVER_VM).merge(velocityContext, bw);
+				Velocity.mergeTemplate(templatePath+OPS_PATH+XHTML_PATH+COVER_VM, "UTF-8", velocityContext, bw);
 				bw.flush();
 				zos.closeArchiveEntry();
 			} else {
@@ -358,7 +360,7 @@ public class Epub3Writer
 		velocityContext.put("images", imageInfos);
 		zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+PACKAGE_FILE));
 		bw = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"));
-		Velocity.getTemplate(templatePath+OPS_PATH+PACKAGE_VM).merge(velocityContext, bw);
+		Velocity.mergeTemplate(templatePath+OPS_PATH+PACKAGE_VM, "UTF-8", velocityContext, bw);
 		bw.flush();
 		zos.closeArchiveEntry();
 		
@@ -366,7 +368,7 @@ public class Epub3Writer
 		velocityContext.put("chapters", chapterInfos);
 		zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+XHTML_PATH+XHTML_NAV_FILE));
 		bw = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"));
-		Velocity.getTemplate(templatePath+OPS_PATH+XHTML_PATH+XHTML_NAV_VM).merge(velocityContext, bw);
+		Velocity.mergeTemplate(templatePath+OPS_PATH+XHTML_PATH+XHTML_NAV_VM, "UTF-8", velocityContext, bw);
 		bw.flush();
 		zos.closeArchiveEntry();
 		
@@ -374,7 +376,7 @@ public class Epub3Writer
 		velocityContext.put("chapters", chapterInfos);
 		zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+TOC_FILE));
 		bw = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"));
-		Velocity.getTemplate(templatePath+OPS_PATH+TOC_VM).merge(velocityContext, bw);
+		Velocity.mergeTemplate(templatePath+OPS_PATH+TOC_VM, "UTF-8", velocityContext, bw);
 		bw.flush();
 		zos.closeArchiveEntry();
 		
@@ -439,7 +441,7 @@ public class Epub3Writer
 			}
 		} else {
 			////////////////////////////////
-			//ziptの場合はzip内画像をすべて出力
+			//zipの場合はzip内画像をすべて出力
 			int zipPathLength = 0;
 			if (this.bookInfo.textEntryName != null) zipPathLength = this.bookInfo.textEntryName.indexOf('/')+1;
 			ZipArchiveInputStream zis = new ZipArchiveInputStream(new BufferedInputStream(new FileInputStream(srcFile), 65536), "MS932", false);
@@ -467,6 +469,14 @@ public class Epub3Writer
 		
 		//ePub3出力ファイルを閉じる
 		zos.close();
+		
+		this.velocityContext = null;
+		this.sectionInfos = null;
+		this.chapterInfos = null;
+		this.imageInfos = null;
+		this.outImageFileNames = null;
+		this.bookInfo = null;
+		this.imageInfoReader = null;
 	}
 	
 	void writeImage(InputStream is,ZipArchiveOutputStream zos, ImageInfo imageInfo) throws IOException
@@ -587,7 +597,7 @@ public class Epub3Writer
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"));
 		//出力開始するセクションに対応したSectionInfoを設定
 		this.velocityContext.put("sectionInfo", sectionInfo);
-		Velocity.getTemplate(this.templatePath+OPS_PATH+XHTML_PATH+XHTML_HEADER_VM).merge(this.velocityContext, bw);
+		Velocity.mergeTemplate(this.templatePath+OPS_PATH+XHTML_PATH+XHTML_HEADER_VM, "UTF-8", velocityContext, bw);
 		bw.flush();
 	}
 	/** セクション終了. 
@@ -596,7 +606,7 @@ public class Epub3Writer
 	{
 		//フッタ出力
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"));
-		Velocity.getTemplate(this.templatePath+OPS_PATH+XHTML_PATH+XHTML_FOOTER_VM).merge(this.velocityContext, bw);
+		Velocity.mergeTemplate(this.templatePath+OPS_PATH+XHTML_PATH+XHTML_FOOTER_VM, "UTF-8", velocityContext, bw);
 		bw.flush();
 		
 		this.zos.closeArchiveEntry();

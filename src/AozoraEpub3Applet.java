@@ -1297,7 +1297,12 @@ public class AozoraEpub3Applet extends JApplet
 			this.jComboEncType.getSelectedItem().toString(),
 			bookInfo, imageInfoReader
 		);
+		
+		//終了処理
 		bookInfo.clear();
+		bookInfo = null;
+		imageInfoReader = null;
+		//System.gc();
 	}
 	
 	////////////////////////////////////////////////////////////////

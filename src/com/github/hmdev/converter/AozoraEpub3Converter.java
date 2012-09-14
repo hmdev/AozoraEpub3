@@ -645,6 +645,8 @@ public class AozoraEpub3Converter
 				convertTextLineToEpub3(out, line);
 			}
 		}
+		//終了処理
+		this.bookInfo = null;
 	}
 	
 	/** 文字列内の外字を変換
