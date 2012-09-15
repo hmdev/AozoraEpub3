@@ -350,3 +350,6 @@ div.jzm37 { max-height: 37em; }
 div.jzm38 { max-height: 38em; }
 div.jzm39 { max-height: 39em; }
 div.jzm40 { max-height: 40em; }
+
+/* 禁則調整用 文字間の全角スペースを前で折り返さない */
+span.withspace { padding-bottom:1em; }

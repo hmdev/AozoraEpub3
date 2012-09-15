@@ -344,3 +344,6 @@ div.jzm47 { max-width: 47em; }
 div.jzm48 { max-width: 48em; }
 div.jzm49 { max-width: 49em; }
 div.jzm50 { max-width: 50em; }
+
+/* 禁則調整用 文字間の全角スペースを前で折り返さない */
+span.withspace { padding-right:1em; }

@@ -996,8 +996,9 @@ public class AozoraEpub3Converter
 			if (chukiTag.charAt(0) == '＃') {
 				continue;
 			}
-			//<img <a </a 以外のタグは注記処理せず本文処理
-			if (chukiTag.charAt(0) == '<' && !(lowerChukiTag.startsWith("<img ") || lowerChukiTag.startsWith("<a ") || lowerChukiTag.startsWith("</a>"))) {
+			//<img </img> <a </a> 以外のタグは注記処理せず本文処理
+			if (chukiTag.charAt(0) == '<' &&
+				!(lowerChukiTag.startsWith("<img ") || lowerChukiTag.startsWith("</img>") || lowerChukiTag.startsWith("<a ") || lowerChukiTag.startsWith("</a>"))) {
 				continue;
 			}
 			
@@ -1521,6 +1522,9 @@ public class AozoraEpub3Converter
 	/** 出力バッファに文字出力 ラテン文字をグリフにして出力 */
 	private void convertChar(StringBuilder buf, char[] ch, int idx, boolean inRuby) throws IOException
 	{
+		//NULL文字なら何も出力しない
+		if (ch[idx] == '\0') return;
+		
 		//String str = latinConverter.toLatinGlyphString(ch);
 		//if (str != null) out.write(str);
 		//else out.write(ch);
@@ -1533,15 +1537,26 @@ public class AozoraEpub3Converter
 				return;
 			}
 		}
-		if (replace2Map != null && idx != 0) {
-			String replaced = replace2Map.get(""+ch[idx-1]+ch[idx]);
-			//置換して終了
-			if (replaced != null) {
-				buf.setLength(length-1);//1文字削除
-				buf.append(replaced);
-				return;
+		if (idx != 0) {
+			if (replace2Map != null) {
+				String replaced = replace2Map.get(""+ch[idx-1]+ch[idx]);
+				//置換して終了
+				if (replaced != null) {
+					buf.setLength(length-1);//1文字削除
+					buf.append(replaced);
+					return;
+				}
 			}
 		}
+		//文字の間の全角スペースを禁則調整
+		if (!inTcy && !inRuby && idx+2<ch.length && ch[idx]!='　' && +ch[idx+1]=='　' && ch[idx+2]!='　') {
+			buf.append("<span class=\"withspace\">");
+			buf.append(ch[idx]);
+			buf.append("</span>");
+			ch[idx+1]='\0';//改行に変更
+			return;
+		}
+		
 		if (this.bookInfo.vertical) {
 			switch (ch[idx]) {
 			case '&': buf.append("&amp;"); break;

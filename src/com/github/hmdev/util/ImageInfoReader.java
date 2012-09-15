@@ -2,6 +2,8 @@ package com.github.hmdev.util;
 
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -17,6 +19,7 @@ import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.archivers.zip.ZipFile;
+import org.apache.commons.compress.utils.IOUtils;
 
 import com.github.hmdev.info.ImageInfo;
 
@@ -219,11 +222,19 @@ public class ImageInfoReader
 			if (entry == null) return null;
 			InputStream is = zf.getInputStream(entry);
 			try {
-				return ImageIO.read(is);
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				IOUtils.copy(is, baos);
+				byte[] bytes= baos.toByteArray();
+				baos.close();
+				ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+				BufferedImage image = ImageIO.read(bais);
+				bais.close();
+				return image;
 			} catch (Exception e) {
 				e.printStackTrace();
 			} finally {
 				is.close();
+				zf.close();
 			}
 		}
 		return null;

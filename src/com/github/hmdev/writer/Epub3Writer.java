@@ -4,6 +4,9 @@ import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.IndexColorModel;
+import java.awt.image.WritableRaster;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -133,7 +136,8 @@ public class Epub3Writer
 	float jpegQuality = 0.8f;
 	
 	////////////////////////////////
-	
+	//4bitグレースケール時のRGB階調
+	byte[] GRAY_VALUES = new byte[]{-113,-97,-81,-65,-49,-33,-17,-1,15,31,47,63,79,95,111,127};
 	
 	/** 出力先ePubのZipストリーム */
 	ZipArchiveOutputStream zos;
@@ -527,8 +531,22 @@ public class Epub3Writer
 				if (srcImage == null) srcImage = ImageIO.read(is);
 				//TODO 画像回転対応
 				int imageType = srcImage.getType();
-				if (imageType == BufferedImage.TYPE_BYTE_BINARY) imageType = BufferedImage.TYPE_BYTE_INDEXED;
-				BufferedImage outImage = new BufferedImage(scaledW, scaledH, imageType);
+				BufferedImage outImage;
+				if (imageType == BufferedImage.TYPE_BYTE_BINARY) {
+					ColorModel colorModel = srcImage.getColorModel();
+					//4bit未満は縮小するので4bitに
+					//if (colorModel.getPixelSize() < 4)
+						colorModel = new IndexColorModel(4, GRAY_VALUES.length, GRAY_VALUES, GRAY_VALUES, GRAY_VALUES);
+					WritableRaster raster = colorModel.createCompatibleWritableRaster(scaledW, scaledH);
+					outImage = new BufferedImage(colorModel, raster, true, null);
+				}
+				else if (imageType == BufferedImage.TYPE_BYTE_INDEXED) {
+					ColorModel colorModel = srcImage.getColorModel();
+					WritableRaster raster = colorModel.createCompatibleWritableRaster(scaledW, scaledH);
+					outImage = new BufferedImage(colorModel, raster, true, null);
+				} else {
+					outImage = new BufferedImage(scaledW, scaledH, imageType);
+				}
 				Graphics2D g = outImage.createGraphics();
 				try {
 					AffineTransformOp ato = new AffineTransformOp(AffineTransform.getScaleInstance(scale, scale), AffineTransformOp.TYPE_BICUBIC);
