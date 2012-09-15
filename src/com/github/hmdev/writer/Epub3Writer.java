@@ -446,7 +446,7 @@ public class Epub3Writer
 			if (this.bookInfo.textEntryName != null) zipPathLength = this.bookInfo.textEntryName.indexOf('/')+1;
 			ZipArchiveInputStream zis = new ZipArchiveInputStream(new BufferedInputStream(new FileInputStream(srcFile), 65536), "MS932", false);
 			ArchiveEntry entry;
-			while( (entry = zis.getNextEntry()) != null ) {
+			while( (entry = zis.getNextZipEntry()) != null ) {
 				//Zip内のサブフォルダは除外してテキストからのパスにする
 				String srcImageFileName = entry.getName().substring(zipPathLength);
 				//if (outImageFileNames.contains(srcImageFileName)) {
@@ -457,7 +457,14 @@ public class Epub3Writer
 					if (imageInfo.getIsCover() && bookInfo.coverImage != null) {
 						this.writeImage(bookInfo.coverImage, zos, imageInfo);
 					} else {
-						this.writeImage(zis, zos, imageInfo);
+						//Zipからの直接読み込みは失敗するので一旦バイト配列にする
+						ByteArrayOutputStream baos = new ByteArrayOutputStream();
+						IOUtils.copy(zis, baos);
+						byte[] bytes= baos.toByteArray();
+						baos.close();
+						ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+						this.writeImage(bais, zos, imageInfo);
+						bais.close();
 					}
 					zos.closeArchiveEntry();
 				}
@@ -507,7 +514,7 @@ public class Epub3Writer
 				ImageWriteParam iwp = imageWriter.getDefaultWriteParam();
 				if (iwp.canWriteCompressed()) {
 					iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-					if (imageInfo.getExt().indexOf('j') == 0) iwp.setCompressionQuality(1.0f-this.jpegQuality);
+					if (imageInfo.getExt().indexOf('j') == 0) iwp.setCompressionQuality(this.jpegQuality);
 				}
 				imageWriter.setOutput(ImageIO.createImageOutputStream(zos));
 				imageWriter.write(null, new IIOImage(srcImage, null, null), iwp);
@@ -516,20 +523,24 @@ public class Epub3Writer
 		} else {
 			int scaledW = (int)(imageInfo.getWidth()*scale);
 			int scaledH = (int)(imageInfo.getHeight()*scale);
-			//TODO 画像回転対応
-			BufferedImage outImage = new BufferedImage(scaledW, scaledH, BufferedImage.TYPE_INT_RGB);
-			Graphics2D g = outImage.createGraphics();
 			try {
 				if (srcImage == null) srcImage = ImageIO.read(is);
-				AffineTransformOp ato = new AffineTransformOp(AffineTransform.getScaleInstance(scale, scale), AffineTransformOp.TYPE_BICUBIC);
-				g.drawImage(srcImage, ato, 0, 0);
-				ImageIO.write(outImage, imageInfo.getExt(), zos);
-				LogAppender.append("画像縮小: "+imageInfo.getOutFileName()+" ("+w+","+h+")→("+scaledW+","+scaledH+")\n");
+				//TODO 画像回転対応
+				int imageType = srcImage.getType();
+				if (imageType == BufferedImage.TYPE_BYTE_BINARY) imageType = BufferedImage.TYPE_BYTE_INDEXED;
+				BufferedImage outImage = new BufferedImage(scaledW, scaledH, imageType);
+				Graphics2D g = outImage.createGraphics();
+				try {
+					AffineTransformOp ato = new AffineTransformOp(AffineTransform.getScaleInstance(scale, scale), AffineTransformOp.TYPE_BICUBIC);
+					g.drawImage(srcImage, ato, 0, 0);
+					ImageIO.write(outImage, imageInfo.getExt(), zos);
+					LogAppender.append("画像縮小: "+imageInfo.getOutFileName()+" ("+w+","+h+")→("+scaledW+","+scaledH+")\n");
+				} finally {
+					g.dispose();
+				}
 			} catch (Exception e) {
 				LogAppender.append("画像読み込みエラー: "+imageInfo.getOutFileName()+"\n");
 				e.printStackTrace();
-			} finally {
-				g.dispose();
 			}
 			zos.flush();
 		}

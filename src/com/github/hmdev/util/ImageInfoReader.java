@@ -186,7 +186,7 @@ public class ImageInfoReader
 	 * 拡張子変更等は外側で修正しておく
 	 * ファイルシステムまたはZipファイルから指定されたファイル名の画像を取得
 	 * @param srcImageFileName ファイル名 Zipならエントリ名
-	 * ※先頭からシークされるので遅い */
+	 * ※先頭からシークされるので遅い? */
 	public BufferedImage getImage(String srcImageFileName) throws IOException
 	{
 		if (this.isFile) {
@@ -204,6 +204,7 @@ public class ImageInfoReader
 					String entryName = entry.getName();
 					if (entryName.equals(srcImageFileName)) {
 						try {
+							//zisからの読み込みは失敗する場合がある
 							return ImageIO.read(zis);
 						} catch (Exception e) {
 							e.printStackTrace();
