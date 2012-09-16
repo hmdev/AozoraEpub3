@@ -1,9 +1,9 @@
 package com.github.hmdev.util;
 
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
 import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -19,9 +19,10 @@ import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.archivers.zip.ZipFile;
-import org.apache.commons.compress.utils.IOUtils;
 
 import com.github.hmdev.info.ImageInfo;
+import com.sun.media.jai.codec.ImageCodec;
+import com.sun.media.jai.codec.ImageDecoder;
 
 /**
  * 画像情報を格納するクラス
@@ -197,39 +198,15 @@ public class ImageInfoReader
 			if (!file.exists()) return null; 
 			BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file), 8192);
 			try {
-				return ImageIO.read(bis);
+				return readImage(srcImageFileName.substring(srcImageFileName.lastIndexOf('.')+1).toLowerCase(), bis);
 			} finally { bis.close(); }
 		} else {
-			/*ZipArchiveInputStream zis = new ZipArchiveInputStream(new BufferedInputStream(new FileInputStream(srcFile), 65536), "MS932", false);
-			try {
-				ArchiveEntry entry;
-				while ((entry = zis.getNextEntry()) != null) {
-					String entryName = entry.getName();
-					if (entryName.equals(srcImageFileName)) {
-						try {
-							//zisからの読み込みは失敗する場合がある
-							return ImageIO.read(zis);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					}
-				}
-			} finally {
-				zis.close();
-			}*/
 			ZipFile zf = new ZipFile(this.srcFile, "MS932");
 			ZipArchiveEntry entry = zf.getEntry(srcImageFileName);
 			if (entry == null) return null;
 			InputStream is = zf.getInputStream(entry);
 			try {
-				ByteArrayOutputStream baos = new ByteArrayOutputStream();
-				IOUtils.copy(is, baos);
-				byte[] bytes= baos.toByteArray();
-				baos.close();
-				ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-				BufferedImage image = ImageIO.read(bais);
-				bais.close();
-				return image;
+				return readImage(srcImageFileName.substring(srcImageFileName.lastIndexOf('.')+1).toLowerCase(), is);
 			} catch (Exception e) {
 				e.printStackTrace();
 			} finally {
@@ -253,7 +230,23 @@ public class ImageInfoReader
 				if (!file.exists()) return null;
 				is = new BufferedInputStream(new FileInputStream(file), 8192);
 			}
-			return ImageIO.read(is);
+			return readImage(path.substring(path.lastIndexOf('.')+1).toLowerCase(), is);
 		} catch (Exception e) { return null; }
+	}
+	
+	final static AffineTransform NO_TRANSFORM = AffineTransform.getTranslateInstance(0, 0);
+	static public BufferedImage readImage(String ext, InputStream is) throws IOException
+	{
+		BufferedImage image;
+		if (ext.equals("jpg") || ext.equals("jpeg")) {
+			ImageDecoder dec = ImageCodec.createImageDecoder("jpeg", is, null);
+			RenderedImage ri = dec.decodeAsRenderedImage();
+			image = new BufferedImage(ri.getWidth(), ri.getHeight(), BufferedImage.TYPE_INT_RGB);
+			image.createGraphics().drawRenderedImage(ri, NO_TRANSFORM);
+		} else {
+			image = ImageIO.read(is);
+		}
+		is.close();
+		return image;
 	}
 }

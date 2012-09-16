@@ -399,13 +399,13 @@ public class Epub3Writer
 				ImageInfo imageInfo = imageInfos.get(0);
 				if (bookInfo.coverImage != null) {
 					zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+IMAGES_PATH+imageInfo.getOutFileName()));
-					this.writeImage(bookInfo.coverImage, zos, coverImageInfo);
+					this.writeImage(imageInfo.getOutFileName(), bookInfo.coverImage, zos, coverImageInfo);
 					zos.closeArchiveEntry();
 					bookInfo.coverImage = null; //同じ画像が使われている場合は以後はファイルから読み込ませる
 				} else {
 					ByteArrayInputStream bais = new ByteArrayInputStream(coverImageBytes);
 					zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+IMAGES_PATH+imageInfo.getOutFileName()));
-					this.writeImage(bais, zos, coverImageInfo);
+					this.writeImage(imageInfo.getOutFileName(), bais, zos, coverImageInfo);
 					zos.closeArchiveEntry();
 					bais.close();
 				}
@@ -432,9 +432,9 @@ public class Epub3Writer
 							zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+IMAGES_PATH+imageInfo.getOutFileName()));
 							//プレビューで編集されていたらイメージを出力
 							if (imageInfo.getIsCover() && bookInfo.coverImage != null) {
-								this.writeImage(bookInfo.coverImage, zos, imageInfo);
+								this.writeImage(srcImageFileName, bookInfo.coverImage, zos, imageInfo);
 							} else {
-								this.writeImage(new BufferedInputStream(fis, 8192), zos, imageInfo);
+								this.writeImage(srcImageFileName, new BufferedInputStream(fis, 8192), zos, imageInfo);
 							}
 							zos.closeArchiveEntry();
 							fis.close();
@@ -459,15 +459,15 @@ public class Epub3Writer
 					zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+IMAGES_PATH+imageInfo.getOutFileName()));
 					//プレビューで編集されていたらイメージを出力
 					if (imageInfo.getIsCover() && bookInfo.coverImage != null) {
-						this.writeImage(bookInfo.coverImage, zos, imageInfo);
+						this.writeImage(srcImageFileName, bookInfo.coverImage, zos, imageInfo);
 					} else {
 						//Zipからの直接読み込みは失敗するので一旦バイト配列にする
 						ByteArrayOutputStream baos = new ByteArrayOutputStream();
 						IOUtils.copy(zis, baos);
-						byte[] bytes= baos.toByteArray();
+						byte[] bytes = baos.toByteArray();
 						baos.close();
 						ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-						this.writeImage(bais, zos, imageInfo);
+						this.writeImage(srcImageFileName, bais, zos, imageInfo);
 						bais.close();
 					}
 					zos.closeArchiveEntry();
@@ -490,17 +490,17 @@ public class Epub3Writer
 		this.imageInfoReader = null;
 	}
 	
-	void writeImage(InputStream is,ZipArchiveOutputStream zos, ImageInfo imageInfo) throws IOException
+	void writeImage(String srcFileName, InputStream is,ZipArchiveOutputStream zos, ImageInfo imageInfo) throws IOException
 	{
-		writeImage(is, null, zos, imageInfo);
+		writeImage(srcFileName, is, null, zos, imageInfo);
 	}
-	void writeImage(BufferedImage srcImage, ZipArchiveOutputStream zos, ImageInfo imageInfo) throws IOException
+	void writeImage(String srcFileName, BufferedImage srcImage, ZipArchiveOutputStream zos, ImageInfo imageInfo) throws IOException
 	{
-		writeImage(null, srcImage, zos, imageInfo);
+		writeImage(srcFileName, null, srcImage, zos, imageInfo);
 	}
 	/** 大きすぎる画像は縮小して出力 
 	 * @throws IOException */
-	void writeImage(InputStream is, BufferedImage srcImage, ZipArchiveOutputStream zos, ImageInfo imageInfo) throws IOException
+	void writeImage(String srcFileName, InputStream is, BufferedImage srcImage, ZipArchiveOutputStream zos, ImageInfo imageInfo) throws IOException
 	{
 		double scale = 1;
 		int w = imageInfo.getWidth();
@@ -528,7 +528,7 @@ public class Epub3Writer
 			int scaledW = (int)(imageInfo.getWidth()*scale);
 			int scaledH = (int)(imageInfo.getHeight()*scale);
 			try {
-				if (srcImage == null) srcImage = ImageIO.read(is);
+				if (srcImage == null) srcImage = ImageInfoReader.readImage(srcFileName.substring(srcFileName.lastIndexOf('.')+1).toLowerCase(), is);
 				//TODO 画像回転対応
 				int imageType = srcImage.getType();
 				BufferedImage outImage;

@@ -1291,7 +1291,7 @@ public class AozoraEpub3Converter
 	/** 注記ルビ等のない文字列に置換 */
 	public String replaceToPlain(String str)
 	{
-		return str.replaceAll("<rt>[^<]+</rt>", "").replaceAll("<[^>]+>", "").replaceAll("《[^》]+》", "").replaceAll("［＃.+?］", "").replaceAll("[｜|※]","").replaceAll("^[ |　]+","").replaceAll("[ |　]+$","")
+		return str.replaceAll("<rt>[^<]+</rt>", "").replaceAll("<[^>]+>", "").replaceAll("《[^》]+》", "").replaceAll("［＃.+?］", "").replaceAll("[｜|※]","").replaceFirst("^[ |　]+","").replaceFirst("[ |　]+$","")
 				.replaceAll("〳〵", "く").replaceAll("〴〵", "ぐ").replaceAll("〻", "々");
 	}
 	
@@ -1553,7 +1553,7 @@ public class AozoraEpub3Converter
 			buf.append("<span class=\"withspace\">");
 			buf.append(ch[idx]);
 			buf.append("</span>");
-			ch[idx+1]='\0';//改行に変更
+			ch[idx+1]=' ';//改行に変更
 			return;
 		}
 		

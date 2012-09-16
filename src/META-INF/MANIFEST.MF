@@ -1,4 +1,4 @@
 Manifest-Version: 1.0
 Created-By: 1.6.0_31 (Sun Microsystems Inc.)
 Main-Class: AozoraEpub3Applet
-Class-Path: . lib/commons-lang-2.4.jar lib/commons-compress-1.0.jar lib/commons-collections-3.2.1.jar lib/velocity-1.7.jar
+Class-Path: . lib/commons-lang-2.4.jar lib/commons-compress-1.0.jar lib/commons-collections-3.2.1.jar lib/velocity-1.7.jar lib/jai_core.jar lib/jai_codec.jar
