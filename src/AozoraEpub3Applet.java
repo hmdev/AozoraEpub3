@@ -119,12 +119,13 @@ public class AozoraEpub3Applet extends JApplet
 	JButton jButtonCover;
 	JButton jButtonDstPath;
 	
-	JTextField jTextImageRateW;
-	JTextField jTextImageRateH;
+	JTextField jTextDispW;
+	JTextField jTextDispH;
 	
 	JTextField jTextSinglePageSizeW;
 	JTextField jTextSinglePageSizeH;
 	JTextField jTextSinglePageWidth;
+	JCheckBox jCheckFitImage;
 	
 	//画像縮小
 	JCheckBox jCheckResizeW;
@@ -532,7 +533,7 @@ public class AozoraEpub3Applet extends JApplet
 		panel.setMinimumSize(size);
 		panel.setMaximumSize(size);
 		panel.setPreferredSize(size);
-		panel.setBorder(BorderFactory.createTitledBorder(" 画面縦横比"));
+		panel.setBorder(BorderFactory.createTitledBorder(" 画面サイズ"));
 		tabPanel.add(panel);
 		//横
 		label = new JLabel("横 : 縦");
@@ -540,28 +541,31 @@ public class AozoraEpub3Applet extends JApplet
 		label = new JLabel("=");
 		label.setBorder(padding2H);
 		panel.add(label);
-		propValue = props.getProperty("ImageRateW");
-		jTextImageRateW = new JTextField(propValue==null?"600":propValue);
-		jTextImageRateW.setHorizontalAlignment(JTextField.RIGHT);
-		jTextImageRateW.setInputVerifier(new IntegerInputVerifier(1));
-		jTextImageRateW.setMaximumSize(new Dimension(35, 20));
-		panel.add(jTextImageRateW);
+		propValue = props.getProperty("DispW");
+		jTextDispW = new JTextField(propValue==null?"600":propValue);
+		jTextDispW.setHorizontalAlignment(JTextField.RIGHT);
+		jTextDispW.setInputVerifier(new IntegerInputVerifier(1));
+		jTextDispW.setMaximumSize(new Dimension(35, 20));
+		panel.add(jTextDispW);
 		label = new JLabel(" : ");
 		label.setBorder(padding2H);
 		panel.add(label);
-		propValue = props.getProperty("ImageRateH");
-		jTextImageRateH = new JTextField(propValue==null?"800":propValue);
-		jTextImageRateH.setHorizontalAlignment(JTextField.RIGHT);
-		jTextImageRateH.setInputVerifier(new IntegerInputVerifier(1));
-		jTextImageRateH.setMaximumSize(new Dimension(35, 20));
-		panel.add(jTextImageRateH);
+		propValue = props.getProperty("DispH");
+		jTextDispH = new JTextField(propValue==null?"800":propValue);
+		jTextDispH.setHorizontalAlignment(JTextField.RIGHT);
+		jTextDispH.setInputVerifier(new IntegerInputVerifier(1));
+		jTextDispH.setMaximumSize(new Dimension(35, 20));
+		panel.add(jTextDispH);
+		label = new JLabel("px");
+		label.setBorder(padding2H);
+		panel.add(label);
 		
 		////////////////////////////////
 		//画像単ページ
 		////////////////////////////////
 		panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-		size = new Dimension(300, 46);
+		size = new Dimension(420, 46);
 		panel.setMinimumSize(size);
 		panel.setMaximumSize(size);
 		panel.setPreferredSize(size);
@@ -596,19 +600,25 @@ public class AozoraEpub3Applet extends JApplet
 		label = new JLabel("px以上  ");
 		label.setBorder(padding2H);
 		panel.add(label);
-		//縦
+		//横のみ
 		label = new JLabel("横のみ");
 		label.setBorder(padding2H);
 		panel.add(label);
 		propValue = props.getProperty("SinglePageWidth");
-		jTextSinglePageWidth = new JTextField(propValue==null?"550":propValue);
+		jTextSinglePageWidth = new JTextField(propValue==null?"600":propValue);
 		jTextSinglePageWidth.setHorizontalAlignment(JTextField.RIGHT);
 		jTextSinglePageWidth.setInputVerifier(new IntegerInputVerifier(0));
 		jTextSinglePageWidth.setMaximumSize(new Dimension(35, 20));
 		panel.add(jTextSinglePageWidth);
-		label = new JLabel("px以上");
+		label = new JLabel("px以上  ");
 		label.setBorder(padding2H);
 		panel.add(label);
+		//拡大しない
+		propValue = props.getProperty("FitImage");
+		jCheckFitImage = new JCheckBox("小さい画像を拡大表示", propValue==null||"1".equals(propValue));
+		jCheckFitImage.setFocusPainted(false);
+		jCheckFitImage.setBorder(padding2H);
+		panel.add(jCheckFitImage);
 		
 		////////////////////////////////
 		//画像縮小指定
@@ -693,7 +703,7 @@ public class AozoraEpub3Applet extends JApplet
 		panel.setMinimumSize(size);
 		panel.setMaximumSize(size);
 		panel.setPreferredSize(size);
-		panel.setBorder(BorderFactory.createTitledBorder(" 表紙サイズ (縮小のみ)"));
+		panel.setBorder(BorderFactory.createTitledBorder(" 表紙画像サイズ (縮小のみ)"));
 		tabPanel.add(panel);
 		//横x縦
 		label = new JLabel("横");
@@ -1073,19 +1083,21 @@ public class AozoraEpub3Applet extends JApplet
 		
 		////////////////////////////////
 		//Appletのパラメータを取得しておく
-		//画像リサイズ
+		//画面サイズと画像リサイズ
 		int resizeW = 0;
 		if (jCheckResizeW.isSelected()) try { resizeW = Integer.parseInt(jTextResizeW.getText()); } catch (Exception e) {}
 		int resizeH = 0;
 		if (jCheckResizeH.isSelected()) try { resizeH = Integer.parseInt(jTextResizeH.getText()); } catch (Exception e) {}
 		int pixels = 0;
 		if (jCheckPixel.isSelected()) try { pixels = Integer.parseInt(jTextPixelW.getText())*Integer.parseInt(jTextPixelH.getText()); } catch (Exception e) {}
+		int dispW = Integer.parseInt(jTextDispW.getText());
+		int dispH = Integer.parseInt(jTextDispH.getText());
 		int singlePageSizeW = Integer.parseInt(jTextSinglePageSizeW.getText());
 		int singlePageSizeH = Integer.parseInt(jTextSinglePageSizeH.getText());
 		int singlePageWidth = Integer.parseInt(jTextSinglePageWidth.getText());
 		float jpegQualty = Integer.parseInt(jTextJpegQuality.getText())/100f;
-		this.epub3Writer.setImageParam(resizeW, resizeH, pixels, singlePageSizeW, singlePageSizeH, singlePageWidth, jpegQualty);
-		this.epub3ImageWriter.setImageParam(resizeW, resizeH, pixels, singlePageSizeW, singlePageSizeH, singlePageWidth, jpegQualty);
+		this.epub3Writer.setImageParam(dispW, dispH, resizeW, resizeH, pixels, singlePageSizeW, singlePageSizeH, singlePageWidth, jCheckFitImage.isSelected(), jpegQualty);
+		this.epub3ImageWriter.setImageParam(dispW, dispH, resizeW, resizeH, pixels, singlePageSizeW, singlePageSizeH, singlePageWidth, jCheckFitImage.isSelected(), jpegQualty);
 		
 		this.aozoraConverter.setForcePageBreak(forcePageBreak, forcePageBreakEmpty, pattern);
 		//栞用ID出力
@@ -1406,8 +1418,8 @@ public class AozoraEpub3Applet extends JApplet
 		this.jComboEncType.setEnabled(enabled);
 		this.jButtonFile.setEnabled(enabled);
 		
-		this.jTextImageRateW.setEnabled(enabled);
-		this.jTextImageRateH.setEnabled(enabled);
+		this.jTextDispW.setEnabled(enabled);
+		this.jTextDispH.setEnabled(enabled);
 		this.jTextSinglePageSizeW.setEnabled(enabled);
 		this.jTextSinglePageSizeH.setEnabled(enabled);
 		this.jTextSinglePageWidth.setEnabled(enabled);
@@ -1541,12 +1553,13 @@ public class AozoraEpub3Applet extends JApplet
 		this.props.setProperty("TocPage", this.jCheckTocPage.isSelected()?"1":"");
 		this.props.setProperty("TocVertical", this.jRadioTocV.isSelected()?"1":"");
 		
-		this.props.setProperty("ImageRateW", this.jTextImageRateW.getText());
-		this.props.setProperty("ImageRateH", this.jTextImageRateH.getText());
+		this.props.setProperty("DispW", this.jTextDispW.getText());
+		this.props.setProperty("DispH", this.jTextDispH.getText());
 		
 		this.props.setProperty("SinglePageSizeW", this.jTextSinglePageSizeW.getText());
 		this.props.setProperty("SinglePageSizeH", this.jTextSinglePageSizeH.getText());
 		this.props.setProperty("SinglePageWidth", this.jTextSinglePageWidth.getText());
+		this.props.setProperty("FitImage", this.jCheckFitImage.isSelected()?"1":"");
 		
 		this.props.setProperty("ResizeW", this.jCheckResizeW.isSelected()?"1":"");
 		this.props.setProperty("ResizeH", this.jCheckResizeH.isSelected()?"1":"");

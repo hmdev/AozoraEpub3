@@ -32,6 +32,7 @@ http://www.aozora.gr.jp/accent_separation.html
 -------------------------------------------------------
 
 アイコン画像→<img src="img/icon.png" alt="アイコン">
+アイコン画像→<img src="img/icon.png" alt="アイコン">←アイコン画像
 <img src='img/表紙.png'>
 
 画像無し→<img src='img/画像無し.png'>←画像無し

@@ -8,6 +8,7 @@ public class PageBreakTrigger
 	final static public int IMAGE_PAGE_NONE = 0;
 	final static public int IMAGE_PAGE_W = 1;
 	final static public int IMAGE_PAGE_H = 2;
+	final static public int IMAGE_PAGE_NOFIT = 5;
 	final static public int IMAGE_PAGE_AUTO = 10;
 	
 	/** 空のページは無視する */

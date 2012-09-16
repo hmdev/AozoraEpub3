@@ -14,6 +14,8 @@ import java.awt.dnd.DropTargetListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
@@ -27,7 +29,7 @@ import com.github.hmdev.info.BookInfo;
 /**
  * 表紙画像プレビューとトリミング用パネル
  */
-public class JCoverImagePanel extends JPanel implements MouseListener, MouseMotionListener, DropTargetListener
+public class JCoverImagePanel extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener, DropTargetListener
 {
 	private static final long serialVersionUID = 1L;
 	
@@ -39,6 +41,8 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 	private double scale = 0;
 	private int offsetX = 0;
 	private int offsetY = 0;
+	
+	private int visibleWidth = 0;
 	
 	private int fitType = 0;
 	final static int FIT_ALL = 0;
@@ -53,7 +57,9 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 	{
 		this.addMouseListener(this);
 		this.addMouseMotionListener(this);
+		this.addMouseWheelListener(this);
 		new DropTarget(this, DnDConstants.ACTION_COPY_OR_MOVE, this, true);
+		this.setBackground(Color.GRAY);
 	}
 	
 	/** パネル描画 */
@@ -68,7 +74,8 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 				this.createPreviewImage(this.scale);
 			}
 			if (this.previewImage != null) {
-				int minX = this.getWidth()-this.previewImage.getWidth();
+				if (this.visibleWidth <= 0) this.visibleWidth = this.getWidth();
+				int minX = this.visibleWidth-this.previewImage.getWidth();
 				int maxX = 0;
 				int x = minX/2;
 				if (minX < 0) x = Math.max(minX, Math.min(maxX, this.offsetX));
@@ -79,6 +86,9 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 				if (minY < 0) y = Math.max(minY,  Math.min(maxY, this.offsetY));
 				else y = 0;
 				this.offsetY = y;
+				g.setClip(0, 0, this.visibleWidth, this.getHeight());
+				g.setColor(Color.WHITE);
+				g.fillRect(0, 0, this.visibleWidth, this.getHeight());
 				g.drawImage(this.previewImage, x, y, this);
 			}
 		}
@@ -107,6 +117,7 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 		this.previewImage = null;
 		this.offsetX = 0;
 		this.offsetY = 0;
+		this.visibleWidth = 0;
 		if (this.fitType == FIT_ZOOM) this.fitType = FIT_ALL;
 		this.setScale();
 		this.repaint();
@@ -133,20 +144,46 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 		this.repaint();
 	}
 	
+	void resetVisibleWidth()
+	{
+		this.visibleWidth = this.getWidth();
+		//プレビューが狭かったら倍率変更
+		this.setScale();
+		this.previewImage = null;
+		this.repaint();
+	}
+	
+	void setVisibleWidthOffset(int offset)
+	{
+		int width = this.visibleWidth+offset;
+		//プレビュー幅の方が狭ければプレビューを狭くする
+		if (offset < 0) {
+			if (this.previewImage != null && width > this.previewImage.getWidth()) width = this.previewImage.getWidth()-offset;
+			if (width < 10) return;
+		} else {
+			if (width > this.getWidth()) return;
+		}
+		this.visibleWidth = width;
+		this.setScale();
+		this.previewImage = null;
+		this.repaint();
+	}
+	
 	private void setScale()
 	{
 		if (bookInfo.coverImage == null) {
 			this.minScale = 0;
 			return;
 		}
-		this.minScale = Math.min((double)this.getWidth()/bookInfo.coverImage.getWidth(), (double)this.getHeight()/this.bookInfo.coverImage.getHeight());
+		if (this.visibleWidth <= 0) this.visibleWidth = this.getWidth();
+		this.minScale = Math.min((double)this.visibleWidth/bookInfo.coverImage.getWidth(), (double)this.getHeight()/this.bookInfo.coverImage.getHeight());
 		switch (this.fitType) {
 		case FIT_ALL:
 			this.scale = minScale; break;
 		case FIT_W:
-			this.scale = (double)this.getWidth()/bookInfo.coverImage.getWidth(); break;
+			this.scale = Math.max(this.minScale, (double)this.visibleWidth/bookInfo.coverImage.getWidth()); break;
 		case FIT_H:
-			this.scale = (double)this.getHeight()/this.bookInfo.coverImage.getHeight(); break;
+			this.scale = Math.max(this.minScale, (double)this.getHeight()/this.bookInfo.coverImage.getHeight()); break;
 		}
 	}
 	
@@ -154,6 +191,8 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 	public boolean isModified()
 	{
 		if (bookInfo.coverImage == null) return false;
+		//幅変更
+		if (this.visibleWidth != this.getWidth()) return true;
 		//トリミングなし
 		double scale = Math.min((double)this.getWidth()/bookInfo.coverImage.getWidth(), (double)this.getHeight()/this.bookInfo.coverImage.getHeight());
 		return this.scale != scale;
@@ -162,40 +201,52 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 	/** 編集された表紙を取得 */
 	public BufferedImage getModifiedImage()
 	{
+		try {
 		//表紙なし
 		if (this.bookInfo.coverImage == null) return null;
-		//トリミングなし
+		
 		double scale = Math.min((double)this.getWidth()/bookInfo.coverImage.getWidth(), (double)this.getHeight()/this.bookInfo.coverImage.getHeight());
-		if (this.scale == scale) return null;
+		if (this.visibleWidth <= 0) this.visibleWidth = this.getWidth();
+		
+		//トリミングと幅変更なしならnullを返す
+		if (this.scale == scale && this.visibleWidth == this.getWidth()) return null;
 		
 		//縮尺に合せてリサイズ 大きければ縮小
-		int coverW = 600;
-		int coverH = 800;
+		double coverW = 600;
+		double coverH = 800;
 		double coverScale = (double)coverW/this.getWidth() * this.scale;
-		coverW = (int)Math.min(coverW, bookInfo.coverImage.getWidth()*coverScale);
-		coverH = (int)Math.min(coverH, this.bookInfo.coverImage.getHeight()*coverScale);
+		coverW = Math.min(coverW, bookInfo.coverImage.getWidth()*coverScale);
+		coverH = Math.min(coverH, this.bookInfo.coverImage.getHeight()*coverScale);
 		if (coverScale > 1) {
 			coverW /= coverScale;
 			coverH /= coverScale;
 			coverScale = 1;
 		}
 		
-		int x = 0;
-		if (this.getWidth() < this.previewImage.getWidth()) x = (int)(this.offsetX * (double)coverW/this.getWidth());
-		int y = 0;
-		if (this.getHeight() < this.previewImage.getHeight()) y = (int)(this.offsetY * (double)coverH/this.getHeight());
-		BufferedImage coverImage = new BufferedImage(coverW, coverH, BufferedImage.TYPE_INT_RGB);
+		double x = 0;
+		if (this.getWidth() < this.previewImage.getWidth()) x = this.offsetX * (double)coverW/this.getWidth();
+		double y = 0;
+		if (this.getHeight() < this.previewImage.getHeight()) y = this.offsetY * (double)coverH/this.getHeight();
+		
+		//幅変更を反映
+		//x -= (this.getWidth()-this.visibleWidth)/2.0 * (double)coverW/this.getWidth();
+		coverW *= (double)this.visibleWidth/this.getWidth();
+		BufferedImage coverImage = new BufferedImage((int)coverW, (int)coverH, BufferedImage.TYPE_INT_RGB);
 		Graphics2D g2 = coverImage.createGraphics();
 		try {
 			//リサイズのatoとoffset指定でdrawImage
 			AffineTransformOp ato = new AffineTransformOp(AffineTransform.getScaleInstance(coverScale, coverScale), AffineTransformOp.TYPE_BICUBIC);
 			g2.setColor(Color.WHITE);
-			g2.fillRect(0, 0, coverW, coverH);
-			g2.drawImage(this.bookInfo.coverImage, ato, x ,y);
+			g2.fillRect(0, 0, (int)coverW, (int)coverH);
+			g2.drawImage(this.bookInfo.coverImage, ato, (int)x, (int)y);
 		} finally {
 			g2.dispose();
 		}
 		return coverImage;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 	////////////////////////////////////////////////////////////////
@@ -286,5 +337,14 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 	{
 	}
 	
-	
+	/** マウスホイールで拡大縮小 */
+	@Override
+	public void mouseWheelMoved(MouseWheelEvent e)
+	{
+		if (e.getWheelRotation() > 0) {
+			this.setZoom(1/1.01);
+		} else {
+			this.setZoom(1.01);
+		}
+	}
 }

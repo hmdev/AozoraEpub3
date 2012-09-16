@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="ja" lang="ja">
 <head>
 #if (${bookInfo.Vertical})
-#if (${sectionInfo.ImageFit})
+#if (${sectionInfo.ImagePage})
 	<link rel="stylesheet" type="text/css" href="../css/vertical_image.css"/>
 #elseif (${sectionInfo.Middle})
 	<link rel="stylesheet" type="text/css" href="../css/vertical_font.css"/>
@@ -15,7 +15,7 @@
 	<link rel="stylesheet" type="text/css" href="../css/vertical.css"/>
 #end
 #else
-#if (${sectionInfo.ImageFit})
+#if (${sectionInfo.ImagePage})
 	<link rel="stylesheet" type="text/css" href="../css/horizontal_image.css"/>
 #elseif (${sectionInfo.Middle})
 	<link rel="stylesheet" type="text/css" href="../css/horizontal_font.css"/>
@@ -33,8 +33,6 @@
 <body class="fit_w">
 #elseif (${sectionInfo.ImageFitH})
 <body class="fit_h">
-#elseif (${sectionInfo.ImageFit})
-<body class="fit">
 #else
 <body>
 #end

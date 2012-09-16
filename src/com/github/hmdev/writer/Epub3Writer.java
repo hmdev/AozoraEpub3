@@ -116,8 +116,10 @@ public class Epub3Writer
 	
 	////////////////////////////////
 	//Properties
-	/** 縦横比 */
-	double imageRate = 3.0/4;
+	/** 画面サイズ */
+	int dispW = 600;
+	int dispH = 800;
+	
 	/** 画像最大幅 0は指定なし */
 	int maxImageW = 0;
 	/** 画像最大高さ 0は指定なし */
@@ -131,6 +133,9 @@ public class Epub3Writer
 	int singlePageSizeH = 600;
 	/** 縦に関係なく横がこれ以上なら単ページ化 */
 	int singlePageWidth = 550;
+	
+	/** 画像を拡大する */
+	boolean fitImage = true;
 	
 	/** jpeg圧縮率 */
 	float jpegQuality = 0.8f;
@@ -185,8 +190,11 @@ public class Epub3Writer
 	}
 	
 	/** 画像のリサイズ用パラメータを設定 */
-	public void setImageParam(int resizeW, int resizeH, int pixels, int singlePageSizeW, int singlePageSizeH, int singlePageWidth, float jpegQuality)
+	public void setImageParam(int dispW, int dispH, int resizeW, int resizeH, int pixels, int singlePageSizeW, int singlePageSizeH, int singlePageWidth, boolean fitImage,  float jpegQuality)
 	{
+		this.dispW = dispW;
+		this.dispH = dispH;
+		
 		this.maxImageW = resizeW;
 		this.maxImageH = resizeH;
 		this.maxImagePixels = pixels;
@@ -194,6 +202,8 @@ public class Epub3Writer
 		this.singlePageSizeW = singlePageSizeW;
 		this.singlePageSizeH = singlePageSizeH;
 		this.singlePageWidth = singlePageWidth;
+		
+		this.fitImage = fitImage;
 		
 		this.jpegQuality = jpegQuality;
 	}
@@ -286,8 +296,6 @@ public class Epub3Writer
 				for(ImageInfo imageInfo2 : imageInfos) {
 					imageInfo2.setIsCover(false);
 				}
-				String ext = "";
-				try { ext = bookInfo.coverFileName.substring(bookInfo.coverFileName.lastIndexOf('.')+1); } catch (Exception e) {}
 				BufferedInputStream bis;
 				if (bookInfo.coverFileName.startsWith("http")) {
 					bis = new BufferedInputStream(new URL(bookInfo.coverFileName).openStream(), 8192);
@@ -302,9 +310,11 @@ public class Epub3Writer
 				ByteArrayInputStream bais = new ByteArrayInputStream(coverImageBytes);
 				coverImageInfo = ImageInfo.getImageInfo(bais);
 				bais.close();
+				String ext = coverImageInfo.getExt();
+				if (ext.equals("jpeg")) ext = "jpg";
 				coverImageInfo.setId("0000");
 				coverImageInfo.setOutFileName("0000."+ext);
-				if (!coverImageInfo.getExt().matches("^(png|jpg|jpeg|gif)$")) {
+				if (!ext.matches("^(png|jpg|jpeg|gif)$")) {
 					LogAppender.append("表紙画像フォーマットエラー: "+bookInfo.coverFileName+"\n");
 					coverImageInfo = null;
 				} else {
@@ -313,6 +323,10 @@ public class Epub3Writer
 				}
 			} catch (Exception e) { e.printStackTrace(); }
 		} else if (bookInfo.coverImage != null) {
+			//表紙設定解除
+			for(ImageInfo imageInfo2 : imageInfos) {
+				imageInfo2.setIsCover(false);
+			}
 			//プレビューでトリミングされた表紙
 			String ext = "jpg";
 			if (bookInfo.coverExt != null) {
@@ -320,6 +334,7 @@ public class Epub3Writer
 			} else if (bookInfo.coverImageIndex > -1) {
 				ext = imageInfoReader.getImageInfo(bookInfo.coverImageIndex).getExt();
 			}
+			if (ext.equals("jpeg")) ext = "jpg";
 			coverImageInfo = ImageInfo.getImageInfo(ext, bookInfo.coverImage, -1);
 			coverImageInfo.setId("0000");
 			coverImageInfo.setOutFileName("0000."+ext);
@@ -600,23 +615,26 @@ public class Epub3Writer
 		switch (imagePageType) {
 		case PageBreakTrigger.IMAGE_PAGE_AUTO:
 			//未使用
-			sectionInfo.setImageFit(true);
+			sectionInfo.setImagePage(true);
 			//画像サイズが横長なら幅に合わせる
 			ImageInfo imageInfo = this.imageInfoReader.getImageInfo(srcImageFilePath);
 			if (imageInfo != null) {
 				//横長ならwidth100％
-				if ((double)imageInfo.getWidth()/imageInfo.getHeight() >= this.imageRate) sectionInfo.setImageFitW(true);
+				if ((double)imageInfo.getWidth()/imageInfo.getHeight() >= (double)this.dispW/this.dispH) sectionInfo.setImageFitW(true);
 				//縦がはみ出すならheight:100%
 				else sectionInfo.setImageFitH(true);
 			}
 			break;
 		case PageBreakTrigger.IMAGE_PAGE_W:
-			sectionInfo.setImageFit(true);
+			sectionInfo.setImagePage(true);
 			sectionInfo.setImageFitW(true);
 			break;
 		case PageBreakTrigger.IMAGE_PAGE_H:
-			sectionInfo.setImageFit(true);
+			sectionInfo.setImagePage(true);
 			sectionInfo.setImageFitH(true);
+			break;
+		case PageBreakTrigger.IMAGE_PAGE_NOFIT:
+			sectionInfo.setImagePage(true);
 			break;
 		}
 		if (isMiddle) sectionInfo.setMiddle(true);
@@ -729,7 +747,11 @@ public class Epub3Writer
 			if (imageInfo == null) return PageBreakTrigger.IMAGE_PAGE_NONE;
 			
 			if (imageInfo.getWidth() >= this.singlePageWidth || imageInfo.getWidth() >= singlePageSizeW && imageInfo.getHeight() >= singlePageSizeH) {
-				if ((double)imageInfo.getWidth()/imageInfo.getHeight() > this.imageRate)
+				//拡大しない＆画面より小さい場合
+				if (!this.fitImage && imageInfo.getWidth() <= this.dispW && imageInfo.getHeight() < this.dispH)
+					return PageBreakTrigger.IMAGE_PAGE_NOFIT;
+				//拡大するか画面より多きい場合
+				if ((double)imageInfo.getWidth()/imageInfo.getHeight() > (double)this.dispW/this.dispH)
 					return PageBreakTrigger.IMAGE_PAGE_W;
 				else return PageBreakTrigger.IMAGE_PAGE_H;
 			}

@@ -6,8 +6,8 @@ public class SectionInfo
 	/** セクションID 0001～ */
 	public String sectionId;
 	
-	/** 画像のみのページ時をページ内に合わせる場合にtrue */
-	public boolean imageFit = false;
+	/** 画像のみのページ時にtrue */
+	public boolean imagePage = false;
 	/** 画像のみのページで幅に合わる場合にtrue */
 	public boolean imageFitW = false;
 	/** 画像のみのページで高さに合わる場合にtrue */
@@ -37,14 +37,14 @@ public class SectionInfo
 		this.sectionId = sectionId;
 	}
 
-	public boolean isImageFit()
+	public boolean isImagePage()
 	{
-		return imageFit;
+		return imagePage;
 	}
 
-	public void setImageFit(boolean imageFit)
+	public void setImagePage(boolean imagePage)
 	{
-		this.imageFit = imageFit;
+		this.imagePage = imagePage;
 	}
 
 	public boolean isImageFitW()
