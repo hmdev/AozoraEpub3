@@ -293,7 +293,7 @@ public class JConfirmDialog extends JDialog
 		//プレビューパネル
 		panel = new JPanel();
 		panel.setBorder(BorderFactory.createEtchedBorder(1));
-		size = new Dimension(PREVIEW_WIDTH+4, PREVIEW_HEIGHT);
+		size = new Dimension(PREVIEW_WIDTH+5, PREVIEW_HEIGHT+5);
 		panel.setMaximumSize(size);
 		panel.setPreferredSize(size);
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));

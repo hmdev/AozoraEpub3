@@ -1309,7 +1309,7 @@ public class AozoraEpub3Converter
 	/** 注記ルビ等のない文字列に置換 */
 	public String replaceToPlain(String str)
 	{
-		return str.replaceAll("<rt>[^<]+</rt>", "").replaceAll("<[^>]+>", "").replaceAll("《[^》]+》", "").replaceAll("［＃.+?］", "").replaceAll("[｜|※]","").replaceFirst("^[ |　]+","").replaceFirst("[ |　]+$","")
+		return str.replaceAll("<span class=\"withspace\">(.)</span>", "$1　").replaceAll("<rt>[^<]+</rt>", "").replaceAll("<[^>]+>", "").replaceAll("《[^》]+》", "").replaceAll("［＃.+?］", "").replaceAll("[｜|※]","").replaceFirst("^[ |　]+","").replaceFirst("[ |　]+$","")
 				.replaceAll("〳〵", "く").replaceAll("〴〵", "ぐ").replaceAll("〻", "々");
 	}
 	
@@ -1567,11 +1567,11 @@ public class AozoraEpub3Converter
 			}
 		}
 		//文字の間の全角スペースを禁則調整
-		if (!inTcy && !inRuby && idx+2<ch.length && ch[idx]!='　' && +ch[idx+1]=='　' && ch[idx+2]!='　') {
+		if (!inTcy && !inRuby && idx+1<ch.length && ch[idx]!='　' && +ch[idx+1]=='　') {
 			buf.append("<span class=\"withspace\">");
 			buf.append(ch[idx]);
 			buf.append("</span>");
-			ch[idx+1]=' ';//改行に変更
+			ch[idx+1]='\0';//改行に変更
 			return;
 		}
 		

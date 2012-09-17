@@ -59,7 +59,7 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 		this.addMouseMotionListener(this);
 		this.addMouseWheelListener(this);
 		new DropTarget(this, DnDConstants.ACTION_COPY_OR_MOVE, this, true);
-		this.setBackground(Color.GRAY);
+		this.setBackground(Color.LIGHT_GRAY);
 	}
 	
 	/** パネル描画 */
@@ -97,7 +97,7 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 	/** プレビュー用の小さい画像を生成 */
 	private void createPreviewImage(double scale)
 	{
-		BufferedImage previewImage = new BufferedImage((int)(this.bookInfo.coverImage.getWidth()*scale), (int)(this.bookInfo.coverImage.getHeight()*scale), BufferedImage.TYPE_INT_RGB);
+		BufferedImage previewImage = new BufferedImage((int)Math.round(this.bookInfo.coverImage.getWidth()*scale), (int)Math.round(this.bookInfo.coverImage.getHeight()*scale), BufferedImage.TYPE_INT_RGB);
 		Graphics2D g2 = previewImage.createGraphics();
 		try {
 			AffineTransformOp ato = new AffineTransformOp(AffineTransform.getScaleInstance(scale, scale), AffineTransformOp.TYPE_BICUBIC);
