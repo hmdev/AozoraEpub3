@@ -785,16 +785,16 @@ public class AozoraEpub3Applet extends JApplet
 		//ピクセル
 		propValue = props.getProperty("SpaceHyphenation");
 		buttonGroup = new ButtonGroup();
-		jRadioSpaceHyp2 = new JRadioButton("禁則処理(追いだし)  ", propValue==null||"2".equals(propValue));
-		jRadioSpaceHyp2.setFocusPainted(false);
-		jRadioSpaceHyp2.setBorder(padding2H);
-		panel.add(jRadioSpaceHyp2);
-		buttonGroup.add(jRadioSpaceHyp2);
-		jRadioSpaceHyp1 = new JRadioButton("行末で非表示(Koboのみ)  ", "1".equals(propValue));
+		jRadioSpaceHyp1 = new JRadioButton("行末で非表示  ", propValue==null||"1".equals(propValue));
 		jRadioSpaceHyp1.setFocusPainted(false);
 		jRadioSpaceHyp1.setBorder(padding2H);
 		panel.add(jRadioSpaceHyp1);
 		buttonGroup.add(jRadioSpaceHyp1);
+		jRadioSpaceHyp2 = new JRadioButton("禁則処理(追いだし)  ", "2".equals(propValue));
+		jRadioSpaceHyp2.setFocusPainted(false);
+		jRadioSpaceHyp2.setBorder(padding2H);
+		panel.add(jRadioSpaceHyp2);
+		buttonGroup.add(jRadioSpaceHyp2);
 		jRadioSpaceHyp0 = new JRadioButton("何もしない", "0".equals(propValue));
 		jRadioSpaceHyp0.setFocusPainted(false);
 		jRadioSpaceHyp0.setBorder(padding2H);
