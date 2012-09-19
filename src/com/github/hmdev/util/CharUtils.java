@@ -43,6 +43,15 @@ public class CharUtils
 		return true;
 	}
 	
+	/** 半角数字かチェック */
+	static public boolean isHalfNum(char ch)
+	{
+		switch (ch) {
+			case '0': case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9': return true;
+		}
+		return false;
+	}
+	
 	/** 英字かどうかをチェック 拡張ラテン文字含む
 	 * 半角スペースを含む */
 	static public boolean isHalfSpace(char ch)

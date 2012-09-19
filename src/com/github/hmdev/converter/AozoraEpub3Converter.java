@@ -31,6 +31,8 @@ public class AozoraEpub3Converter
 	
 	/** 半角2文字の数字と!?を縦横中に変換 */
 	boolean autoYoko = true;
+	/** 半角数字1桁も自動縦中横 */
+	boolean autoYokoNum1 = true;
 	
 	/** 栞用のidを行頭の<p>につけるならtrue */
 	boolean withMarkId = false;
@@ -47,6 +49,12 @@ public class AozoraEpub3Converter
 	
 	/** 奥付を別ページ */
 	boolean separateColophon = true;
+	
+	/** 文中全角スペース(1文字)の禁則処理
+	 * 1なら余白付き半角スペース
+	 * 2なら追い出しのために前の文字の後ろに余白 */
+	int spaceHyphenation = 0;
+	
 	
 	/** 強制改行行数 ページ先頭からこれ以降の行 */
 	int forcePageBreak = 500;
@@ -287,9 +295,10 @@ public class AozoraEpub3Converter
 	}
 	/**  半角数字!?の回転を設定
 	 * @param autoYoko 回転を設定するならtrue */
-	public void setAutoYoko(boolean autoYoko)
+	public void setAutoYoko(boolean autoYoko, boolean autoYokoNum1)
 	{
 		this.autoYoko = autoYoko;
+		this.autoYokoNum1 = autoYokoNum1;
 	}
 	/**  4バイト文字変換を設定
 	 * @param gaiji32 4バイト文字変換するならtrue */
@@ -302,6 +311,11 @@ public class AozoraEpub3Converter
 	public void setMiddleTitle(boolean middleFirst)
 	{
 		this.middleTitle = middleFirst;
+	}
+	
+	public void setSpaceHyphenation(int type)
+	{
+		this.spaceHyphenation = type;
 	}
 	
 	/** 自動強制改行設定 */
@@ -1309,7 +1323,7 @@ public class AozoraEpub3Converter
 	/** 注記ルビ等のない文字列に置換 */
 	public String replaceToPlain(String str)
 	{
-		return str.replaceAll("<span class=\"withspace\">(.)</span>", "$1　").replaceAll("<rt>[^<]+</rt>", "").replaceAll("<[^>]+>", "").replaceAll("《[^》]+》", "").replaceAll("［＃.+?］", "").replaceAll("[｜|※]","").replaceFirst("^[ |　]+","").replaceFirst("[ |　]+$","")
+		return str.replaceAll("<span class=\"withsp\">(.)</span>", "$1　").replaceAll("<span class=\"fullsp\"> </span>", "　").replaceAll("<rt>[^<]+</rt>", "").replaceAll("<[^>]+>", "").replaceAll("《[^》]+》", "").replaceAll("［＃.+?］", "").replaceAll("[｜|※]","").replaceFirst("^[ |　]+","").replaceFirst("[ |　]+$","")
 				.replaceAll("〳〵", "く").replaceAll("〴〵", "ぐ").replaceAll("〻", "々");
 	}
 	
@@ -1386,8 +1400,8 @@ public class AozoraEpub3Converter
 			case '0': case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9':
 				//数字2文字を縦横中で出力
 				if (!this.inTcy && this.autoYoko && !noRuby && !inRuby) {
-					//数字2文字
-					if (i+1<ch.length && '0'<=ch[i+1] && ch[i+1]<='9') {
+					if (i+1<ch.length && CharUtils.isHalfNum(ch[i+1])) {
+						//数字2文字
 						//前後が半角かチェック
 						if (i>0 && CharUtils.isHalf(ch[i-1])) break;
 						if (i+2<ch.length && CharUtils.isHalf(ch[i+2])) break;
@@ -1402,6 +1416,21 @@ public class AozoraEpub3Converter
 						buf.append(ch[i+1]);
 						buf.append(chukiMap.get("縦中横終わり")[0]);
 						i++;
+						continue;
+					} else if (this.autoYokoNum1 && (i==0 || !CharUtils.isHalfNum(ch[i-1])) && (i+1==ch.length || !CharUtils.isHalfNum(ch[i+1]))) {
+						//数字1文字
+						//前後が半角かチェック
+						if (i>0 && CharUtils.isHalf(ch[i-1])) break;
+						if (i+1<ch.length && CharUtils.isHalf(ch[i+1])) break;
+						//半角スペースの前後が半角文字
+						if (i>1 && ch[i-1]==' ' && CharUtils.isHalf(ch[i-2])) break;
+						if (i+2<ch.length && ch[i+1]==' ' && CharUtils.isHalf(ch[i+2])) break;
+						//前まで出力
+						if (rubyStart != -1) convertChars(buf, ch, rubyStart, i - rubyStart, false);
+						rubyStart = -1;
+						buf.append(chukiMap.get("縦中横")[0]);
+						buf.append(ch[i]);
+						buf.append(chukiMap.get("縦中横終わり")[0]);
 						continue;
 					}
 					//1月1日のような場合
@@ -1567,12 +1596,22 @@ public class AozoraEpub3Converter
 			}
 		}
 		//文字の間の全角スペースを禁則調整
-		if (!inTcy && !inRuby && idx+1<ch.length && ch[idx]!='　' && +ch[idx+1]=='　') {
-			buf.append("<span class=\"withspace\">");
-			buf.append(ch[idx]);
-			buf.append("</span>");
-			ch[idx+1]='\0';//改行に変更
-			return;
+		switch (this.spaceHyphenation) {
+		case 1:
+			if (!inTcy && !inRuby && ch[idx]=='　' && buf.length()>0 && buf.charAt(buf.length()-1)!='　' && (idx-1==ch.length || idx+1<ch.length && ch[idx+1]!='　')) {
+				buf.append("<span class=\"fullsp\"> </span>");
+				return;
+			}
+			break;
+		case 2:
+			if (!inTcy && !inRuby && idx+1<ch.length && ch[idx]!='　' && +ch[idx+1]=='　') {
+				buf.append("<span class=\"withsp\">");
+				buf.append(ch[idx]);
+				buf.append("</span>");
+				ch[idx+1]='\0';//改行に変更
+				return;
+			}
+			break;
 		}
 		
 		if (this.bookInfo.vertical) {
