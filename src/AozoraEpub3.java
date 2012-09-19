@@ -68,7 +68,7 @@ public class AozoraEpub3
 			//栞用span出力
 			aozoraConverter.setWithMarkId(withIdSpan);
 			//変換オプション設定
-			aozoraConverter.setAutoYoko(autoYoko);
+			aozoraConverter.setAutoYoko(autoYoko, false);
 			//4バイト文字出力
 			aozoraConverter.setGaiji32(gaiji32);
 			
