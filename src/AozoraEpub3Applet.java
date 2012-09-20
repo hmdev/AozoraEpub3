@@ -1489,6 +1489,7 @@ public class AozoraEpub3Applet extends JApplet
 		this.jTextSinglePageSizeW.setEnabled(enabled);
 		this.jTextSinglePageSizeH.setEnabled(enabled);
 		this.jTextSinglePageWidth.setEnabled(enabled);
+		this.jCheckFitImage.setEnabled(enabled);
 		
 		this.jCheckResizeW.setEnabled(enabled);
 		this.jCheckResizeH.setEnabled(enabled);
