@@ -351,5 +351,5 @@ div.jzm38 { max-height: 38em; }
 div.jzm39 { max-height: 39em; }
 div.jzm40 { max-height: 40em; }
 
-/* 禁則調整用 文字間の全角スペースを追い出し */
-span.withsp { padding-bottom:1em; display:inline-block; }
+/* 行内全角スペース調整用 */
+span.fullsp { padding-top:.5em; }

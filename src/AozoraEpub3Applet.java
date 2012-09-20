@@ -211,6 +211,7 @@ public class AozoraEpub3Applet extends JApplet
 		Border padding2H = BorderFactory.createEmptyBorder(0, 2, 0, 2);
 		Border padding4H = BorderFactory.createEmptyBorder(0, 4, 0, 4);
 		Border padding4H2V = BorderFactory.createEmptyBorder(2, 4, 2, 4);
+		Border padding2H6B = BorderFactory.createEmptyBorder(0, 2, 6, 2);
 		//アップレットのレイアウト設定
 		this.setLayout(new BoxLayout(this.getContentPane(), BoxLayout.Y_AXIS));
 		
@@ -521,7 +522,7 @@ public class AozoraEpub3Applet extends JApplet
 		////////////////////////////////////////////////////////////////
 		tabPanel = new JPanel();
 		//tabPanel.setLayout(new BoxLayout(tabPanel, BoxLayout.Y_AXIS));
-		tabPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 1, 1));
+		tabPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 1, 0));
 		jTabbedPane.add("画像設定", tabPanel);
 		
 		////////////////////////////////
@@ -768,36 +769,35 @@ public class AozoraEpub3Applet extends JApplet
 		////////////////////////////////////////////////////////////////
 		tabPanel = new JPanel();
 		//tabPanel.setLayout(new BoxLayout(tabPanel, BoxLayout.Y_AXIS));
-		tabPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 1, 1));
+		tabPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 1, 0));
 		jTabbedPane.add("詳細設定", tabPanel);
 		
 		////////////////////////////////
-		//画像縮小指定
+		//詳細設定
 		////////////////////////////////
 		panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-		size = new Dimension(400, 46);
-		panel.setMinimumSize(size);
-		panel.setMaximumSize(size);
-		panel.setPreferredSize(size);
 		panel.setBorder(BorderFactory.createTitledBorder(" 文中全角スペースの処理"));
 		tabPanel.add(panel);
 		//ピクセル
 		propValue = props.getProperty("SpaceHyphenation");
 		buttonGroup = new ButtonGroup();
-		jRadioSpaceHyp1 = new JRadioButton("行末で非表示  ", propValue==null||"1".equals(propValue));
+		jRadioSpaceHyp1 = new JRadioButton("行末非表示 (Kobo・Kindle用)  ", propValue==null||"1".equals(propValue));
+		jRadioSpaceHyp1.setToolTipText("Readerでは何もしないのと同じ表示になります");
 		jRadioSpaceHyp1.setFocusPainted(false);
-		jRadioSpaceHyp1.setBorder(padding2H);
+		jRadioSpaceHyp1.setBorder(padding2H6B);
 		panel.add(jRadioSpaceHyp1);
 		buttonGroup.add(jRadioSpaceHyp1);
-		jRadioSpaceHyp2 = new JRadioButton("禁則処理(追いだし)  ", "2".equals(propValue));
+		jRadioSpaceHyp2 = new JRadioButton("行末非表示 (Reader用)  ", "2".equals(propValue));
+		jRadioSpaceHyp2.setToolTipText("Reader以外では追い出しの禁則処理になります");
 		jRadioSpaceHyp2.setFocusPainted(false);
-		jRadioSpaceHyp2.setBorder(padding2H);
+		jRadioSpaceHyp2.setBorder(padding2H6B);
 		panel.add(jRadioSpaceHyp2);
 		buttonGroup.add(jRadioSpaceHyp2);
 		jRadioSpaceHyp0 = new JRadioButton("何もしない", "0".equals(propValue));
+		jRadioSpaceHyp0.setToolTipText("行の折り返し部分にある全角スペースが行頭に表示されます");
 		jRadioSpaceHyp0.setFocusPainted(false);
-		jRadioSpaceHyp0.setBorder(padding2H);
+		jRadioSpaceHyp0.setBorder(padding2H6B);
 		panel.add(jRadioSpaceHyp0);
 		buttonGroup.add(jRadioSpaceHyp0);
 		
@@ -812,11 +812,14 @@ public class AozoraEpub3Applet extends JApplet
 		propValue = props.getProperty("AutoYoko");
 		jCheckAutoYoko = new JCheckBox("自動縦中横有効  ", propValue==null||"1".equals(propValue));
 		jCheckAutoYoko.setFocusPainted(false);
+		jCheckAutoYoko.setToolTipText("半角の2文字の数字、!?,!!,??,?!を並べて縦中横で表示します。");
+		jCheckAutoYoko.setBorder(padding2H6B);
 		panel.add(jCheckAutoYoko);
 		//半角2文字縦書き
 		propValue = props.getProperty("AutoYokoNum1");
 		jCheckAutoYokoNum1 = new JCheckBox("数字1桁", "1".equals(propValue));
 		jCheckAutoYokoNum1.setFocusPainted(false);
+		jCheckAutoYokoNum1.setBorder(padding2H6B);
 		panel.add(jCheckAutoYokoNum1);
 		
 		////////////////////////////////////////////////////////////////

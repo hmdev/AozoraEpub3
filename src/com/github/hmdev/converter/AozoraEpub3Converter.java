@@ -1323,7 +1323,7 @@ public class AozoraEpub3Converter
 	/** 注記ルビ等のない文字列に置換 */
 	public String replaceToPlain(String str)
 	{
-		return str.replaceAll("<span class=\"withsp\">(.)</span>", "$1　").replaceAll((char)(0x2000)+""+(char)(0x2002), "　").replaceAll("<rt>[^<]+</rt>", "").replaceAll("<[^>]+>", "").replaceAll("《[^》]+》", "").replaceAll("［＃.+?］", "").replaceAll("[｜|※]","").replaceFirst("^[ |　]+","").replaceFirst("[ |　]+$","")
+		return str.replaceAll("<span class=\"fullsp\"> </span>", "　").replaceAll(String.valueOf((char)(0x2000))+(char)(0x2000), "　").replaceAll("<rt>[^<]+</rt>", "").replaceAll("<[^>]+>", "").replaceAll("《[^》]+》", "").replaceAll("［＃.+?］", "").replaceAll("[｜|※]","").replaceFirst("^[ |　]+","").replaceFirst("[ |　]+$","")
 				.replaceAll("〳〵", "く").replaceAll("〴〵", "ぐ").replaceAll("〻", "々");
 	}
 	
@@ -1596,23 +1596,28 @@ public class AozoraEpub3Converter
 			}
 		}
 		//文字の間の全角スペースを禁則調整
-		switch (this.spaceHyphenation) {
-		case 1:
-			if (!inTcy && !inRuby && ch[idx]=='　' && buf.length()>0 && buf.charAt(buf.length()-1)!='　' && (idx-1==ch.length || idx+1<ch.length && ch[idx+1]!='　')) {
-				//buf.append("<span class=\"fullsp\"> </span>");
-				buf.append((char)(0x2000)).append((char)(0x2002));
-				return;
+		if (!inTcy && !inRuby) {
+			switch (this.spaceHyphenation) {
+			case 1:
+				if (ch[idx]=='　' && buf.length()>0 && buf.charAt(buf.length()-1)!='　' && (idx-1==ch.length || idx+1<ch.length && ch[idx+1]!='　')) {
+					buf.append("<span class=\"fullsp\"> </span>");
+					return;
+				}
+				break;
+			case 2:
+				if (ch[idx]=='　' && buf.length()>0 && buf.charAt(buf.length()-1)!='　' && (idx-1==ch.length || idx+1<ch.length && ch[idx+1]!='　')) {
+					buf.append((char)(0x2000)).append((char)(0x2000));
+					return;
+				}
+				/*if (idx+1<ch.length && ch[idx]!='　' && +ch[idx+1]=='　') {
+					buf.append("<span class=\"withsp\">");
+					buf.append(ch[idx]);
+					buf.append("</span>");
+					ch[idx+1]='\0';//出力しないNULL文字に変更
+					return;
+				}*/
+				break;
 			}
-			break;
-		case 2:
-			if (!inTcy && !inRuby && idx+1<ch.length && ch[idx]!='　' && +ch[idx+1]=='　') {
-				buf.append("<span class=\"withsp\">");
-				buf.append(ch[idx]);
-				buf.append("</span>");
-				ch[idx+1]='\0';//出力しないNULL文字に変更
-				return;
-			}
-			break;
 		}
 		
 		if (this.bookInfo.vertical) {
