@@ -619,10 +619,14 @@ public class Epub3Writer
 			//画像サイズが横長なら幅に合わせる
 			ImageInfo imageInfo = this.imageInfoReader.getImageInfo(srcImageFilePath);
 			if (imageInfo != null) {
-				//横長ならwidth100％
-				if ((double)imageInfo.getWidth()/imageInfo.getHeight() >= (double)this.dispW/this.dispH) sectionInfo.setImageFitW(true);
-				//縦がはみ出すならheight:100%
-				else sectionInfo.setImageFitH(true);
+				//小さい画像をそのまま出す場合
+				if (!this.fitImage && imageInfo.getWidth() <= this.dispW && imageInfo.getHeight() < this.dispH) {
+				} else {
+					//横長ならwidth100％
+					if ((double)imageInfo.getWidth()/imageInfo.getHeight() >= (double)this.dispW/this.dispH) sectionInfo.setImageFitW(true);
+					//縦がはみ出すならheight:100%
+					else sectionInfo.setImageFitH(true);
+				}
 			}
 			break;
 		case PageBreakTrigger.IMAGE_PAGE_W:

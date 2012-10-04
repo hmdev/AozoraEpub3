@@ -147,6 +147,9 @@ public class AozoraEpub3Applet extends JApplet
 	JCheckBox jCheckAutoYoko;
 	JCheckBox jCheckAutoYokoNum1;
 	
+	JCheckBox jCheckCommentPrint;
+	JCheckBox jCheckCommentConvert;
+	
 	//テキストエリア
 	JScrollPane jScrollPane;
 	JTextArea jTextArea;
@@ -783,7 +786,7 @@ public class AozoraEpub3Applet extends JApplet
 		propValue = props.getProperty("SpaceHyphenation");
 		buttonGroup = new ButtonGroup();
 		jRadioSpaceHyp1 = new JRadioButton("行末非表示 (Kobo・Kindle用)  ", propValue==null||"1".equals(propValue));
-		jRadioSpaceHyp1.setToolTipText("Readerでは何もしないのと同じ表示になります");
+		jRadioSpaceHyp1.setToolTipText("Readerでは何もしないと同じ表示になります");
 		jRadioSpaceHyp1.setFocusPainted(false);
 		jRadioSpaceHyp1.setBorder(padding2H6B);
 		panel.add(jRadioSpaceHyp1);
@@ -821,6 +824,27 @@ public class AozoraEpub3Applet extends JApplet
 		jCheckAutoYokoNum1.setFocusPainted(false);
 		jCheckAutoYokoNum1.setBorder(padding2H6B);
 		panel.add(jCheckAutoYokoNum1);
+		
+		////////////////////////////////
+		//コメント出力
+		////////////////////////////////
+		panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		panel.setBorder(BorderFactory.createTitledBorder(" コメント出力"));
+		tabPanel.add(panel);
+		//半角2文字縦書き
+		propValue = props.getProperty("CommentPrint");
+		jCheckCommentPrint = new JCheckBox("コメントブロックを出力  ", "1".equals(propValue));
+		jCheckCommentPrint.setFocusPainted(false);
+		jCheckCommentPrint.setBorder(padding2H6B);
+		panel.add(jCheckCommentPrint);
+		//半角2文字縦書き
+		propValue = props.getProperty("CommentConvert");
+		jCheckCommentConvert = new JCheckBox("コメント内注記変換", "1".equals(propValue));
+		jCheckCommentConvert.setToolTipText("コメント内の注記を変換します");
+		jCheckCommentConvert.setFocusPainted(false);
+		jCheckCommentConvert.setBorder(padding2H6B);
+		panel.add(jCheckCommentConvert);
 		
 		////////////////////////////////////////////////////////////////
 		//テキストエリア
@@ -1175,6 +1199,8 @@ public class AozoraEpub3Applet extends JApplet
 		this.aozoraConverter.setMiddleTitle(this.jCheckMiddleTitle.isSelected());
 		//全角スペースの禁則
 		this.aozoraConverter.setSpaceHyphenation(this.jRadioSpaceHyp0.isSelected()?0:(this.jRadioSpaceHyp1.isSelected()?1:2));
+		//コメント
+		this.aozoraConverter.setCommentPrint(this.jCheckCommentPrint.isSelected(), this.jCheckCommentConvert.isSelected());
 		
 		////////////////////////////////
 		//すべてのファイルの変換実行
@@ -1510,6 +1536,10 @@ public class AozoraEpub3Applet extends JApplet
 		
 		this.jCheckAutoYoko.setEnabled(enabled);
 		this.jCheckAutoYokoNum1.setEnabled(enabled);
+		
+		this.jCheckCommentPrint.setEnabled(enabled);
+		this.jCheckCommentConvert.setEnabled(enabled);
+		
 	}
 	
 	private void setResizeTextEditable(boolean enabled)
@@ -1651,6 +1681,9 @@ public class AozoraEpub3Applet extends JApplet
 		
 		this.props.setProperty("AutoYoko", this.jCheckAutoYoko.isSelected()?"1":"");
 		this.props.setProperty("AutoYokoNum1", this.jCheckAutoYokoNum1.isSelected()?"1":"");
+		
+		this.props.setProperty("CommentPrint", this.jCheckCommentPrint.isSelected()?"1":"");
+		this.props.setProperty("CommentConvert", this.jCheckCommentConvert.isSelected()?"1":"");
 		
 		this.props.setProperty("EncType", ""+this.jComboEncType.getSelectedIndex());
 		this.props.setProperty("OverWrite", this.jCheckOverWrite.isSelected()?"1":"");

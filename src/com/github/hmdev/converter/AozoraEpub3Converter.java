@@ -38,7 +38,9 @@ public class AozoraEpub3Converter
 	boolean withMarkId = false;
 	
 	/** コメントブロックを非表示 */
-	public boolean hideCommentBlock = true;
+	public boolean commentPrint = false;
+	/** コメントブロック内注記変換 */
+	public boolean commentConvert = false;
 	
 	/** 4バイト文字を表示 */
 	boolean gaiji32 = false;
@@ -311,6 +313,13 @@ public class AozoraEpub3Converter
 	public void setMiddleTitle(boolean middleFirst)
 	{
 		this.middleTitle = middleFirst;
+	}
+	
+	/** コメント行内出力設定 */
+	public void setCommentPrint(boolean commentPrint, boolean commentConvert)
+	{
+		this.commentPrint = commentPrint;
+		this.commentConvert = commentConvert;
 	}
 	
 	public void setSpaceHyphenation(int type)
@@ -595,15 +604,38 @@ public class AozoraEpub3Converter
 			else if (bookInfo.isPageBreakLine(lineNum) && sectionCharLength > 0) this.setPageBreakTrigger(pageBreakNormal);
 			
 			//コメント除外
-			if (hideCommentBlock) {
-				if (line.startsWith("--------------------------------------------------")) {
+			if (line.startsWith("--------------------------------------------------")) {
+				if (commentPrint) {
+					if (inComment) { inComment = false; }
+					else { inComment = true; }
+				} else {
 					if (inComment) { inComment = false; continue;
 					} else {
 						//コメント開始
 						inComment = true; continue;
 					}
 				}
-				if (inComment) continue;
+			}
+			if (inComment) {
+				if (commentPrint) {
+					if (!commentConvert) {
+						//そのまま出力
+						StringBuilder buf = new StringBuilder();
+						char[] ch = line.toCharArray();
+						for (int idx=0; idx<ch.length; idx++) {
+							switch (ch[idx]) {
+							case '&': buf.append("&amp;"); break;
+							case '<': buf.append("&lt;"); break;
+							case '>': buf.append("&gt;"); break;
+							default: buf.append(ch[idx]);
+							}
+						}
+						this.printLineBuffer(out, buf, lineNum, false);
+						continue;
+					}
+				} else {
+					continue;
+				}
 			}
 			
 			//出力しない行を飛ばす

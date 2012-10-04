@@ -29,6 +29,8 @@
 （例）繁雑な日本の 〔e'tiquette〕 も、
 アクセント分解についての詳細は下記URLを参照してください
 http://www.aozora.gr.jp/accent_separation.html
+
+<&>?
 -------------------------------------------------------
 
 アイコン画像→<img src="img/icon.png" alt="アイコン">

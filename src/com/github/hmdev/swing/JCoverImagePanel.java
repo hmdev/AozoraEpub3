@@ -163,6 +163,11 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 		} else {
 			if (width > this.getWidth()) return;
 		}
+		switch (this.fitType) {
+		case FIT_ALL:
+		case FIT_W:
+			this.fitType = FIT_H;
+		}
 		this.visibleWidth = width;
 		this.setScale();
 		this.previewImage = null;
@@ -214,8 +219,8 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 		//縮尺に合せてリサイズ 大きければ縮小
 		double coverW = 600;
 		double coverH = 800;
-		double coverScale = (double)coverW/this.getWidth() * this.scale;
-		coverW = Math.min(coverW, bookInfo.coverImage.getWidth()*coverScale);
+		double coverScale = Math.min((double)coverW/this.getWidth(), (double)coverH/this.getHeight()) * this.scale;
+		coverW = Math.min(coverW, this.bookInfo.coverImage.getWidth()*coverScale);
 		coverH = Math.min(coverH, this.bookInfo.coverImage.getHeight()*coverScale);
 		if (coverScale > 1) {
 			coverW /= coverScale;
@@ -224,7 +229,7 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 		}
 		
 		double x = 0;
-		if (this.getWidth() < this.previewImage.getWidth()) x = this.offsetX * (double)coverW/this.getWidth();
+		if (this.visibleWidth < this.previewImage.getWidth()) x = this.offsetX * (double)coverW/this.getWidth();
 		double y = 0;
 		if (this.getHeight() < this.previewImage.getHeight()) y = this.offsetY * (double)coverH/this.getHeight();
 		
