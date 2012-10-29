@@ -75,6 +75,7 @@
 		<itemref idref="sec${sectionInfo.SectionId}" linear="yes"/>
 #end
 	</spine>
+#if (${bookInfo.InsertCoverPage} || ${bookInfo.InsertTocPage})
 	<guide>
 #if (${bookInfo.InsertCoverPage})
 		<reference type="cover" title="cover-page" href="xhtml/cover.xhtml"/>
@@ -83,4 +84,5 @@
 		<reference type="toc" title="nav" href="xhtml/nav.xhtml"/>
 #end
 	</guide>
+#end
 </package>

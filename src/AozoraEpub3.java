@@ -94,6 +94,10 @@ public class AozoraEpub3
 					if (titleCreator[0] != null && titleCreator[0].trim().length() >0) bookInfo.title = titleCreator[0];
 					if (titleCreator[1] != null && titleCreator[1].trim().length() >0) bookInfo.creator = titleCreator[1];
 				}
+
+				if (!isFile) {
+					imageInfoReader.loadZipImageInfos(srcFile, bookInfo == null);
+				}
 				
 				File outFile = getOutFile(srcFile, null, bookInfo, autoFileName, outExt);
 				AozoraEpub3.convertFile(
