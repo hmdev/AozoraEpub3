@@ -125,10 +125,14 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 	/** 幅高さに合わせる */
 	public void setFitType(int fitType)
 	{
+		if (this.fitType == fitType) return;
 		this.fitType = fitType;
 		this.previewImage = null;
 		this.offsetX = 0;
 		this.offsetY = 0;
+		if (fitType == FIT_W) {
+			this.visibleWidth = this.getWidth();
+		}
 		this.setScale();
 		this.repaint();
 	}
@@ -186,7 +190,8 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 		case FIT_ALL:
 			this.scale = minScale; break;
 		case FIT_W:
-			this.scale = Math.max(this.minScale, (double)this.visibleWidth/bookInfo.coverImage.getWidth()); break;
+			this.scale = Math.max(this.minScale, (double)this.visibleWidth/bookInfo.coverImage.getWidth());
+			break;
 		case FIT_H:
 			this.scale = Math.max(this.minScale, (double)this.getHeight()/this.bookInfo.coverImage.getHeight()); break;
 		}
@@ -204,7 +209,7 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 		
 	}
 	/** 編集された表紙を取得 */
-	public BufferedImage getModifiedImage()
+	public BufferedImage getModifiedImage(double coverW, double coverH)
 	{
 		try {
 		//表紙なし
@@ -213,12 +218,13 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 		double scale = Math.min((double)this.getWidth()/bookInfo.coverImage.getWidth(), (double)this.getHeight()/this.bookInfo.coverImage.getHeight());
 		if (this.visibleWidth <= 0) this.visibleWidth = this.getWidth();
 		
-		//トリミングと幅変更なしならnullを返す
-		if (this.scale == scale && this.visibleWidth == this.getWidth()) return null;
+		//トリミングと幅変更なしで、表紙サイズならnullを返す
+		if (this.scale == scale && this.visibleWidth == this.getWidth()) {
+			//if ()
+			return null;
+		}
 		
 		//縮尺に合せてリサイズ 大きければ縮小
-		double coverW = 600;
-		double coverH = 800;
 		double coverScale = Math.min((double)coverW/this.getWidth(), (double)coverH/this.getHeight()) * this.scale;
 		coverW = Math.min(coverW, this.bookInfo.coverImage.getWidth()*coverScale);
 		coverH = Math.min(coverH, this.bookInfo.coverImage.getHeight()*coverScale);

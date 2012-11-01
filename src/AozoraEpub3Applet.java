@@ -179,6 +179,11 @@ public class AozoraEpub3Applet extends JApplet
 	
 	File currentPath = null;
 	
+	//UIパラメータ
+	int coverW;
+	int coverH;
+	
+	
 	private void setFrame(JFrame parent)
 	{
 		this.jFrameParent = parent;
@@ -298,7 +303,7 @@ public class AozoraEpub3Applet extends JApplet
 		label = new JLabel("ページ出力:");
 		panel.add(label);
 		propValue = props.getProperty("CoverPage");
-		jCheckCoverPage = new JCheckBox("表紙", propValue==null||"1".equals(propValue));
+		jCheckCoverPage = new JCheckBox("表紙画像", propValue==null||"1".equals(propValue));
 		jCheckCoverPage.setFocusPainted(false);
 		panel.add(jCheckCoverPage);
 		label = new JLabel("  ");
@@ -1202,6 +1207,11 @@ public class AozoraEpub3Applet extends JApplet
 		//コメント
 		this.aozoraConverter.setCommentPrint(this.jCheckCommentPrint.isSelected(), this.jCheckCommentConvert.isSelected());
 		
+		this.coverW = 600;
+		try { this.coverW = Integer.parseInt(this.jTextCoverW.getText()); } catch (Exception e) {}
+		this.coverH = 800;
+		try { this.coverH = Integer.parseInt(this.jTextCoverH.getText()); } catch (Exception e) {}
+		
 		////////////////////////////////
 		//すべてのファイルの変換実行
 		_convertFiles(srcFiles, dstPath);
@@ -1365,7 +1375,7 @@ public class AozoraEpub3Applet extends JApplet
 			if (bookInfo.creator.length() == 0) bookInfo.creatorLine = -1;
 			
 			//プレビューでトリミングされていたらbookInfo.coverImageにBufferedImageを設定 それ以外はnullにする
-			BufferedImage coverImage = this.jConfirmDialog.jCoverImagePanel.getModifiedImage();
+			BufferedImage coverImage = this.jConfirmDialog.jCoverImagePanel.getModifiedImage(this.coverW, this.coverH);
 			if (coverImage != null) {
 				//Epub3Writerでイメージを出力
 				bookInfo.coverImage = coverImage;
