@@ -117,8 +117,9 @@ public class Epub3Writer
 	
 	////////////////////////////////
 	//Properties
-	/** 画面サイズ */
+	/** 画面サイズ 横 */
 	int dispW = 600;
+	/** 画面サイズ 縦 */
 	int dispH = 800;
 	
 	/** 画像最大幅 0は指定なし */
@@ -137,6 +138,11 @@ public class Epub3Writer
 	
 	/** 画像を拡大する */
 	boolean fitImage = true;
+	
+	/** 表紙サイズ 横 */
+	int coverW = 600;
+	/** 表紙サイズ 縦 */
+	int coverH = 800;
 	
 	/** jpeg圧縮率 */
 	float jpegQuality = 0.8f;
@@ -191,7 +197,9 @@ public class Epub3Writer
 	}
 	
 	/** 画像のリサイズ用パラメータを設定 */
-	public void setImageParam(int dispW, int dispH, int resizeW, int resizeH, int pixels, int singlePageSizeW, int singlePageSizeH, int singlePageWidth, boolean fitImage,  float jpegQuality)
+	public void setImageParam(int dispW, int dispH, int resizeW, int resizeH, int pixels,
+			int singlePageSizeW, int singlePageSizeH, int singlePageWidth, boolean fitImage,
+			int coverW, int coverH, float jpegQuality)
 	{
 		this.dispW = dispW;
 		this.dispH = dispH;
@@ -205,6 +213,9 @@ public class Epub3Writer
 		this.singlePageWidth = singlePageWidth;
 		
 		this.fitImage = fitImage;
+		
+		this.coverW = coverW;
+		this.coverH = coverH;
 		
 		this.jpegQuality = jpegQuality;
 	}
@@ -417,7 +428,7 @@ public class Epub3Writer
 				} else {
 					ByteArrayInputStream bais = new ByteArrayInputStream(coverImageBytes);
 					zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+IMAGES_PATH+imageInfo.getOutFileName()));
-					this.writeImage(imageInfo.getOutFileName(), bais, zos, coverImageInfo);
+					this.writeImage(imageInfo.getOutFileName(), bais, null, zos, coverImageInfo, 0, this.coverW, this.coverH);
 					zos.closeArchiveEntry();
 					bais.close();
 				}
@@ -504,22 +515,22 @@ public class Epub3Writer
 	
 	void writeImage(String srcFileName, InputStream is,ZipArchiveOutputStream zos, ImageInfo imageInfo) throws IOException
 	{
-		writeImage(srcFileName, is, null, zos, imageInfo);
+		writeImage(srcFileName, is, null, zos, imageInfo, this.maxImagePixels, this.maxImageW, this.maxImageH);
 	}
 	void writeImage(String srcFileName, BufferedImage srcImage, ZipArchiveOutputStream zos, ImageInfo imageInfo) throws IOException
 	{
-		writeImage(srcFileName, null, srcImage, zos, imageInfo);
+		writeImage(srcFileName, null, srcImage, zos, imageInfo, this.maxImagePixels, this.maxImageW, this.maxImageH);
 	}
 	/** 大きすぎる画像は縮小して出力 
 	 * @throws IOException */
-	void writeImage(String srcFileName, InputStream is, BufferedImage srcImage, ZipArchiveOutputStream zos, ImageInfo imageInfo) throws IOException
+	void writeImage(String srcFileName, InputStream is, BufferedImage srcImage, ZipArchiveOutputStream zos, ImageInfo imageInfo, int maxImagePixels, int maxImageW, int maxImageH) throws IOException
 	{
 		double scale = 1;
 		int w = imageInfo.getWidth();
 		int h = imageInfo.getHeight();
-		if (this.maxImagePixels >= 10000) scale = Math.sqrt((double)this.maxImagePixels/(w*h)); //最大画素数指定
-		if (this.maxImageW > 0) scale = Math.min(scale, (double)this.maxImageW/w); //最大幅指定
-		if (this.maxImageH > 0) scale = Math.min(scale, (double)this.maxImageH/h); //最大高さ指定
+		if (maxImagePixels >= 10000) scale = Math.sqrt((double)maxImagePixels/(w*h)); //最大画素数指定
+		if (maxImageW > 0) scale = Math.min(scale, (double)maxImageW/w); //最大幅指定
+		if (maxImageH > 0) scale = Math.min(scale, (double)maxImageH/h); //最大高さ指定
 		
 		if (scale >= 1) {
 			//TODO 画像回転対応
@@ -546,9 +557,7 @@ public class Epub3Writer
 				BufferedImage outImage;
 				if (imageType == BufferedImage.TYPE_BYTE_BINARY) {
 					ColorModel colorModel = srcImage.getColorModel();
-					//4bit未満は縮小するので4bitに
-					//if (colorModel.getPixelSize() < 4)
-						colorModel = new IndexColorModel(4, GRAY_VALUES.length, GRAY_VALUES, GRAY_VALUES, GRAY_VALUES);
+					colorModel = new IndexColorModel(4, GRAY_VALUES.length, GRAY_VALUES, GRAY_VALUES, GRAY_VALUES);
 					WritableRaster raster = colorModel.createCompatibleWritableRaster(scaledW, scaledH);
 					outImage = new BufferedImage(colorModel, raster, true, null);
 				}
@@ -640,7 +649,7 @@ public class Epub3Writer
 		}
 		if (isMiddle) sectionInfo.setMiddle(true);
 		this.sectionInfos.add(sectionInfo);
-		this.addChapter(sectionId, null); //章の名称はsectionIdを仮に設定
+		this.addChapter(null, null, 0); //セクション開始は名称がnullなので改ページ処理で文字列が設定されなければ出力されない
 		
 		this.zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+XHTML_PATH+sectionId+".xhtml"));
 		
@@ -663,10 +672,10 @@ public class Epub3Writer
 		this.zos.closeArchiveEntry();
 	}
 	/** 章を追加 */
-	public void addChapter(String chapterId, String name)
+	public void addChapter(String chapterId, String name, int chapterLevel)
 	{
 		SectionInfo sectionInfo = this.sectionInfos.lastElement();
-		this.chapterInfos.add(new ChapterInfo(sectionInfo.sectionId, chapterId, name));
+		this.chapterInfos.add(new ChapterInfo(sectionInfo.sectionId, chapterId, name, chapterLevel));
 	}
 	/** 追加済の章の名称を変更 */
 	public void updateChapterName(String name)

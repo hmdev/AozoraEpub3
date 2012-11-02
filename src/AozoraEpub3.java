@@ -68,7 +68,7 @@ public class AozoraEpub3
 			//栞用span出力
 			aozoraConverter.setWithMarkId(withIdSpan);
 			//変換オプション設定
-			aozoraConverter.setAutoYoko(autoYoko, false);
+			aozoraConverter.setAutoYoko(autoYoko, false, false);
 			//4バイト文字出力
 			aozoraConverter.setGaiji32(gaiji32);
 			
@@ -94,7 +94,7 @@ public class AozoraEpub3
 					if (titleCreator[0] != null && titleCreator[0].trim().length() >0) bookInfo.title = titleCreator[0];
 					if (titleCreator[1] != null && titleCreator[1].trim().length() >0) bookInfo.creator = titleCreator[1];
 				}
-
+				
 				if (!isFile) {
 					imageInfoReader.loadZipImageInfos(srcFile, bookInfo == null);
 				}

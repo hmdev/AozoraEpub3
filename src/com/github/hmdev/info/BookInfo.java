@@ -117,6 +117,8 @@ public class BookInfo
 	HashSet<Integer> mapNoPageBreakLine;
 	/** 出力ページしない行 (左右中央後の空行と改ページ前の空行) */
 	HashSet<Integer> mapIgnoreLine;
+	/** 見出し行の情報 */
+	HashMap<Integer, Integer> mapChapterLine;
 	
 	////////////////////////////////////////////////////////////////
 	public BookInfo()
@@ -197,6 +199,26 @@ public class BookInfo
 		if (this.mapIgnoreLine == null) return false;
 		return this.mapIgnoreLine.contains(lineNum);
 	}
+	
+	/** 見出し行と階層レベルを保存 */
+	public void addChapterLine(int lineNum, int level)
+	{
+		if (this.mapChapterLine == null) this.mapChapterLine = new HashMap<Integer, Integer>();
+		this.mapChapterLine.put(lineNum, level);
+	}
+	/** 見出し行と削除 */
+	public void removeChapterLine(int lineNum)
+	{
+		if (this.mapChapterLine != null) this.mapChapterLine.remove(lineNum);
+	}
+	/** 見出し行なら目次階層レベルを返す */
+	public int getChapterLevel(int lineNum)
+	{
+		if (this.mapChapterLine == null) return 0;
+		Integer level = this.mapChapterLine.get(lineNum);
+		return level == null ? 0 : level;
+	}
+	
 	
 	////////////////////////////////////////////////////////////////
 	public String getTitle()
