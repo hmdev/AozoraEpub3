@@ -1616,6 +1616,7 @@ public class AozoraEpub3Applet extends JApplet
 		this.jCheckCommentPrint.setEnabled(enabled);
 		this.jCheckCommentConvert.setEnabled(enabled);
 		
+		this.jTextMaxChapterNameLength.setEnabled(enabled);
 		this.jCheckChapterSection.setEnabled(enabled);
 		this.jCheckChapterH.setEnabled(enabled);
 		this.jCheckChapterH1.setEnabled(enabled);
