@@ -228,24 +228,28 @@
 ３段階大きな文字	<span class="font3">
 ４段階大きな文字	<span class="font4">
 ５段階大きな文字	<span class="font5">
+６段階大きな文字	<span class="font5">
 大きな文字終わり	</span>
 ここから１段階大きな文字	<div class="font1">		1
 ここから２段階大きな文字	<div class="font2">		1
 ここから３段階大きな文字	<div class="font3">		1
 ここから４段階大きな文字	<div class="font4">		1
 ここから５段階大きな文字	<div class="font5">		1
+ここから６段階大きな文字	<div class="font5">		1
 ここで大きな文字終わり	</div>		1
 １段階小さな文字	<span class="font-1">
 ２段階小さな文字	<span class="font-2">
 ３段階小さな文字	<span class="font-3">
 ４段階小さな文字	<span class="font-4">
 ５段階小さな文字	<span class="font-5">
+６段階小さな文字	<span class="font-5">
 小さな文字終わり	</span>
 ここから１段階小さな文字	<div class="font-1">		1
 ここから２段階小さな文字	<div class="font-2">		1
 ここから３段階小さな文字	<div class="font-3">		1
 ここから４段階小さな文字	<div class="font-4">		1
 ここから５段階小さな文字	<div class="font-5">		1
+ここから６段階小さな文字	<div class="font-5">		1
 ここで小さな文字終わり	</div>		1
 
 ####外字注記形式による代替表現 → 別処理
