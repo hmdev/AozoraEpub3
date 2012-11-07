@@ -370,7 +370,7 @@ public class AozoraEpub3Converter
 		
 		//「第」か「その」で始まる
 		this.chapterPattern = null;
-		if (chapterName) this.chapterPattern = Pattern.compile("^[ |　]*(第|その)[0-9|０-９|一|二|三|四|五|六|七|八|九|十|百|〇|壱|弐|参]+[章|話]?([ |　|「|―]+.*)?$");
+		if (chapterName) this.chapterPattern = Pattern.compile("^[ |　]*(第|その)[0-9|０-９|一|二|三|四|五|六|七|八|九|十|百|〇|壱|弐|参]+[篇|章|話]?([ |　|「|―]+.*)?$");
 		//TODO プロローグ エピローグ 序 序章 終章 幕間 （一）
 		
 		//数字のみ
@@ -1758,7 +1758,8 @@ public class AozoraEpub3Converter
 			case '≫': buf.append("》"); break;
 			case '“': buf.append("〝"); break;
 			case '”': buf.append("〟"); break;
-			//ローマ数字
+			//ローマ数字等 Readerで回転させない
+			//その他右回転する記号: ¶⇔⇒≡√∇∂∃∠⊥⌒∽∝∫∬∮∑∟⊿≠≦≧∈∋⊆⊇⊂⊃∧∨↑↓→←
 			case 'Ⅰ': case 'Ⅱ': case 'Ⅲ': case 'Ⅳ': case 'Ⅴ': case 'Ⅵ': case 'Ⅶ': case 'Ⅷ': case 'Ⅸ': case 'Ⅹ': case 'Ⅺ': case 'Ⅻ':
 			case 'ⅰ': case 'ⅱ': case 'ⅲ': case 'ⅳ': case 'ⅴ': case 'ⅵ': case 'ⅶ': case 'ⅷ': case 'ⅸ': case 'ⅹ': case 'ⅺ': case 'ⅻ':
 			case '①': case '②': case '③': case '④': case '⑤': case '⑥': case '⑦': case '⑧': case '⑨': case '⑩':
@@ -1766,7 +1767,10 @@ public class AozoraEpub3Converter
 			case '㉑': case '㉒': case '㉓': case '㉔': case '㉕': case '㉖': case '㉗': case '㉘': case '㉙': case '㉚':
 			case '㉛': case '㉜': case '㉝': case '㉞': case '㉟': case '㊱': case '㊲': case '㊳': case '㊴': case '㊵':
 			case '㊶': case '㊷': case '㊸': case '㊹': case '㊺': case '㊻': case '㊼': case '㊽': case '㊾': case '㊿':
-			case '△': case '▽': case '▲': case '▼':
+			case '△': case '▽': case '▲': case '▼': case '☆': case '★':
+			case '♂': case '♀': case '♪': case '♭': case '§': case '†': case '‡': 
+			case '÷': case '±': case '∀': case '∞': case '∴': case '∵': 
+			case '‼': case '⁇': case '⁉': case '⁈':
 				//縦中横の中でなければタグで括る
 				if (!inTcy && !inRuby) {
 					buf.append(chukiMap.get("縦中横")[0]);

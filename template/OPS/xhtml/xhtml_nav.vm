@@ -28,9 +28,6 @@ li a {text-decoration:none; border-bottom-width:1px;border-bottom-style:solid;pa
 	<nav xmlns:epub="http://www.idpf.org/2007/ops" epub:type="toc" id="toc">
 		<h1>${toc_name}</h1>
 		<ol>
-#if (${bookInfo.InsertCoverPage})
-			<li class="chapter" id="toccover"><a href="cover.xhtml">${cover_name}</a></li>
-#end
 #foreach(${chapter} in ${chapters})
 #if ($chapter.ChapterName)
 #set($idx=$idx+1)

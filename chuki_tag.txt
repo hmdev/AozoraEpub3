@@ -181,16 +181,18 @@
 ####割り注
 ## → 未対応
 ## ブロック注記改行制御とログ表示抑止のため空欄で設定
-ここから割り注		1
-ここで割り注終わり		1
+ここから割り注			1
+ここで割り注終わり			1
 
-####横組み
-## → 未対応(注記削除)
-## ブロック注記改行制御とログ表示抑止のため空欄で設定
-ここから横組み			1
-ここで横組み終わり			1
-ここから横書き			1
-ここで横書き終わり			1
+####横組み (縦書きの向きで文字右回転) → Reader未対応？
+ここから横組み	<div class="swr">		1
+ここで横組み終わり	</div>		1
+横組み	<span class="swr">
+横組み終わり	</span>
+
+####横書き 文中で横書き混在 → 混在はビューア未対応？
+#ここから横書き	<div class="yoko">		1
+#ここで横書き終わり	</div>		1
 
 ####小書き
 行右小書き	<span class="sup">
@@ -209,6 +211,8 @@
 罫囲み終わり	</span>
 破線罫囲み	<span class="dashed_border">
 破線罫囲み終わり	</span>
+破線の罫囲み	<span class="dashed_border">
+破線の罫囲み終わり	</span>
 枠囲み	<span class="border">
 枠囲み終わり	</span>
 破線枠囲み	<span class="dashed_border">
@@ -228,28 +232,28 @@
 ３段階大きな文字	<span class="font3">
 ４段階大きな文字	<span class="font4">
 ５段階大きな文字	<span class="font5">
-６段階大きな文字	<span class="font5">
+６段階大きな文字	<span class="font6">
 大きな文字終わり	</span>
 ここから１段階大きな文字	<div class="font1">		1
 ここから２段階大きな文字	<div class="font2">		1
 ここから３段階大きな文字	<div class="font3">		1
 ここから４段階大きな文字	<div class="font4">		1
 ここから５段階大きな文字	<div class="font5">		1
-ここから６段階大きな文字	<div class="font5">		1
+ここから６段階大きな文字	<div class="font6">		1
 ここで大きな文字終わり	</div>		1
 １段階小さな文字	<span class="font-1">
 ２段階小さな文字	<span class="font-2">
 ３段階小さな文字	<span class="font-3">
 ４段階小さな文字	<span class="font-4">
 ５段階小さな文字	<span class="font-5">
-６段階小さな文字	<span class="font-5">
+６段階小さな文字	<span class="font-6">
 小さな文字終わり	</span>
 ここから１段階小さな文字	<div class="font-1">		1
 ここから２段階小さな文字	<div class="font-2">		1
 ここから３段階小さな文字	<div class="font-3">		1
 ここから４段階小さな文字	<div class="font-4">		1
 ここから５段階小さな文字	<div class="font-5">		1
-ここから６段階小さな文字	<div class="font-5">		1
+ここから６段階小さな文字	<div class="font-6">		1
 ここで小さな文字終わり	</div>		1
 
 ####外字注記形式による代替表現 → 別処理

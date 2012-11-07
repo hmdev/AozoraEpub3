@@ -100,6 +100,8 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 		BufferedImage previewImage = new BufferedImage((int)Math.round(this.bookInfo.coverImage.getWidth()*scale), (int)Math.round(this.bookInfo.coverImage.getHeight()*scale), BufferedImage.TYPE_INT_RGB);
 		Graphics2D g2 = previewImage.createGraphics();
 		try {
+			g2.setColor(Color.WHITE);
+			g2.fillRect(0, 0, previewImage.getWidth(), previewImage.getHeight());
 			AffineTransformOp ato = new AffineTransformOp(AffineTransform.getScaleInstance(scale, scale), AffineTransformOp.TYPE_BICUBIC);
 			g2.drawImage(this.bookInfo.coverImage, ato, 0 ,0);
 		} finally {

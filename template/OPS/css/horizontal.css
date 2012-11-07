@@ -131,7 +131,7 @@ span.underline, span.double_underline, span.dotted_underline, span.dashed_underl
 	padding-bottom: 1px;
 }
 span.underline {
-	border-bottom-style: solid
+	border-bottom-style: solid;
 }
 span.double_underline {
 	border-bottom-width: 3px;
@@ -165,6 +165,7 @@ span.left_underline {
 .font-3 { font-size: 70%; }
 .font-4 { font-size: 60%; }
 .font-5 { font-size: 50%; }
+.font-6 { font-size: 45%; }
 .kogaki { font-size: 70%; }
 
 /* 縦中横 */
@@ -183,7 +184,7 @@ span.left_underline {
 }
 
 /* 中央揃え */
-div.center, div.center p { text-align: center;}
+div.center, div.center p { text-align: center; }
 
 /* 字下げ */
 div.top1 { margin-left: 1em; }
