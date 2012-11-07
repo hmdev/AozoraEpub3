@@ -90,6 +90,8 @@ public class AozoraEpub3Converter
 	int inJisage = -1;
 	/** 縦中横内 */
 	boolean inTcy = false;
+	/** 横組み内 */
+	boolean inYoko = false;
 	
 	//---------------- パターン ----------------//
 	/** 注記パターン */
@@ -433,7 +435,7 @@ public class AozoraEpub3Converter
 			this.lineNum++;
 			
 			//外字変換後に前方参照注記変換
-			line = this.replaceChukiSufTag(this.convertGaijiChuki(line, true));
+			line = this.replaceChukiSufTag(this.convertGaijiChuki(line, true, false));
 			
 			//コメント除外 50文字以上をコメントにする
 			if (line.startsWith("--------------------------------")) {
@@ -764,6 +766,10 @@ public class AozoraEpub3Converter
 	 * @return 外字変換済の行文字列 */
 	public String convertGaijiChuki(String line, boolean escape)
 	{
+		return convertGaijiChuki(line, escape, true);
+	}
+	public String convertGaijiChuki(String line, boolean escape, boolean logged)
+	{
 		/*
 		・外字
 		 ※の場合は外字に変換
@@ -833,7 +839,7 @@ public class AozoraEpub3Converter
 				//if (unsupportGaiji.contains(gaiji)) {
 				//Unicode32文字なら後ろに小書きで注記追加
 				if (gaiji != null && gaiji.getBytes().length ==4) {
-					LogAppender.append("外字4バイト: ("+this.lineNum+") "+chuki+"\n");
+					if (logged) LogAppender.append("外字4バイト: ("+this.lineNum+") "+chuki+"\n");
 					if (!gaiji32) {
 						gaiji = "〓";
 						if (!isInnerChuki(line, m.start())) {
@@ -851,10 +857,10 @@ public class AozoraEpub3Converter
 						if (imageStartIdx > -1 && chuki.indexOf('.', 2) != -1) {
 							//※を消して画像注記に変更
 							gaiji = chuki.substring(1);
-							LogAppender.append("外字画像利用: ("+this.lineNum+") "+chuki+"\n");
+							if (logged) LogAppender.append("外字画像利用: ("+this.lineNum+") "+chuki+"\n");
 						} else {
 							//画像以外
-							LogAppender.append("外字未変換: ("+this.lineNum+") "+chuki+"\n");
+							if (logged) LogAppender.append("外字未変換: ("+this.lineNum+") "+chuki+"\n");
 							gaiji = "〓［＃行右小書き］（"+chukiValues[0]+"）［＃行右小書き終わり］";
 						}
 					}
@@ -1113,6 +1119,9 @@ public class AozoraEpub3Converter
 			//注記→タグ変換
 			String chukiName = chukiTag.substring(2, chukiTag.length()-1);
 			
+			//横組みチェック
+			if (chukiName.endsWith("横組み")) inYoko = true;
+			if (inYoko && chukiName.endsWith("横組み終わり")) inYoko = false;
 			//縦中横チェック
 			if (chukiName.startsWith("縦中横")) {
 				if (chukiName.endsWith("終わり")) inTcy = false;
@@ -1490,7 +1499,7 @@ public class AozoraEpub3Converter
 				break;
 			case '0': case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9':
 				//数字2文字を縦横中で出力
-				if (!this.inTcy && this.autoYoko && !noRuby && !inRuby) {
+				if (this.autoYoko && !(this.inYoko || this.inTcy || noRuby || inRuby)) {
 					if (this.autoYokoNum3 && i+2<ch.length && CharUtils.isHalfNum(ch[i+1]) && CharUtils.isHalfNum(ch[i+2])) {
 						//数字3文字
 						//前後が半角かチェック
@@ -1578,7 +1587,7 @@ public class AozoraEpub3Converter
 				break;
 			case '!': case '?':
 				//!?3文字を縦中横で出力
-				if (!inTcy && autoYoko && autoYokoEQ3 && !noRuby && !inRuby && i+2<ch.length && (ch[i+1]=='!' || ch[i+1]=='?') && (ch[i+2]=='!' || ch[i+2]=='?')) {
+				if (autoYoko && autoYokoEQ3 && !(inYoko || inTcy || noRuby || inRuby) && i+2<ch.length && (ch[i+1]=='!' || ch[i+1]=='?') && (ch[i+2]=='!' || ch[i+2]=='?')) {
 					//前後が半角かチェック
 					if (i!=0 && CharUtils.isHalf(ch[i-1])) break;
 					if (i+3<ch.length && CharUtils.isHalf(ch[i+3])) break;
@@ -1597,7 +1606,7 @@ public class AozoraEpub3Converter
 					continue;
 				} else {
 					//!?2文字を縦横中で出力
-					if (!inTcy && autoYoko && !noRuby && !inRuby && i+1<ch.length && (ch[i+1]=='!' || ch[i+1]=='?')) {
+					if (autoYoko && !(inYoko || inTcy || noRuby || inRuby) && i+1<ch.length && (ch[i+1]=='!' || ch[i+1]=='?')) {
 						//前後が半角かチェック
 						if (i!=0 && CharUtils.isHalf(ch[i-1])) break;
 						if (i+2<ch.length && CharUtils.isHalf(ch[i+2])) break;
@@ -1725,7 +1734,7 @@ public class AozoraEpub3Converter
 			}
 		}
 		//文字の間の全角スペースを禁則調整
-		if (!inTcy && !inRuby) {
+		if (!(inYoko || inTcy || inRuby)) {
 			switch (this.spaceHyphenation) {
 			case 1:
 				if (ch[idx]=='　' && buf.length()>0 && buf.charAt(buf.length()-1)!='　' && (idx-1==ch.length || idx+1<ch.length && ch[idx+1]!='　')) {
@@ -1772,7 +1781,7 @@ public class AozoraEpub3Converter
 			case '÷': case '±': case '∀': case '∞': case '∴': case '∵': 
 			case '‼': case '⁇': case '⁉': case '⁈':
 				//縦中横の中でなければタグで括る
-				if (!inTcy && !inRuby) {
+				if (!(inYoko || inTcy || inRuby)) {
 					buf.append(chukiMap.get("縦中横")[0]);
 					buf.append(ch[idx]);
 					buf.append(chukiMap.get("縦中横終わり")[0]);

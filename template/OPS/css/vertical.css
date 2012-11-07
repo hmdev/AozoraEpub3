@@ -167,11 +167,11 @@ span.left_underline {
 .font6 { font-size: 160%; }
 /* 文字サイズ 小 */
 .font-1 { font-size: 90%; }
-.font-2 { font-size: 80%; }
-.font-3 { font-size: 70%; }
-.font-4 { font-size: 60%; }
-.font-5 { font-size: 50%; }
-.font-6 { font-size: 45%; }
+.font-2 { font-size: 83%; }
+.font-3 { font-size: 77%; }
+.font-4 { font-size: 70%; }
+.font-5 { font-size: 66%; }
+.font-6 { font-size: 62%; }
 .kogaki { font-size: 70%; }
 
 /* 縦中横 */
@@ -196,6 +196,7 @@ span.swr {
 
 /* 横書き */
 div.yoko {
+	display: inline-block;
 	writing-mode: horizontal-tb;
 	-webkit-writing-mode: horizontal-tb;
 	-epub-writing-mode: horizontal-tb;
