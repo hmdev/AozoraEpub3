@@ -1777,6 +1777,11 @@ public class AozoraEpub3Converter
 			case '㉛': case '㉜': case '㉝': case '㉞': case '㉟': case '㊱': case '㊲': case '㊳': case '㊴': case '㊵':
 			case '㊶': case '㊷': case '㊸': case '㊹': case '㊺': case '㊻': case '㊼': case '㊽': case '㊾': case '㊿':
 			case '△': case '▽': case '▲': case '▼': case '☆': case '★':
+			case 'ς': case '¡': case '¿': case '¦': case '©': case '®': case 'ª': case 'º': case '⁑': case '⁂':
+			case '◐': case '◑': case '◒': case '◓': case '▷': case '▶': case '◁': case '◀':
+			case '♤': case '♠': case '♢': case '♦': case '♡': case '♥': case '♧': case '♣': 
+			case '☖': case '☗': case '☎': case '☁': case '☂': case '☃': case '♨': case '☞': case '▱': case '⊿':
+			case '✓': case '␣': case '⏎': case '♩': case '♮': case '♫': case '♬': case '€': case 'ℓ': 
 			case '♂': case '♀': case '♪': case '♭': case '§': case '†': case '‡': 
 			case '÷': case '±': case '∀': case '∞': case '∴': case '∵': 
 			case '‼': case '⁇': case '⁉': case '⁈':
