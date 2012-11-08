@@ -11,6 +11,15 @@
 </docTitle>
 <navMap>
 #set($idx=0)
+#if (${bookInfo.InsertCoverPage} && ${bookInfo.InsertCoverPageToc})
+#set($idx=$idx+1)
+	<navPoint id="toccover" playOrder="${idx}">
+		<navLabel>
+			<text>${cover_name}</text>
+		</navLabel>
+		<content src="xhtml/cover.xhtml"/>
+	</navPoint>
+#end
 #foreach(${chapter} in ${chapters})
 #if ($chapter.ChapterName)
 #set($idx=$idx+1)

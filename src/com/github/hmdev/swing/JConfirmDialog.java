@@ -461,7 +461,6 @@ public class JConfirmDialog extends JDialog
 			public void actionPerformed(ActionEvent arg0) { deleteCover(); }
 		});
 		panel.add(jButtonDelete);
-		
 	}
 	
 	void checkPreviewControlEnabled()

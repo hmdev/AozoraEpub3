@@ -11,6 +11,8 @@ import java.awt.dnd.DropTargetDragEvent;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -29,7 +31,7 @@ import com.github.hmdev.info.BookInfo;
 /**
  * 表紙画像プレビューとトリミング用パネル
  */
-public class JCoverImagePanel extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener, DropTargetListener
+public class JCoverImagePanel extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener, DropTargetListener, KeyListener
 {
 	private static final long serialVersionUID = 1L;
 	
@@ -60,6 +62,9 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 		this.addMouseWheelListener(this);
 		new DropTarget(this, DnDConstants.ACTION_COPY_OR_MOVE, this, true);
 		this.setBackground(Color.LIGHT_GRAY);
+		
+		this.setFocusable(true);
+		this.addKeyListener(this);
 	}
 	
 	/** パネル描画 */
@@ -315,6 +320,7 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 			e.printStackTrace();
 		} finally {
 		}
+		this.requestFocus();
 	}
 	
 	@Override
@@ -324,6 +330,7 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 	@Override
 	public void mouseEntered(MouseEvent e)
 	{
+		this.requestFocus();
 	}
 	@Override
 	public void mouseExited(MouseEvent e)
@@ -336,6 +343,7 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 		this.startX -= this.offsetX;
 		this.startY = e.getY();
 		if (this.offsetY != 0) this.startY -= this.offsetY;
+		this.requestFocus();
 	}
 	@Override
 	public void mouseReleased(MouseEvent e)
@@ -367,5 +375,27 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 		} else {
 			this.setZoom(1.01);
 		}
+	}
+	
+	@Override
+	public void keyPressed(KeyEvent e)
+	{
+		if (previewImage == null) return;
+		switch (e.getKeyCode()) {
+		case KeyEvent.VK_UP: this.offsetY--; break;
+		case KeyEvent.VK_DOWN: this.offsetY++; break;
+		case KeyEvent.VK_LEFT: this.offsetX--; break;
+		case KeyEvent.VK_RIGHT: this.offsetX++; break;
+		default: return;
+		}
+		repaint();
+	}
+	@Override
+	public void keyReleased(KeyEvent arg0)
+	{
+	}
+	@Override
+	public void keyTyped(KeyEvent e)
+	{
 	}
 }

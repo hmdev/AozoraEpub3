@@ -90,6 +90,9 @@ public class BookInfo
 	
 	/** 先頭に表紙ページを追加 */
 	public boolean insertCoverPage = false;
+	/** 表紙を目次に入れる */
+	public boolean insertCoverPageToc = false;
+	
 	/** 表紙ページを追加した場合は表紙は目次より前に出力 */
 	public boolean insertTitlePage = false;
 	/** 目次ページを追加 */
@@ -315,10 +318,10 @@ public class BookInfo
 	{
 		return insertCoverPage;
 	}
-
-	public void setInsertCoverPage(boolean insertCoverPage)
+	
+	public boolean isInsertCoverPageToc()
 	{
-		this.insertCoverPage = insertCoverPage;
+		return insertCoverPageToc;
 	}
 	
 	public boolean isInsertTitlePage()

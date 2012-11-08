@@ -155,6 +155,7 @@ public class AozoraEpub3Applet extends JApplet
 	JCheckBox jCheckCommentConvert;
 	
 	JTextField jTextMaxChapterNameLength;
+	JCheckBox jCheckCoverPageToc;
 	JCheckBox jCheckChapterSection;
 	JCheckBox jCheckChapterH;
 	JCheckBox jCheckChapterH1;
@@ -889,6 +890,14 @@ public class AozoraEpub3Applet extends JApplet
 		//panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 		panelV.add(panel);
 		
+		//表紙
+		propValue = props.getProperty("CoverPageToc");
+		jCheckCoverPageToc = new JCheckBox("表紙  ", "1".equals(propValue));
+		jCheckCoverPageToc.setToolTipText("表紙画像のページを目次を追加します");
+		jCheckCoverPageToc.setFocusPainted(false);
+		jCheckCoverPageToc.setBorder(padding2H2T3B);
+		panel.add(jCheckCoverPageToc);
+		
 		//改ページ後を目次に追加
 		propValue = props.getProperty("ChapterSection");
 		jCheckChapterSection = new JCheckBox("改ページ後 ", propValue==null||"1".equals(propValue));
@@ -1476,6 +1485,7 @@ public class AozoraEpub3Applet extends JApplet
 		
 		//表紙目次ページ出力設定
 		bookInfo.insertCoverPage = this.jCheckCoverPage.isSelected();
+		bookInfo.insertCoverPageToc = this.jCheckCoverPageToc.isSelected();
 		bookInfo.insertTocPage = this.jCheckTocPage.isSelected();
 		//目次縦書き
 		bookInfo.setTocVertical(this.jRadioTocV.isSelected());
@@ -1706,7 +1716,7 @@ public class AozoraEpub3Applet extends JApplet
 		this.jComboxPageBreakEmptyLine.setEnabled(enabled);
 		this.jCheckPageBreakChapter.setEnabled(enabled);
 		
-		this.jTextMaxChapterNameLength.setEnabled(enabled);
+		this.jCheckCoverPageToc.setEnabled(enabled);
 		this.jCheckChapterSection.setEnabled(enabled);
 		this.jCheckChapterH.setEnabled(enabled);
 		this.jCheckChapterH1.setEnabled(enabled);
@@ -1715,6 +1725,7 @@ public class AozoraEpub3Applet extends JApplet
 		this.jCheckChapterName.setEnabled(enabled);
 		this.jCheckChapterNum.setEnabled(enabled);
 		this.jCheckChapterNumOnly.setEnabled(enabled);
+		this.jTextMaxChapterNameLength.setEnabled(enabled);
 	}
 	
 	private void setResizeTextEditable(boolean enabled)
@@ -1886,6 +1897,7 @@ public class AozoraEpub3Applet extends JApplet
 		this.props.setProperty("PageBreakChapter", this.jCheckPageBreakChapter.isSelected()?"1":"");
 		//目次出力
 		this.props.setProperty("MaxChapterNameLength", this.jTextMaxChapterNameLength.getText());
+		this.props.setProperty("CoverPageToc", this.jCheckCoverPageToc.isSelected()?"1":"");
 		this.props.setProperty("ChapterSection", this.jCheckChapterSection.isSelected()?"1":"");
 		this.props.setProperty("ChapterH", this.jCheckChapterH.isSelected()?"1":"");
 		this.props.setProperty("ChapterH1", this.jCheckChapterH1.isSelected()?"1":"");
