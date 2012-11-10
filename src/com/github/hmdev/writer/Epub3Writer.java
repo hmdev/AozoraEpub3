@@ -423,8 +423,10 @@ public class Epub3Writer
 			preChapterInfo = chapterInfo;
 		}
 		//一番最後は閉じる
-		ChapterInfo chapterInfo = chapterInfos.lastElement();
-		if (chapterInfo != null) chapterInfo.levelEnd = chapterInfo.chapterLevel; 
+		if (chapterInfos.size() > 0) {
+			ChapterInfo chapterInfo = chapterInfos.lastElement();
+			if (chapterInfo != null) chapterInfo.levelEnd = chapterInfo.chapterLevel;
+		}
 		
 		//navファイル
 		velocityContext.put("chapters", chapterInfos);
