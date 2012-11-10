@@ -9,8 +9,14 @@ public class ChapterInfo
 	String chapterId;
 	/** 章名称 */
 	String chapterName;
+	
 	/** 目次階層レベル */
-	int chapterLevel;
+	public int chapterLevel;
+	
+	/** 出力前に階層化開始タグを入れる回数 通常は1回 */
+	public int levelStart = 0;
+	/** 出力後に階層化終了タグを入れる回数 */
+	public int levelEnd = 0;
 	
 	public ChapterInfo(String sectionId, String chapterId, String chapterName, int chapterLevel)
 	{
@@ -51,8 +57,17 @@ public class ChapterInfo
 	{
 		return chapterLevel;
 	}
-	public void setChapterLevel(int chapterLevel)
+	
+	/** Velocityでループするために配列を返す */
+	public int[] getLevelStart()
 	{
-		this.chapterLevel = chapterLevel;
+		if (this.levelStart == 0) return null;
+		return new int[this.levelStart];
+	}
+	/** Velocityでループするために配列を返す */
+	public int[] getLevelEnd()
+	{
+		if (this.levelEnd == 0) return null;
+		return new int[this.levelEnd];
 	}
 }

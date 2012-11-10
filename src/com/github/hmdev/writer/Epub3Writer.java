@@ -391,6 +391,41 @@ public class Epub3Writer
 		bw.flush();
 		zos.closeArchiveEntry();
 		
+		//目次の階層情報を設定
+		//nullを除去
+		for (int i=chapterInfos.size()-1; i>=0; i--) {
+			if (chapterInfos.get(i).getChapterName() == null) chapterInfos.remove(i);
+		}
+		//レベルを0から開始に変更
+		int[] chapterCounts = new int[10];
+		for (ChapterInfo chapterInfo : chapterInfos) {
+			chapterCounts[chapterInfo.getChapterLevel()]++;
+		}
+		int[] levelDiff = new int[10];
+		for (int i=0; i<chapterCounts.length; i++) {
+			if (chapterCounts[i] == 0) {
+				for (int j=i+1; j<levelDiff.length; j++) {
+					levelDiff[j]++;
+				}
+			}
+		}
+		for (ChapterInfo chapterInfo : chapterInfos) {
+			chapterInfo.chapterLevel = chapterInfo.chapterLevel-levelDiff[chapterInfo.chapterLevel];
+		}
+		ChapterInfo preChapterInfo = new ChapterInfo(null, null, null, 0); //レベル0
+		for (ChapterInfo chapterInfo : chapterInfos) {
+			if (preChapterInfo != null) {
+				//開始
+				chapterInfo.levelStart = Math.max(0, chapterInfo.chapterLevel - preChapterInfo.chapterLevel);
+				//終了
+				preChapterInfo.levelEnd = Math.max(0, preChapterInfo.chapterLevel - chapterInfo.chapterLevel);
+			}
+			preChapterInfo = chapterInfo;
+		}
+		//一番最後は閉じる
+		ChapterInfo chapterInfo = chapterInfos.lastElement();
+		if (chapterInfo != null) chapterInfo.levelEnd = chapterInfo.chapterLevel; 
+		
 		//navファイル
 		velocityContext.put("chapters", chapterInfos);
 		zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+XHTML_PATH+XHTML_NAV_FILE));
@@ -649,7 +684,8 @@ public class Epub3Writer
 		}
 		if (isMiddle) sectionInfo.setMiddle(true);
 		this.sectionInfos.add(sectionInfo);
-		this.addChapter(null, null, 0); //セクション開始は名称がnullなので改ページ処理で文字列が設定されなければ出力されない
+		//セクション開始は名称がnullなので改ページ処理で文字列が設定されなければ出力されない 階層レベルは1
+		this.addChapter(null, null, 1);
 		
 		this.zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+XHTML_PATH+sectionId+".xhtml"));
 		

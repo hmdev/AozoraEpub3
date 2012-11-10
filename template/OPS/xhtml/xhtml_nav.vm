@@ -13,13 +13,17 @@ html {
 }
 h1 {font-size:1.5em;padding-top:1em;}
 ol {list-style:disc;}
-li {padding:0 .5em 0 0;}
+li {padding:0 .25em 0 0;}
+ol ol li {padding:0 .15em 0 0;}
+ol ol ol li {padding:0;}
 li a {text-decoration:none; border-right-width:1px;border-right-style:solid;padding-right: 1px;}
 #else
 @page {	margin:.5em 0 0 .5em; }
 h1 {font-size:1.5em;text-align:center;}
 ol {list-style:disc;}
-li {padding:.5em 0 0 0;}
+li {padding:.25em 0 0 0;}
+ol ol li {padding:.15em 0 0 0;}
+ol ol ol li {padding:0;}
 li a {text-decoration:none; border-bottom-width:1px;border-bottom-style:solid;padding-right: 1px;}
 #end
 </style>
@@ -35,10 +39,16 @@ li a {text-decoration:none; border-bottom-width:1px;border-bottom-style:solid;pa
 #foreach(${chapter} in ${chapters})
 #if ($chapter.ChapterName)
 #set($idx=$idx+1)
+#foreach(${start} in ${chapter.LevelStart})
+		<ol>
+#end
 #if ($chapter.ChapterId)
 			<li class="chapter" id="toc${idx}"><a href="${chapter.SectionId}.xhtml#${chapter.ChapterId}">${chapter.ChapterName}</a></li>
 #else
 			<li class="chapter" id="toc${idx}"><a href="${chapter.SectionId}.xhtml">${chapter.ChapterName}</a></li>
+#end
+#foreach(${end} in ${chapter.LevelEnd})
+		</ol>
 #end
 #end
 #end

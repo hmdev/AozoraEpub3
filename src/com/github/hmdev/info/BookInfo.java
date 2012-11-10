@@ -121,7 +121,7 @@ public class BookInfo
 	/** 出力ページしない行 (左右中央後の空行と改ページ前の空行) */
 	HashSet<Integer> mapIgnoreLine;
 	/** 見出し行の情報 */
-	HashMap<Integer, Integer> mapChapterLine;
+	HashMap<Integer, ChapterLineInfo> mapChapterLine;
 	
 	////////////////////////////////////////////////////////////////
 	public BookInfo()
@@ -204,10 +204,10 @@ public class BookInfo
 	}
 	
 	/** 見出し行と階層レベルを保存 */
-	public void addChapterLine(int lineNum, int level)
+	public void addChapterLine(int lineNum, ChapterLineInfo chapterLineInfo)
 	{
-		if (this.mapChapterLine == null) this.mapChapterLine = new HashMap<Integer, Integer>();
-		this.mapChapterLine.put(lineNum, level);
+		if (this.mapChapterLine == null) this.mapChapterLine = new HashMap<Integer, ChapterLineInfo>();
+		this.mapChapterLine.put(lineNum, chapterLineInfo);
 	}
 	/** 見出し行と削除 */
 	public void removeChapterLine(int lineNum)
@@ -218,21 +218,21 @@ public class BookInfo
 	public int getChapterLevel(int lineNum)
 	{
 		if (this.mapChapterLine == null) return 0;
-		Integer level = this.mapChapterLine.get(lineNum);
-		return level == null ? 0 : level;
+		ChapterLineInfo info = this.mapChapterLine.get(lineNum);
+		return info == null ? 0 : info.level;
 	}
 	
-	
 	/** 目次ページの自動抽出見出しを除外 */
-	public void excludeChapter()
+	public void excludeTocChapter()
 	{
-		//前2行と後ろ2行が自動抽出見出しの行を抽出
+		if (this.mapChapterLine == null) return;
+		//前2行と後ろ2行が自動抽出見出しの行を抽出 間の行は空行のみ許可
 		HashSet<Integer> excludeLine = new HashSet<Integer>();
 		for (Integer lineNum : this.mapChapterLine.keySet()) {
-			if (this.mapChapterLine.get(lineNum) >= 10) {
+			if (this.getChapterLevel(lineNum) >= 10) {
 				boolean prevIsPattern = false;
 				if (this.getChapterLevel(lineNum-1) >= 10) prevIsPattern = true;
-				else if (this.getChapterLevel(lineNum-2) >= 10) prevIsPattern = true;
+				else if (this.mapChapterLine.get(lineNum).emptyNext && this.getChapterLevel(lineNum-2) >= 10) prevIsPattern = true; //前が空行の場合のみ
 				boolean nextIsPattern = false;
 				if (this.getChapterLevel(lineNum+1) >= 10) nextIsPattern = true;
 				else if (this.getChapterLevel(lineNum+2) >= 10) nextIsPattern = true;
@@ -241,7 +241,7 @@ public class BookInfo
 		}
 		//先頭と最後も除外に追加
 		for (Integer lineNum : this.mapChapterLine.keySet()) {
-			if (this.mapChapterLine.get(lineNum) >= 10) {
+			if (this.getChapterLevel(lineNum) >= 10) {
 				if (excludeLine.contains(lineNum-1)) excludeLine.add(lineNum);
 				else if (excludeLine.contains(lineNum-2)) excludeLine.add(lineNum);
 				else if (excludeLine.contains(lineNum+1)) excludeLine.add(lineNum);
