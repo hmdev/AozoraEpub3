@@ -507,20 +507,20 @@ public class AozoraEpub3Converter
 			//注記タグのない文字列に変換
 			String noTagLine = this.removeChukiTag(line);
 			
-			//見出し行パターン抽出
+			//見出し行パターン抽出 パターン抽出時はレベル+10
 			//TODO パターンと目次レベルは設定可能にする 空行指定の場合はpreLines利用
 			if (bookInfo.getChapterLevel(lineNum) == 0) {
 				if (this.chapterPattern != null) {
 					//第～章 第～話 その～ で、後ろが行末またはスペース
-					if (this.chapterPattern.matcher(noTagLine).find()) bookInfo.addChapterLine(lineNum, 1);
+					if (this.chapterPattern.matcher(noTagLine).find()) bookInfo.addChapterLine(lineNum, 11);
 				}
 				if (this.chapterPatternNum != null) {
 					//数字+章名
-					if (this.chapterPatternNum.matcher(noTagLine).find()) bookInfo.addChapterLine(lineNum, 2);
+					if (this.chapterPatternNum.matcher(noTagLine).find()) bookInfo.addChapterLine(lineNum, 12);
 				}
 				if (this.chapterPatternNumOnly != null) {
 					//数字のみの行
-					if (this.chapterPatternNumOnly.matcher(noTagLine).find()) bookInfo.addChapterLine(lineNum, 2);
+					if (this.chapterPatternNumOnly.matcher(noTagLine).find()) bookInfo.addChapterLine(lineNum, 12);
 				}
 			}
 			//コメント行の後はタイトル取得はしない
@@ -575,6 +575,11 @@ public class AozoraEpub3Converter
 				bookInfo.insertTitlePage = true;
 			}
 		}
+		
+		//目次ページの見出しを除外
+		//前後2行前と2行後に3つ以上に抽出した見出しがある場合連続する見出しを除去
+		bookInfo.excludeChapter();
+		
 		return bookInfo;
 	}
 	
@@ -1767,11 +1772,11 @@ public class AozoraEpub3Converter
 			case '≫': buf.append("》"); break;
 			case '“': buf.append("〝"); break;
 			case '”': buf.append("〟"); break;
-			//ローマ数字等 Readerで回転させない
+			//ローマ数字等 Readerで正立にする
 			//その他右回転する記号: ¶⇔⇒≡√∇∂∃∠⊥⌒∽∝∫∬∮∑∟⊿≠≦≧∈∋⊆⊇⊂⊃∧∨↑↓→←
 			case 'Ⅰ': case 'Ⅱ': case 'Ⅲ': case 'Ⅳ': case 'Ⅴ': case 'Ⅵ': case 'Ⅶ': case 'Ⅷ': case 'Ⅸ': case 'Ⅹ': case 'Ⅺ': case 'Ⅻ':
 			case 'ⅰ': case 'ⅱ': case 'ⅲ': case 'ⅳ': case 'ⅴ': case 'ⅵ': case 'ⅶ': case 'ⅷ': case 'ⅸ': case 'ⅹ': case 'ⅺ': case 'ⅻ':
-			case '①': case '②': case '③': case '④': case '⑤': case '⑥': case '⑦': case '⑧': case '⑨': case '⑩':
+			case '⓪': case '①': case '②': case '③': case '④': case '⑤': case '⑥': case '⑦': case '⑧': case '⑨': case '⑩':
 			case '⑪': case '⑫': case '⑬': case '⑭': case '⑮': case '⑯': case '⑰': case '⑱': case '⑲': case '⑳':
 			case '㉑': case '㉒': case '㉓': case '㉔': case '㉕': case '㉖': case '㉗': case '㉘': case '㉙': case '㉚':
 			case '㉛': case '㉜': case '㉝': case '㉞': case '㉟': case '㊱': case '㊲': case '㊳': case '㊴': case '㊵':
@@ -1784,6 +1789,7 @@ public class AozoraEpub3Converter
 			case '◐': case '◑': case '◒': case '◓': case '▷': case '▶': case '◁': case '◀':
 			case '♤': case '♠': case '♢': case '♦': case '♡': case '♥': case '♧': case '♣': 
 			case '☖': case '☗': case '☎': case '☁': case '☂': case '☃': case '♨': case '▱': case '⊿':
+			case '☹': case '☺': case '☻':
 			case '✓': case '␣': case '⏎': case '♩': case '♮': case '♫': case '♬': case 'ℓ': case '№': case '℡':
 			case 'ℵ': case 'ℏ': case '℧':
 				//縦中横の中でなければタグで括る
@@ -1890,8 +1896,25 @@ public class AozoraEpub3Converter
 			//バッファ内の文字列出力
 			//見出し階層レベル
 			int chapterLevel = this.bookInfo.getChapterLevel(lineNum);
+			//タグの階層をチェック
+			int tagStart = 0;
+			int tagEnd = 0;
+			boolean inTag = false;
+			for (int i=0; i<length; i++) {
+				if (inTag) {
+					if (line.charAt(i) == '/' && line.charAt(i+1) == '>') tagEnd++;
+					if (line.charAt(i) == '>') inTag = false;
+				} else {
+					if (line.charAt(i) == '<') {
+						if (i<length-1 && line.charAt(i+1) == '/') tagEnd++;
+						else tagStart++;
+						inTag = true;
+					}
+				}
+			}
 			
-			//強制改ページ
+			//強制改ページ処理
+			//サイズが超えていて改ページトリガが設定されていなければ
 			if (this.forcePageBreak > 0 && this.pageBreakTrigger == null && this.pageByteSize > this.forcePageBreak) {
 				//タグの外の場合のみ
 				if (this.tagLevel == 0) {
@@ -1900,8 +1923,12 @@ public class AozoraEpub3Converter
 						 this.setPageBreakTrigger(pageBreakNoChapter);
 					} else {
 						//章での分割が有効
-						if (forcePageBreakChapter > 0 && chapterLevel > 0) this.setPageBreakTrigger(pageBreakNoChapter);
-						else if (forcePageBreakEmptyLine > 0 && this.printEmptyLines >= forcePageBreakEmptyLine) this.setPageBreakTrigger(pageBreakNoChapter);
+						if (forcePageBreakEmptyLine > 0 && this.printEmptyLines >= forcePageBreakEmptyLine) this.setPageBreakTrigger(pageBreakNoChapter);
+						else if (forcePageBreakChapter > 0) {
+							if (chapterLevel > 0) this.setPageBreakTrigger(pageBreakNoChapter);
+							//次の行が見出しでタグの中なら1行前で改ページ
+							else if (tagStart-tagEnd > 0 && this.bookInfo.getChapterLevel(lineNum+1) > 0) this.setPageBreakTrigger(pageBreakNoChapter);
+						}
 					}
 				}
 			}
@@ -1980,22 +2007,7 @@ public class AozoraEpub3Converter
 				out.write("\n");
 			}
 			
-			//タグの階層をチェック
-			int tagStart = 0;
-			int tagEnd = 0;
-			boolean inTag = false;
-			for (int i=0; i<length; i++) {
-				if (inTag) {
-					if (line.charAt(i) == '/' && line.charAt(i+1) == '>') tagEnd++;
-					if (line.charAt(i) == '>') inTag = false;
-				} else {
-					if (line.charAt(i) == '<') {
-						if (i<length-1 && line.charAt(i+1) == '/') tagEnd++;
-						else tagStart++;
-						inTag = true;
-					}
-				}
-			}
+			//タグの階層を変更
 			this.tagLevel += tagStart-tagEnd;
 			
 			//見出しのChapter追加

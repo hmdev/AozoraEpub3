@@ -223,6 +223,36 @@ public class BookInfo
 	}
 	
 	
+	/** 目次ページの自動抽出見出しを除外 */
+	public void excludeChapter()
+	{
+		//前2行と後ろ2行が自動抽出見出しの行を抽出
+		HashSet<Integer> excludeLine = new HashSet<Integer>();
+		for (Integer lineNum : this.mapChapterLine.keySet()) {
+			if (this.mapChapterLine.get(lineNum) >= 10) {
+				boolean prevIsPattern = false;
+				if (this.getChapterLevel(lineNum-1) >= 10) prevIsPattern = true;
+				else if (this.getChapterLevel(lineNum-2) >= 10) prevIsPattern = true;
+				boolean nextIsPattern = false;
+				if (this.getChapterLevel(lineNum+1) >= 10) nextIsPattern = true;
+				else if (this.getChapterLevel(lineNum+2) >= 10) nextIsPattern = true;
+				if (prevIsPattern && nextIsPattern) excludeLine.add(lineNum);
+			}
+		}
+		//先頭と最後も除外に追加
+		for (Integer lineNum : this.mapChapterLine.keySet()) {
+			if (this.mapChapterLine.get(lineNum) >= 10) {
+				if (excludeLine.contains(lineNum-1)) excludeLine.add(lineNum);
+				else if (excludeLine.contains(lineNum-2)) excludeLine.add(lineNum);
+				else if (excludeLine.contains(lineNum+1)) excludeLine.add(lineNum);
+				else if (excludeLine.contains(lineNum+2)) excludeLine.add(lineNum);
+			}
+		}
+		for (Integer lineNum : excludeLine) {
+			this.mapChapterLine.remove(lineNum);
+		}
+	}
+	
 	////////////////////////////////////////////////////////////////
 	public String getTitle()
 	{

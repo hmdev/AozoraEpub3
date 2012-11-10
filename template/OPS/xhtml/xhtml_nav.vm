@@ -31,6 +31,7 @@ li a {text-decoration:none; border-bottom-width:1px;border-bottom-style:solid;pa
 #if (${bookInfo.InsertCoverPage} && ${bookInfo.InsertCoverPageToc})
 			<li class="chapter" id="toccover"><a href="cover.xhtml">${cover_name}</a></li>
 #end
+#set($idx=0)
 #foreach(${chapter} in ${chapters})
 #if ($chapter.ChapterName)
 #set($idx=$idx+1)
