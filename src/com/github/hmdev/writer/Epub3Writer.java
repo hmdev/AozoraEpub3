@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.Vector;
+import java.util.zip.CRC32;
 
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
@@ -190,11 +191,8 @@ public class Epub3Writer
 		zos = new ZipArchiveOutputStream(new BufferedOutputStream(new FileOutputStream(epubFile)));
 		//mimetypeは非圧縮
 		//STOREDで格納しCRCとsizeを指定する必要がある
-		zos.setLevel(0);
 		ZipArchiveEntry mimeTypeEntry = new ZipArchiveEntry(MIMETYPE_PATH);
-		zos.putArchiveEntry(mimeTypeEntry);
 		FileInputStream fis = new FileInputStream(new File(templatePath+MIMETYPE_PATH));
-		/*//STOREで格納 → Readium等で読めなくなるので通常のDEFLATEDに戻す
 		byte[] b = new byte[256];
 		int len = fis.read(b);
 		fis.close();
@@ -203,10 +201,9 @@ public class Epub3Writer
 		mimeTypeEntry.setMethod(ZipArchiveEntry.STORED);
 		mimeTypeEntry.setCrc(crc32.getValue());
 		mimeTypeEntry.setSize(len);
+		zos.putArchiveEntry(mimeTypeEntry);
 		zos.write(b, 0, len);
-		b = null;*/
-		IOUtils.copy(fis, zos);
-		fis.close();
+		b = null;
 		zos.closeArchiveEntry();
 		
 		zos.setLevel(9);
