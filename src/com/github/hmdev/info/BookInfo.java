@@ -239,15 +239,18 @@ public class BookInfo
 				if (prevIsPattern && nextIsPattern) excludeLine.add(lineNum);
 			}
 		}
-		//先頭と最後も除外に追加
+		//先頭と最後
+		int start = -1; int end = -1;
 		for (Integer lineNum : this.mapChapterLine.keySet()) {
-			if (this.getChapterLevel(lineNum) >= 10) {
-				if (excludeLine.contains(lineNum-1)) excludeLine.add(lineNum);
-				else if (excludeLine.contains(lineNum-2)) excludeLine.add(lineNum);
-				else if (excludeLine.contains(lineNum+1)) excludeLine.add(lineNum);
-				else if (excludeLine.contains(lineNum+2)) excludeLine.add(lineNum);
+			if (this.getChapterLevel(lineNum) >= 10 && !excludeLine.contains(lineNum)) {
+				if (excludeLine.contains(lineNum-1)) end = lineNum;
+				else if (this.mapChapterLine.get(lineNum).emptyNext && excludeLine.contains(lineNum-2)) end = lineNum;
+				else if (excludeLine.contains(lineNum+1)) start = lineNum;
+				else if (excludeLine.contains(lineNum+2)) start = lineNum;
 			}
 		}
+		if (start > -1) this.mapChapterLine.remove(start);
+		if (end > -1) this.mapChapterLine.remove(end);
 		for (Integer lineNum : excludeLine) {
 			this.mapChapterLine.remove(lineNum);
 		}
