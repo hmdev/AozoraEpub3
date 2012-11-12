@@ -595,7 +595,7 @@ public class AozoraEpub3Converter
 			}
 			//コメント行の後はタイトル取得はしない
 			if (!firstCommentStarted) {
-				String replaced = this.replaceToPlain(this.convertGaijiChuki(line, false));
+				String replaced = this.replaceToPlain(line);
 				if (firstLineStart == -1) {
 					//改ページチェック
 					//タイトル前の改ページ位置を保存
@@ -2097,7 +2097,8 @@ public class AozoraEpub3Converter
 			if (this.chapterSection && !this.chapterStarted) {
 				if (lineNum == bookInfo.titleLine || lineNum > bookInfo.titleEndLine) {
 					String name = this.getChapterName(line);
-					if (name.length() > 0) {
+					//記号のみの行は除外
+					if (name.replaceAll("◇|◆|□|■|＊|＋", "").length() > 0) {
 						this.chapterStarted = true;
 						this.writer.updateChapterName(name);
 					}
@@ -2113,12 +2114,13 @@ public class AozoraEpub3Converter
 	/** タグのない文字列に置換 */
 	private String replaceToPlain(String str)
 	{
-		return str.replaceAll("<span class=\"fullsp\"> </span>", "　").replaceAll(String.valueOf((char)(0x2000))+(char)(0x2000), "　").replaceAll("<rt>[^<]+</rt>", "").replaceAll("<[^>]+>", "")
-				.replaceAll("〳〵", "く").replaceAll("〴〵", "ぐ").replaceAll("〻", "々").replaceFirst("^[ |　]+","").replaceFirst("[ |　]+$","");
+		return str.replaceAll("［＃.+?］", "").replaceFirst("^[ |　|―]*", "").replaceAll("《[^》]+?》", "").replaceAll("〳〵", "く").replaceAll("〴〵", "ぐ").replaceAll("〻", "々").replaceFirst("^[ |　]+","").replaceFirst("[ |　]+$","");
 	}
 	private String getChapterName(String line)
 	{
-		String name = this.replaceToPlain(line).replaceAll("^(=|-|―|─)(=|-|―|─)+", "").replaceAll("(=|-|―|─)(=|-|―|─)+$", "");
+		String name = line.replaceAll("<span class=\"fullsp\"> </span>", "　").replaceAll(String.valueOf((char)(0x2000))+(char)(0x2000), "　")
+				.replaceAll("<rt>[^<]+</rt>", "").replaceAll("<[^>]+>", "").replaceFirst("^(=|＝|-|―|─)(=|＝|-|―|─)+", "")
+				.replaceFirst("(=|＝|-|―|─)(=|＝|-|―|─)+$", "");
 		return name.length()>maxChapterNameLength ? name.substring(0, maxChapterNameLength)+"..." : name;
 	}
 }

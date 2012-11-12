@@ -240,18 +240,19 @@ public class BookInfo
 			}
 		}
 		//先頭と最後
-		int start = -1; int end = -1;
+		HashSet<Integer> excludeLine2 = new HashSet<Integer>();
 		for (Integer lineNum : this.mapChapterLine.keySet()) {
-			if (this.getChapterLevel(lineNum) >= 10 && !excludeLine.contains(lineNum)) {
-				if (excludeLine.contains(lineNum-1)) end = lineNum;
-				else if (this.mapChapterLine.get(lineNum).emptyNext && excludeLine.contains(lineNum-2)) end = lineNum;
-				else if (excludeLine.contains(lineNum+1)) start = lineNum;
-				else if (excludeLine.contains(lineNum+2)) start = lineNum;
+			if (!excludeLine.contains(lineNum) && this.getChapterLevel(lineNum) >= 10) {
+				if (excludeLine.contains(lineNum-1)) excludeLine2.add(lineNum);
+				else if (this.mapChapterLine.get(lineNum).emptyNext && excludeLine.contains(lineNum-2)) excludeLine2.add(lineNum);
+				else if (excludeLine.contains(lineNum+1)) excludeLine2.add(lineNum);
+				else if (excludeLine.contains(lineNum+2)) excludeLine2.add(lineNum);
 			}
 		}
-		if (start > -1) this.mapChapterLine.remove(start);
-		if (end > -1) this.mapChapterLine.remove(end);
 		for (Integer lineNum : excludeLine) {
+			this.mapChapterLine.remove(lineNum);
+		}
+		for (Integer lineNum : excludeLine2) {
 			this.mapChapterLine.remove(lineNum);
 		}
 	}
