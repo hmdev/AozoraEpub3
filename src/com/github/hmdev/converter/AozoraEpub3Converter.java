@@ -97,9 +97,9 @@ public class AozoraEpub3Converter
 	/** 章名数字無し */
 	String[] chapterName = new String[]{"プロローグ","エピローグ","序","序章","終章","間章","幕間"};
 	/** 章名数字前 suffixのみは空文字 */
-	String[] chapterNumPrefix = new String[]{"第","その","（", ""};
+	String[] chapterNumPrefix = new String[]{"第","その", ""};//new String[]{"第","その","（", ""};
 	/** 章名数字後 prefixに対応する複数のsuffixを指定 指定なしなら空文字 */
-	String[][] chapterNumSuffix = new String[][]{{"話","章","篇","部","節","幕"},{""},{"）"},{"章"}};
+	String[][] chapterNumSuffix = new String[][]{{"話","章","篇","部","節","幕"},{""},{"章"}};//new String[][]{{"話","章","篇","部","節","幕"},{""},{"章"}};
 	
 	/** 章の注記と目次階層レベル指定 大見出し 中見出し 小見出し 見出し */
 	HashMap<String, Integer> chapterChukiMap = null;

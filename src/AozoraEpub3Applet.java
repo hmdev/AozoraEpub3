@@ -938,12 +938,12 @@ public class AozoraEpub3Applet extends JApplet
 		jCheckChapterName.setBorder(padding2H2T3B);
 		panel.add(jCheckChapterName);
 		propValue = props.getProperty("ChapterNumOnly");
-		jCheckChapterNumOnly = new JCheckBox("数字のみ ) ", "1".equals(propValue));
+		jCheckChapterNumOnly = new JCheckBox("数字のみ", "1".equals(propValue));
 		jCheckChapterNumOnly.setFocusPainted(false);
 		jCheckChapterNumOnly.setBorder(padding2H2T3B);
 		panel.add(jCheckChapterNumOnly);
 		propValue = props.getProperty("ChapterNum");
-		jCheckChapterNum = new JCheckBox("数字と章名", "1".equals(propValue));
+		jCheckChapterNum = new JCheckBox("数字と章名 ) ", "1".equals(propValue));
 		jCheckChapterNum.setFocusPainted(false);
 		jCheckChapterNum.setBorder(padding2H2T3B);
 		panel.add(jCheckChapterNum);
