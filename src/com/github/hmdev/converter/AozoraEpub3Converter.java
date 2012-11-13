@@ -77,8 +77,12 @@ public class AozoraEpub3Converter
 	
 	//---------------- Chapter Properties ----------------//
 	boolean autoChapterName = false;
-	boolean autoChapterNum = false;
 	boolean autoChapterNumOnly = false;
+	boolean autoChapterNumTitle = false;
+	boolean autoChapterNumParen = false;
+	boolean autoChapterNumParenTitle = false;
+	
+	boolean excludeSeqencialChapter = true;
 	
 	/** 章名の最大文字数 */
 	int maxChapterNameLength = 64;
@@ -97,9 +101,12 @@ public class AozoraEpub3Converter
 	/** 章名数字無し */
 	String[] chapterName = new String[]{"プロローグ","エピローグ","序","序章","終章","間章","幕間"};
 	/** 章名数字前 suffixのみは空文字 */
-	String[] chapterNumPrefix = new String[]{"第","その", ""};//new String[]{"第","その","（", ""};
+	String[] chapterNumPrefix = new String[]{"第","その", ""};
 	/** 章名数字後 prefixに対応する複数のsuffixを指定 指定なしなら空文字 */
-	String[][] chapterNumSuffix = new String[][]{{"話","章","篇","部","節","幕"},{""},{"章"}};//new String[][]{{"話","章","篇","部","節","幕"},{""},{"章"}};
+	String[][] chapterNumSuffix = new String[][]{{"話","章","篇","部","節","幕"},{""},{"章"}};
+	
+	String[] chapterNumParenPrefix = new String[]{"（","〈","〔","【"};
+	String[] chapterNumParenSuffix = new String[]{"）","〉","〕","】"};
 	
 	/** 章の注記と目次階層レベル指定 大見出し 中見出し 小見出し 見出し */
 	HashMap<String, Integer> chapterChukiMap = null;
@@ -364,7 +371,8 @@ public class AozoraEpub3Converter
 	}
 	
 	/** コメント行内出力設定 */
-	public void setChapterLevel(int maxLength, boolean section, boolean h, boolean h1, boolean h2, boolean h3, boolean chapterName, boolean chapterNum, boolean chapterNumOnly)
+	public void setChapterLevel(int maxLength, boolean excludeSeqencialChapter, boolean section, boolean h, boolean h1, boolean h2, boolean h3,
+			boolean chapterName, boolean autoChapterNumOnly, boolean autoChapterNumTitle, boolean autoChapterNumParen, boolean autoChapterNumParenTitle)
 	{
 		this.maxChapterNameLength = maxLength;
 		
@@ -389,10 +397,12 @@ public class AozoraEpub3Converter
 			chapterChukiMap.put("小見出し", 4);
 		}
 		
+		this.excludeSeqencialChapter = excludeSeqencialChapter;
 		this.autoChapterName = chapterName;
-		this.autoChapterNum = chapterNum;
-		this.autoChapterNumOnly = chapterNumOnly;
-		
+		this.autoChapterNumOnly = autoChapterNumOnly;
+		this.autoChapterNumTitle = autoChapterNumTitle;
+		this.autoChapterNumParen = autoChapterNumParen;
+		this.autoChapterNumParenTitle = autoChapterNumParenTitle;
 	}
 	
 	public void setSpaceHyphenation(int type)
@@ -449,7 +459,7 @@ public class AozoraEpub3Converter
 		int lastEmptyLine = -1;
 		
 		//目次用見出し自動抽出
-		boolean autoChapter = this.autoChapterName || this.autoChapterNum || this.autoChapterNumOnly;
+		boolean autoChapter = this.autoChapterName || this.autoChapterNumTitle || this.autoChapterNumOnly || this.autoChapterNumParen || this.autoChapterNumParenTitle;
 		
 		//最後まで回す
 		while ((line = src.readLine()) != null) {
@@ -572,23 +582,35 @@ public class AozoraEpub3Converter
 					if (isChapter)
 						bookInfo.addChapterLine(lineNum, new ChapterLineInfo(13, lastEmptyLine==lineNum-1));
 				}
-				if (this.autoChapterNum) {
-					//数字+章名
+				if (this.autoChapterNumOnly || this.autoChapterNumTitle) {
+					//数字
 					int idx = 0;
 					while (noChukiLineLength > idx && isChapterNum(noChukiLine.charAt(idx))) idx++;
 					if (idx > 0) {
-						if (noChukiLine.length() > idx && isChapterSeparator(noChukiLine.charAt(idx))) { 
+						if (this.autoChapterNumOnly && noChukiLine.length()==idx ||
+							this.autoChapterNumTitle && noChukiLine.length() > idx && isChapterSeparator(noChukiLine.charAt(idx))) { 
 							bookInfo.addChapterLine(lineNum, new ChapterLineInfo(13, lastEmptyLine==lineNum-1));
 						}
 					}
 				}
-				if (this.autoChapterNumOnly) {
-					//数字のみの行
-					int idx = 0;
-					while (noChukiLineLength > idx && isChapterNum(noChukiLine.charAt(idx))) idx++;
-					if (idx > 0) {
-						if (noChukiLine.length() == idx) { 
-							bookInfo.addChapterLine(lineNum, new ChapterLineInfo(13, lastEmptyLine==lineNum-1));
+				if (this.autoChapterNumParen || this.autoChapterNumParenTitle) {
+					//括弧内数字のみ
+					for (int i=0; i<this.chapterNumParenPrefix.length; i++) {
+						String prefix = this.chapterNumParenPrefix[i];
+						if (noChukiLine.startsWith(prefix)) {
+							int idx = prefix.length();
+							//次が数字かチェック
+							while (noChukiLineLength > idx && isChapterNum(noChukiLine.charAt(idx))) idx++;
+							if (idx <= prefix.length()) break; //数字がなければ抽出しない
+							//後ろをチェック
+							String suffix = this.chapterNumParenSuffix[i];
+							if (noChukiLine.substring(idx).startsWith(suffix)) {
+								idx += suffix.length();
+								if (this.autoChapterNumParen && noChukiLine.length()==idx ||
+									this.autoChapterNumParenTitle && noChukiLine.length()>idx && isChapterSeparator(noChukiLine.charAt(idx))) {
+									bookInfo.addChapterLine(lineNum, new ChapterLineInfo(13, lastEmptyLine==lineNum-1));
+								}
+							}
 						}
 					}
 				}
@@ -644,7 +666,7 @@ public class AozoraEpub3Converter
 		
 		//目次ページの見出しを除外
 		//前後2行前と2行後に3つ以上に抽出した見出しがある場合連続する見出しを除去
-		bookInfo.excludeTocChapter();
+		if (this.excludeSeqencialChapter) bookInfo.excludeTocChapter();
 		
 		return bookInfo;
 	}

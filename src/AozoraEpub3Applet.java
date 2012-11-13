@@ -162,8 +162,12 @@ public class AozoraEpub3Applet extends JApplet
 	JCheckBox jCheckChapterH2;
 	JCheckBox jCheckChapterH3;
 	JCheckBox jCheckChapterName;
+	JCheckBox jCheckChapterNameTitle;
 	JCheckBox jCheckChapterNum;
 	JCheckBox jCheckChapterNumOnly;
+	JCheckBox jCheckChapterNumParen;
+	JCheckBox jCheckChapterNumParenTitle;
+	JCheckBox jCheckChapterExclude;
 	
 	JComboBox jComboxPageBreak;
 	JCheckBox jCheckPageBreakEmpty;
@@ -262,6 +266,8 @@ public class AozoraEpub3Applet extends JApplet
 		jTabbedPane.setBorder(padding2H);
 		this.add(jTabbedPane);
 		
+		ButtonGroup buttonGroup;
+		
 		////////////////////////////////////////////////////////////////
 		//Tab 変換
 		////////////////////////////////////////////////////////////////
@@ -354,9 +360,9 @@ public class AozoraEpub3Applet extends JApplet
 		panel.add(jCheckTocPage);
 		label = new JLabel("(");
 		panel.add(label);
-		ButtonGroup buttonGroup = new ButtonGroup();
+		buttonGroup = new ButtonGroup();
 		propValue = props.getProperty("TocVertical");
-		jRadioTocV = new JRadioButton("縦書き", propValue==null||"1".equals(propValue));
+		jRadioTocV = new JRadioButton("縦書き ", propValue==null||"1".equals(propValue));
 		jRadioTocV.setFocusPainted(false);
 		jRadioTocV.setBorder(padding0);
 		panel.add(jRadioTocV);
@@ -368,6 +374,7 @@ public class AozoraEpub3Applet extends JApplet
 		buttonGroup.add(jRadioTocH);
 		label = new JLabel(")");
 		panel.add(label);
+		
 		
 		////////////////////////////////
 		//出力ファイル設定
@@ -877,18 +884,37 @@ public class AozoraEpub3Applet extends JApplet
 		jCheckPageBreakChapter.setBorder(padding2H2T3B);
 		panel.add(jCheckPageBreakChapter);
 		
+		////////////////////////////////////////////////////////////////
+		//Tab 目次設定
+		////////////////////////////////////////////////////////////////
+		tabPanel = new JPanel();
+		//tabPanel.setLayout(new BoxLayout(tabPanel, BoxLayout.Y_AXIS));
+		tabPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 1, 0));
+		jTabbedPane.add("目次設定", tabPanel);
+		
 		////////////////////////////////
 		//目次設定
 		////////////////////////////////
-		panelV = new JPanel();
-		panelV.setLayout(new BoxLayout(panelV, BoxLayout.Y_AXIS));
-		panelV.setBorder(new NarrowTitledBorder("目次出力"));
-		tabPanel.add(panelV);
+		//目次出力
 		panel = new JPanel();
-		panel.setLayout(new FlowLayout(FlowLayout.LEFT, 1, 0));
-		panel.setBorder(padding4B);
-		//panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-		panelV.add(panel);
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		panel.setBorder(new NarrowTitledBorder("目次出力"));
+		tabPanel.add(panel);
+		
+		//最大文字数
+		label = new JLabel(" 最大文字数");
+		label.setBorder(padding2H2T3B);
+		panel.add(label);
+		propValue = props.getProperty("MaxChapterNameLength");
+		jTextMaxChapterNameLength = new JTextField(propValue==null?"64":propValue);
+		jTextMaxChapterNameLength.setHorizontalAlignment(JTextField.RIGHT);
+		jTextMaxChapterNameLength.setInputVerifier(new IntegerInputVerifier(1, 999));
+		jTextMaxChapterNameLength.setPreferredSize(text3);
+		panel.add(jTextMaxChapterNameLength);
+		
+		label = new JLabel("  ");
+		label.setBorder(padding2H2T3B);
+		panel.add(label);
 		
 		//表紙
 		propValue = props.getProperty("CoverPageToc");
@@ -898,6 +924,23 @@ public class AozoraEpub3Applet extends JApplet
 		jCheckCoverPageToc.setBorder(padding2H2T3B);
 		panel.add(jCheckCoverPageToc);
 		
+		propValue = props.getProperty("ChapterExclude");
+		jCheckChapterExclude = new JCheckBox("連続する見出しを除外", propValue==null||"1".equals(propValue));
+		jCheckChapterExclude.setToolTipText("目次ページ等 3つ以上連続する見出しは除外します(空行1行間隔も連続扱い)");
+		jCheckChapterExclude.setFocusPainted(false);
+		jCheckChapterExclude.setBorder(padding2H2T3B);
+		panel.add(jCheckChapterExclude);
+		
+		//目次抽出
+		panelV = new JPanel();
+		panelV.setLayout(new BoxLayout(panelV, BoxLayout.Y_AXIS));
+		panelV.setBorder(new NarrowTitledBorder("目次抽出"));
+		tabPanel.add(panelV);
+		
+		panel = new JPanel();
+		panel.setLayout(new FlowLayout(FlowLayout.LEFT, 1, 0));
+		panel.setBorder(padding4B);
+		panelV.add(panel);
 		//改ページ後を目次に追加
 		propValue = props.getProperty("ChapterSection");
 		jCheckChapterSection = new JCheckBox("改ページ後 ", propValue==null||"1".equals(propValue));
@@ -906,6 +949,9 @@ public class AozoraEpub3Applet extends JApplet
 		jCheckChapterSection.setBorder(padding2H2T3B);
 		panel.add(jCheckChapterSection);
 		//見出し注記
+		label = new JLabel(" 注記(");
+		label.setBorder(padding2H2T3B);
+		panel.add(label);
 		propValue = props.getProperty("ChapterH");
 		jCheckChapterH = new JCheckBox("見出し ", propValue==null||"1".equals(propValue));
 		jCheckChapterH.setFocusPainted(false);
@@ -922,41 +968,44 @@ public class AozoraEpub3Applet extends JApplet
 		jCheckChapterH2.setBorder(padding2H2T3B);
 		panel.add(jCheckChapterH2);
 		propValue = props.getProperty("ChapterH3");
-		jCheckChapterH3 = new JCheckBox("小見出し ", propValue==null||"1".equals(propValue));
+		jCheckChapterH3 = new JCheckBox("小見出し )", propValue==null||"1".equals(propValue));
 		jCheckChapterH3.setFocusPainted(false);
 		jCheckChapterH3.setBorder(padding2H2T3B);
 		panel.add(jCheckChapterH3);
+		
 		panel = new JPanel();
 		panel.setLayout(new FlowLayout(FlowLayout.LEFT, 1, 0));
+		panel.setBorder(padding4B);
 		panelV.add(panel);
-		label = new JLabel("自動抽出(");
-		label.setBorder(padding2H2T3B);
-		panel.add(label);
 		propValue = props.getProperty("ChapterName");
-		jCheckChapterName = new JCheckBox("第～/その～", propValue==null||"1".equals(propValue));
+		jCheckChapterName = new JCheckBox("章番号 (第～章/その～/～章/序/プロローグ 等)", propValue==null||"1".equals(propValue));
 		jCheckChapterName.setFocusPainted(false);
 		jCheckChapterName.setBorder(padding2H2T3B);
 		panel.add(jCheckChapterName);
+		
+		panel = new JPanel();
+		panel.setLayout(new FlowLayout(FlowLayout.LEFT, 1, 0));
+		panelV.add(panel);
 		propValue = props.getProperty("ChapterNumOnly");
 		jCheckChapterNumOnly = new JCheckBox("数字のみ", "1".equals(propValue));
 		jCheckChapterNumOnly.setFocusPainted(false);
 		jCheckChapterNumOnly.setBorder(padding2H2T3B);
 		panel.add(jCheckChapterNumOnly);
 		propValue = props.getProperty("ChapterNum");
-		jCheckChapterNum = new JCheckBox("数字と章名 ) ", "1".equals(propValue));
+		jCheckChapterNum = new JCheckBox("数字+章名  ", "1".equals(propValue));
 		jCheckChapterNum.setFocusPainted(false);
 		jCheckChapterNum.setBorder(padding2H2T3B);
 		panel.add(jCheckChapterNum);
-		//最大文字数
-		label = new JLabel(" 最大文字数");
-		label.setBorder(padding2H2T3B);
-		panel.add(label);
-		propValue = props.getProperty("MaxChapterNameLength");
-		jTextMaxChapterNameLength = new JTextField(propValue==null?"64":propValue);
-		jTextMaxChapterNameLength.setHorizontalAlignment(JTextField.RIGHT);
-		jTextMaxChapterNameLength.setInputVerifier(new IntegerInputVerifier(1, 999));
-		jTextMaxChapterNameLength.setPreferredSize(text3);
-		panel.add(jTextMaxChapterNameLength);
+		propValue = props.getProperty("ChapterNumParen");
+		jCheckChapterNumParen = new JCheckBox("数字(括弧内)", propValue==null||"1".equals(propValue));
+		jCheckChapterNumParen.setFocusPainted(false);
+		jCheckChapterNumParen.setBorder(padding2H2T3B);
+		panel.add(jCheckChapterNumParen);
+		propValue = props.getProperty("ChapterNumParenTitle");
+		jCheckChapterNumParenTitle = new JCheckBox("数字(括弧内)+章名", "1".equals(propValue));
+		jCheckChapterNumParenTitle.setFocusPainted(false);
+		jCheckChapterNumParenTitle.setBorder(padding2H2T3B);
+		panel.add(jCheckChapterNumParenTitle);
 		
 		////////////////////////////////////////////////////////////////
 		//テキストエリア
@@ -1366,9 +1415,10 @@ public class AozoraEpub3Applet extends JApplet
 			
 			int maxLength = 64;
 			try { maxLength = Integer.parseInt((jTextMaxChapterNameLength.getText())); } catch (Exception e) {}
-			this.aozoraConverter.setChapterLevel(maxLength, jCheckChapterSection.isSelected(),
+			this.aozoraConverter.setChapterLevel(maxLength, jCheckChapterExclude.isSelected(), jCheckChapterSection.isSelected(),
 					jCheckChapterH.isSelected(), jCheckChapterH1.isSelected(), jCheckChapterH2.isSelected(), jCheckChapterH3.isSelected(),
-					jCheckChapterName.isSelected(), jCheckChapterNum.isSelected(), jCheckChapterNumOnly.isSelected());
+					jCheckChapterName.isSelected(),
+					jCheckChapterNumOnly.isSelected(), jCheckChapterNum.isSelected(), jCheckChapterNumParen.isSelected(), jCheckChapterNumParenTitle.isSelected());
 			
 			////////////////////////////////
 			//すべてのファイルの変換実行
@@ -1717,6 +1767,7 @@ public class AozoraEpub3Applet extends JApplet
 		this.jCheckPageBreakChapter.setEnabled(enabled);
 		
 		this.jCheckCoverPageToc.setEnabled(enabled);
+		this.jCheckChapterExclude.setEnabled(enabled);
 		this.jCheckChapterSection.setEnabled(enabled);
 		this.jCheckChapterH.setEnabled(enabled);
 		this.jCheckChapterH1.setEnabled(enabled);
@@ -1725,6 +1776,8 @@ public class AozoraEpub3Applet extends JApplet
 		this.jCheckChapterName.setEnabled(enabled);
 		this.jCheckChapterNum.setEnabled(enabled);
 		this.jCheckChapterNumOnly.setEnabled(enabled);
+		this.jCheckChapterNumParen.setEnabled(enabled);
+		this.jCheckChapterNumParenTitle.setEnabled(enabled);
 		this.jTextMaxChapterNameLength.setEnabled(enabled);
 	}
 	
@@ -1898,6 +1951,7 @@ public class AozoraEpub3Applet extends JApplet
 		//目次出力
 		this.props.setProperty("MaxChapterNameLength", this.jTextMaxChapterNameLength.getText());
 		this.props.setProperty("CoverPageToc", this.jCheckCoverPageToc.isSelected()?"1":"");
+		this.props.setProperty("ChapterExclude", this.jCheckChapterExclude.isSelected()?"1":"");
 		this.props.setProperty("ChapterSection", this.jCheckChapterSection.isSelected()?"1":"");
 		this.props.setProperty("ChapterH", this.jCheckChapterH.isSelected()?"1":"");
 		this.props.setProperty("ChapterH1", this.jCheckChapterH1.isSelected()?"1":"");
@@ -1906,7 +1960,9 @@ public class AozoraEpub3Applet extends JApplet
 		this.props.setProperty("ChapterName", this.jCheckChapterName.isSelected()?"1":"");
 		this.props.setProperty("ChapterNum", this.jCheckChapterNum.isSelected()?"1":"");
 		this.props.setProperty("ChapterNumOnly", this.jCheckChapterNumOnly.isSelected()?"1":"");
-		
+		this.props.setProperty("ChapterNumParen", this.jCheckChapterNumParen.isSelected()?"1":"");
+		this.props.setProperty("ChapterNumParenTitle", this.jCheckChapterNumParenTitle.isSelected()?"1":"");
+				
 		this.props.setProperty("EncType", ""+this.jComboEncType.getSelectedIndex());
 		this.props.setProperty("OverWrite", this.jCheckOverWrite.isSelected()?"1":"");
 		this.props.setProperty("LastDir", this.currentPath==null?"":this.currentPath.getAbsolutePath());
