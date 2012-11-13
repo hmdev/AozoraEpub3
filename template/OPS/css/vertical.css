@@ -7,12 +7,10 @@ p {
 img {
 	max-width: 100%;
 	max-height: 100%;
-	background-color: white;
 }
 span.img {
 	display: inline-block;
 	vertical-align: middle;
-	background-color: white;
 }
 
 :link { color: #00C; background: transparent; }
@@ -39,6 +37,7 @@ p { margin: 0; }
 
 /* 外字文字画像 */
 .gaiji {
+	display: inline-block;
 	vertical-align: middle;
 }
 .gaiji img {

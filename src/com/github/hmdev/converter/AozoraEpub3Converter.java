@@ -944,7 +944,7 @@ public class AozoraEpub3Converter
 						int imageStartIdx = chuki.indexOf('（', 2);
 						if (imageStartIdx > -1 && chuki.indexOf('.', 2) != -1) {
 							//※を消して画像注記に変更
-							gaiji = chuki.substring(1);
+							gaiji = chuki.substring(1, chuki.length()-1)+"#GAIJI#］";
 							if (logged) LogAppender.append("外字画像利用: ("+this.lineNum+") "+chuki+"\n");
 						} else {
 							//画像以外
@@ -1317,8 +1317,13 @@ public class AozoraEpub3Converter
 						} else {
 							String fileName = writer.getImageFilePath(srcFilePath.trim(), lineNum);
 							if (fileName != null) { //先頭に移動してここで出力しない場合はnull
-								//単ページ画像の場合は<p>タグを出さない
-								if (bookInfo.isImageSectionLine(lineNum)) {
+								//外字の場合 (注記末尾がフラグ文字列になっている)
+								if (chukiTag.endsWith("#GAIJI#］")) {
+									buf.append(chukiMap.get("外字画像開始")[0]);
+									buf.append(fileName);
+									buf.append(chukiMap.get("外字画像終了")[0]);
+								} else if (bookInfo.isImageSectionLine(lineNum)) {
+									//単ページ画像の場合は<p>タグを出さない
 									noBr = true;
 									buf.append(chukiMap.get("画像開始")[0]);
 									buf.append(fileName);

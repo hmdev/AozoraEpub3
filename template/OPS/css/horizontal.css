@@ -36,6 +36,7 @@ p { margin: 0; }
 
 /* 外字文字画像 */
 .gaiji {
+	display: inline-block;
 	vertical-align: baseline;
 }
 .gaiji img {

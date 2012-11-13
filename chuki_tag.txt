@@ -584,7 +584,7 @@
 
 画像開始	<span class="img"><img src="
 画像終了	"/></span>
-外字画像開始	<span class="img gaiji"><img src="
+外字画像開始	<span class="gaiji"><img src="
 外字画像終了	"/></span>
 
 表題前	<div class="font5">		1
