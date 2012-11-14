@@ -720,6 +720,12 @@ public class Epub3Writer
 	{
 		this.chapterInfos.lastElement().setChapterName(name);
 	}
+	/** 最後の章の情報を返却 */
+	public ChapterInfo getLastChapterInfo()
+	{
+		if (this.chapterInfos.size() == 0) return null;
+		return this.chapterInfos.lastElement();
+	}
 	
 	/** 連番に変更した画像ファイル名を返却.
 	 * 重複していたら前に出力したときの連番ファイル名を返す

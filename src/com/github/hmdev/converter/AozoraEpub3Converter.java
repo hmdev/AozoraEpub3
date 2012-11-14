@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 
 import com.github.hmdev.info.BookInfo;
 import com.github.hmdev.info.BookInfo.TitleType;
+import com.github.hmdev.info.ChapterInfo;
 import com.github.hmdev.info.ChapterLineInfo;
 import com.github.hmdev.util.CharUtils;
 import com.github.hmdev.util.ImageInfoReader;
@@ -83,9 +84,14 @@ public class AozoraEpub3Converter
 	boolean autoChapterNumParenTitle = false;
 	
 	boolean excludeSeqencialChapter = true;
+	/** 次の行の文字列も繋げて目次の見出しにする */
+	boolean useNextLineChapterName = true;
 	
 	/** 章名の最大文字数 */
 	int maxChapterNameLength = 64;
+	
+	/** 目次抽出パターン */
+	Pattern chapterPattern;
 	
 	//---------------- Chapter Infos ----------------//
 	//TODO パターンはファイルまたは設定から読み込む
@@ -371,8 +377,9 @@ public class AozoraEpub3Converter
 	}
 	
 	/** コメント行内出力設定 */
-	public void setChapterLevel(int maxLength, boolean excludeSeqencialChapter, boolean section, boolean h, boolean h1, boolean h2, boolean h3,
-			boolean chapterName, boolean autoChapterNumOnly, boolean autoChapterNumTitle, boolean autoChapterNumParen, boolean autoChapterNumParenTitle)
+	public void setChapterLevel(int maxLength, boolean excludeSeqencialChapter, boolean useNextLineChapterName, boolean section, boolean h, boolean h1, boolean h2, boolean h3,
+			boolean chapterName, boolean autoChapterNumOnly, boolean autoChapterNumTitle, boolean autoChapterNumParen, boolean autoChapterNumParenTitle,
+			String chapterPattern)
 	{
 		this.maxChapterNameLength = maxLength;
 		
@@ -397,12 +404,20 @@ public class AozoraEpub3Converter
 			chapterChukiMap.put("小見出し", 4);
 		}
 		
+		this.useNextLineChapterName = useNextLineChapterName;
 		this.excludeSeqencialChapter = excludeSeqencialChapter;
+		
 		this.autoChapterName = chapterName;
 		this.autoChapterNumOnly = autoChapterNumOnly;
 		this.autoChapterNumTitle = autoChapterNumTitle;
 		this.autoChapterNumParen = autoChapterNumParen;
 		this.autoChapterNumParenTitle = autoChapterNumParenTitle;
+		
+		this.chapterPattern = null;
+		if (!"".equals(chapterPattern))
+			try {
+				this.chapterPattern = Pattern.compile(chapterPattern);
+			} catch (Exception e) { LogAppender.append("[WARN] 目次抽出のその他パターンが正しくありません: "+chapterPattern+"\n"); }
 	}
 	
 	public void setSpaceHyphenation(int type)
@@ -459,7 +474,7 @@ public class AozoraEpub3Converter
 		int lastEmptyLine = -1;
 		
 		//目次用見出し自動抽出
-		boolean autoChapter = this.autoChapterName || this.autoChapterNumTitle || this.autoChapterNumOnly || this.autoChapterNumParen || this.autoChapterNumParenTitle;
+		boolean autoChapter = this.autoChapterName || this.autoChapterNumTitle || this.autoChapterNumOnly || this.autoChapterNumParen || this.autoChapterNumParenTitle || this.chapterPattern != null;
 		
 		//最後まで回す
 		while ((line = src.readLine()) != null) {
@@ -543,6 +558,12 @@ public class AozoraEpub3Converter
 			if (autoChapter && bookInfo.getChapterLevel(lineNum) == 0) {
 				//文字列から注記と前の空白を除去
 				String noChukiLine = this.removeTag(line);
+				//その他パターン
+				if (this.chapterPattern != null) {
+					if (this.chapterPattern.matcher(noChukiLine).find()) {
+						bookInfo.addChapterLine(lineNum, new ChapterLineInfo(13, lastEmptyLine==lineNum-1));
+					}
+				}
 				int noChukiLineLength = noChukiLine.length();
 				if (this.autoChapterName) {
 					boolean isChapter = false;
@@ -1960,6 +1981,8 @@ public class AozoraEpub3Converter
 	/** タグの階層 */
 	int tagLevel = 0;
 	
+	int preChapterLevel = 0;
+	
 	/** 改ページ用のトリガを設定
 	 * 設定済みだが連続行で書かれていたり空行除外で改行されていない場合は上書きされて無視される
 	 * @param trigger 改ページトリガ nullなら改ページ設定キャンセル
@@ -1986,6 +2009,8 @@ public class AozoraEpub3Converter
 		int idIdx = 1;
 		String chapterId = null;
 		
+		int chapterLevel = 0;
+		
 		if (length == 0) {
 			//空行なら行数をカウント 左右中央の時の本文前の空行は無視
 			if (!this.skipMiddleEmpty && !noBr) {
@@ -1994,7 +2019,7 @@ public class AozoraEpub3Converter
 		} else {
 			//バッファ内の文字列出力
 			//見出し階層レベル
-			int chapterLevel = this.bookInfo.getChapterLevel(lineNum);
+			chapterLevel = this.bookInfo.getChapterLevel(lineNum);
 			
 			//タグの階層をチェック (強制改ページ判別用に先にやっておく)
 			int tagStart = 0;
@@ -2118,6 +2143,13 @@ public class AozoraEpub3Converter
 					//自動抽出で+10されているのは1桁のレベルに戻す
 					this.writer.addChapter(chapterId, name, chapterLevel%10);
 				}
+			} else if (	preChapterLevel > 0 && this.useNextLineChapterName) {
+				//見出しの次の行を繋げる
+				String name = this.getChapterName(line);
+				if (name.length() > 0) {
+					ChapterInfo lastChapterInfo = this.writer.getLastChapterInfo();
+					if (lastChapterInfo != null) this.writer.updateChapterName(lastChapterInfo.getChapterName()+"　"+name);
+				}
 			}
 			
 			//改ページ後の章名を設定
@@ -2136,22 +2168,25 @@ public class AozoraEpub3Converter
 			//バッファクリア
 			buf.setLength(0);
 		}
+		this.preChapterLevel = chapterLevel;
+		
 	}
 	
 	/** タグのみ削除 */
 	private String removeTag(String line)
 	{
-		return line.replaceAll("［＃.+?］", "").replaceFirst("^[ |　|―]*", "").replaceAll("<[^>]+>", "");
+		return line.replaceAll("［＃.+?］", "").replaceFirst("^[ |　|―]+", "").replaceAll("<[^>]+>", "");
 	}
 	
 	/** タグとルビのない文字列に置換 */
 	private String replaceToPlain(String str)
 	{
-		return str.replaceAll("［＃.+?］", "").replaceFirst("^[ |　|―]*", "").replaceAll("《[^》]+?》", "").replaceAll("<[^>]+>", "").replaceAll("〳〵", "く").replaceAll("〴〵", "ぐ").replaceAll("〻", "々").replaceFirst("^[ |　]+","").replaceFirst("[ |　]+$","");
+		return str.replaceFirst("^[ |　|―]+", "").replaceFirst("[ |　|―]+$","").replaceAll("［＃.+?］", "").replaceAll("《[^》]+?》", "").replaceAll("<[^>]+>", "").replaceAll("〳〵", "く").replaceAll("〴〵", "ぐ").replaceAll("〻", "々");
 	}
 	private String getChapterName(String line)
 	{
-		String name = line.replaceAll("<span class=\"fullsp\"> </span>", "　").replaceAll(String.valueOf((char)(0x2000))+(char)(0x2000), "　")
+		String name = line.replaceFirst("^[ |　]+", "").replaceFirst("[ |　]+$","")
+				.replaceAll("<span class=\"fullsp\"> </span>", "　").replaceAll(String.valueOf((char)(0x2000))+(char)(0x2000), "　")
 				.replaceAll("<rt>[^<]+</rt>", "").replaceAll("<[^>]+>", "").replaceFirst("^(=|＝|-|―|─)(=|＝|-|―|─)+", "")
 				.replaceFirst("(=|＝|-|―|─)(=|＝|-|―|─)+$", "");
 		return name.length()>maxChapterNameLength ? name.substring(0, maxChapterNameLength)+"..." : name;
