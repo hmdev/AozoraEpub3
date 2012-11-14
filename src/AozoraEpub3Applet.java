@@ -52,12 +52,14 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingWorker;
+import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.plaf.FontUIResource;
 
 import org.apache.commons.compress.utils.IOUtils;
 
@@ -1826,7 +1828,21 @@ public class AozoraEpub3Applet extends JApplet
 	{
 		//LookAndFeel変更
 		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			String lafName = UIManager.getSystemLookAndFeelClassName();
+			if (lafName.startsWith("com.sun.java.swing.plaf.windows."))
+				UIManager.setLookAndFeel(lafName);
+			else {
+				//Windows以外はMetalのままでFontはPLAIN
+				UIDefaults defaultTable = UIManager.getLookAndFeelDefaults();
+				for (Object o: defaultTable.keySet()) {
+					if (o.toString().toLowerCase().endsWith("font")) {
+						FontUIResource font = (FontUIResource)UIManager.get(o);
+						font = new FontUIResource(font.getName(), Font.PLAIN, font.getSize());
+						UIManager.put(o, font);
+					}
+				}
+			}
+			
 		} catch(Exception e) { e.printStackTrace(); }
 		
 		final AozoraEpub3Applet applet = new AozoraEpub3Applet();
