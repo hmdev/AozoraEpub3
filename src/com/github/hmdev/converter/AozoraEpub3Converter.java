@@ -542,7 +542,7 @@ public class AozoraEpub3Converter
 			//TODO パターンと目次レベルは設定可能にする 空行指定の場合はpreLines利用
 			if (autoChapter && bookInfo.getChapterLevel(lineNum) == 0) {
 				//文字列から注記と前の空白を除去
-				String noChukiLine = line.replaceAll("［＃.+?］", "").replaceFirst("^[ |　|―]*", "");
+				String noChukiLine = this.removeTag(line);
 				int noChukiLineLength = noChukiLine.length();
 				if (this.autoChapterName) {
 					boolean isChapter = false;
@@ -2138,10 +2138,16 @@ public class AozoraEpub3Converter
 		}
 	}
 	
-	/** タグのない文字列に置換 */
+	/** タグのみ削除 */
+	private String removeTag(String line)
+	{
+		return line.replaceAll("［＃.+?］", "").replaceFirst("^[ |　|―]*", "").replaceAll("<[^>]+>", "");
+	}
+	
+	/** タグとルビのない文字列に置換 */
 	private String replaceToPlain(String str)
 	{
-		return str.replaceAll("［＃.+?］", "").replaceFirst("^[ |　|―]*", "").replaceAll("《[^》]+?》", "").replaceAll("〳〵", "く").replaceAll("〴〵", "ぐ").replaceAll("〻", "々").replaceFirst("^[ |　]+","").replaceFirst("[ |　]+$","");
+		return str.replaceAll("［＃.+?］", "").replaceFirst("^[ |　|―]*", "").replaceAll("《[^》]+?》", "").replaceAll("<[^>]+>", "").replaceAll("〳〵", "く").replaceAll("〴〵", "ぐ").replaceAll("〻", "々").replaceFirst("^[ |　]+","").replaceFirst("[ |　]+$","");
 	}
 	private String getChapterName(String line)
 	{
