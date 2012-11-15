@@ -157,6 +157,8 @@ public class AozoraEpub3Converter
 	public static HashSet<String> chukiFlagPageBreak = new HashSet<String>();
 	/** 注記フラグ 左右中央 key = 注記名 */
 	static HashSet<String> chukiFlagMiddle = new HashSet<String>();
+	/** 注記フラグ ページ左 key = 注記名 */
+	static HashSet<String> chukiFlagBottom = new HashSet<String>();
 	
 	/** 注記を返す 画像のみの出力用 */
 	public String[] getChukiValue(String key)
@@ -204,19 +206,21 @@ public class AozoraEpub3Converter
 	////////////////////////////////
 	//改ページトリガ ファイル名は入れ替えて利用する
 	/** 改ページ通常 */
-	final static PageBreakTrigger pageBreakNormal = new PageBreakTrigger(true, false, PageBreakTrigger.IMAGE_PAGE_NONE);
+	final static PageBreakTrigger pageBreakNormal = new PageBreakTrigger(true, 0, PageBreakTrigger.IMAGE_PAGE_NONE);
 	/** 改ページ左右中央 */
-	final static PageBreakTrigger pageBreakMiddle = new PageBreakTrigger(true, true, PageBreakTrigger.IMAGE_PAGE_NONE);
+	final static PageBreakTrigger pageBreakMiddle = new PageBreakTrigger(true, PageBreakTrigger.PAGE_MIDDLE, PageBreakTrigger.IMAGE_PAGE_NONE);
+	/** 改ページ左 */
+	final static PageBreakTrigger pageBreakBottom = new PageBreakTrigger(true, PageBreakTrigger.PAGE_BOTTOM, PageBreakTrigger.IMAGE_PAGE_NONE);
 	/** 改ページ画像単一ページ サイズに応じて自動調整 */
-	final static PageBreakTrigger pageBreakImageAuto = new PageBreakTrigger(true, false, PageBreakTrigger.IMAGE_PAGE_AUTO);
+	final static PageBreakTrigger pageBreakImageAuto = new PageBreakTrigger(true, 0, PageBreakTrigger.IMAGE_PAGE_AUTO);
 	/** 改ページ画像単一ページ 幅100% */
-	final static PageBreakTrigger pageBreakImageW = new PageBreakTrigger(true, false, PageBreakTrigger.IMAGE_PAGE_W);
+	final static PageBreakTrigger pageBreakImageW = new PageBreakTrigger(true, 0, PageBreakTrigger.IMAGE_PAGE_W);
 	/** 改ページ画像単一ページ 高さ100% */
-	final static PageBreakTrigger pageBreakImageH = new PageBreakTrigger(true, false, PageBreakTrigger.IMAGE_PAGE_H);
+	final static PageBreakTrigger pageBreakImageH = new PageBreakTrigger(true, 0, PageBreakTrigger.IMAGE_PAGE_H);
 	/** 改ページ画像単一ページ 拡大しない */
-	final static PageBreakTrigger pageBreakImageNoFit = new PageBreakTrigger(true, false, PageBreakTrigger.IMAGE_PAGE_NOFIT);
+	final static PageBreakTrigger pageBreakImageNoFit = new PageBreakTrigger(true, 0, PageBreakTrigger.IMAGE_PAGE_NOFIT);
 	/** 改ページ「底本：」の前 */
-	final static PageBreakTrigger pageBreakNoChapter = new PageBreakTrigger(true, false, PageBreakTrigger.IMAGE_PAGE_NONE, true);
+	final static PageBreakTrigger pageBreakNoChapter = new PageBreakTrigger(true, 0, PageBreakTrigger.IMAGE_PAGE_NONE, true);
 	
 	/** 見出し仮対応出力用
 	 * 章の最初の本文をsetChapterNameでセットしたらtrue */
@@ -265,6 +269,9 @@ public class AozoraEpub3Converter
 							case 'M': chukiFlagPageBreak.add(values[0]);
 								chukiFlagMiddle.add(values[0]);
 								break;
+							case 'L': chukiFlagPageBreak.add(values[0]);
+								chukiFlagBottom.add(values[0]);
+							break;
 							}
 						}
 						
@@ -1272,6 +1279,15 @@ public class AozoraEpub3Converter
 				//改ページ注記
 				////////////////////////////////////////////////////////////////
 				if (chukiFlagPageBreak.contains(chukiName) && !bookInfo.isNoPageBreakLine(lineNum)) {
+					//字下げ状態エラー出力
+					if (inJisage >= 0) {
+						LogAppender.append("字下げ注記省略: ("+inJisage+") \n");
+						//字下げ省略処理
+						//字下げフラグ処理
+						buf.append(chukiMap.get("字下げ省略")[0]);
+						inJisage = -1;
+					}
+					
 					//改ページの前に文字があれば出力
 					if (buf.length() > 0) this.printLineBuffer(out, buf, lineNum, true);
 					
@@ -1279,21 +1295,15 @@ public class AozoraEpub3Converter
 					//改ページの後ろに文字があれば</br>は出力
 					if (ch.length > begin+chukiTag.length()) noBr = false;
 					
-					//字下げ状態エラー出力
-					if (inJisage >= 0) {
-						LogAppender.append("字下げ注記エラー: ("+inJisage+") \n");
-						//字下げ省略処理
-						//字下げフラグ処理
-						buf.append(chukiMap.get("字下げ省略")[0]);
-						inJisage = -1;
-					}
-					
 					//改ページフラグ設定
-					if (this.middleTitle && bookInfo.preTitlePageBreak == lineNum)
+					if (this.middleTitle && bookInfo.preTitlePageBreak == lineNum) {
 						this.setPageBreakTrigger(pageBreakMiddle);
-					else if (chukiFlagMiddle.contains(chukiName)) {
+					} else if (chukiFlagMiddle.contains(chukiName)) {
 						//左右中央
 						this.setPageBreakTrigger(pageBreakMiddle);
+					} else if (chukiFlagBottom.contains(chukiName)) {
+						//ページ左
+						this.setPageBreakTrigger(pageBreakBottom);
 					} else if (bookInfo.isImageSectionLine(lineNum+1)) {
 						//次の行が画像単ページの表紙
 						if (writer.getImageIndex() == bookInfo.coverImageIndex && bookInfo.insertCoverPage) {
@@ -1313,6 +1323,7 @@ public class AozoraEpub3Converter
 				else if (chukiTag.endsWith("字下げ］")) {
 					if (inJisage >= 0) {
 						buf.append(chukiMap.get("字下げ省略")[0]);
+						inJisage = -1;
 					}
 					//タグが閉じていればインラインなのでフラグは立てない
 					if (tags.length > 1) inJisage = -1;//インライン
@@ -1320,7 +1331,7 @@ public class AozoraEpub3Converter
 				}
 				else if (chukiTag.endsWith("字下げ終わり］")) {
 					 if (inJisage == -1) {
-						 LogAppender.append("字下げ注記エラー：("+lineNum+")\n");
+						 LogAppender.append("字下げ注記省略：("+lineNum+")\n");
 						 noAppend = true;
 					 }
 					inJisage = -1;
@@ -1962,7 +1973,7 @@ public class AozoraEpub3Converter
 		}
 		printLineBuffer(out, buf, lineNum, true);
 		
-		//タイトル寄り前なら別処理
+		//タイトルより前なら別処理
 		if (this.lineNum < this.bookInfo.titleLine && this.middleTitle)
 			this.setPageBreakTrigger(pageBreakMiddle);
 		else if (hasPageBreakTriger) this.setPageBreakTrigger(pageBreakNormal);
@@ -1992,7 +2003,7 @@ public class AozoraEpub3Converter
 		//改ページ前の空行は無視
 		this.printEmptyLines = 0;
 		this.pageBreakTrigger = trigger;
-		if (this.pageBreakTrigger != null && this.pageBreakTrigger.isMiddle) this.skipMiddleEmpty = true;
+		if (this.pageBreakTrigger != null && this.pageBreakTrigger.pageType != PageBreakTrigger.PAGE_NORMAL) this.skipMiddleEmpty = true;
 	}
 	
 	/** 行の文字列を出力
@@ -2065,12 +2076,12 @@ public class AozoraEpub3Converter
 				//}
 				
 				//改ページ処理
-				if (this.pageBreakTrigger.isMiddle) {
+				if (this.pageBreakTrigger.pageType != PageBreakTrigger.PAGE_NORMAL) {
 					//左右中央
-					this.writer.nextSection(out, lineNum, true, PageBreakTrigger.IMAGE_PAGE_NONE, null);
+					this.writer.nextSection(out, lineNum, this.pageBreakTrigger.pageType, PageBreakTrigger.IMAGE_PAGE_NONE, null);
 				} else {
 					//その他
-					this.writer.nextSection(out, lineNum, false, this.pageBreakTrigger.imagePageType, this.pageBreakTrigger.imageFileName);
+					this.writer.nextSection(out, lineNum, PageBreakTrigger.PAGE_NORMAL, this.pageBreakTrigger.imagePageType, this.pageBreakTrigger.imageFileName);
 				}
 				
 				//ページ情報初期化

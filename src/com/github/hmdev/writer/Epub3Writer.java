@@ -638,17 +638,17 @@ public class Epub3Writer
 	/** 次のチャプター用のZipArchiveEntryに切替え 
 	 * チャプターのファイル名はcpaterFileNamesに追加される (0001)
 	 * @throws IOException */
-	public void nextSection(BufferedWriter bw, int lineNum, boolean isMiddle, int imagePageType, String srcImageFilePath) throws IOException
+	public void nextSection(BufferedWriter bw, int lineNum, int pageType, int imagePageType, String srcImageFilePath) throws IOException
 	{
 		if (this.sectionIndex >0) {
 			bw.flush();
 			this.endSection();
 		}
-		this.startSection(lineNum, isMiddle, imagePageType, srcImageFilePath);
+		this.startSection(lineNum, pageType, imagePageType, srcImageFilePath);
 	}
 	/** セクション開始. 
 	 * @throws IOException */
-	void startSection(int lineNum, boolean isMiddle, int imagePageType, String srcImageFilePath) throws IOException
+	void startSection(int lineNum, int pageType, int imagePageType, String srcImageFilePath) throws IOException
 	{
 		this.sectionIndex++;
 		String sectionId = decimalFormat.format(this.sectionIndex);
@@ -684,7 +684,8 @@ public class Epub3Writer
 			sectionInfo.setImagePage(true);
 			break;
 		}
-		if (isMiddle) sectionInfo.setMiddle(true);
+		if (pageType == PageBreakTrigger.PAGE_MIDDLE) sectionInfo.setMiddle(true);
+		else if (pageType == PageBreakTrigger.PAGE_BOTTOM) sectionInfo.setBottom(true);
 		this.sectionInfos.add(sectionInfo);
 		//セクション開始は名称がnullなので改ページ処理で文字列が設定されなければ出力されない 階層レベルは1
 		this.addChapter(null, null, 1);

@@ -5,7 +5,7 @@
 #if (${bookInfo.Vertical})
 #if (${sectionInfo.ImagePage})
 	<link rel="stylesheet" type="text/css" href="../css/vertical_image.css"/>
-#elseif (${sectionInfo.Middle})
+#elseif (${sectionInfo.Middle} || ${sectionInfo.Bottom})
 	<link rel="stylesheet" type="text/css" href="../css/vertical_font.css"/>
 	<link rel="stylesheet" type="text/css" href="../css/vertical_middle.css"/>
 	<link rel="stylesheet" type="text/css" href="../css/vertical.css"/>
@@ -38,4 +38,7 @@
 #end
 #if (${sectionInfo.Middle})
 <table class="middle"><tr><td>
+#end
+#if (${sectionInfo.Bottom})
+<table class="bottom"><tr><td>
 #end

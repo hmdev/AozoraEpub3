@@ -11,10 +11,14 @@ public class PageBreakTrigger
 	final static public int IMAGE_PAGE_NOFIT = 5;
 	final static public int IMAGE_PAGE_AUTO = 10;
 	
+	final static public int PAGE_NORMAL = 0;
+	final static public int PAGE_MIDDLE = 1;
+	final static public int PAGE_BOTTOM = 2;
+	
 	/** 空のページは無視する */
 	boolean ignoreEmptyPage = true;
 	/** 次のページは左右中央 */
-	boolean isMiddle = false;
+	int pageType = PAGE_NORMAL;
 	/** 次のページは画像 */
 	int imagePageType = IMAGE_PAGE_NONE;
 	
@@ -28,15 +32,15 @@ public class PageBreakTrigger
 	 * @param ignoreEmptyPage
 	 * @param isMiddle
 	 * @param isImage 	 */
-	public PageBreakTrigger(boolean ignoreEmptyPage, boolean isMiddle, int imagePageType)
+	public PageBreakTrigger(boolean ignoreEmptyPage, int pageType, int imagePageType)
 	{
-		this(ignoreEmptyPage, isMiddle, imagePageType, false);
+		this(ignoreEmptyPage, pageType, imagePageType, false);
 	}
-	public PageBreakTrigger(boolean ignoreEmptyPage, boolean isMiddle, int imagePageType, boolean noChapter)
+	public PageBreakTrigger(boolean ignoreEmptyPage, int pageType, int imagePageType, boolean noChapter)
 	{
 		super();
 		this.ignoreEmptyPage = ignoreEmptyPage;
-		this.isMiddle = isMiddle;
+		this.pageType = pageType;
 		this.imagePageType = imagePageType;
 		this.noChapter = noChapter;
 	}

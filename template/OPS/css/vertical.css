@@ -174,9 +174,9 @@ span.left_underline {
 .kogaki { font-size: 70%; }
 
 /* 縦中横 */
-span.tcy {
+/*span.tcy {
 	display: inline-block;
-}
+}*/
 .tcy span {
 	text-combine: horizontal;
 	-webkit-text-combine: horizontal;
