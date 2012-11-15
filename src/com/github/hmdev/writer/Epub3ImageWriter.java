@@ -86,7 +86,7 @@ public class Epub3ImageWriter extends Epub3Writer
 		}
 		
 		this.sectionInfos.add(sectionInfo);
-		if (this.sectionIndex ==1 || this.sectionIndex % 5 == 0) this.addChapter(sectionId, ""+this.sectionIndex, 0); //目次追加
+		if (this.sectionIndex ==1 || this.sectionIndex % 5 == 0) this.addChapter(null, ""+this.sectionIndex, 0); //目次追加
 		super.zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+XHTML_PATH+sectionId+".xhtml"));
 		//ヘッダ出力
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(super.zos, "UTF-8"));

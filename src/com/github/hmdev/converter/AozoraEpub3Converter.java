@@ -67,14 +67,21 @@ public class AozoraEpub3Converter
 	int spaceHyphenation = 0;
 	
 	
+	/** 強制改ページが有効ならtrue*/
+	boolean forcePageBreak = false;
 	/** 強制改ページバイト数 */
-	int forcePageBreak = 0;
-	/** 空行でのみ強制改ページ */
+	int forcePageBreakSize = 0;
+	/** 空行でのみ強制改ページ行数 */
 	int forcePageBreakEmptyLine = 0;
-	/** 見出しでのみ強制改ページ */
-	int forcePageBreakChapter = 0;
+	/** 空行でのみ強制改ページ バイト数 */
+	int forcePageBreakEmptySize = 0;
+	/** 見出しでのみ強制改ページ 階層レベル */
+	int forcePageBreakChapterLevel = 0;
+	/** 見出しでのみ強制改ページ バイト数 */
+	int forcePageBreakChapterSize = 0;
+	
 	/** 強制改行対象の空行後のパターン */
-	Pattern forcePageBreakPattern = null;
+	//Pattern forcePageBreakPattern = null;
 	
 	//---------------- Chapter Properties ----------------//
 	boolean autoChapterName = false;
@@ -433,12 +440,19 @@ public class AozoraEpub3Converter
 	}
 	
 	/** 自動強制改行設定 */
-	public void setForcePageBreak(int forcePageBreak, int emptyLine, int chapterLevel, Pattern pattern)
+	public void setForcePageBreak(int forcePageBreakSize, int emptyLine, int emptySize, int chapterLevel, int chapterSize)
 	{
-		this.forcePageBreak = forcePageBreak;
+		this.forcePageBreakSize = forcePageBreakSize;
 		this.forcePageBreakEmptyLine = emptyLine;
-		this.forcePageBreakChapter = chapterLevel;
-		this.forcePageBreakPattern = pattern;
+		this.forcePageBreakEmptySize = emptySize;
+		this.forcePageBreakChapterLevel = chapterLevel;
+		this.forcePageBreakChapterSize = chapterSize;
+		//this.forcePageBreakPattern = pattern;
+		
+		this.forcePageBreak  = forcePageBreakSize > 0 || (emptyLine > 0 && emptySize > 0) || (chapterLevel > 0 && chapterSize > 0);
+		//行での強制改行は他の改行設定より大きくする
+		if (emptyLine > 0) this.forcePageBreakSize = Math.max(this.forcePageBreakSize, emptySize);
+		if (chapterLevel > 0) this.forcePageBreakSize = Math.max(this.forcePageBreakSize, chapterSize);
 	}
 	
 	/** タイトルと著作者を取得. 行番号も保存して出力時に変換出力
@@ -2049,21 +2063,19 @@ public class AozoraEpub3Converter
 				}
 			}
 			//強制改ページ処理
-			//サイズが超えていて改ページトリガが設定されていなければ
-			if (this.forcePageBreak > 0 && this.pageBreakTrigger == null && this.pageByteSize > this.forcePageBreak) {
-				//タグの外の場合のみ
-				if (this.tagLevel == 0) {
-					//改ページ制限なし
-					if (forcePageBreakChapter == 0 && forcePageBreakEmptyLine == 0) {
-						 this.setPageBreakTrigger(pageBreakNoChapter);
-					} else {
-						//章での分割が有効
-						if (forcePageBreakEmptyLine > 0 && this.printEmptyLines >= forcePageBreakEmptyLine) this.setPageBreakTrigger(pageBreakNoChapter);
-						else if (forcePageBreakChapter > 0) {
-							if (chapterLevel > 0) this.setPageBreakTrigger(pageBreakNoChapter);
-							//次の行が見出しでタグの中なら1行前で改ページ
-							else if (tagStart-tagEnd > 0 && this.bookInfo.getChapterLevel(lineNum+1) > 0) this.setPageBreakTrigger(pageBreakNoChapter);
-						}
+			//改ページトリガが設定されていない＆タグの外
+			if (this.forcePageBreak && this.pageBreakTrigger == null && this.tagLevel == 0) {
+				//行単位で強制改ページ
+				if (this.pageByteSize > this.forcePageBreakSize) {
+					this.setPageBreakTrigger(pageBreakNoChapter);
+				} else {
+					if (forcePageBreakEmptyLine > 0 && this.printEmptyLines >= forcePageBreakEmptyLine && this.pageByteSize > this.forcePageBreakEmptySize) {
+						//空行での分割
+						this.setPageBreakTrigger(pageBreakNoChapter);
+					} else if (forcePageBreakChapterLevel > 0 && this.pageByteSize > this.forcePageBreakChapterSize) {
+						//章での分割 次の行が見出しで次の行がタグの中になる場合１行前で改ページ
+						if (chapterLevel > 0) this.setPageBreakTrigger(pageBreakNoChapter);
+						else if (tagStart-tagEnd > 0 && this.bookInfo.getChapterLevel(lineNum+1) > 0) this.setPageBreakTrigger(pageBreakNoChapter);
 					}
 				}
 			}
@@ -2132,7 +2144,7 @@ public class AozoraEpub3Converter
 			}
 			out.write(line);
 			//ページバイト数加算
-			if (this.forcePageBreak > 0) this.pageByteSize += line.getBytes("UTF-8").length;
+			if (this.forcePageBreak) this.pageByteSize += line.getBytes("UTF-8").length;
 			
 			//改行のpまたは見出しspanを閉じる
 			if (noBr) {
