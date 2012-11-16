@@ -49,13 +49,13 @@ public class AozoraEpub3
 			Options options = new Options();
 			options.addOption("h", "help", false, "show usage");
 			options.addOption("i", "ini", true, "指定したiniファイルから設定を読み込みます (コマンドラインオプション以外)");
-			options.addOption("t", true, "本文内の表題種別 [0:表題→著者名(default), 1:著者名→表題, 2:表題→著者名(副題優先), 3:表題のみ, 4:なし]");
+			options.addOption("t", true, "本文内の表題種別\n [0:表題→著者名] (default)\n[1:著者名→表題]\n[2:表題→著者名(副題優先)]\n[3:表題のみ]\n[4:なし]");
 			options.addOption("tf", false, "入力ファイル名を表題に利用");
-			options.addOption("c", "cover", true, "表紙画像 [0:先頭の挿絵] それ以外はファイル名orURL]");
-			options.addOption("ext", true, "出力ファイル拡張子 [.epub(default),.kepub.epub]");
+			options.addOption("c", "cover", true, "表紙画像\n[0:先頭の挿絵]\n[1:ファイル名と同じ画像]\n[ファイル名 or URL]");
+			options.addOption("ext", true, "出力ファイル拡張子\n[.epub] (default)\n[.kepub.epub]");
 			options.addOption("of", true, "出力ファイル名を入力ファイル名に合せる");
 			options.addOption("d", "dst", true, "出力先パス");
-			options.addOption("enc", true, "入力ファイルエンコード [MS932(default),UTF-8]");
+			options.addOption("enc", true, "入力ファイルエンコード\n[MS932] (default)\n[UTF-8]");
 			//options.addOption("id", false, "栞用ID出力 (for Kobo)");
 			//options.addOption("tcy", false, "自動縦中横有効");
 			//options.addOption("g4", false, "4バイト文字変換");
@@ -176,7 +176,7 @@ public class AozoraEpub3
 			boolean chapterH3 = "1".equals(props.getProperty("ChapterH3"));
 			boolean chapterName = "1".equals(props.getProperty("ChapterName"));
 			boolean chapterNumOnly = "1".equals(props.getProperty("ChapterNumOnly"));
-			boolean chapterNumTitle = "1".equals(props.getProperty("ChapterNum"));
+			boolean chapterNumTitle = "1".equals(props.getProperty("ChapterNumTitle"));
 			boolean chapterNumParen = "1".equals(props.getProperty("ChapterNumParen"));
 			boolean chapterNumParenTitle = "1".equals(props.getProperty("hapterNumParenTitle"));
 			String chapterPattern = ""; if ("1".equals(props.getProperty("ChapterPattern"))) chapterPattern = props.getProperty("ChapterPatternText");

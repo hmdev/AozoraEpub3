@@ -109,14 +109,14 @@ public class AozoraEpub3Converter
 			'壱','弐','参','肆','伍',
 			'Ⅰ','Ⅱ','Ⅲ','Ⅳ','Ⅴ','Ⅵ','Ⅶ','Ⅷ','Ⅸ','Ⅹ','Ⅺ','Ⅻ'};
 	/** 章番号の後の証明との間の文字 */
-	char[] chapterSeparator = {' ','　','-','－','「','―','『','、','・'};
+	char[] chapterSeparator = {' ','　','-','－','「','―','『','、'};
 	
 	/** 章名数字無し */
 	String[] chapterName = new String[]{"プロローグ","エピローグ","序","序章","終章","間章","幕間"};
 	/** 章名数字前 suffixのみは空文字 */
 	String[] chapterNumPrefix = new String[]{"第","その", ""};
 	/** 章名数字後 prefixに対応する複数のsuffixを指定 指定なしなら空文字 */
-	String[][] chapterNumSuffix = new String[][]{{"話","章","篇","部","節","幕"},{""},{"章"}};
+	String[][] chapterNumSuffix = new String[][]{{"話","章","篇","部","節","幕","編"},{""},{"章"}};
 	
 	String[] chapterNumParenPrefix = new String[]{"（","〈","〔","【"};
 	String[] chapterNumParenSuffix = new String[]{"）","〉","〕","】"};
