@@ -235,6 +235,7 @@ public class ImageInfoReader
 	}
 	
 	final static AffineTransform NO_TRANSFORM = AffineTransform.getTranslateInstance(0, 0);
+	/** ストリームから画像を読み込み */
 	static public BufferedImage readImage(String ext, InputStream is) throws IOException
 	{
 		BufferedImage image;

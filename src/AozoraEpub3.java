@@ -143,10 +143,20 @@ public class AozoraEpub3
 			int singlePageWidth = 600; try { singlePageWidth = Integer.parseInt(props.getProperty("SinglePageWidth")); } catch (Exception e) {}
 			int coverW = 600; try { coverW = Integer.parseInt(props.getProperty("CoverW")); } catch (Exception e) {}
 			int coverH = 800; try { coverH = Integer.parseInt(props.getProperty("CoverH")); } catch (Exception e) {}
-			float jpegQualty = 80; try { jpegQualty = Integer.parseInt(props.getProperty("JpegQuality"))/100f; } catch (Exception e) {}
 			boolean fitImage = "1".equals(props.getProperty("FitImage"));
-			epub3Writer.setImageParam(dispW, dispH, resizeW, resizeH, pixels, singlePageSizeW, singlePageSizeH, singlePageWidth, fitImage, coverW, coverH, jpegQualty);
-			epub3ImageWriter.setImageParam(dispW, dispH, resizeW, resizeH, pixels, singlePageSizeW, singlePageSizeH, singlePageWidth, fitImage, coverW, coverH, jpegQualty);
+			float jpegQualty = 80; try { jpegQualty = Integer.parseInt(props.getProperty("JpegQuality"))/100f; } catch (Exception e) {}
+			int autoMarginLimitH = 0;
+			int autoMarginLimitV = 0;
+			int autoMarginWhiteLevel = 80;
+			 if ("1".equals(props.getProperty("AutoMargin"))) {
+				try { autoMarginLimitH =Integer.parseInt(props.getProperty("AutoMarginLimitH")); } catch (Exception e) {}
+				try { autoMarginLimitV =Integer.parseInt(props.getProperty("AutoMarginLimitV")); } catch (Exception e) {}
+				try { autoMarginWhiteLevel =Integer.parseInt(props.getProperty("AutoMarginWhiteLevel")); } catch (Exception e) {}
+			 }
+			epub3Writer.setImageParam(dispW, dispH, resizeW, resizeH, pixels, singlePageSizeW, singlePageSizeH, singlePageWidth, fitImage, coverW, coverH, jpegQualty,
+					autoMarginLimitH, autoMarginLimitV, autoMarginWhiteLevel);
+			epub3ImageWriter.setImageParam(dispW, dispH, resizeW, resizeH, pixels, singlePageSizeW, singlePageSizeH, singlePageWidth, fitImage, coverW, coverH, jpegQualty,
+					autoMarginLimitH, autoMarginLimitV, autoMarginWhiteLevel);
 			
 			//自動改ページ
 			int forcePageBreakSize = 0;

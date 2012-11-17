@@ -100,6 +100,8 @@ public class AozoraEpub3Converter
 	/** 目次抽出パターン */
 	Pattern chapterPattern;
 	
+	boolean canceled = false;
+	
 	//---------------- Chapter Infos ----------------//
 	//TODO パターンはファイルまたは設定から読み込む
 	/** 章の数値文字パターン */
@@ -683,6 +685,9 @@ public class AozoraEpub3Converter
 			preLines[0] = line;
 		}
 		
+		//行数設定
+		bookInfo.totalLineNum = lineNum;
+		
 		if (inComment) {
 			LogAppender.append("[ERROR] コメントが閉じていません ("+commentLineStart+")\n");
 		}
@@ -796,6 +801,15 @@ public class AozoraEpub3Converter
 		return null;
 	}
 	
+	
+	////////////////////////////////////////////////////////////////
+	//	変換処理
+	////////////////////////////////////////////////////////////////
+	public void cancel()
+	{
+		this.canceled = true;
+	}
+	
 	/** 青空テキストをePub3のXHTMLに変換
 	 * @param _msgBuf ログ出力用バッファ
 	 * @param out 出力先Writer
@@ -803,6 +817,8 @@ public class AozoraEpub3Converter
 	 * @param titleType  */
 	public void convertTextToEpub3(BufferedWriter out, BufferedReader src, BookInfo bookInfo) throws IOException
 	{
+		this.canceled = false;
+		
 		//BookInfoの参照を保持
 		this.bookInfo = bookInfo;
 		
@@ -904,6 +920,11 @@ public class AozoraEpub3Converter
 			}
 			else {
 				convertTextLineToEpub3(out, line);
+			}
+			if (this.canceled) return;
+			if (this.writer.jProgressBar != null && lineNum % 10 == 9){
+				this.writer.jProgressBar.setValue(lineNum/10+1);
+				this.writer.jProgressBar.repaint();
 			}
 		}
 		//終了処理
@@ -2192,7 +2213,6 @@ public class AozoraEpub3Converter
 			buf.setLength(0);
 		}
 		this.preChapterLevel = chapterLevel;
-		
 	}
 	
 	/** タグのみ削除 */

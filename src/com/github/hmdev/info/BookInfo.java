@@ -43,6 +43,9 @@ public class BookInfo
 		}
 	}
 	
+	/** テキストの行数 */
+	public int totalLineNum = -1;
+	
 	/** タイトル */
 	public String title;
 	/** タイトル行番号 */
