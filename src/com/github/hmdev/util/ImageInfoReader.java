@@ -100,10 +100,16 @@ public class ImageInfoReader
 	{
 		return this.imageFileNames.get(idx);
 	}
-	public int countImageFiles()
+	public int countImageFileInfos()
+	{
+		return this.imageFileInfos.size();
+		//return this.imageFileNames.size();
+	}
+	public int countImageFileNames()
 	{
 		return this.imageFileNames.size();
 	}
+	
 	
 	public Vector<String> getImageFileNames()
 	{
@@ -153,7 +159,7 @@ public class ImageInfoReader
 	
 	/** zip内の画像情報をすべて読み込み
 	 * @throws IOException */
-	public void loadZipImageInfos(File srcFile, boolean addFile) throws IOException
+	public void loadZipImageInfos(File srcFile, boolean addFileName) throws IOException
 	{
 		ZipArchiveInputStream zis = new ZipArchiveInputStream(new BufferedInputStream(new FileInputStream(srcFile), 65536), "MS932", false);
 		ArchiveEntry entry;
@@ -172,11 +178,18 @@ public class ImageInfoReader
 				}
 				if (imageInfo != null) {
 					this.imageFileInfos.put(entryName, imageInfo);
-					if (addFile) this.addImageFileName(entryName);
+					if (addFileName) this.addImageFileName(entryName);
 				}
 			}
 		}
 		zis.close();
+	}
+	/** 圧縮ファイル内の画像で画像注記以外の画像も表紙に選択できるように追加 */
+	public void addNoNameImageFileName()
+	{
+		for (String name : this.imageFileInfos.keySet()) {
+			if (!this.imageFileNames.contains(name)) this.addImageFileName(name);
+		}
 	}
 	
 	/** 指定した順番の画像情報を取得 */

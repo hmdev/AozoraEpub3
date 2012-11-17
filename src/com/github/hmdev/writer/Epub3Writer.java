@@ -146,6 +146,8 @@ public class Epub3Writer
 	int autoMarginLimitV = 0;
 	/** 余白の白画素判別レベル 黒:0～白:100 */
 	int autoMarginWhiteLevel = 100;
+	/** 余白除去後に追加する余白 */
+	float autoMarginPadding = 0;
 	
 	/** 表紙サイズ 横 */
 	int coverW = 600;
@@ -218,7 +220,7 @@ public class Epub3Writer
 	public void setImageParam(int dispW, int dispH, int resizeW, int resizeH, int pixels,
 			int singlePageSizeW, int singlePageSizeH, int singlePageWidth, boolean fitImage,
 			int coverW, int coverH, float jpegQuality,
-			int autoMarginLimitH, int autoMarginLimitV, int autoMarginWhiteLevel)
+			int autoMarginLimitH, int autoMarginLimitV, int autoMarginWhiteLevel, float autoMarginPadding)
 	{
 		this.dispW = dispW;
 		this.dispH = dispH;
@@ -241,6 +243,7 @@ public class Epub3Writer
 		this.autoMarginLimitH = autoMarginLimitH;
 		this.autoMarginLimitV = autoMarginLimitV;
 		this.autoMarginWhiteLevel = autoMarginWhiteLevel;
+		this.autoMarginPadding = autoMarginPadding;
 	}
 	
 	/** 処理を中止 */
@@ -382,22 +385,25 @@ public class Epub3Writer
 		
 		//表紙ページ出力 先頭画像表示時は画像出力時にカバー指定するので出力しない
 		if (bookInfo.insertCoverPage) {
-			ImageInfo coverPageImage = coverImageInfo;
-			//先頭画像から取得
-			if (coverPageImage == null) {
-				for (ImageInfo imageInfo2 : imageInfos) {
-					if (imageInfo2.getIsCover()) {
-						coverPageImage = imageInfo2;
-						break;
-					}
+			//追加用の情報取得にのみ使う
+			ImageInfo insertCoverInfo = coverImageInfo;
+			if (insertCoverInfo == null && bookInfo.coverImageIndex >= 0) {
+				insertCoverInfo = imageInfoReader.getImageInfo(bookInfo.coverImageIndex);
+				insertCoverInfo.setIsCover(true);
+				if (insertCoverInfo.getId() == null) {
+					//zip内の画像で追加処理されていない
+					this.imageIndex++;
+					String imageId = decimalFormat.format(this.imageIndex);
+					insertCoverInfo.setId(imageId);
+					insertCoverInfo.setOutFileName(imageId+"."+insertCoverInfo.getExt());
 				}
 			}
-			if (coverPageImage != null) {
+			if (insertCoverInfo != null) {
 				//画像が横長なら幅100% それ以外は高さ100%
 				SectionInfo sectionInfo = new SectionInfo("cover-page");
-				if ((double)coverPageImage.getWidth()/coverPageImage.getHeight() >= 3.0/4) sectionInfo.setImageFitW(true);
+				if ((double)insertCoverInfo.getWidth()/insertCoverInfo.getHeight() >= 3.0/4) sectionInfo.setImageFitW(true);
 				this.velocityContext.put("sectionInfo", sectionInfo);
-				this.velocityContext.put("coverImage", coverPageImage);
+				this.velocityContext.put("coverImage", insertCoverInfo);
 				zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+XHTML_PATH+COVER_FILE));
 				bw = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"));
 				Velocity.mergeTemplate(templatePath+OPS_PATH+XHTML_PATH+COVER_VM, "UTF-8", velocityContext, bw);
@@ -484,7 +490,7 @@ public class Epub3Writer
 		////////////////////////////////////////////////////////////////////////////////////////////////
 		//画像ファイルコピー (連番にリネーム)
 		//表紙指定があればそれを入力に設定 先頭画像のisCoverはfalseになっている
-		//プレビューで編集された場合はここで追加する TODO 置き換えずに画像を出力する場合はCover設定を解除してpackage.opfの方で調整
+		//プレビューで編集された場合はここで追加する
 		////////////////////////////////
 		//表紙
 		if (coverImageInfo != null) {
@@ -499,11 +505,12 @@ public class Epub3Writer
 				} else {
 					ByteArrayInputStream bais = new ByteArrayInputStream(coverImageBytes);
 					zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+IMAGES_PATH+imageInfo.getOutFileName()));
-					this.writeImage(imageInfo.getOutFileName(), bais, null, zos, coverImageInfo, 0, this.coverW, this.coverH, 0, 0, 0);
+					this.writeImage(imageInfo.getOutFileName(), bais, null, zos, coverImageInfo, 0, this.coverW, this.coverH, 0, 0, 0, 0);
 					zos.closeArchiveEntry();
 					bais.close();
 				}
 				imageInfos.remove(0);//カバー画像は出力済みなので削除
+				if (this.jProgressBar != null) this.jProgressBar.setValue(this.jProgressBar.getValue()+10);
 			} catch (Exception e) {
 				e.printStackTrace();
 				LogAppender.append("[ERROR] 表紙画像取得エラー: "+bookInfo.coverFileName+"\n");
@@ -553,6 +560,7 @@ public class Epub3Writer
 				String srcImageFileName = entry.getName().substring(zipPathLength);
 				//if (outImageFileNames.contains(srcImageFileName)) {
 				ImageInfo imageInfo = imageInfoReader.getImageInfo(srcImageFileName);
+				//Zip内テキストの場合はidと出力ファイル名が登録されていなければ出力しない。
 				if (imageInfo != null && imageInfo.getId() != null) {
 					zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+IMAGES_PATH+imageInfo.getOutFileName()));
 					//プレビューで編集されていたらイメージを出力
@@ -590,11 +598,11 @@ public class Epub3Writer
 	
 	void writeImage(String srcFileName, InputStream is,ZipArchiveOutputStream zos, ImageInfo imageInfo) throws IOException
 	{
-		writeImage(srcFileName, is, null, zos, imageInfo, this.maxImagePixels, this.maxImageW, this.maxImageH, this.autoMarginLimitH, this.autoMarginLimitV, this.autoMarginWhiteLevel);
+		writeImage(srcFileName, is, null, zos, imageInfo, this.maxImagePixels, this.maxImageW, this.maxImageH, this.autoMarginLimitH, this.autoMarginLimitV, this.autoMarginWhiteLevel, this.autoMarginPadding);
 	}
 	void writeImage(String srcFileName, BufferedImage srcImage, ZipArchiveOutputStream zos, ImageInfo imageInfo) throws IOException
 	{
-		writeImage(srcFileName, null, srcImage, zos, imageInfo, this.maxImagePixels, this.maxImageW, this.maxImageH, this.autoMarginLimitH,  this.autoMarginLimitV, this.autoMarginWhiteLevel);
+		writeImage(srcFileName, null, srcImage, zos, imageInfo, this.maxImagePixels, this.maxImageW, this.maxImageH, this.autoMarginLimitH,  this.autoMarginLimitV, this.autoMarginWhiteLevel, this.autoMarginPadding);
 	}
 	/** 大きすぎる画像は縮小して出力
 	 * @param srcFileName 画像のファイル名 拡張子取得
@@ -607,9 +615,10 @@ public class Epub3Writer
 	 * @param maxImageH 縮小する画像高さ
 	 * @param autoMarginLimitH 余白除去 最大%
 	 * @param autoMarginLimitV 余白除去 最大%
-	 * @param marginWhiteLevel 白画素として判別する白さ 100が白
+	 * @param autoMarginWhiteLevel 白画素として判別する白さ 100が白
 	 */
-	void writeImage(String srcFileName, InputStream is, BufferedImage srcImage, ZipArchiveOutputStream zos, ImageInfo imageInfo, int maxImagePixels, int maxImageW, int maxImageH, int autoMarginLimitH, int autoMarginLimitV, int marginWhiteLevel) throws IOException
+	void writeImage(String srcFileName, InputStream is, BufferedImage srcImage, ZipArchiveOutputStream zos, ImageInfo imageInfo, int maxImagePixels, int maxImageW, int maxImageH,
+			int autoMarginLimitH, int autoMarginLimitV, int autoMarginWhiteLevel, float autoMarginPadding) throws IOException
 	{
 		int w = imageInfo.getWidth();
 		int h = imageInfo.getHeight();
@@ -620,7 +629,7 @@ public class Epub3Writer
 			//画像がなければ読み込み
 			if (srcImage == null) srcImage = ImageInfoReader.readImage(ext, is);
 			int ignorePixels = (int)(w*0.005);
-			margin = getPlainMargin(srcImage, autoMarginLimitH/100f, autoMarginLimitV/100f, marginWhiteLevel/100f, ignorePixels);
+			margin = getPlainMargin(srcImage, autoMarginLimitH/100f, autoMarginLimitV/100f, autoMarginWhiteLevel/100f, autoMarginPadding/100f, ignorePixels);
 			if (margin[0]==0 && margin[1]==0 && margin[2]==0 && margin[3]==0) margin = null;
 			if (margin != null) {
 				w = w-margin[0]-margin[2];
@@ -696,11 +705,15 @@ public class Epub3Writer
 	 * @param whiteLevel 余白と判別する白レベル
 	 * @param ignorePixels 連続で余白でなければ無視するピクセル数
 	 * @return 余白画素数(left, top, right, bottom) */
-	private int[] getPlainMargin(BufferedImage image, float limitH, float limitV, float whiteLevel, int ignorePixels)
+	private int[] getPlainMargin(BufferedImage image, float limitH, float limitV, float whiteLevel, float padding, int ignorePixels)
 	{
 		int[] margin = new int[4]; //left, top, right, bottom
 		int width = image.getWidth();
 		int height = image.getHeight();
+		
+		//余白除去後に追加する余白 (削れ過ぎるので最低で2にしておく)
+		int paddingH = Math.max(2, (int)(width*padding));
+		int paddingV = Math.max(2, (int)(height*padding));
 		
 		//ピクセルに変更 上下、左右それぞれの
 		int limitPxH = (int)(width*limitH);
@@ -708,29 +721,28 @@ public class Epub3Writer
 		
 		//この列数以下ならゴミとして無視する
 		int noPlainCount = 0;
+		
 		for (int i=0; i<=limitPxH; i++) {
-			double whiteRate = getWhiteRate(image, 1, height, i, 0, whiteLevel);
-			if (whiteRate < .995) {
+			double whiteRate = getWhiteRateV(image, height, i, whiteLevel, 0.95);
+			if (whiteRate < 0.999) {
 				noPlainCount++;
 				if (whiteRate < 0.95 || noPlainCount > ignorePixels) break;
 			} else
 				margin[0] = i;//left
 		}
-		//左はルビがあるので制限きつめ
 		noPlainCount = 0;
 		for (int i=0; i<=limitPxV; i++) { 
-			double whiteRate = getWhiteRate(image, width, 1, 0, i, whiteLevel);
-			if (whiteRate < .999) {
+			double whiteRate = getWhiteRateH(image, width, i, whiteLevel, 0.95);
+			if (whiteRate < 0.999) {
 				noPlainCount++;
 				if (whiteRate < 0.95 || noPlainCount > ignorePixels) break;
 			} else 
 				margin[1] = i;//top
 		}
-		//左はルビがあるので制限きつめ
 		noPlainCount = 0;
 		for (int i=0; i<=limitPxH; i++) {
-			double whiteRate = getWhiteRate(image, 1, height, width-1-i, 0, whiteLevel);
-				if (whiteRate < .999) {
+			double whiteRate = getWhiteRateV(image, height, width-1-i, whiteLevel, 0.95);
+			if (whiteRate < 0.999) {
 				noPlainCount++;
 				if (whiteRate < 0.95 || noPlainCount > ignorePixels) break;
 			} else
@@ -738,8 +750,8 @@ public class Epub3Writer
 		}
 		noPlainCount = 0;
 		for (int i=0; i<=limitPxV; i++) {
-			double whiteRate = getWhiteRate(image, width, 1, 0, height-1-i, whiteLevel);
-				if (whiteRate < .995) {
+			double whiteRate = getWhiteRateH(image, width, height-1-i, whiteLevel, 0.95);
+			if (whiteRate < 0.999) {
 				noPlainCount++;
 				if (whiteRate < 0.95 || noPlainCount > ignorePixels) break;
 			} else
@@ -756,35 +768,57 @@ public class Epub3Writer
 			margin[1] = (int)(margin[1]*rate);
 			margin[3] = (int)(margin[3]*rate);
 		}
-		
+		//余白分広げる
+		margin[0] -= paddingH; if (margin[0] < 0) margin[0] = 0;
+		margin[1] -= paddingV; if (margin[1] < 0) margin[1] = 0;
+		margin[2] -= paddingH; if (margin[2] < 0) margin[2] = 0;
+		margin[3] -= paddingV; if (margin[3] < 0) margin[3] = 0;
 		return margin;
 	}
 	
 	/** 指定範囲の白い画素数の比率を返す
-	 * @param image
-	 * @param w
-	 * @param h
-	 * @param offsetX
-	 * @param offsetY
-	 * @param whiteRate 白画素の比率 0.0-1.0
+	 * @param image 比率をチェックする画像
+	 * @param w 比率をチェックする幅
+	 * @param offsetY 画像内の縦位置
+	 * @param limit これよりも白比率が小さくなったら終了 値は0が帰る
 	 * @return 白画素の比率 0.0-1.0 */
-	private double getWhiteRate(BufferedImage image, int w, int h, int offsetX, int offsetY, double whiteLevel)
+	private double getWhiteRateH(BufferedImage image, int w, int offsetY, double whiteLevel, double limit)
 	{
 		//rgbともこれより大きければ白画素とする
 		int rgbLimit = (int)(256*whiteLevel);
-		//白っぽいピクセル数
-		int whitePixels = 0;
+		//白でないピクセル数
+		int coloredPixels = 0;
+		//これよりピクセル数が多くなったら終了
+		int limitPixel = (int)(w*(1.0-limit));
 		
-		for (int x=offsetX+w-1; x>=offsetX; x--) {
-			for (int y=offsetY+h-1; y>=offsetY; y--) {
-				int rgb = image.getRGB(x, y);
-				if (rgbLimit > (rgb>>16 & 0xFF)) continue; //R
-				if (rgbLimit > (rgb>>8 & 0xFF)) continue; //G
-				if (rgbLimit > (rgb & 0xFF)) continue; //B
-				whitePixels++;
-			}
+		for (int x=w-1; x>=0; x--) {
+			int rgb = image.getRGB(x, offsetY);
+			if (rgbLimit > (rgb>>16 & 0xFF) || rgbLimit > (rgb>>8 & 0xFF) || rgbLimit > (rgb & 0xFF)) coloredPixels++;
 		}
-		return (double)whitePixels/(w*h);
+		if (limitPixel < coloredPixels) return 0;
+		return (double)(w-coloredPixels)/(w);
+	}
+	/** 指定範囲の白い画素数の比率を返す
+	 * @param image 比率をチェックする画像
+	 * @param h 比率をチェックする高さ
+	 * @param offsetX 画像内の横位置
+	 * @param limit これよりも白比率が小さくなったら終了 値はlimitが帰る
+	 * @return 白画素の比率 0.0-1.0 */
+	private double getWhiteRateV(BufferedImage image, int h, int offsetX, double whiteLevel, double limit)
+	{
+		//rgbともこれより大きければ白画素とする
+		int rgbLimit = (int)(256*whiteLevel);
+		//白でないピクセル数
+		int coloredPixels = 0;
+		//これよりピクセル数が多くなったら終了
+		int limitPixel = (int)(h*(1.0-limit));
+		
+		for (int y=h-1; y>=0; y--) {
+			int rgb = image.getRGB(offsetX, y);
+			if (rgbLimit > (rgb>>16 & 0xFF) || rgbLimit > (rgb>>8 & 0xFF) || rgbLimit > (rgb & 0xFF)) coloredPixels++;
+			if (limitPixel < coloredPixels) return 0;
+		}
+		return (double)(h-coloredPixels)/(h);
 	}
 	
 	/** 本文を出力する */
@@ -931,7 +965,7 @@ public class Epub3Writer
 				this.imageInfos.add(imageInfo);
 				this.outImageFileNames.add(srcImageFileName);
 				if (this.imageIndex-1 == this.bookInfo.coverImageIndex) {
-					imageInfo.setIsCover(true);
+					//imageInfo.setIsCover(true);
 					isCover = true;
 				}
 			}

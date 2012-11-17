@@ -42,7 +42,7 @@ public class AozoraEpub3
 		/** 出力先パス */
 		File dstPath = null;
 		
-		String helpMsg = "AozoraEpub3 [-options] input_files(txt,zip)";
+		String helpMsg = "AozoraEpub3 [-options] input_files(txt,txtz,zip,cbz)";
 		
 		try {
 			//コマンドライン オプション設定
@@ -148,15 +148,17 @@ public class AozoraEpub3
 			int autoMarginLimitH = 0;
 			int autoMarginLimitV = 0;
 			int autoMarginWhiteLevel = 80;
+			float autoMarginPadding = 0;
 			 if ("1".equals(props.getProperty("AutoMargin"))) {
 				try { autoMarginLimitH =Integer.parseInt(props.getProperty("AutoMarginLimitH")); } catch (Exception e) {}
 				try { autoMarginLimitV =Integer.parseInt(props.getProperty("AutoMarginLimitV")); } catch (Exception e) {}
 				try { autoMarginWhiteLevel =Integer.parseInt(props.getProperty("AutoMarginWhiteLevel")); } catch (Exception e) {}
+				try { autoMarginPadding =Float.parseFloat(props.getProperty("AutoMarginPadding")); } catch (Exception e) {}
 			 }
 			epub3Writer.setImageParam(dispW, dispH, resizeW, resizeH, pixels, singlePageSizeW, singlePageSizeH, singlePageWidth, fitImage, coverW, coverH, jpegQualty,
-					autoMarginLimitH, autoMarginLimitV, autoMarginWhiteLevel);
+					autoMarginLimitH, autoMarginLimitV, autoMarginWhiteLevel, autoMarginPadding);
 			epub3ImageWriter.setImageParam(dispW, dispH, resizeW, resizeH, pixels, singlePageSizeW, singlePageSizeH, singlePageWidth, fitImage, coverW, coverH, jpegQualty,
-					autoMarginLimitH, autoMarginLimitV, autoMarginWhiteLevel);
+					autoMarginLimitH, autoMarginLimitV, autoMarginWhiteLevel, autoMarginPadding);
 			
 			//自動改ページ
 			int forcePageBreakSize = 0;
@@ -257,7 +259,7 @@ public class AozoraEpub3
 				int txtCount = 1;
 				boolean imageOnly = false;
 				boolean isFile = "txt".equals(ext);
-				if("zip".equals(ext)) { 
+				if("zip".equals(ext) || "txtz".equals(ext)) { 
 					try {
 						txtCount = AozoraEpub3.countZipText(srcFile);
 					} catch (IOException e) {
@@ -272,7 +274,7 @@ public class AozoraEpub3
 					
 					BookInfo bookInfo = null;
 					if (!imageOnly) {
-						InputStream is = AozoraEpub3.getInputStream(srcFile, ext, imageInfoReader, txtIdx);
+						InputStream is = AozoraEpub3.getInputStream(srcFile, ext, imageInfoReader, null, txtIdx);
 						bookInfo = AozoraEpub3.getBookInfo(is, imageInfoReader, aozoraConverter, encType, BookInfo.TitleType.indexOf(titleIndex));
 						bookInfo.vertical = vertical;
 						bookInfo.insertTocPage = tocPage;
@@ -281,7 +283,7 @@ public class AozoraEpub3
 					
 					Epub3Writer writer = epub3Writer;
 					if (!isFile) {
-						imageInfoReader.loadZipImageInfos(srcFile, bookInfo==null);
+						imageInfoReader.loadZipImageInfos(srcFile, imageOnly);
 						if (imageOnly) {
 							LogAppender.append("画像のみのePubファイルを生成します\n");
 							//画像出力用のBookInfo生成
@@ -290,7 +292,7 @@ public class AozoraEpub3
 							//Writerを画像出力用派生クラスに入れ替え
 							writer = epub3ImageWriter;
 							
-							if (imageInfoReader.countImageFiles() == 0) {
+							if (imageInfoReader.countImageFileInfos() == 0) {
 								LogAppender.append("[ERROR] 画像がありませんでした\n");
 								return;
 							}
@@ -362,9 +364,6 @@ public class AozoraEpub3
 			String encType, BookInfo.TitleType titleType)
 	{
 		try {
-			//Zip内テキストファイルのパス
-			String[] textEntryNames = new String[1];
-			
 			if (is == null) {
 				return null;
 			}
@@ -372,7 +371,6 @@ public class AozoraEpub3
 			//タイトル取得
 			BufferedReader src = new BufferedReader(new InputStreamReader(is, (String)encType));
 			BookInfo bookInfo = aozoraConverter.getBookInfo(src, imageInfoReader, titleType);
-			bookInfo.textEntryName = textEntryNames[0];
 			is.close();
 			
 			return bookInfo;
@@ -400,7 +398,7 @@ public class AozoraEpub3
 			//入力Stream再オープン
 			BufferedReader src = null;
 			if (!bookInfo.imageOnly) {
-				src = new BufferedReader(new InputStreamReader(getInputStream(srcFile, ext, null, txtIdx), encType));
+				src = new BufferedReader(new InputStreamReader(getInputStream(srcFile, ext, null, null, txtIdx), encType));
 			}
 			
 			//ePub書き出し srcは中でクローズされる
@@ -459,10 +457,10 @@ public class AozoraEpub3
 	 * @return テキストファイルのストリーム (close()は呼び出し側ですること)
 	 */
 	@SuppressWarnings("resource")
-	static public InputStream getInputStream(File srcFile, String ext, ImageInfoReader imageInfoReader, int txtIdx) throws IOException
+	static public InputStream getInputStream(File srcFile, String ext, ImageInfoReader imageInfoReader, String[] textEntryName, int txtIdx) throws IOException
 	{
 		InputStream is = null;
-		if ("zip".equals(ext)) {
+		if ("zip".equals(ext) || "txtz".equals(ext)) {
 			//Zipなら最初のtxt
 			ZipArchiveInputStream zis = new ZipArchiveInputStream(new BufferedInputStream(new FileInputStream(srcFile), 65536), "MS932", false);
 			ArchiveEntry entry;
@@ -470,6 +468,7 @@ public class AozoraEpub3
 				String entryName = entry.getName();
 				if (entryName.substring(entryName.lastIndexOf('.')+1).equalsIgnoreCase("txt") && txtIdx-- == 0) {
 					if (imageInfoReader != null) imageInfoReader.setZipTextEntry(entryName);
+					if (textEntryName != null) textEntryName[0] = entryName;
 					is = zis; break;
 				}
 			}
@@ -483,7 +482,7 @@ public class AozoraEpub3
 		} else if ("txt".equals(ext)) {
 			is = new FileInputStream(srcFile);
 		} else {
-			LogAppender.append("txt, zipのみ変換可能です: ");
+			LogAppender.append("txt, zip, txtzのみ変換可能です: ");
 			LogAppender.append(srcFile.getPath());
 			LogAppender.append("\n");
 		}

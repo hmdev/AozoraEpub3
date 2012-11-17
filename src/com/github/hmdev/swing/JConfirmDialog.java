@@ -465,7 +465,7 @@ public class JConfirmDialog extends JDialog
 	
 	void checkPreviewControlEnabled()
 	{
-		int count = this.imageInfoReader.countImageFiles();
+		int count = this.imageInfoReader.countImageFileNames();
 		this.jButtonPrev.setEnabled(count > 0 && this.bookInfo.coverImageIndex > 0);
 		this.jButtonNext.setEnabled(count > 0 && this.bookInfo.coverImageIndex < count-1);
 		//this.jButtonMove.setEnabled(this.bookInfo.coverImage != null || this.bookInfo.coverImageIndex > 0);
@@ -523,10 +523,14 @@ public class JConfirmDialog extends JDialog
 	 * @param location ダイアログ表示位置 */
 	public void showDialog(String srcFile, String dstPath, String title, String creator, BookInfo bookInfo, ImageInfoReader imageInfoReader, Point location)
 	{
+		//zip内テキストファイル名も表示
+		if (bookInfo.textEntryName != null) srcFile += " : "+bookInfo.textEntryName.substring(bookInfo.textEntryName.lastIndexOf('/')+1);
 		this.jTextSrcFileName.setText(srcFile);
-		this.jTextSrcFileName.setCaretPosition(0);
+		this.jTextSrcFileName.setToolTipText(srcFile);
+		//this.jTextSrcFileName.setCaretPosition(0);
 		this.jTextDstFileName.setText(dstPath);
-		this.jTextDstFileName.setCaretPosition(0);
+		this.jTextDstFileName.setToolTipText(dstPath);
+		//this.jTextDstFileName.setCaretPosition(0);
 		this.jTextTitle.setText(title);
 		this.jTextCreator.setText(creator);
 		this.jCheckReplaceCover.setSelected(false);
@@ -542,7 +546,7 @@ public class JConfirmDialog extends JDialog
 		
 		//プレビュー表示
 		try {
-			if (imageInfoReader.countImageFiles() > 0 && bookInfo.coverImageIndex >= 0) {
+			if (imageInfoReader.countImageFileNames() > 0 && bookInfo.coverImageIndex >= 0) {
 				bookInfo.coverImage = imageInfoReader.getImage(0);
 			} else if (bookInfo.coverImage == null && bookInfo.coverFileName != null) {
 				bookInfo.loadCoverImage(bookInfo.coverFileName);

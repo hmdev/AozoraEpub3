@@ -174,11 +174,7 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 		} else {
 			if (width > this.getWidth()) return;
 		}
-		switch (this.fitType) {
-		case FIT_ALL:
-		case FIT_W:
-			this.fitType = FIT_H;
-		}
+		this.fitType = FIT_H;
 		this.visibleWidth = width;
 		this.setScale();
 		this.previewImage = null;
@@ -233,26 +229,21 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 		
 		//縮尺に合せてリサイズ 大きければ縮小
 		double coverScale = 1;
-		if (coverW > 0 && coverH > 0) coverScale = Math.min((double)coverW/this.getWidth(), (double)coverH/this.getHeight()) * this.scale;
-		else if (coverW > 0) coverScale = ((double)coverW/this.getWidth()) * this.scale;
-		else if (coverH > 0) coverScale = ((double)coverH/this.getHeight()) * this.scale;
-		if (coverScale == 1) {
-			coverW = this.bookInfo.coverImage.getWidth();
-			coverH = this.bookInfo.coverImage.getHeight();
-		} else {
-			coverW = Math.min(coverW, this.bookInfo.coverImage.getWidth()*coverScale);
-			coverH = Math.min(coverH, this.bookInfo.coverImage.getHeight()*coverScale);
-			if (coverScale > 1) {
-				coverW /= coverScale;
-				coverH /= coverScale;
-				coverScale = 1;
-			}
+		if (coverW > 0 && coverH > 0) coverScale = Math.min(coverW/this.getWidth(), coverH/this.getHeight()) * this.scale;
+		else if (coverW > 0) coverScale = (coverW/this.getWidth()) * this.scale;
+		else if (coverH > 0) coverScale = (coverH/this.getHeight()) * this.scale;
+		coverW = Math.min(coverW, this.bookInfo.coverImage.getWidth()*coverScale);
+		coverH = Math.min(coverH, this.bookInfo.coverImage.getHeight()*coverScale);
+		if (coverScale > 1) {
+			coverW /= coverScale;
+			coverH /= coverScale;
+			coverScale = 1;
 		}
 		
 		double x = 0;
-		if (this.visibleWidth < this.previewImage.getWidth()) x = this.offsetX * (double)coverW/this.getWidth();
+		if (this.visibleWidth < this.previewImage.getWidth()) x = this.offsetX * coverW/this.getWidth();
 		double y = 0;
-		if (this.getHeight() < this.previewImage.getHeight()) y = this.offsetY * (double)coverH/this.getHeight();
+		if (this.getHeight() < this.previewImage.getHeight()) y = this.offsetY * coverH/this.getHeight();
 		
 		//幅変更を反映
 		//x -= (this.getWidth()-this.visibleWidth)/2.0 * (double)coverW/this.getWidth();
