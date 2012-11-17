@@ -701,48 +701,62 @@ public class Epub3Writer
 		int[] margin = new int[4]; //left, top, right, bottom
 		int width = image.getWidth();
 		int height = image.getHeight();
-		//ピクセルに変更
-		limitH = (int)(width*limitH);
-		limitV = (int)(height*limitV);
 		
+		//ピクセルに変更 上下、左右それぞれの
+		int limitPxH = (int)(width*limitH);
+		int limitPxV = (int)(height*limitV);
+		
+		//この列数以下ならゴミとして無視する
 		int noPlainCount = 0;
-		for (int i=0; i<=limitH; i++) {
+		for (int i=0; i<=limitPxH; i++) {
 			double whiteRate = getWhiteRate(image, 1, height, i, 0, whiteLevel);
 			if (whiteRate < .995) {
 				noPlainCount++;
-				if (whiteRate >= 0.95 && noPlainCount > ignorePixels) break;
+				if (whiteRate < 0.95 || noPlainCount > ignorePixels) break;
 			} else
 				margin[0] = i;//left
 		}
 		//左はルビがあるので制限きつめ
 		noPlainCount = 0;
-		for (int i=0; i<=limitV; i++) { 
+		for (int i=0; i<=limitPxV; i++) { 
 			double whiteRate = getWhiteRate(image, width, 1, 0, i, whiteLevel);
 			if (whiteRate < .999) {
 				noPlainCount++;
-				if (whiteRate >= 0.95 && noPlainCount > ignorePixels) break;
+				if (whiteRate < 0.95 || noPlainCount > ignorePixels) break;
 			} else 
 				margin[1] = i;//top
 		}
 		//左はルビがあるので制限きつめ
 		noPlainCount = 0;
-		for (int i=0; i<=limitH; i++) {
+		for (int i=0; i<=limitPxH; i++) {
 			double whiteRate = getWhiteRate(image, 1, height, width-1-i, 0, whiteLevel);
 				if (whiteRate < .999) {
 				noPlainCount++;
-				if (whiteRate >= 0.95 && noPlainCount > ignorePixels) break;
+				if (whiteRate < 0.95 || noPlainCount > ignorePixels) break;
 			} else
 				margin[2] = i;//right
 		}
 		noPlainCount = 0;
-		for (int i=0; i<=limitV; i++) {
+		for (int i=0; i<=limitPxV; i++) {
 			double whiteRate = getWhiteRate(image, width, 1, 0, height-1-i, whiteLevel);
 				if (whiteRate < .995) {
 				noPlainCount++;
-				if (whiteRate >= 0.95 && noPlainCount > ignorePixels) break;
+				if (whiteRate < 0.95 || noPlainCount > ignorePixels) break;
 			} else
 				margin[3] = i;//bottom
 		}
+		//上下、左右の合計が制限を超えていたら調整
+		if (margin[0]+margin[2] > limitPxH) {
+			double rate = (double)limitPxH/(margin[0]+margin[2]);
+			margin[0] = (int)(margin[0]*rate);
+			margin[2] = (int)(margin[2]*rate);
+		}
+		if (margin[1]+margin[3] > limitPxV) {
+			double rate = (double)limitPxV/(margin[1]+margin[3]);
+			margin[1] = (int)(margin[1]*rate);
+			margin[3] = (int)(margin[3]*rate);
+		}
+		
 		return margin;
 	}
 	

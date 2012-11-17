@@ -826,8 +826,9 @@ public class AozoraEpub3Applet extends JApplet
 		label = new JLabel("  横");
 		panel.add(label);
 		propValue = props.getProperty("AutoMarginLimitH");
-		defaultValue = 10; try { defaultValue = Integer.parseInt(propValue); } catch (Exception e) {}
+		defaultValue = 20; try { defaultValue = Integer.parseInt(propValue); } catch (Exception e) {}
 		jTextAutoMarginLimitH = new JTextField(propValue==null?""+defaultValue:propValue);
+		jTextAutoMarginLimitH.setToolTipText("横方向の余白除去量の制限 左右の余白の合計");
 		jTextAutoMarginLimitH.setHorizontalAlignment(JTextField.RIGHT);
 		jTextAutoMarginLimitH.setInputVerifier(new IntegerInputVerifier(defaultValue, 0, 50));
 		jTextAutoMarginLimitH.setMaximumSize(text36);
@@ -840,8 +841,9 @@ public class AozoraEpub3Applet extends JApplet
 		label = new JLabel("  縦");
 		panel.add(label);
 		propValue = props.getProperty("AutoMarginLimitV");
-		defaultValue = 10; try { defaultValue = Integer.parseInt(propValue); } catch (Exception e) {}
+		defaultValue = 15; try { defaultValue = Integer.parseInt(propValue); } catch (Exception e) {}
 		jTextAutoMarginLimitV = new JTextField(propValue==null?""+defaultValue:propValue);
+		jTextAutoMarginLimitV.setToolTipText("縦方向の余白除去量の制限 上下の余白の合計");
 		jTextAutoMarginLimitV.setHorizontalAlignment(JTextField.RIGHT);
 		jTextAutoMarginLimitV.setInputVerifier(new IntegerInputVerifier(defaultValue, 0, 50));
 		jTextAutoMarginLimitV.setMaximumSize(text28);
@@ -857,7 +859,7 @@ public class AozoraEpub3Applet extends JApplet
 		propValue = props.getProperty("AutoMarginWhiteLevel");
 		defaultValue = 80; try { defaultValue = Integer.parseInt(propValue); } catch (Exception e) {}
 		jTextAutoMarginWhiteLevel = new JTextField(propValue==null?""+defaultValue:propValue);
-		jTextAutoMarginWhiteLevel.setToolTipText("余白の白と判別する値を設定します (黒:0～白:100)");
+		jTextAutoMarginWhiteLevel.setToolTipText("余白部分の白い画素と判別するレベルを指定します (黒:0～白:100)");
 		jTextAutoMarginWhiteLevel.setHorizontalAlignment(JTextField.RIGHT);
 		jTextAutoMarginWhiteLevel.setInputVerifier(new IntegerInputVerifier(defaultValue, 0, 100));
 		jTextAutoMarginWhiteLevel.setMaximumSize(text28);
