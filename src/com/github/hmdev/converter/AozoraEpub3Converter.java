@@ -114,7 +114,7 @@ public class AozoraEpub3Converter
 	char[] chapterSeparator = {' ','　','-','－','「','―','『'};
 	
 	/** 章名数字無し */
-	String[] chapterName = new String[]{"プロローグ","エピローグ","序","序章","終章","間章","幕間"};
+	String[] chapterName = new String[]{"プロローグ","エピローグ","モノローグ","序","序章","終章","間章","転章","幕間"};
 	/** 章名数字前 suffixのみは空文字 */
 	String[] chapterNumPrefix = new String[]{"第","その", ""};
 	/** 章名数字後 prefixに対応する複数のsuffixを指定 指定なしなら空文字 */
@@ -847,8 +847,15 @@ public class AozoraEpub3Converter
 			
 			//強制改ページ行なら先頭で改ページ 空のページなら出力しない
 			//この行が改ページ注記だと差うう中央が上書きされるので、改ページ注記処理でも左右中央を設定
-			if (this.middleTitle && bookInfo.preTitlePageBreak == lineNum) this.setPageBreakTrigger(pageBreakMiddle);
-			else if (bookInfo.isPageBreakLine(lineNum) && sectionCharLength > 0) this.setPageBreakTrigger(pageBreakNormal);
+			if (this.middleTitle && bookInfo.preTitlePageBreak == lineNum) {
+				//タグの中ならずらす
+				if (this.tagLevel == 0) this.setPageBreakTrigger(pageBreakMiddle);
+				else bookInfo.preTitlePageBreak++;
+			}
+			else if (bookInfo.isPageBreakLine(lineNum) && sectionCharLength > 0) {
+				if (this.tagLevel == 0) this.setPageBreakTrigger(pageBreakNormal);
+				else bookInfo.addPageBreakLine(lineNum+1);
+			}
 			
 			//コメント除外
 			if (line.startsWith("--------------------------------------------------")) {
@@ -922,8 +929,8 @@ public class AozoraEpub3Converter
 				convertTextLineToEpub3(out, line);
 			}
 			if (this.canceled) return;
-			if (this.writer.jProgressBar != null && lineNum % 10 == 9){
-				this.writer.jProgressBar.setValue(lineNum/10+1);
+			if (this.writer.jProgressBar != null && lineNum % 10 == 0){
+				this.writer.jProgressBar.setValue(lineNum/10);
 				this.writer.jProgressBar.repaint();
 			}
 		}
@@ -1331,9 +1338,7 @@ public class AozoraEpub3Converter
 					if (ch.length > begin+chukiTag.length()) noBr = false;
 					
 					//改ページフラグ設定
-					if (this.middleTitle && bookInfo.preTitlePageBreak == lineNum) {
-						this.setPageBreakTrigger(pageBreakMiddle);
-					} else if (chukiFlagMiddle.contains(chukiName)) {
+					if (chukiFlagMiddle.contains(chukiName)) {
 						//左右中央
 						this.setPageBreakTrigger(pageBreakMiddle);
 					} else if (chukiFlagBottom.contains(chukiName)) {
@@ -2121,7 +2126,7 @@ public class AozoraEpub3Converter
 				this.pageByteSize = 0;
 				this.sectionCharLength = 0;
 				this.chapterStarted = false;
-				if (tagLevel > 0) LogAppender.append("[ERROR] タグが閉じていません ("+lineNum+")");
+				if (tagLevel > 0) LogAppender.append("[ERROR] タグが閉じていません ("+lineNum+")\n");
 				this.tagLevel = 0;
 				
 				//改ページ目次非表示 抽出されていない場合
@@ -2218,17 +2223,17 @@ public class AozoraEpub3Converter
 	/** タグのみ削除 */
 	private String removeTag(String line)
 	{
-		return line.replaceAll("［＃.+?］", "").replaceFirst("^[ |　|―]+", "").replaceAll("<[^>]+>", "");
+		return line.replaceAll("［＃.+?］", "").replaceFirst("^[ |　|―]+", "").replaceAll("<[^>]+>", "").replaceAll("｜", "");
 	}
 	
 	/** タグとルビのない文字列に置換 */
 	private String replaceToPlain(String str)
 	{
-		return str.replaceFirst("^[ |　|―]+", "").replaceFirst("[ |　|―]+$","").replaceAll("［＃.+?］", "").replaceAll("《[^》]+?》", "").replaceAll("<[^>]+>", "").replaceAll("〳〵", "く").replaceAll("〴〵", "ぐ").replaceAll("〻", "々");
+		return str.replaceFirst("^[ |　|―]+", "").replaceFirst("[ |　|―]+$","").replaceAll("［＃.+?］", "").replaceAll("《[^》]+?》", "").replaceAll("｜", "").replaceAll("<[^>]+>", "").replaceAll("〳〵", "く").replaceAll("〴〵", "ぐ").replaceAll("〻", "々");
 	}
 	private String getChapterName(String line)
 	{
-		String name = line.replaceFirst("^[ |　]+", "").replaceFirst("[ |　]+$","")
+		String name = line.replaceFirst("^[ |　]+", "").replaceFirst("[ |　]+$","").replaceAll("｜", "")
 				.replaceAll("<span class=\"fullsp\"> </span>", "　").replaceAll(String.valueOf((char)(0x2000))+(char)(0x2000), "　")
 				.replaceAll("<rt>[^<]+</rt>", "").replaceAll("<[^>]+>", "").replaceFirst("^(=|＝|-|―|─)(=|＝|-|―|─)+", "")
 				.replaceFirst("(=|＝|-|―|─)(=|＝|-|―|─)+$", "");

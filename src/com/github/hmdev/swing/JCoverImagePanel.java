@@ -72,7 +72,6 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 	public void paint(Graphics g)
 	{
 		super.paint(g);
-		//g.clearRect(0, 0, this.getWidth(), this.getHeight());
 		if (this.bookInfo != null && this.bookInfo.coverImage != null) {
 			if (this.scale <= 0) this.setScale();
 			if (this.previewImage == null) {
@@ -91,9 +90,9 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 				if (minY < 0) y = Math.max(minY,  Math.min(maxY, this.offsetY));
 				else y = 0;
 				this.offsetY = y;
-				g.setClip(0, 0, this.visibleWidth, this.getHeight());
+				g.setClip(0, 0, this.visibleWidth, this.previewImage.getHeight());
 				g.setColor(Color.WHITE);
-				g.fillRect(0, 0, this.visibleWidth, this.getHeight());
+				g.fillRect(x, 0, Math.min(this.previewImage.getWidth()-x, this.visibleWidth), this.previewImage.getHeight());
 				g.drawImage(this.previewImage, x, y, this);
 			}
 		}
@@ -143,12 +142,19 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 		this.setScale();
 		this.repaint();
 	}
-	/** 倍率変更 */
+	/** 倍率変更
+	 * 幅調整中は高さ100%まで */
 	public void setZoom(double zoom)
 	{
+		if (this.visibleWidth < this.getWidth()) {
+			//幅調整中なら高さ制限
+			if (this.scale*zoom*this.bookInfo.coverImage.getHeight() < this.getHeight()) return;
+		} else {
+			//最小スケールに制限
+			if (this.scale*zoom < this.minScale) return;
+		}
 		this.fitType = FIT_ZOOM;
 		this.previewImage = null;
-		if (this.scale*zoom < this.minScale) zoom = this.minScale/this.scale; 
 		this.scale *= zoom;
 		this.offsetX *= zoom;
 		this.offsetY *= zoom;
@@ -174,7 +180,17 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 		} else {
 			if (width > this.getWidth()) return;
 		}
-		this.fitType = FIT_H;
+		//高さより低かったら縦に合わせる
+		switch (this.fitType) {
+		case FIT_ALL:
+		case FIT_W:
+			this.fitType = FIT_H;
+			break;
+		case FIT_ZOOM:
+			if (this.previewImage.getHeight() < this.getHeight()) {
+				this.fitType = FIT_H;
+			}
+		}
 		this.visibleWidth = width;
 		this.setScale();
 		this.previewImage = null;
@@ -292,7 +308,8 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 					bookInfo.coverFileName = files.get(0).getAbsolutePath();
 					bookInfo.loadCoverImage(bookInfo.coverFileName);
 					bookInfo.coverImageIndex = -1;
-					setFitType(FIT_ALL);
+					this.fitType = FIT_ZOOM;
+					this.setFitType(FIT_ALL);
 					repaint();
 				}
 			} else {
@@ -301,7 +318,8 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 						bookInfo.coverFileName = transfer.getTransferData(DataFlavor.stringFlavor).toString();
 						bookInfo.loadCoverImage(bookInfo.coverFileName);
 						bookInfo.coverImageIndex = -1;
-						setFitType(FIT_ALL);
+						this.fitType = FIT_ZOOM;
+						this.setFitType(FIT_ALL);
 						repaint();
 						return;
 					}

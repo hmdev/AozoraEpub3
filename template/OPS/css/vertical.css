@@ -204,13 +204,13 @@ div.yoko {
 /* 行右小書き 上付き小文字 */
 .sup {
 	vertical-align: super;
-	font-size: 0.5em;
+	font-size: 0.66em;
 	letter-spacing: -2px;
 }
 /* 行左小書き 下付き小文字 */
 .sub {
 	vertical-align: sub;
-	font-size: 0.5em;
+	font-size: 0.66em;
 	letter-spacing: -2px;
 }
 

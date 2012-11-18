@@ -270,7 +270,7 @@ public class AozoraEpub3Applet extends JApplet
 		Border padding4H = BorderFactory.createEmptyBorder(0, 4, 0, 4);
 		Border padding4H2V = BorderFactory.createEmptyBorder(2, 4, 2, 4);
 		Border padding2 = BorderFactory.createEmptyBorder(2, 2, 2, 2);
-		Border padding4B = BorderFactory.createEmptyBorder(0, 0, 4, 0);
+		Border padding3B = BorderFactory.createEmptyBorder(0, 0, 3, 0);
 		
 		Dimension panelSize = new Dimension(1920, 26);
 		Dimension text28 = new Dimension(28, 19);
@@ -679,7 +679,7 @@ public class AozoraEpub3Applet extends JApplet
 		tabPanel.add(panelV);
 		panel = new JPanel();
 		panel.setLayout(new FlowLayout(FlowLayout.LEFT, 1, 0));
-		panel.setBorder(padding4B);
+		panel.setBorder(padding3B);
 		panelV.add(panel);
 		//ピクセル
 		propValue = props.getProperty("Pixel");
@@ -987,7 +987,7 @@ public class AozoraEpub3Applet extends JApplet
 		tabPanel.add(panelV);
 		panel = new JPanel();
 		panel.setLayout(new FlowLayout(FlowLayout.LEFT, 1, 0));
-		panel.setBorder(padding4B);
+		panel.setBorder(padding3B);
 		panelV.add(panel);
 		
 		propValue = props.getProperty("PageBreak");
@@ -1133,7 +1133,7 @@ public class AozoraEpub3Applet extends JApplet
 		
 		panel = new JPanel();
 		panel.setLayout(new FlowLayout(FlowLayout.LEFT, 1, 0));
-		panel.setBorder(padding4B);
+		panel.setBorder(padding3B);
 		panelV.add(panel);
 		//改ページ後を目次に追加
 		propValue = props.getProperty("ChapterSection");
@@ -1169,18 +1169,18 @@ public class AozoraEpub3Applet extends JApplet
 		
 		panel = new JPanel();
 		panel.setLayout(new FlowLayout(FlowLayout.LEFT, 1, 0));
-		panel.setBorder(padding4B);
+		panel.setBorder(padding3B);
 		panelV.add(panel);
 		propValue = props.getProperty("ChapterName");
 		jCheckChapterName = new JCheckBox("章見出し (第～章/その～/～章/序/プロローグ 等)", propValue==null||"1".equals(propValue));
-		jCheckChapterName.setToolTipText("第～話/第～章/第～篇/第～部/第～節/第～幕/第～編/その～/～章/プロローグ/エピローグ/序/序章/終章/間章/幕間");
+		jCheckChapterName.setToolTipText("第～話/第～章/第～篇/第～部/第～節/第～幕/第～編/その～/～章/プロローグ/エピローグ/モノローグ/序/序章/終章/転章/間章/幕間");
 		jCheckChapterName.setFocusPainted(false);
 		jCheckChapterName.setBorder(padding2);
 		panel.add(jCheckChapterName);
 		
 		panel = new JPanel();
 		panel.setLayout(new FlowLayout(FlowLayout.LEFT, 1, 0));
-		panel.setBorder(padding4B);
+		panel.setBorder(padding3B);
 		panelV.add(panel);
 		propValue = props.getProperty("ChapterNumOnly");
 		jCheckChapterNumOnly = new JCheckBox("数字のみ", "1".equals(propValue));
@@ -1245,18 +1245,22 @@ public class AozoraEpub3Applet extends JApplet
 		statusPane.setLayout(new BoxLayout(statusPane, BoxLayout.X_AXIS));
 		statusPane.setMaximumSize(new Dimension(1920, 22));
 		statusPane.setPreferredSize(new Dimension(1920, 22));
-		statusPane.setBorder(BorderFactory.createEmptyBorder(1, 2, 0, 2));
+		statusPane.setBorder(padding2H);
 		this.add(statusPane);
 		////////////////////////////////
 		//プログレスバー
 		////////////////////////////////
+		panel = new JPanel();
+		panel.setLayout(new FlowLayout(FlowLayout.LEFT, 1, 0));
+		panel.setBorder(BorderFactory.createEmptyBorder(1, 2, 0, 2));
+		statusPane.add(panel);
 		jProgressBar = new JProgressBar(0, 100);
 		jProgressBar.setMaximumSize(new Dimension(200, 20));
 		jProgressBar.setPreferredSize(new Dimension(200, 20));
-		statusPane.add(jProgressBar);
+		panel.add(jProgressBar);
 		label = new JLabel(" ");
-		label.setBorder(padding2);
-		statusPane.add(label);
+		label.setBorder(padding2H);
+		panel.add(label);
 		jButtonCancel = new JButton("処理中止");
 		jButtonCancel.setBorder(padding3V);
 		jButtonCancel.setMaximumSize(new Dimension(80, 20));
@@ -1273,7 +1277,7 @@ public class AozoraEpub3Applet extends JApplet
 				convertCanceled = true;
 			}
 		});
-		statusPane.add(jButtonCancel);
+		panel.add(jButtonCancel);
 		////////////////////////////////
 		//ログ関連
 		////////////////////////////////
@@ -1282,7 +1286,7 @@ public class AozoraEpub3Applet extends JApplet
 		panel.setBorder(BorderFactory.createEmptyBorder(1, 2, 0, 2));
 		statusPane.add(panel);
 		label = new JLabel("ログ:");
-		label.setBorder(padding2);
+		label.setBorder(padding2H);
 		panel.add(label);
 		JButton jButtonLogClear = new JButton("削除");
 		jButtonLogClear.setBorder(padding3V);
@@ -1292,7 +1296,7 @@ public class AozoraEpub3Applet extends JApplet
 		jButtonLogClear.setFocusable(false);
 		jButtonLogClear.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) { jTextArea.setText(""); }
+			public void actionPerformed(ActionEvent e) { jTextArea.setText(""); jProgressBar.setValue(0); jProgressBar.setStringPainted(false); }
 		});
 		panel.add(jButtonLogClear);
 		
@@ -1812,11 +1816,11 @@ public class AozoraEpub3Applet extends JApplet
 		String ext = srcFile.getName();
 		ext = ext.substring(ext.lastIndexOf('.')+1).toLowerCase();
 		
-		LogAppender.append("--------\n");
 		//zipならzip内のテキストを検索
 		int txtCount = 1;
 		boolean imageOnly = false;
 		if("zip".equals(ext) || "txtz".equals(ext)) { 
+			LogAppender.append("--------\n");
 			try {
 				txtCount = AozoraEpub3.countZipText(srcFile);
 			} catch (IOException e) {
@@ -1824,7 +1828,10 @@ public class AozoraEpub3Applet extends JApplet
 			}
 			if (txtCount == 0) { txtCount = 1; imageOnly = true; }
 		} else if ("cbz".equals(ext)) {
+			LogAppender.append("--------\n");
 			imageOnly = true;
+		} else if ("txt".equals(ext)) {
+			LogAppender.append("--------\n");
 		}
 		if (this.convertCanceled){
 			LogAppender.append("変換処理を中止しました : "+srcFile.getAbsolutePath()+"\n");
@@ -1845,7 +1852,9 @@ public class AozoraEpub3Applet extends JApplet
 		if (txtIdx > 0) LogAppender.append("--------\n");
 		//パラメータ設定
 		if (!"txt".equals(ext) && !"txtz".equals(ext) && !"zip".equals(ext) && !"cbz".equals(ext) ) {
-			LogAppender.append("txt, txtz, zip, cbz 以外は変換できません\n");
+			if (!"png".equals(ext) && !"jpg".equals(ext) && !"jpeg".equals(ext) && !"gif".equals(ext)) {
+				LogAppender.append("txt, txtz, zip, cbz 以外は変換できません\n");
+			}
 			return;
 		}
 		//表紙にする挿絵の位置-1なら挿絵は使わない
@@ -1933,7 +1942,8 @@ public class AozoraEpub3Applet extends JApplet
 		
 		//テキストなら行数/100と画像数をプログレスバーに設定
 		if (bookInfo.totalLineNum > 0) {
-			this.jProgressBar.setMaximum(bookInfo.totalLineNum/10 + imageInfoReader.countImageFileInfos()*10);
+			if (isFile) this.jProgressBar.setMaximum(bookInfo.totalLineNum/10 + imageInfoReader.countImageFileNames()*10);
+			else this.jProgressBar.setMaximum(bookInfo.totalLineNum/10 + imageInfoReader.countImageFileInfos()*10);
 			jProgressBar.setValue(0);
 			jProgressBar.setStringPainted(true);
 		}
@@ -2162,9 +2172,9 @@ public class AozoraEpub3Applet extends JApplet
 		//LookAndFeel変更
 		try {
 			String lafName = UIManager.getSystemLookAndFeelClassName();
-			if (lafName.startsWith("com.sun.java.swing.plaf.windows."))
+			if (lafName.startsWith("com.sun.java.swing.plaf.windows.")) {
 				UIManager.setLookAndFeel(lafName);
-			else {
+			} else {
 				//Windows以外はMetalのままでFontはPLAIN
 				UIDefaults defaultTable = UIManager.getLookAndFeelDefaults();
 				for (Object o: defaultTable.keySet()) {

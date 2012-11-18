@@ -42,7 +42,7 @@ public class AozoraEpub3
 		/** 出力先パス */
 		File dstPath = null;
 		
-		String helpMsg = "AozoraEpub3 [-options] input_files(txt,txtz,zip,cbz)";
+		String helpMsg = "AozoraEpub3 [-options] input_files(txt,zip,cbz)";
 		
 		try {
 			//コマンドライン オプション設定
@@ -402,7 +402,7 @@ public class AozoraEpub3
 			}
 			
 			//ePub書き出し srcは中でクローズされる
-			epubWriter.write(aozoraConverter, src, srcFile, outFile, bookInfo, imageInfoReader);
+			epubWriter.write(aozoraConverter, src, srcFile, ext, outFile, bookInfo, imageInfoReader);
 			
 			LogAppender.append("変換完了 : ");
 			LogAppender.append(outFile.getPath());
@@ -422,7 +422,11 @@ public class AozoraEpub3
 		//ファイル名からタイトル取得
 		String[] titleCreator = new String[2];
 		String noExtName = fileName.substring(0, fileName.lastIndexOf('.'));
-		noExtName = noExtName.replaceAll("^(.*)[\\(|（].*?[\\)|）][ |　]*$", "$1");
+		//後ろの括弧から校正情報等を除外
+		noExtName = noExtName.replaceAll("（","\\(").replaceAll("）","\\)");
+		noExtName = noExtName.replaceAll("\\(青空[^\\)]*\\)", "");
+		noExtName = noExtName.replaceAll("\\([^\\)]*(校正|軽量|表紙|挿絵|補正|修正|ルビ)[^\\)]*\\)", "");
+		
 		Matcher m = Pattern.compile("[\\[|［](.+?)[\\]|］][ |　]*(.*)[ |　]*$").matcher(noExtName);
 		if (m.find()) {
 			titleCreator[0] = m.group(2);
