@@ -829,13 +829,13 @@ public class AozoraEpub3Applet extends JApplet
 		label.setToolTipText("横方向の余白除去量の制限 左右の余白の合計");
 		panel.add(label);
 		propValue = props.getProperty("AutoMarginLimitH");
-		defaultValue = 20; try { defaultValue = Integer.parseInt(propValue); } catch (Exception e) {}
+		defaultValue = 15; try { defaultValue = Integer.parseInt(propValue); } catch (Exception e) {}
 		jTextAutoMarginLimitH = new JTextField(propValue==null?""+defaultValue:propValue);
 		jTextAutoMarginLimitH.setToolTipText(label.getToolTipText());
 		jTextAutoMarginLimitH.setHorizontalAlignment(JTextField.RIGHT);
 		jTextAutoMarginLimitH.setInputVerifier(new IntegerInputVerifier(defaultValue, 0, 50));
-		jTextAutoMarginLimitH.setMaximumSize(text36);
-		jTextAutoMarginLimitH.setPreferredSize(text36);
+		jTextAutoMarginLimitH.setMaximumSize(text28);
+		jTextAutoMarginLimitH.setPreferredSize(text28);
 		jTextAutoMarginLimitH.setEditable(jCheckAutoMargin.isSelected());
 		panel.add(jTextAutoMarginLimitH);
 		label = new JLabel("%");
@@ -845,7 +845,7 @@ public class AozoraEpub3Applet extends JApplet
 		label.setToolTipText("縦方向の余白除去量の制限 上下の余白の合計");
 		panel.add(label);
 		propValue = props.getProperty("AutoMarginLimitV");
-		defaultValue = 15; try { defaultValue = Integer.parseInt(propValue); } catch (Exception e) {}
+		defaultValue = 10; try { defaultValue = Integer.parseInt(propValue); } catch (Exception e) {}
 		jTextAutoMarginLimitV = new JTextField(propValue==null?""+defaultValue:propValue);
 		jTextAutoMarginLimitV.setToolTipText(label.getToolTipText());
 		jTextAutoMarginLimitV.setHorizontalAlignment(JTextField.RIGHT);
@@ -861,7 +861,7 @@ public class AozoraEpub3Applet extends JApplet
 		label.setToolTipText("余白部分の白い画素と判別するレベルを指定します (黒:0～白:100)");
 		panel.add(label);
 		propValue = props.getProperty("AutoMarginWhiteLevel");
-		defaultValue = 90; try { defaultValue = Integer.parseInt(propValue); } catch (Exception e) {}
+		defaultValue = 80; try { defaultValue = Integer.parseInt(propValue); } catch (Exception e) {}
 		jTextAutoMarginWhiteLevel = new JTextField(propValue==null?""+defaultValue:propValue);
 		jTextAutoMarginWhiteLevel.setToolTipText(label.getToolTipText());
 		jTextAutoMarginWhiteLevel.setHorizontalAlignment(JTextField.RIGHT);
@@ -1217,7 +1217,7 @@ public class AozoraEpub3Applet extends JApplet
 		panel.add(jCheckChapterPattern);
 		propValue = props.getProperty("ChapterPatternText");
 		jComboChapterPattern = new JComboBox(new String[]{
-				"^(見出し１|見出し２|見出し３)$","^(0-9|０-９|一|二|三|四|五|六|七|八|九|十|〇)",
+				"^(見出し１|見出し２|見出し３)$","^(†|【|▼)","^(0-9|０-９|一|二|三|四|五|六|七|八|九|十|〇)",
 				"^[1|2|１|２]?[0-9|０-９]月[1-3|１-３]?[0-9|０-９]日",
 				"^(一|十)?(一|二|三|四|五|六|七|八|九|十|〇)月(一|二|三|十)?十?(一|二|三|四|五|六|七|八|九|十|〇)日"});
 		jComboChapterPattern.setSelectedItem(propValue==null?"":propValue);

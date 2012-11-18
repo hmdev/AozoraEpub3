@@ -120,6 +120,7 @@ public class ImageInfoReader
 	/** 指定した順番の画像情報を取得 */
 	public ImageInfo getImageInfo(int idx) throws IOException
 	{
+		if (this.imageFileNames.size()-1 < idx) return null;
 		return this.getImageInfo(this.imageFileNames.get(idx));
 	}
 	

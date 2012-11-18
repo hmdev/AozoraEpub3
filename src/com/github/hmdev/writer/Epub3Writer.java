@@ -389,13 +389,15 @@ public class Epub3Writer
 			ImageInfo insertCoverInfo = coverImageInfo;
 			if (insertCoverInfo == null && bookInfo.coverImageIndex >= 0) {
 				insertCoverInfo = imageInfoReader.getImageInfo(bookInfo.coverImageIndex);
-				insertCoverInfo.setIsCover(true);
-				if (insertCoverInfo.getId() == null) {
-					//zip内の画像で追加処理されていない
-					this.imageIndex++;
-					String imageId = decimalFormat.format(this.imageIndex);
-					insertCoverInfo.setId(imageId);
-					insertCoverInfo.setOutFileName(imageId+"."+insertCoverInfo.getExt());
+				if (insertCoverInfo != null) {
+					insertCoverInfo.setIsCover(true);
+					if (insertCoverInfo.getId() == null) {
+						//zip内の画像で追加処理されていない
+						this.imageIndex++;
+						String imageId = decimalFormat.format(this.imageIndex);
+						insertCoverInfo.setId(imageId);
+						insertCoverInfo.setOutFileName(imageId+"."+insertCoverInfo.getExt());
+					}
 				}
 			}
 			if (insertCoverInfo != null) {
