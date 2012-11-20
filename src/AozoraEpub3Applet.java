@@ -53,6 +53,7 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -89,6 +90,9 @@ public class AozoraEpub3Applet extends JApplet
 	JFrame jFrameParent;
 	/** アプリケーションのアイコン画像 */
 	Image iconImage;
+	
+	/** 上下分割Split */
+	JSplitPane jSplitPane;
 	
 	/** 上部タブパネル */
 	JTabbedPane jTabbedPane;
@@ -277,16 +281,23 @@ public class AozoraEpub3Applet extends JApplet
 		Border padding3B = BorderFactory.createEmptyBorder(0, 0, 3, 0);
 		
 		Dimension panelSize = new Dimension(1920, 26);
-		Dimension text28 = new Dimension(28, 19);
-		Dimension text36 = new Dimension(36, 19);
+		Dimension text32 = new Dimension(32, 19);
+		Dimension text40 = new Dimension(40, 19);
 		Dimension text300 = new Dimension(300, 19);
 		
 		//アップレットのレイアウト設定
 		this.setLayout(new BoxLayout(this.getContentPane(), BoxLayout.Y_AXIS));
 		
+		int dividerLocation = 220;
+		try { dividerLocation = Integer.parseInt(props.getProperty("DividerLocation")); } catch (Exception e) {}
+		jSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+		jSplitPane.setDividerLocation(dividerLocation);
+		this.add(jSplitPane);
+		
 		jTabbedPane = new JTabbedPane();
 		jTabbedPane.setBorder(padding2H);
-		this.add(jTabbedPane);
+		
+		jSplitPane.add(jTabbedPane);
 		
 		ButtonGroup buttonGroup;
 		
@@ -296,7 +307,6 @@ public class AozoraEpub3Applet extends JApplet
 		////////////////////////////////////////////////////////////////
 		tabPanel = new JPanel();
 		tabPanel.setLayout(new BoxLayout(tabPanel, BoxLayout.Y_AXIS));
-		jTabbedPane.setMaximumSize(new Dimension(1920, 260));
 		jTabbedPane.setPreferredSize(new Dimension(1920, 220));
 		jTabbedPane.add("  変換  ", tabPanel);
 		
@@ -318,6 +328,7 @@ public class AozoraEpub3Applet extends JApplet
 		jComboTitle = new JComboBox(BookInfo.TitleType.titleTypeNames);
 		jComboTitle.setFocusable(false);
 		jComboTitle.setMaximumSize(new Dimension(180, 22));
+		jComboTitle.setBorder(padding0);
 		try { jComboTitle.setSelectedIndex(Integer.parseInt(props.getProperty("TitleType"))); } catch (Exception e) {}
 		((JLabel)jComboTitle.getRenderer()).setBorder(padding2H);
 		panel.add(jComboTitle);
@@ -590,8 +601,8 @@ public class AozoraEpub3Applet extends JApplet
 		defaultValue = 600; try { defaultValue = Integer.parseInt(propValue); } catch (Exception e) {}
 		jTextDispW = new JTextField(propValue==null?""+defaultValue:propValue);
 		jTextDispW.setHorizontalAlignment(JTextField.RIGHT);
-		jTextDispW.setMaximumSize(text36);
-		jTextDispW.setPreferredSize(text36);
+		jTextDispW.setMaximumSize(text40);
+		jTextDispW.setPreferredSize(text40);
 		jTextDispW.setInputVerifier(new IntegerInputVerifier(defaultValue, 1, 9999));
 		panel.add(jTextDispW);
 		label = new JLabel("x");
@@ -603,8 +614,8 @@ public class AozoraEpub3Applet extends JApplet
 		defaultValue = 800; try { defaultValue = Integer.parseInt(propValue); } catch (Exception e) {}
 		jTextDispH = new JTextField(propValue==null?""+defaultValue:propValue);
 		jTextDispH.setHorizontalAlignment(JTextField.RIGHT);
-		jTextDispH.setMaximumSize(text36);
-		jTextDispH.setPreferredSize(text36);
+		jTextDispH.setMaximumSize(text40);
+		jTextDispH.setPreferredSize(text40);
 		jTextDispH.setInputVerifier(new IntegerInputVerifier(defaultValue, 1, 9999));
 		panel.add(jTextDispH);
 		label = new JLabel("px");
@@ -629,8 +640,8 @@ public class AozoraEpub3Applet extends JApplet
 		jTextSinglePageSizeW = new JTextField(propValue==null?""+defaultValue:propValue);
 		jTextSinglePageSizeW.setHorizontalAlignment(JTextField.RIGHT);
 		jTextSinglePageSizeW.setInputVerifier(new IntegerInputVerifier(defaultValue, 1, 9999));
-		jTextSinglePageSizeW.setMaximumSize(text36);
-		jTextSinglePageSizeW.setPreferredSize(text36);
+		jTextSinglePageSizeW.setMaximumSize(text40);
+		jTextSinglePageSizeW.setPreferredSize(text40);
 		panel.add(jTextSinglePageSizeW);
 		label = new JLabel("x");
 		label.setBorder(padding2H);
@@ -642,8 +653,8 @@ public class AozoraEpub3Applet extends JApplet
 		jTextSinglePageSizeH = new JTextField(propValue==null?""+defaultValue:propValue);
 		jTextSinglePageSizeH.setHorizontalAlignment(JTextField.RIGHT);
 		jTextSinglePageSizeH.setInputVerifier(new IntegerInputVerifier(defaultValue, 1, 9999));
-		jTextSinglePageSizeH.setMaximumSize(text36);
-		jTextSinglePageSizeH.setPreferredSize(text36);
+		jTextSinglePageSizeH.setMaximumSize(text40);
+		jTextSinglePageSizeH.setPreferredSize(text40);
 		panel.add(jTextSinglePageSizeH);
 		label = new JLabel("px以上  ");
 		label.setBorder(padding2H);
@@ -657,8 +668,8 @@ public class AozoraEpub3Applet extends JApplet
 		jTextSinglePageWidth = new JTextField(propValue==null?""+defaultValue:propValue);
 		jTextSinglePageWidth.setHorizontalAlignment(JTextField.RIGHT);
 		jTextSinglePageWidth.setInputVerifier(new IntegerInputVerifier(defaultValue, 1, 9999));
-		jTextSinglePageWidth.setMaximumSize(text36);
-		jTextSinglePageWidth.setPreferredSize(text36);
+		jTextSinglePageWidth.setMaximumSize(text40);
+		jTextSinglePageWidth.setPreferredSize(text40);
 		panel.add(jTextSinglePageWidth);
 		label = new JLabel("px以上  ");
 		label.setBorder(padding2H);
@@ -697,8 +708,8 @@ public class AozoraEpub3Applet extends JApplet
 		jTextPixelW = new JTextField(propValue==null?""+defaultValue:propValue);
 		jTextPixelW.setHorizontalAlignment(JTextField.RIGHT);
 		jTextPixelW.setInputVerifier(new IntegerInputVerifier(defaultValue, 100, 9999));
-		jTextPixelW.setMaximumSize(text36);
-		jTextPixelW.setPreferredSize(text36);
+		jTextPixelW.setMaximumSize(text40);
+		jTextPixelW.setPreferredSize(text40);
 		panel.add(jTextPixelW);
 		label = new JLabel("x");
 		label.setBorder(padding2H);
@@ -708,8 +719,8 @@ public class AozoraEpub3Applet extends JApplet
 		jTextPixelH = new JTextField(propValue==null?""+defaultValue:propValue);
 		jTextPixelH.setHorizontalAlignment(JTextField.RIGHT);
 		jTextPixelH.setInputVerifier(new IntegerInputVerifier(defaultValue, 100, 9999));
-		jTextPixelH.setMaximumSize(text36);
-		jTextPixelH.setPreferredSize(text36);
+		jTextPixelH.setMaximumSize(text40);
+		jTextPixelH.setPreferredSize(text40);
 		panel.add(jTextPixelH);
 		label = new JLabel("px以下  ");
 		label.setBorder(padding2H);
@@ -726,8 +737,8 @@ public class AozoraEpub3Applet extends JApplet
 		jTextResizeNumW = new JTextField(propValue==null?""+defaultValue:propValue);
 		jTextResizeNumW.setHorizontalAlignment(JTextField.RIGHT);
 		jTextResizeNumW.setInputVerifier(new IntegerInputVerifier(defaultValue, 100, 9999));
-		jTextResizeNumW.setMaximumSize(text36);
-		jTextResizeNumW.setPreferredSize(text36);
+		jTextResizeNumW.setMaximumSize(text40);
+		jTextResizeNumW.setPreferredSize(text40);
 		jTextResizeNumW.setEditable(jCheckResizeW.isSelected());
 		panel.add(jTextResizeNumW);
 		label = new JLabel("px以下  ");
@@ -745,8 +756,8 @@ public class AozoraEpub3Applet extends JApplet
 		jTextResizeNumH = new JTextField(propValue==null?""+defaultValue:propValue);
 		jTextResizeNumH.setHorizontalAlignment(JTextField.RIGHT);
 		jTextResizeNumH.setInputVerifier(new IntegerInputVerifier(defaultValue, 100, 9999));
-		jTextResizeNumH.setMaximumSize(text36);
-		jTextResizeNumH.setPreferredSize(text36);
+		jTextResizeNumH.setMaximumSize(text40);
+		jTextResizeNumH.setPreferredSize(text40);
 		panel.add(jTextResizeNumH);
 		label = new JLabel("px以下");
 		label.setBorder(padding2H);
@@ -768,8 +779,8 @@ public class AozoraEpub3Applet extends JApplet
 		jTextCoverW = new JTextField(propValue==null?""+defaultValue:propValue);
 		jTextCoverW.setHorizontalAlignment(JTextField.RIGHT);
 		jTextCoverW.setInputVerifier(new IntegerInputVerifier(defaultValue, 32, 9999));
-		jTextCoverW.setMaximumSize(text36);
-		jTextCoverW.setPreferredSize(text36);
+		jTextCoverW.setMaximumSize(text40);
+		jTextCoverW.setPreferredSize(text40);
 		panel.add(jTextCoverW);
 		label = new JLabel("x");
 		label.setBorder(padding2H);
@@ -781,8 +792,8 @@ public class AozoraEpub3Applet extends JApplet
 		jTextCoverH = new JTextField(propValue==null?""+defaultValue:propValue);
 		jTextCoverH.setHorizontalAlignment(JTextField.RIGHT);
 		jTextCoverH.setInputVerifier(new IntegerInputVerifier(defaultValue, 64, 9999));
-		jTextCoverH.setMaximumSize(text36);
-		jTextCoverH.setPreferredSize(text36);
+		jTextCoverH.setMaximumSize(text40);
+		jTextCoverH.setPreferredSize(text40);
 		panel.add(jTextCoverH);
 		label = new JLabel("px以下");
 		label.setBorder(padding2H);
@@ -800,8 +811,8 @@ public class AozoraEpub3Applet extends JApplet
 		jTextJpegQuality = new JTextField(propValue==null?""+defaultValue:propValue);
 		jTextJpegQuality.setHorizontalAlignment(JTextField.RIGHT);
 		jTextJpegQuality.setInputVerifier(new IntegerInputVerifier(defaultValue, 30, 100));
-		jTextJpegQuality.setMaximumSize(text28);
-		jTextJpegQuality.setPreferredSize(text28);
+		jTextJpegQuality.setMaximumSize(text32);
+		jTextJpegQuality.setPreferredSize(text32);
 		panel.add(jTextJpegQuality);
 		label = new JLabel(" (30～100) ");
 		label.setBorder(padding2H);
@@ -838,8 +849,8 @@ public class AozoraEpub3Applet extends JApplet
 		jTextAutoMarginLimitH.setToolTipText(label.getToolTipText());
 		jTextAutoMarginLimitH.setHorizontalAlignment(JTextField.RIGHT);
 		jTextAutoMarginLimitH.setInputVerifier(new IntegerInputVerifier(defaultValue, 0, 50));
-		jTextAutoMarginLimitH.setMaximumSize(text28);
-		jTextAutoMarginLimitH.setPreferredSize(text28);
+		jTextAutoMarginLimitH.setMaximumSize(text32);
+		jTextAutoMarginLimitH.setPreferredSize(text32);
 		jTextAutoMarginLimitH.setEditable(jCheckAutoMargin.isSelected());
 		panel.add(jTextAutoMarginLimitH);
 		label = new JLabel("%");
@@ -854,8 +865,8 @@ public class AozoraEpub3Applet extends JApplet
 		jTextAutoMarginLimitV.setToolTipText(label.getToolTipText());
 		jTextAutoMarginLimitV.setHorizontalAlignment(JTextField.RIGHT);
 		jTextAutoMarginLimitV.setInputVerifier(new IntegerInputVerifier(defaultValue, 0, 50));
-		jTextAutoMarginLimitV.setMaximumSize(text28);
-		jTextAutoMarginLimitV.setPreferredSize(text28);
+		jTextAutoMarginLimitV.setMaximumSize(text32);
+		jTextAutoMarginLimitV.setPreferredSize(text32);
 		jTextAutoMarginLimitV.setEditable(jCheckAutoMargin.isSelected());
 		panel.add(jTextAutoMarginLimitV);
 		label = new JLabel("%");
@@ -870,8 +881,8 @@ public class AozoraEpub3Applet extends JApplet
 		jTextAutoMarginWhiteLevel.setToolTipText(label.getToolTipText());
 		jTextAutoMarginWhiteLevel.setHorizontalAlignment(JTextField.RIGHT);
 		jTextAutoMarginWhiteLevel.setInputVerifier(new IntegerInputVerifier(defaultValue, 0, 100));
-		jTextAutoMarginWhiteLevel.setMaximumSize(text28);
-		jTextAutoMarginWhiteLevel.setPreferredSize(text28);
+		jTextAutoMarginWhiteLevel.setMaximumSize(text32);
+		jTextAutoMarginWhiteLevel.setPreferredSize(text32);
 		jTextAutoMarginWhiteLevel.setEditable(jCheckAutoMargin.isSelected());
 		panel.add(jTextAutoMarginWhiteLevel);
 		label = new JLabel("%");
@@ -885,8 +896,8 @@ public class AozoraEpub3Applet extends JApplet
 		jTextAutoMarginPadding.setToolTipText(label.getToolTipText());
 		jTextAutoMarginPadding.setHorizontalAlignment(JTextField.RIGHT);
 		jTextAutoMarginPadding.setInputVerifier(new FloatInputVerifier(0, 0, 50));
-		jTextAutoMarginPadding.setMaximumSize(text28);
-		jTextAutoMarginPadding.setPreferredSize(text28);
+		jTextAutoMarginPadding.setMaximumSize(text32);
+		jTextAutoMarginPadding.setPreferredSize(text32);
 		jTextAutoMarginPadding.setEditable(jCheckAutoMargin.isSelected());
 		panel.add(jTextAutoMarginPadding);
 		label = new JLabel("%");
@@ -1016,8 +1027,8 @@ public class AozoraEpub3Applet extends JApplet
 		propValue = props.getProperty("PageBreakSize");
 		defaultValue = 400; try { defaultValue = Integer.parseInt(propValue); } catch (Exception e) {}
 		jTextPageBreakSize = new JTextField();
-		jTextPageBreakSize.setMaximumSize(text36);
-		jTextPageBreakSize.setPreferredSize(text36);
+		jTextPageBreakSize.setMaximumSize(text40);
+		jTextPageBreakSize.setPreferredSize(text40);
 		jTextPageBreakSize.setText(Integer.toString(defaultValue));
 		jTextPageBreakSize.setInputVerifier(new IntegerInputVerifier(defaultValue, 1, 9999));
 		jTextPageBreakSize.setEditable(jCheckPageBreak.isSelected());
@@ -1033,6 +1044,7 @@ public class AozoraEpub3Applet extends JApplet
 		panel.add(jCheckPageBreakEmpty);
 		jComboxPageBreakEmptyLine = new JComboBox(new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9"});
 		jComboxPageBreakEmptyLine.setFocusable(false);
+		jComboxPageBreakEmptyLine.setBorder(padding0);
 		jComboxPageBreakEmptyLine.setMaximumSize(new Dimension(42, 19));
 		jComboxPageBreakEmptyLine.setPreferredSize(new Dimension(42, 19));
 		((JLabel)jComboxPageBreakEmptyLine.getRenderer()).setBorder(padding2);
@@ -1045,8 +1057,8 @@ public class AozoraEpub3Applet extends JApplet
 		propValue = props.getProperty("PageBreakEmptySize");
 		defaultValue = 300; try { defaultValue = Integer.parseInt(propValue); } catch (Exception e) {}
 		jTextPageBreakEmptySize = new JTextField();
-		jTextPageBreakEmptySize.setMaximumSize(text28);
-		jTextPageBreakEmptySize.setPreferredSize(text28);
+		jTextPageBreakEmptySize.setMaximumSize(text40);
+		jTextPageBreakEmptySize.setPreferredSize(text40);
 		jTextPageBreakEmptySize.setText(Integer.toString(defaultValue));
 		jTextPageBreakEmptySize.setInputVerifier(new IntegerInputVerifier(defaultValue, 1, 9999));
 		jTextPageBreakEmptySize.setEditable(jCheckPageBreak.isSelected());
@@ -1063,8 +1075,8 @@ public class AozoraEpub3Applet extends JApplet
 		propValue = props.getProperty("PageBreakChapterSize");
 		defaultValue = 200; try { defaultValue = Integer.parseInt(propValue); } catch (Exception e) {}
 		jTextPageBreakChapterSize = new JTextField();
-		jTextPageBreakChapterSize.setMaximumSize(text28);
-		jTextPageBreakChapterSize.setPreferredSize(text28);
+		jTextPageBreakChapterSize.setMaximumSize(text40);
+		jTextPageBreakChapterSize.setPreferredSize(text40);
 		jTextPageBreakChapterSize.setText(Integer.toString(defaultValue));
 		jTextPageBreakChapterSize.setInputVerifier(new IntegerInputVerifier(defaultValue, 1, 9999));
 		jTextPageBreakChapterSize.setEditable(jCheckPageBreak.isSelected());
@@ -1099,8 +1111,8 @@ public class AozoraEpub3Applet extends JApplet
 		jTextMaxChapterNameLength = new JTextField(propValue==null?""+defaultValue:propValue);
 		jTextMaxChapterNameLength.setHorizontalAlignment(JTextField.RIGHT);
 		jTextMaxChapterNameLength.setInputVerifier(new IntegerInputVerifier(defaultValue, 1, 999));
-		jTextMaxChapterNameLength.setMaximumSize(text28);
-		jTextMaxChapterNameLength.setPreferredSize(text28);
+		jTextMaxChapterNameLength.setMaximumSize(text32);
+		jTextMaxChapterNameLength.setPreferredSize(text32);
 		panel.add(jTextMaxChapterNameLength);
 		
 		label = new JLabel("  ");
@@ -1225,6 +1237,7 @@ public class AozoraEpub3Applet extends JApplet
 				"^[1|2|１|２]?[0-9|０-９]月[1-3|１-３]?[0-9|０-９]日",
 				"^(一|十)?(一|二|三|四|五|六|七|八|九|十|〇)月(一|二|三|十)?十?(一|二|三|四|五|六|七|八|九|十|〇)日"});
 		jComboChapterPattern.setSelectedItem(propValue==null?"":propValue);
+		jComboChapterPattern.setBorder(padding0);
 		jComboChapterPattern.setMaximumSize(text300);
 		jComboChapterPattern.setPreferredSize(text300);
 		jComboChapterPattern.setEditable(jCheckChapterPattern.isSelected());
@@ -1233,6 +1246,10 @@ public class AozoraEpub3Applet extends JApplet
 		////////////////////////////////////////////////////////////////
 		//テキストエリア
 		////////////////////////////////////////////////////////////////
+		JPanel lowerPane = new JPanel();
+		lowerPane.setLayout(new BoxLayout(lowerPane, BoxLayout.Y_AXIS));
+		jSplitPane.add(lowerPane);
+		
 		jTextArea = new JTextArea("青空文庫テキストをここにドラッグ＆ドロップまたは「ファイル選択」で変換します。\n");
 		jTextArea.setEditable(false);
 		jTextArea.setFont(new Font("Default", Font.PLAIN, 12));
@@ -1240,7 +1257,7 @@ public class AozoraEpub3Applet extends JApplet
 		new DropTarget(jTextArea, DnDConstants.ACTION_COPY_OR_MOVE, new DropListener(), true);
 		
 		jScrollPane = new JScrollPane(jTextArea);
-		this.add(jScrollPane);
+		lowerPane.add(jScrollPane);
 		
 		////////////////////////////////////////////////////////////////
 		//画面下 ステータス
@@ -1250,7 +1267,7 @@ public class AozoraEpub3Applet extends JApplet
 		statusPane.setMaximumSize(new Dimension(1920, 22));
 		statusPane.setPreferredSize(new Dimension(1920, 22));
 		statusPane.setBorder(padding2H);
-		this.add(statusPane);
+		lowerPane.add(statusPane);
 		////////////////////////////////
 		//プログレスバー
 		////////////////////////////////
@@ -1292,12 +1309,12 @@ public class AozoraEpub3Applet extends JApplet
 		label = new JLabel("ログ:");
 		label.setBorder(padding2H);
 		panel.add(label);
-		JButton jButtonLogClear = new JButton("削除");
+		JButton jButtonLogClear = new JButton();
 		jButtonLogClear.setToolTipText("ログを削除してクリップボードにコピーします");
 		jButtonLogClear.setBorder(padding3V);
-		jButtonLogClear.setMaximumSize(new Dimension(56, 20));
-		jButtonLogClear.setPreferredSize(new Dimension(56, 20));
-		jButtonLogClear.setIcon(new ImageIcon(AozoraEpub3Applet.class.getResource("images/delete.png")));
+		jButtonLogClear.setMaximumSize(new Dimension(24, 20));
+		jButtonLogClear.setPreferredSize(new Dimension(24, 20));
+		jButtonLogClear.setIcon(new ImageIcon(AozoraEpub3Applet.class.getResource("images/del_cut.png")));
 		jButtonLogClear.setFocusable(false);
 		jButtonLogClear.addActionListener(new ActionListener() {
 			@Override
@@ -2122,6 +2139,19 @@ public class AozoraEpub3Applet extends JApplet
 		bookInfo = null;
 		imageInfoReader = null;
 		//System.gc();
+		
+		//kindlegen.exeがあれば実行
+		
+		try {
+			Runtime rt = Runtime.getRuntime();
+			if (new File("kindlegen.exe").exists()) {
+				String exec = "kindlegen.exe \""+outFile.getAbsolutePath()+"\"";
+				LogAppender.append("kindlegenを実行します : "+exec+"\n");
+				rt.exec(exec);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	////////////////////////////////////////////////////////////////
