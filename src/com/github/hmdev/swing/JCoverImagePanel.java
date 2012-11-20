@@ -22,6 +22,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.net.URLDecoder;
 import java.util.List;
 
 import javax.swing.JPanel;
@@ -316,6 +317,8 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 				for (DataFlavor flavar : flavars) {
 					if (flavar.isFlavorTextType()) {
 						bookInfo.coverFileName = transfer.getTransferData(DataFlavor.stringFlavor).toString();
+						if (bookInfo.coverFileName.startsWith("file://"))
+							bookInfo.coverFileName = URLDecoder.decode(bookInfo.coverFileName.substring(0, bookInfo.coverFileName.indexOf('\n')-1).substring(7).trim(),"UTF-8");
 						bookInfo.loadCoverImage(bookInfo.coverFileName);
 						bookInfo.coverImageIndex = -1;
 						this.fitType = FIT_ZOOM;

@@ -6,7 +6,9 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Image;
 import java.awt.Point;
+import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
@@ -26,7 +28,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.List;
 import java.util.Properties;
 import java.util.Vector;
@@ -1289,6 +1293,7 @@ public class AozoraEpub3Applet extends JApplet
 		label.setBorder(padding2H);
 		panel.add(label);
 		JButton jButtonLogClear = new JButton("削除");
+		jButtonLogClear.setToolTipText("ログを削除してクリップボードにコピーします");
 		jButtonLogClear.setBorder(padding3V);
 		jButtonLogClear.setMaximumSize(new Dimension(56, 20));
 		jButtonLogClear.setPreferredSize(new Dimension(56, 20));
@@ -1296,7 +1301,17 @@ public class AozoraEpub3Applet extends JApplet
 		jButtonLogClear.setFocusable(false);
 		jButtonLogClear.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) { jTextArea.setText(""); jProgressBar.setValue(0); jProgressBar.setStringPainted(false); }
+			public void actionPerformed(ActionEvent e) {
+				String text = jTextArea.getText();
+				jTextArea.setText("");
+				jProgressBar.setValue(0);
+				jProgressBar.setStringPainted(false);
+				try {
+					Clipboard systemClipboard = getToolkit().getSystemClipboard();
+					StringSelection responseURLString = new StringSelection(text);
+					systemClipboard.setContents(responseURLString, null);
+				} catch (Exception e2) { e2.printStackTrace(); }
+			}
 		});
 		panel.add(jButtonLogClear);
 		
@@ -1457,10 +1472,17 @@ public class AozoraEpub3Applet extends JApplet
 					List<File> files = (List<File>)transfer.getTransferData(DataFlavor.javaFileListFlavor);
 					if (files.size() > 0) {
 						jComboCover.setSelectedItem(files.get(0).getAbsolutePath());
+						return;
 					}
 				} else {
 					for (DataFlavor flavar : flavars) {
-						if (flavar.isFlavorTextType()) jComboCover.setSelectedItem(transfer.getTransferData(DataFlavor.stringFlavor));
+						if (flavar.isFlavorTextType()) {
+							String path = (String)transfer.getTransferData(DataFlavor.stringFlavor);
+							if (path.startsWith("file://"))
+								try { path = URLDecoder.decode(path.substring(0, path.indexOf('\n')-1).substring(7).trim(),"UTF-8"); } catch (UnsupportedEncodingException e1) { }
+							jComboCover.setSelectedItem(path);
+							return;
+						}
 					}
 				}
 			} catch (Exception e) {
@@ -1496,6 +1518,17 @@ public class AozoraEpub3Applet extends JApplet
 						File file = files.get(0);
 						if (!file.isDirectory()) file = file.getParentFile();
 						jComboDstPath.setSelectedItem(file.getAbsolutePath());
+						return;
+					}
+				} else {
+					for (DataFlavor flavar : flavars) {
+						if (flavar.isFlavorTextType()) {
+							String path = (String)transfer.getTransferData(DataFlavor.stringFlavor);
+							if (path.startsWith("file://"))
+								try { path = URLDecoder.decode(path.substring(0, path.indexOf('\n')-1).substring(7).trim(),"UTF-8"); } catch (UnsupportedEncodingException e1) { }
+							jComboDstPath.setSelectedItem(path);
+							return;
+						}
 					}
 				}
 			} catch (Exception e) {
@@ -1622,8 +1655,26 @@ public class AozoraEpub3Applet extends JApplet
 								ConvertFilesWorker convertFilesWorker = new ConvertFilesWorker(new File[]{file});
 								convertFilesWorker.execute();
 								return;
+							} else if (urlString.startsWith("file://")) {
+								//Linux等 ファイルのパスでファイルがあれば変換
+								try {
+									String[] fileNames = urlString.split("\n");
+									Vector<File> vecFiles = new Vector<File>();
+									for (String path : fileNames) {
+										File file = new File(URLDecoder.decode(path.substring(7).trim(),"UTF-8"));
+										if (file.exists()) vecFiles.add(file);
+									}
+									File[] files = new File[vecFiles.size()];
+									for (int i=0; i<files.length; i++) { files[i] = vecFiles.get(i); }
+									if (vecFiles.size() > 0) {
+										ConvertFilesWorker convertFilesWorker = new ConvertFilesWorker(files);
+										convertFilesWorker.execute();
+										return;
+									}
+								} catch (Exception e) { e.printStackTrace(); }
+								
 							}
-							//JOptionPane.showMessageDialog(jFrameParent, "");
+							
 						}
 					}
 				}

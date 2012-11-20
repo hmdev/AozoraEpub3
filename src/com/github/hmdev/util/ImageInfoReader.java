@@ -135,7 +135,7 @@ public class ImageInfoReader
 	/** ImageInfoを取得
 	 * zip内テキストファイルがサブフォルダ以下にある場合はnullになるので本文中のパスに親のパスをつけて再取得
 	 * @param srcImageFileName テキスト内の画像注記で指定されている相対ファイル名 */
-	private ImageInfo _getImageInfo(String srcImageFileName) throws IOException
+	private ImageInfo _getImageInfo(String srcImageFileName) 
 	{
 		//取得済みならそれを返す zipならすべて取得済み
 		ImageInfo imageInfo = this.imageFileInfos.get(srcImageFileName);
@@ -145,11 +145,13 @@ public class ImageInfoReader
 			//ファイルシステムから取得
 			File imageFile = new File(this.srcParentPath+srcImageFileName);
 			if (imageFile.exists()) {
-				imageInfo = ImageInfo.getImageInfo(imageFile);
-				if (imageInfo != null) {
-					this.imageFileInfos.put(srcImageFileName, imageInfo);
-					return imageInfo;
-				}
+				try {
+					imageInfo = ImageInfo.getImageInfo(imageFile);
+					if (imageInfo != null) {
+						this.imageFileInfos.put(srcImageFileName, imageInfo);
+						return imageInfo;
+					}
+				} catch (IOException ioe) { System.err.println(ioe); }
 			}
 		} else {
 			imageInfo = this.imageFileInfos.get(this.zipTextParentPath+srcImageFileName);
