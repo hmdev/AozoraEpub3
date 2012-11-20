@@ -632,7 +632,7 @@ public class Epub3Writer
 		if (autoMarginLimitH > 0 || autoMarginLimitV > 0) {
 			//画像がなければ読み込み
 			if (srcImage == null) srcImage = ImageInfoReader.readImage(ext, is);
-			int ignorePixels = (int)(w*0.005);
+			int ignorePixels = (int)(w*0.005); //0.5%
 			margin = getPlainMargin(srcImage, autoMarginLimitH/100f, autoMarginLimitV/100f, autoMarginWhiteLevel/100f, autoMarginPadding/100f, ignorePixels);
 			if (margin[0]==0 && margin[1]==0 && margin[2]==0 && margin[3]==0) margin = null;
 			if (margin != null) {
@@ -651,16 +651,7 @@ public class Epub3Writer
 				IOUtils.copy(is, zos);
 			} else {
 				//編集済の画像がある場合 同じ形式で書き出し
-				ImageWriter imageWriter = ImageIO.getImageWritersByFormatName(imageInfo.getExt()).next();
-				ImageWriteParam iwp = imageWriter.getDefaultWriteParam();
-				if (iwp.canWriteCompressed()) {
-					iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-					if (imageInfo.getExt().indexOf('j') == 0) iwp.setCompressionQuality(this.jpegQuality);
-				}
-				if (margin != null) srcImage = srcImage.getSubimage(margin[0], margin[1], srcImage.getWidth()-margin[2]-margin[0], srcImage.getHeight()-margin[3]-margin[1]);
-				imageWriter.setOutput(ImageIO.createImageOutputStream(zos));
-				imageWriter.write(null, new IIOImage(srcImage, null, null), iwp);
-				zos.flush();
+				this._writeImage(zos, srcImage, imageInfo.getExt(), margin, this.jpegQuality);
 			}
 		} else {
 			//縮小
@@ -690,11 +681,12 @@ public class Epub3Writer
 					AffineTransformOp ato = new AffineTransformOp(at, AffineTransformOp.TYPE_BICUBIC);
 					if (margin == null) g.drawImage(srcImage, ato, 0, 0);
 					else g.drawImage(srcImage, ato, (int)(-margin[0]*scale+0.5), (int)(-margin[1]*scale+0.5));
-					ImageIO.write(outImage, imageInfo.getExt(), zos);
-					LogAppender.append("画像縮小: "+imageInfo.getOutFileName()+" ("+w+","+h+")→("+scaledW+","+scaledH+")\n");
 				} finally {
 					g.dispose();
 				}
+				//ImageIO.write(outImage, imageInfo.getExt(), zos);
+				this._writeImage(zos, outImage, imageInfo.getExt(), margin, this.jpegQuality);
+				LogAppender.append("画像縮小: "+imageInfo.getOutFileName()+" ("+w+","+h+")→("+scaledW+","+scaledH+")\n");
 			} catch (Exception e) {
 				LogAppender.append("画像読み込みエラー: "+imageInfo.getOutFileName()+"\n");
 				e.printStackTrace();
@@ -702,8 +694,26 @@ public class Epub3Writer
 			zos.flush();
 		}
 	}
+	/** 画像を出力 圧縮率指定
+	 * @throws IOException */
+	private void _writeImage(ZipArchiveOutputStream zos, BufferedImage srcImage, String ext, int[] margin, float jpegQuality) throws IOException
+	{
+		ImageWriter imageWriter = ImageIO.getImageWritersByFormatName(ext).next();
+		ImageWriteParam iwp = imageWriter.getDefaultWriteParam();
+		if (iwp.canWriteCompressed()) {
+			try {
+				iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+				if (ext.charAt(0) == 'j') iwp.setCompressionQuality(jpegQuality);
+				//else if (ext.startsWith("png")) iwp.setCompressionQuality(0); //PNGは圧縮に対応していない
+			} catch (Exception e) { e.printStackTrace(); }
+		}
+		if (margin != null) srcImage = srcImage.getSubimage(margin[0], margin[1], srcImage.getWidth()-margin[2]-margin[0], srcImage.getHeight()-margin[3]-margin[1]);
+		imageWriter.setOutput(ImageIO.createImageOutputStream(zos));
+		imageWriter.write(null, new IIOImage(srcImage, null, null), iwp);
+		zos.flush();
+	}
 	
-	/** 余白の画素数取得   of image bg color margins.
+	/** 余白の画素数取得
 	 * @param image 余白を検出する画像
 	 * @param limit 余白検出制限 0.0-1.0
 	 * @param whiteLevel 余白と判別する白レベル
