@@ -1,12 +1,6 @@
 package com.github.hmdev.writer;
 
-import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.IndexColorModel;
-import java.awt.image.WritableRaster;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -27,10 +21,6 @@ import java.util.UUID;
 import java.util.Vector;
 import java.util.zip.CRC32;
 
-import javax.imageio.IIOImage;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageWriteParam;
-import javax.imageio.ImageWriter;
 import javax.swing.JProgressBar;
 
 import org.apache.commons.compress.archivers.ArchiveEntry;
@@ -48,6 +38,7 @@ import com.github.hmdev.info.ChapterInfo;
 import com.github.hmdev.info.ImageInfo;
 import com.github.hmdev.info.SectionInfo;
 import com.github.hmdev.util.ImageInfoReader;
+import com.github.hmdev.util.ImageUtils;
 import com.github.hmdev.util.LogAppender;
 
 /** ePub3用のファイル一式をZipで固めたファイルを生成.
@@ -157,10 +148,9 @@ public class Epub3Writer
 	/** jpeg圧縮率 */
 	float jpegQuality = 0.8f;
 	
-	////////////////////////////////
-	//4bitグレースケール時のRGB階調
-	byte[] GRAY_VALUES = new byte[]{-113,-97,-81,-65,-49,-33,-17,-1,15,31,47,63,79,95,111,127};
+	boolean isKindle = false;
 	
+	////////////////////////////////
 	/** 出力先ePubのZipストリーム */
 	ZipArchiveOutputStream zos;
 	
@@ -292,6 +282,9 @@ public class Epub3Writer
 		//更新日時
 		velocityContext.put("modified", dateFormat.format(bookInfo.modified));
 		
+		//端末種別
+		if (this.isKindle) velocityContext.put("kindle", true);
+		
 		//出力先ePubのZipストリーム生成
 		zos = new ZipArchiveOutputStream(new BufferedOutputStream(new FileOutputStream(epubFile)));
 		//mimetypeは非圧縮
@@ -331,6 +324,7 @@ public class Epub3Writer
 		byte[] coverImageBytes = null;
 		ImageInfo coverImageInfo = null;
 		if (bookInfo.coverFileName != null && bookInfo.coverFileName.length() > 0) {
+			//外部画像ファイルを表紙にする
 			//表紙情報をimageInfosに追加
 			try {
 				//表紙設定解除
@@ -352,7 +346,7 @@ public class Epub3Writer
 				coverImageInfo = ImageInfo.getImageInfo(bais);
 				bais.close();
 				String ext = coverImageInfo.getExt();
-				if (ext.equals("jpeg")) ext = "jpg";
+				if (isKindle || ext.equals("jpeg")) ext = "jpg";
 				coverImageInfo.setId("0000");
 				coverImageInfo.setOutFileName("0000."+ext);
 				if (!ext.matches("^(png|jpg|jpeg|gif)$")) {
@@ -364,7 +358,8 @@ public class Epub3Writer
 				}
 			} catch (Exception e) { e.printStackTrace(); }
 		} else if (bookInfo.coverImage != null) {
-			//表紙設定解除
+			//表紙画像が編集されていた場合
+			//すべてのページの表紙設定解除
 			for(ImageInfo imageInfo2 : imageInfos) {
 				imageInfo2.setIsCover(false);
 			}
@@ -375,7 +370,7 @@ public class Epub3Writer
 			} else if (bookInfo.coverImageIndex > -1) {
 				ext = imageInfoReader.getImageInfo(bookInfo.coverImageIndex).getExt();
 			}
-			if (ext.equals("jpeg")) ext = "jpg";
+			if (isKindle || ext.equals("jpeg")) ext = "jpg";
 			coverImageInfo = ImageInfo.getImageInfo(ext, bookInfo.coverImage, -1);
 			coverImageInfo.setId("0000");
 			coverImageInfo.setOutFileName("0000."+ext);
@@ -388,15 +383,18 @@ public class Epub3Writer
 			//追加用の情報取得にのみ使う
 			ImageInfo insertCoverInfo = coverImageInfo;
 			if (insertCoverInfo == null && bookInfo.coverImageIndex >= 0) {
+				//本文中の挿絵の場合
 				insertCoverInfo = imageInfoReader.getImageInfo(bookInfo.coverImageIndex);
 				if (insertCoverInfo != null) {
 					insertCoverInfo.setIsCover(true);
-					if (insertCoverInfo.getId() == null) {
+					if (!bookInfo.imageOnly && insertCoverInfo.getId() == null) {
 						//zip内の画像で追加処理されていない
 						this.imageIndex++;
 						String imageId = decimalFormat.format(this.imageIndex);
 						insertCoverInfo.setId(imageId);
-						insertCoverInfo.setOutFileName(imageId+"."+insertCoverInfo.getExt());
+						String ext = insertCoverInfo.getExt();
+						if (isKindle) ext = "jpg";
+						insertCoverInfo.setOutFileName(imageId+"."+ext);
 					}
 				}
 			}
@@ -490,16 +488,28 @@ public class Epub3Writer
 		
 		zos.setLevel(0);
 		////////////////////////////////////////////////////////////////////////////////////////////////
-		//画像ファイルコピー (連番にリネーム)
+		//画像ファイル出力 (連番にリネーム)
 		//表紙指定があればそれを入力に設定 先頭画像のisCoverはfalseになっている
 		//プレビューで編集された場合はここで追加する
 		////////////////////////////////
-		//表紙
+		//表紙出力
 		if (coverImageInfo != null) {
 			try {
-				//プレビューで編集されている場合
 				ImageInfo imageInfo = imageInfos.get(0);
+				//kindleの場合は常にjpegに変換
+				if (isKindle) {
+					String imgExt = coverImageInfo.getExt();
+					if (!imgExt.startsWith("jp")) {
+						if (bookInfo.coverImage == null) {
+							ByteArrayInputStream bais = new ByteArrayInputStream(coverImageBytes);
+							bookInfo.coverImage = ImageInfoReader.readImage(imgExt, bais);
+							bais.close();
+						}
+						coverImageInfo.setExt("jpeg");
+					}
+				}
 				if (bookInfo.coverImage != null) {
+					//プレビューで編集されている場合
 					zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+IMAGES_PATH+imageInfo.getOutFileName()));
 					this.writeImage(imageInfo.getOutFileName(), bookInfo.coverImage, zos, coverImageInfo);
 					zos.closeArchiveEntry();
@@ -507,7 +517,7 @@ public class Epub3Writer
 				} else {
 					ByteArrayInputStream bais = new ByteArrayInputStream(coverImageBytes);
 					zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+IMAGES_PATH+imageInfo.getOutFileName()));
-					this.writeImage(imageInfo.getOutFileName(), bais, null, zos, coverImageInfo, 0, this.coverW, this.coverH, 0, 0, 0, 0);
+					this.writeCoverImage(imageInfo.getOutFileName(), bais, zos, coverImageInfo);
 					zos.closeArchiveEntry();
 					bais.close();
 				}
@@ -535,12 +545,7 @@ public class Epub3Writer
 						if (imageFile.exists()) {
 							fis = new FileInputStream(imageFile);
 							zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+IMAGES_PATH+imageInfo.getOutFileName()));
-							//プレビューで編集されていたらイメージを出力
-							if (imageInfo.getIsCover() && bookInfo.coverImage != null) {
-								this.writeImage(srcImageFileName, bookInfo.coverImage, zos, imageInfo);
-							} else {
-								this.writeImage(srcImageFileName, new BufferedInputStream(fis, 8192), zos, imageInfo);
-							}
+							this.writeImage(srcImageFileName, new BufferedInputStream(fis, 8192), zos, imageInfo);
 							zos.closeArchiveEntry();
 							fis.close();
 							outImageFileNames.remove(srcImageFileName);
@@ -566,19 +571,14 @@ public class Epub3Writer
 				if (imageInfo != null) {
 					if (imageInfo.getId() != null) {
 						zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+IMAGES_PATH+imageInfo.getOutFileName()));
-						//プレビューで編集されていたらイメージを出力
-						if (imageInfo.getIsCover() && bookInfo.coverImage != null) {
-							this.writeImage(srcImageFileName, bookInfo.coverImage, zos, imageInfo);
-						} else {
-							//Zipからの直接読み込みは失敗するので一旦バイト配列にする
-							ByteArrayOutputStream baos = new ByteArrayOutputStream();
-							IOUtils.copy(zis, baos);
-							byte[] bytes = baos.toByteArray();
-							baos.close();
-							ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-							this.writeImage(srcImageFileName, bais, zos, imageInfo);
-							bais.close();
-						}
+						//Zipからの直接読み込みは失敗するので一旦バイト配列にする
+						ByteArrayOutputStream baos = new ByteArrayOutputStream();
+						IOUtils.copy(zis, baos);
+						byte[] bytes = baos.toByteArray();
+						baos.close();
+						ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+						this.writeImage(srcImageFileName, bais, zos, imageInfo);
+						bais.close();
 						zos.closeArchiveEntry();
 					}
 					if (this.canceled) return;
@@ -600,239 +600,26 @@ public class Epub3Writer
 		this.imageInfoReader = null;
 	}
 	
+	/** 表紙画像を出力 */
+	void writeCoverImage(String srcFileName, InputStream is, ZipArchiveOutputStream zos, ImageInfo imageInfo) throws IOException
+	{
+		ImageUtils.writeImage(imageInfo.getOutFileName(), is, null, zos,imageInfo, this.jpegQuality,
+				0, this.coverW, this.coverH,
+				0, 0, 0, 0);
+	}
+	/** 画像を出力 */
 	void writeImage(String srcFileName, InputStream is,ZipArchiveOutputStream zos, ImageInfo imageInfo) throws IOException
 	{
-		writeImage(srcFileName, is, null, zos, imageInfo, this.maxImagePixels, this.maxImageW, this.maxImageH, this.autoMarginLimitH, this.autoMarginLimitV, this.autoMarginWhiteLevel, this.autoMarginPadding);
+		ImageUtils.writeImage(srcFileName, is, null, zos, imageInfo, this.jpegQuality,
+				this.maxImagePixels, this.maxImageW, this.maxImageH,
+				this.autoMarginLimitH, this.autoMarginLimitV, this.autoMarginWhiteLevel, this.autoMarginPadding);
 	}
+	/** 画像を出力 */
 	void writeImage(String srcFileName, BufferedImage srcImage, ZipArchiveOutputStream zos, ImageInfo imageInfo) throws IOException
 	{
-		writeImage(srcFileName, null, srcImage, zos, imageInfo, this.maxImagePixels, this.maxImageW, this.maxImageH, this.autoMarginLimitH,  this.autoMarginLimitV, this.autoMarginWhiteLevel, this.autoMarginPadding);
-	}
-	/** 大きすぎる画像は縮小して出力
-	 * @param srcFileName 画像のファイル名 拡張子取得
-	 * @param is 画像の入力ストリーム
-	 * @param srcImage 読み込み済の場合は画像をこちらに設定 isは利用しないのでnullでOK
-	 * @param zos 出力先Zip
-	 * @param imageInfo 画像情報
-	 * @param maxImagePixels 縮小する画素数
-	 * @param maxImageW 縮小する画像幅
-	 * @param maxImageH 縮小する画像高さ
-	 * @param autoMarginLimitH 余白除去 最大%
-	 * @param autoMarginLimitV 余白除去 最大%
-	 * @param autoMarginWhiteLevel 白画素として判別する白さ 100が白
-	 */
-	void writeImage(String srcFileName, InputStream is, BufferedImage srcImage, ZipArchiveOutputStream zos, ImageInfo imageInfo, int maxImagePixels, int maxImageW, int maxImageH,
-			int autoMarginLimitH, int autoMarginLimitV, int autoMarginWhiteLevel, float autoMarginPadding) throws IOException
-	{
-		int w = imageInfo.getWidth();
-		int h = imageInfo.getHeight();
-		String ext = srcFileName.substring(srcFileName.lastIndexOf('.')+1).toLowerCase();
-		
-		int[] margin = null;
-		if (autoMarginLimitH > 0 || autoMarginLimitV > 0) {
-			//画像がなければ読み込み
-			if (srcImage == null) srcImage = ImageInfoReader.readImage(ext, is);
-			int ignorePixels = (int)(w*0.005); //0.5%
-			margin = getPlainMargin(srcImage, autoMarginLimitH/100f, autoMarginLimitV/100f, autoMarginWhiteLevel/100f, autoMarginPadding/100f, ignorePixels);
-			if (margin[0]==0 && margin[1]==0 && margin[2]==0 && margin[3]==0) margin = null;
-			if (margin != null) {
-				w = w-margin[0]-margin[2];
-				h = h-margin[1]-margin[3];
-			}
-		}
-		//倍率取得
-		double scale = 1;
-		if (maxImagePixels >= 10000) scale = Math.sqrt((double)maxImagePixels/(w*h)); //最大画素数指定
-		if (maxImageW > 0) scale = Math.min(scale, (double)maxImageW/w); //最大幅指定
-		if (maxImageH > 0) scale = Math.min(scale, (double)maxImageH/h); //最大高さ指定
-		
-		if (scale >= 1) {
-			if (srcImage == null) {
-				IOUtils.copy(is, zos);
-			} else {
-				//編集済の画像がある場合 同じ形式で書き出し
-				this._writeImage(zos, srcImage, imageInfo.getExt(), margin, this.jpegQuality);
-			}
-		} else {
-			//縮小
-			int scaledW = (int)(w*scale);
-			int scaledH = (int)(h*scale);
-			try {
-				//画像がなければ読み込み
-				if (srcImage == null) srcImage = ImageInfoReader.readImage(ext, is);
-				int imageType = srcImage.getType();
-				BufferedImage outImage;
-				if (imageType == BufferedImage.TYPE_BYTE_BINARY) {
-					ColorModel colorModel = srcImage.getColorModel();
-					colorModel = new IndexColorModel(4, GRAY_VALUES.length, GRAY_VALUES, GRAY_VALUES, GRAY_VALUES);
-					WritableRaster raster = colorModel.createCompatibleWritableRaster(scaledW, scaledH);
-					outImage = new BufferedImage(colorModel, raster, true, null);
-				}
-				else if (imageType == BufferedImage.TYPE_BYTE_INDEXED) {
-					ColorModel colorModel = srcImage.getColorModel();
-					WritableRaster raster = colorModel.createCompatibleWritableRaster(scaledW, scaledH);
-					outImage = new BufferedImage(colorModel, raster, true, null);
-				} else {
-					outImage = new BufferedImage(scaledW, scaledH, imageType);
-				}
-				Graphics2D g = outImage.createGraphics();
-				try {
-					AffineTransform at = AffineTransform.getScaleInstance(scale, scale);
-					AffineTransformOp ato = new AffineTransformOp(at, AffineTransformOp.TYPE_BICUBIC);
-					if (margin == null) g.drawImage(srcImage, ato, 0, 0);
-					else g.drawImage(srcImage, ato, (int)(-margin[0]*scale+0.5), (int)(-margin[1]*scale+0.5));
-				} finally {
-					g.dispose();
-				}
-				//ImageIO.write(outImage, imageInfo.getExt(), zos);
-				this._writeImage(zos, outImage, imageInfo.getExt(), margin, this.jpegQuality);
-				LogAppender.append("画像縮小: "+imageInfo.getOutFileName()+" ("+w+","+h+")→("+scaledW+","+scaledH+")\n");
-			} catch (Exception e) {
-				LogAppender.append("画像読み込みエラー: "+imageInfo.getOutFileName()+"\n");
-				e.printStackTrace();
-			}
-			zos.flush();
-		}
-	}
-	/** 画像を出力 圧縮率指定
-	 * @throws IOException */
-	private void _writeImage(ZipArchiveOutputStream zos, BufferedImage srcImage, String ext, int[] margin, float jpegQuality) throws IOException
-	{
-		ImageWriter imageWriter = ImageIO.getImageWritersByFormatName(ext).next();
-		ImageWriteParam iwp = imageWriter.getDefaultWriteParam();
-		if (iwp.canWriteCompressed()) {
-			try {
-				iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-				if (ext.charAt(0) == 'j') iwp.setCompressionQuality(jpegQuality);
-				//else if (ext.startsWith("png")) iwp.setCompressionQuality(0); //PNGは圧縮に対応していない
-			} catch (Exception e) { e.printStackTrace(); }
-		}
-		if (margin != null) srcImage = srcImage.getSubimage(margin[0], margin[1], srcImage.getWidth()-margin[2]-margin[0], srcImage.getHeight()-margin[3]-margin[1]);
-		imageWriter.setOutput(ImageIO.createImageOutputStream(zos));
-		imageWriter.write(null, new IIOImage(srcImage, null, null), iwp);
-		zos.flush();
-	}
-	
-	/** 余白の画素数取得
-	 * @param image 余白を検出する画像
-	 * @param limit 余白検出制限 0.0-1.0
-	 * @param whiteLevel 余白と判別する白レベル
-	 * @param ignorePixels 連続で余白でなければ無視するピクセル数
-	 * @return 余白画素数(left, top, right, bottom) */
-	private int[] getPlainMargin(BufferedImage image, float limitH, float limitV, float whiteLevel, float padding, int ignorePixels)
-	{
-		int[] margin = new int[4]; //left, top, right, bottom
-		int width = image.getWidth();
-		int height = image.getHeight();
-		
-		//余白除去後に追加する余白 (削れ過ぎるので最低で2にしておく)
-		int paddingH = Math.max(2, (int)(width*padding));
-		int paddingV = Math.max(2, (int)(height*padding));
-		
-		//ピクセルに変更 上下、左右それぞれの
-		int limitPxH = (int)(width*limitH);
-		int limitPxV = (int)(height*limitV);
-		
-		//この列数以下ならゴミとして無視する
-		int noPlainCount = 0;
-		
-		for (int i=0; i<=limitPxH; i++) {
-			double whiteRate = getWhiteRateV(image, height, i, whiteLevel, 0.95);
-			if (whiteRate < 0.999) {
-				noPlainCount++;
-				if (whiteRate < 0.95 || noPlainCount > ignorePixels) break;
-			} else
-				margin[0] = i;//left
-		}
-		noPlainCount = 0;
-		for (int i=0; i<=limitPxV; i++) { 
-			double whiteRate = getWhiteRateH(image, width, i, whiteLevel, 0.95);
-			if (whiteRate < 0.999) {
-				noPlainCount++;
-				if (whiteRate < 0.95 || noPlainCount > ignorePixels) break;
-			} else 
-				margin[1] = i;//top
-		}
-		noPlainCount = 0;
-		for (int i=0; i<=limitPxH; i++) {
-			double whiteRate = getWhiteRateV(image, height, width-1-i, whiteLevel, 0.95);
-			if (whiteRate < 0.999) {
-				noPlainCount++;
-				if (whiteRate < 0.95 || noPlainCount > ignorePixels) break;
-			} else
-				margin[2] = i;//right
-		}
-		noPlainCount = 0;
-		for (int i=0; i<=limitPxV; i++) {
-			double whiteRate = getWhiteRateH(image, width, height-1-i, whiteLevel, 0.95);
-			if (whiteRate < 0.999) {
-				noPlainCount++;
-				if (whiteRate < 0.95 || noPlainCount > ignorePixels) break;
-			} else
-				margin[3] = i;//bottom
-		}
-		//上下、左右の合計が制限を超えていたら調整
-		if (margin[0]+margin[2] > limitPxH) {
-			double rate = (double)limitPxH/(margin[0]+margin[2]);
-			margin[0] = (int)(margin[0]*rate);
-			margin[2] = (int)(margin[2]*rate);
-		}
-		if (margin[1]+margin[3] > limitPxV) {
-			double rate = (double)limitPxV/(margin[1]+margin[3]);
-			margin[1] = (int)(margin[1]*rate);
-			margin[3] = (int)(margin[3]*rate);
-		}
-		//余白分広げる
-		margin[0] -= paddingH; if (margin[0] < 0) margin[0] = 0;
-		margin[1] -= paddingV; if (margin[1] < 0) margin[1] = 0;
-		margin[2] -= paddingH; if (margin[2] < 0) margin[2] = 0;
-		margin[3] -= paddingV; if (margin[3] < 0) margin[3] = 0;
-		return margin;
-	}
-	
-	/** 指定範囲の白い画素数の比率を返す
-	 * @param image 比率をチェックする画像
-	 * @param w 比率をチェックする幅
-	 * @param offsetY 画像内の縦位置
-	 * @param limit これよりも白比率が小さくなったら終了 値は0が帰る
-	 * @return 白画素の比率 0.0-1.0 */
-	private double getWhiteRateH(BufferedImage image, int w, int offsetY, double whiteLevel, double limit)
-	{
-		//rgbともこれより大きければ白画素とする
-		int rgbLimit = (int)(256*whiteLevel);
-		//白でないピクセル数
-		int coloredPixels = 0;
-		//これよりピクセル数が多くなったら終了
-		int limitPixel = (int)(w*(1.0-limit));
-		
-		for (int x=w-1; x>=0; x--) {
-			int rgb = image.getRGB(x, offsetY);
-			if (rgbLimit > (rgb>>16 & 0xFF) || rgbLimit > (rgb>>8 & 0xFF) || rgbLimit > (rgb & 0xFF)) coloredPixels++;
-		}
-		if (limitPixel < coloredPixels) return 0;
-		return (double)(w-coloredPixels)/(w);
-	}
-	/** 指定範囲の白い画素数の比率を返す
-	 * @param image 比率をチェックする画像
-	 * @param h 比率をチェックする高さ
-	 * @param offsetX 画像内の横位置
-	 * @param limit これよりも白比率が小さくなったら終了 値はlimitが帰る
-	 * @return 白画素の比率 0.0-1.0 */
-	private double getWhiteRateV(BufferedImage image, int h, int offsetX, double whiteLevel, double limit)
-	{
-		//rgbともこれより大きければ白画素とする
-		int rgbLimit = (int)(256*whiteLevel);
-		//白でないピクセル数
-		int coloredPixels = 0;
-		//これよりピクセル数が多くなったら終了
-		int limitPixel = (int)(h*(1.0-limit));
-		
-		for (int y=h-1; y>=0; y--) {
-			int rgb = image.getRGB(offsetX, y);
-			if (rgbLimit > (rgb>>16 & 0xFF) || rgbLimit > (rgb>>8 & 0xFF) || rgbLimit > (rgb & 0xFF)) coloredPixels++;
-			if (limitPixel < coloredPixels) return 0;
-		}
-		return (double)(h-coloredPixels)/(h);
+		ImageUtils.writeImage(srcFileName, null, srcImage, zos, imageInfo, this.jpegQuality,
+				this.maxImagePixels, this.maxImageW, this.maxImageH,
+				this.autoMarginLimitH,  this.autoMarginLimitV, this.autoMarginWhiteLevel, this.autoMarginPadding);
 	}
 	
 	/** 本文を出力する */
@@ -1026,5 +813,13 @@ public class Epub3Writer
 			}
 		} catch (Exception e) { e.printStackTrace(); }
 		return PageBreakTrigger.IMAGE_PAGE_NONE;
+	}
+	
+	
+	/** Kindleかどうかを設定 Kindleなら例外処理を行う */
+	public void setIsKindle(boolean isKindle)
+	{
+		this.isKindle = isKindle;
+		
 	}
 }

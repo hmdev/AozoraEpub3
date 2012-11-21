@@ -96,26 +96,30 @@ public class ImageInfoReader
 		Collections.sort(this.imageFileNames, new FileNameComparator());
 	}
 	
+	/** 指定位置の画像ファイル名を取得 */
 	public String getImageFileName(int idx)
 	{
 		return this.imageFileNames.get(idx);
 	}
-	public int countImageFileInfos()
-	{
-		return this.imageFileInfos.size();
-		//return this.imageFileNames.size();
-	}
-	public int countImageFileNames()
-	{
-		return this.imageFileNames.size();
-	}
-	
-	
+	/** 画像ファイル名のVectorを取得 */
 	public Vector<String> getImageFileNames()
 	{
 		return this.imageFileNames;
 	}
 	
+	/** 画像情報のカウント zipの場合はzip内にある画像すべて  */
+	public int countImageFileInfos()
+	{
+		return this.imageFileInfos.size();
+		//return this.imageFileNames.size();
+	}
+	/** テキスト内の画像順で格納された画像ファイル名の件数
+	 * zipテキストの場合は、本文以外の画像も後から追加される
+	 * zip画像のみ場合はソートされてすべての画像の件数 */
+	public int countImageFileNames()
+	{
+		return this.imageFileNames.size();
+	}
 	
 	/** 指定した順番の画像情報を取得 */
 	public ImageInfo getImageInfo(int idx) throws IOException
@@ -190,9 +194,13 @@ public class ImageInfoReader
 	/** 圧縮ファイル内の画像で画像注記以外の画像も表紙に選択できるように追加 */
 	public void addNoNameImageFileName()
 	{
+		//名前順にソートしてから追加
+		Vector<String> names = new Vector<String>();
 		for (String name : this.imageFileInfos.keySet()) {
-			if (!this.imageFileNames.contains(name)) this.addImageFileName(name);
+			if (!this.imageFileNames.contains(name)) names.add(name);
 		}
+		Collections.sort(names, new FileNameComparator());
+		for (String name : names) this.imageFileNames.add(name);
 	}
 	
 	/** 指定した順番の画像情報を取得 */
