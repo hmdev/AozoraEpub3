@@ -1329,13 +1329,15 @@ public class AozoraEpub3Applet extends JApplet
 			public void actionPerformed(ActionEvent e) {
 				String text = jTextArea.getText();
 				jTextArea.setText("");
-				jProgressBar.setValue(0);
-				jProgressBar.setStringPainted(false);
 				try {
 					Clipboard systemClipboard = getToolkit().getSystemClipboard();
 					StringSelection responseURLString = new StringSelection(text);
 					systemClipboard.setContents(responseURLString, null);
 				} catch (Exception e2) { e2.printStackTrace(); }
+				if (!jButtonCancel.isEnabled()) {
+					jProgressBar.setValue(0);
+					jProgressBar.setStringPainted(false);
+				}
 			}
 		});
 		panel.add(jButtonLogClear);
@@ -2151,6 +2153,9 @@ public class AozoraEpub3Applet extends JApplet
 			bookInfo, imageInfoReader, txtIdx
 		);
 		
+		imageInfoReader = null;
+		//System.gc();
+		
 		//変換中にキャンセルされた場合
 		if (this.convertCanceled) {
 			LogAppender.append("変換処理を中止しました : "+srcFile.getAbsolutePath()+"\n");
@@ -2158,33 +2163,40 @@ public class AozoraEpub3Applet extends JApplet
 		}
 		
 		////////////////////////////////
-		//終了処理
-		bookInfo.clear();
-		bookInfo = null;
-		imageInfoReader = null;
-		//System.gc();
-		
-		////////////////////////////////
 		//kindlegen.exeがあれば実行
 		try {
-			Runtime rt = Runtime.getRuntime();
-			if (kindlegen != null) {
+			if (kindlegen != null && !bookInfo.imageOnly) {
+				Runtime rt = Runtime.getRuntime();
 				//Linuxは""でくくるとkindlegenが読めないので要対策
 				String outFileName = "\""+outFile.getAbsolutePath()+"\"";
-				String exec = kindlegen.getAbsolutePath()+" "+outFileName;
+				String exec = kindlegen.getAbsolutePath()+" -verbose "+outFileName;
 				LogAppender.append("kindlegenを実行します : "+kindlegen.getName()+" "+outFileName+"\n");
 				Process p =rt.exec(exec);
 				BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
 				String line;
+				int idx = 0;
 				while ((line = br.readLine()) != null) {
-					if (line.length() > 0) System.out.println(line);
+					if (line.length() > 0) {
+						System.out.println(line);
+						if (idx++ % 2 == 0) LogAppender.append(".");
+					}
+					if (convertCanceled) {
+						LogAppender.append("\n");
+						return;
+					}
 				}
-				LogAppender.append("kindlegen変換完了");
+				LogAppender.append("\nkindlegen変換完了\n");
 				br.close();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		////////////////////////////////
+		//終了処理
+		bookInfo.clear();
+		bookInfo = null;
+		
 	}
 	
 	////////////////////////////////////////////////////////////////
