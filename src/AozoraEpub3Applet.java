@@ -788,7 +788,7 @@ public class AozoraEpub3Applet extends JApplet
 		defaultValue = 600; try { defaultValue = Integer.parseInt(propValue); } catch (Exception e) {}
 		jTextCoverW = new JTextField(propValue==null?""+defaultValue:propValue);
 		jTextCoverW.setHorizontalAlignment(JTextField.RIGHT);
-		jTextCoverW.setInputVerifier(new IntegerInputVerifier(defaultValue, 32, 9999));
+		jTextCoverW.setInputVerifier(new IntegerInputVerifier(defaultValue, 64, 4096));
 		jTextCoverW.setMaximumSize(text4);
 		jTextCoverW.setPreferredSize(text4);
 		panel.add(jTextCoverW);
@@ -801,7 +801,7 @@ public class AozoraEpub3Applet extends JApplet
 		defaultValue = 800; try { defaultValue = Integer.parseInt(propValue); } catch (Exception e) {}
 		jTextCoverH = new JTextField(propValue==null?""+defaultValue:propValue);
 		jTextCoverH.setHorizontalAlignment(JTextField.RIGHT);
-		jTextCoverH.setInputVerifier(new IntegerInputVerifier(defaultValue, 64, 9999));
+		jTextCoverH.setInputVerifier(new IntegerInputVerifier(defaultValue, 64, 4096));
 		jTextCoverH.setMaximumSize(text4);
 		jTextCoverH.setPreferredSize(text4);
 		panel.add(jTextCoverH);
@@ -1408,7 +1408,7 @@ public class AozoraEpub3Applet extends JApplet
 				if (this.max != Integer.MAX_VALUE && i > this.max) {
 					textField.setText(Integer.toString(this.max));
 					return true;
-				} else if (i > this.min) {
+				} else if (i < this.min) {
 					textField.setText(Integer.toString(this.min));
 					return true;
 				}
@@ -1451,7 +1451,7 @@ public class AozoraEpub3Applet extends JApplet
 				if (this.max != Float.MAX_VALUE && f > this.max) {
 					textField.setText(Float.toString(this.max));
 					return true;
-				} else if (f > this.min) {
+				} else if (f < this.min) {
 					textField.setText(Float.toString(this.min));
 					return true;
 				}
@@ -2068,7 +2068,8 @@ public class AozoraEpub3Applet extends JApplet
 			this.jConfirmDialog.showDialog(
 				srcFile.getName(),
 				(dstPath!=null ? dstPath.getAbsolutePath() : srcFile.getParentFile().getAbsolutePath())+File.separator,
-				title, creator, bookInfo, imageInfoReader, this.jFrameParent.getLocation() 
+				title, creator, bookInfo, imageInfoReader, this.jFrameParent.getLocation(),
+				coverW, coverH
 			);
 			
 			//ダイアログが閉じた後に再開

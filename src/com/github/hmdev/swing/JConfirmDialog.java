@@ -45,15 +45,20 @@ public class JConfirmDialog extends JDialog
 	
 	////////////////////////////////
 	/** 入力ファイル名 */
-	public JTextField jTextSrcFileName;
+	JTextField jTextSrcFileName;
 	/** 出力ファイル名 */
-	public JTextField jTextDstFileName;
+	JTextField jTextDstFileName;
 	/** 表題 (+副題)編集用 */
 	public JTextField jTextTitle;
 	/** 著者名編集用 */
 	public JTextField jTextCreator;
+	
 	/** プレビューパネル */
 	public JCoverImagePanel jCoverImagePanel;
+	/** プレビューパネル外側 */
+	JPanel previewOuterPane;
+	JPanel previewRight;
+	
 	/** 表紙画像削除 */
 	public JCheckBox jCheckReplaceCover;
 	
@@ -61,7 +66,7 @@ public class JConfirmDialog extends JDialog
 	public JCheckBox jCheckConfirm2;
 	
 	////////////////////////////////
-	//Preview
+	//Preview Controls
 	/** 前の画像 */
 	JButton jButtonPrev;
 	/** 次の画像 */
@@ -96,11 +101,15 @@ public class JConfirmDialog extends JDialog
 	BookInfo bookInfo;
 	ImageInfoReader imageInfoReader;
 	
+	//Size
+	final int DIALOG_WIDTH = 600;
+	final int DIALOG_HEIGHT = 310;
+	
+	final int PREVIEW_WIDTH = 150;
+	final int PREVIEW_HEIGHT = 200;
+	
 	public JConfirmDialog(final JApplet applet, Image iconImage, String imageURLPath)
 	{
-		final int PREVIEW_WIDTH = 150;
-		final int PREVIEW_HEIGHT = 200;
-		
 		JButton jButton;
 		JPanel panel;
 		Border padding0 = BorderFactory.createEmptyBorder(0, 0, 0, 0);
@@ -108,8 +117,7 @@ public class JConfirmDialog extends JDialog
 		Border padding4 = BorderFactory.createEmptyBorder(4, 4, 4, 4);
 		Border titlePadding4 = BorderFactory.createEmptyBorder(0, 4, 4, 4);
 		
-		Dimension dialogSize = new Dimension(580, 310);
-		
+		final Dimension dialogSize = new Dimension(DIALOG_WIDTH, DIALOG_HEIGHT);
 		this.setIconImage(iconImage);
 		this.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
 		this.setSize(dialogSize);
@@ -120,36 +128,32 @@ public class JConfirmDialog extends JDialog
 			public void windowClosing(WindowEvent evt) { canceled = true; }
 		});
 		
-		JPanel dialogPanel = new JPanel();
-		dialogPanel.setLayout(new BoxLayout(dialogPanel, BoxLayout.Y_AXIS));
-		dialogPanel.setMaximumSize(dialogSize);
-		dialogPanel.setPreferredSize(dialogSize);
-		dialogPanel.setBorder(padding4);
-		this.add(dialogPanel);
+		int LEFT_PANE_WIDTH = 420;
 		
 		//入出力ファイル情報とプレビューを横に並べる
-		JPanel previewOuter = new JPanel();
-		previewOuter.setLayout(new BoxLayout(previewOuter, BoxLayout.X_AXIS));
-		previewOuter.setPreferredSize(dialogSize);
-		dialogPanel.add(previewOuter);
+		JPanel outer = new JPanel();
+		outer.setLayout(new BoxLayout(outer, BoxLayout.X_AXIS));
+		//outer.setPreferredSize(dialogSize);
+		this.add(outer);
 		JPanel previewLeft = new JPanel();
 		previewLeft.setLayout(new BoxLayout(previewLeft, BoxLayout.Y_AXIS));
-		previewLeft.setPreferredSize(new Dimension(460, dialogSize.height));
+		previewLeft.setMaximumSize(new Dimension(LEFT_PANE_WIDTH, DIALOG_HEIGHT));
+		previewLeft.setPreferredSize(new Dimension(LEFT_PANE_WIDTH, DIALOG_HEIGHT));
 		previewLeft.setBorder(padding4);
-		previewOuter.add(previewLeft);
+		outer.add(previewLeft);
 		
 		JPanel inputOuter = new JPanel();
 		inputOuter.setBorder(BorderFactory.createTitledBorder("入力ファイル"));
 		inputOuter.setLayout(new BoxLayout(inputOuter, BoxLayout.X_AXIS));
-		inputOuter.setPreferredSize(new Dimension(460, 54));
+		inputOuter.setPreferredSize(new Dimension(LEFT_PANE_WIDTH, 54));
 		panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 		panel.setBorder(titlePadding4);
-		panel.setPreferredSize(new Dimension(460, 26));
+		panel.setPreferredSize(new Dimension(LEFT_PANE_WIDTH, 26));
 		jTextSrcFileName = new JTextField();
 		jTextSrcFileName.setEditable(false);
-		jTextSrcFileName.setMaximumSize(new Dimension(460, 24));
-		jTextSrcFileName.setPreferredSize(new Dimension(460, 24));
+		jTextSrcFileName.setMaximumSize(new Dimension(LEFT_PANE_WIDTH, 24));
+		jTextSrcFileName.setPreferredSize(new Dimension(LEFT_PANE_WIDTH, 24));
 		panel.add(jTextSrcFileName);
 		inputOuter.add(panel);
 		previewLeft.add(inputOuter);
@@ -157,15 +161,15 @@ public class JConfirmDialog extends JDialog
 		JPanel outputOuter = new JPanel();
 		outputOuter.setBorder(BorderFactory.createTitledBorder("出力パス"));
 		outputOuter.setLayout(new BoxLayout(outputOuter, BoxLayout.X_AXIS));
-		outputOuter.setPreferredSize(new Dimension(460, 54));
+		outputOuter.setPreferredSize(new Dimension(LEFT_PANE_WIDTH, 54));
 		panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 		panel.setBorder(titlePadding4);
-		panel.setPreferredSize(new Dimension(460, 26));
+		panel.setPreferredSize(new Dimension(LEFT_PANE_WIDTH, 26));
 		jTextDstFileName = new JTextField();
 		jTextDstFileName.setEditable(false);
-		jTextDstFileName.setMaximumSize(new Dimension(460, 24));
-		jTextDstFileName.setPreferredSize(new Dimension(460, 24));
+		jTextDstFileName.setMaximumSize(new Dimension(LEFT_PANE_WIDTH, 24));
+		jTextDstFileName.setPreferredSize(new Dimension(LEFT_PANE_WIDTH, 24));
 		panel.add(jTextDstFileName);
 		outputOuter.add(panel);
 		previewLeft.add(outputOuter);
@@ -174,7 +178,7 @@ public class JConfirmDialog extends JDialog
 		JPanel metadataOuter = new JPanel();
 		metadataOuter.setBorder(BorderFactory.createTitledBorder("メタデータ設定 (本文は変更されません)"));
 		metadataOuter.setLayout(new BoxLayout(metadataOuter, BoxLayout.X_AXIS));
-		metadataOuter.setPreferredSize(new Dimension(460, 60));
+		metadataOuter.setPreferredSize(new Dimension(LEFT_PANE_WIDTH, 60));
 		JPanel metadataInner = new JPanel();
 		metadataInner.setLayout(new BoxLayout(metadataInner, BoxLayout.Y_AXIS));
 		metadataOuter.add(metadataInner);
@@ -182,22 +186,22 @@ public class JConfirmDialog extends JDialog
 		panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 		panel.setBorder(titlePadding4);
-		panel.setPreferredSize(new Dimension(460, 28));
+		panel.setPreferredSize(new Dimension(LEFT_PANE_WIDTH, 28));
 		panel.add(new JLabel("表題 : "));
 		jTextTitle = new JTextField();
-		jTextTitle.setPreferredSize(new Dimension(460, 26));
-		jTextTitle.setMaximumSize(new Dimension(460, 26));
+		jTextTitle.setPreferredSize(new Dimension(LEFT_PANE_WIDTH, 26));
+		jTextTitle.setMaximumSize(new Dimension(LEFT_PANE_WIDTH, 26));
 		panel.add(jTextTitle);
 		metadataInner.add(panel);
 		//著者
 		panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 		panel.setBorder(titlePadding4);
-		panel.setPreferredSize(new Dimension(460, 28));
+		panel.setPreferredSize(new Dimension(LEFT_PANE_WIDTH, 28));
 		panel.add(new JLabel("著者 : "));
 		jTextCreator = new JTextField();
-		jTextCreator.setPreferredSize(new Dimension(460, 26));
-		jTextCreator.setMaximumSize(new Dimension(460, 26));
+		jTextCreator.setPreferredSize(new Dimension(LEFT_PANE_WIDTH, 26));
+		jTextCreator.setMaximumSize(new Dimension(LEFT_PANE_WIDTH, 26));
 		panel.add(jTextCreator);
 		metadataInner.add(panel);
 		//入れ替えボタン
@@ -281,29 +285,26 @@ public class JConfirmDialog extends JDialog
 		
 		
 		//右側プレビューパネル
-		JPanel previewRight = new JPanel();
+		previewRight = new JPanel();
 		previewRight.setLayout(new BoxLayout(previewRight, BoxLayout.Y_AXIS));
-		Dimension size = new Dimension(160, dialogSize.height);
-		previewRight.setMinimumSize(size);
-		previewRight.setMaximumSize(size);
-		previewRight.setPreferredSize(size);
+		Dimension size = new Dimension(PREVIEW_WIDTH+10, dialogSize.height);
+		previewRight.setSize(size);
 		previewRight.setBorder(padding0);
-		previewOuter.add(previewRight);
+		outer.add(previewRight);
 		
 		//プレビューパネル
-		panel = new JPanel();
-		panel.setBorder(BorderFactory.createEtchedBorder(1));
+		previewOuterPane = new JPanel();
+		previewOuterPane.setBorder(BorderFactory.createEtchedBorder(1));
 		size = new Dimension(PREVIEW_WIDTH+5, PREVIEW_HEIGHT+5);
-		panel.setMaximumSize(size);
-		panel.setPreferredSize(size);
-		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-		previewRight.add(panel);
+		previewOuterPane.setMaximumSize(size);
+		previewOuterPane.setPreferredSize(size);
+		previewOuterPane.setLayout(new BoxLayout(previewOuterPane, BoxLayout.X_AXIS));
+		previewRight.add(previewOuterPane);
 		jCoverImagePanel = new JCoverImagePanel();
 		size = new Dimension(PREVIEW_WIDTH, PREVIEW_HEIGHT);
-		jCoverImagePanel.setMinimumSize(size);
 		jCoverImagePanel.setMaximumSize(size);
 		jCoverImagePanel.setPreferredSize(size);
-		panel.add(jCoverImagePanel);
+		previewOuterPane.add(jCoverImagePanel);
 		
 		//操作パネル
 		panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 1, 1));
@@ -521,7 +522,7 @@ public class JConfirmDialog extends JDialog
 	
 	/** 確認ダイアログを表示
 	 * @param location ダイアログ表示位置 */
-	public void showDialog(String srcFile, String dstPath, String title, String creator, BookInfo bookInfo, ImageInfoReader imageInfoReader, Point location)
+	public void showDialog(String srcFile, String dstPath, String title, String creator, BookInfo bookInfo, ImageInfoReader imageInfoReader, Point location, int coverW, int coverH)
 	{
 		//zip内テキストファイル名も表示
 		if (bookInfo.textEntryName != null) srcFile += " : "+bookInfo.textEntryName.substring(bookInfo.textEntryName.lastIndexOf('/')+1);
@@ -543,6 +544,30 @@ public class JConfirmDialog extends JDialog
 		
 		this.bookInfo = bookInfo;
 		this.imageInfoReader = imageInfoReader;
+		
+		//プレビューパネルとダイアログの幅調整
+		//増加分
+		int delta = (int)(((double)coverW/coverH) / ((double)PREVIEW_WIDTH/PREVIEW_HEIGHT)*PREVIEW_WIDTH - PREVIEW_WIDTH);
+		if (delta > 1000 || delta < -1000) {
+			JOptionPane.showMessageDialog(this, "表紙サイズを修正してください");
+			this.canceled = true;
+			return;
+		}
+		this.setResizable(true);
+		this.jCoverImagePanel.setPreferredSize(new Dimension(PREVIEW_WIDTH+delta, PREVIEW_HEIGHT));
+		this.jCoverImagePanel.setMaximumSize(new Dimension(PREVIEW_WIDTH+delta, PREVIEW_HEIGHT));
+		this.previewOuterPane.setPreferredSize(new Dimension(PREVIEW_WIDTH+5+delta, PREVIEW_HEIGHT));
+		this.previewOuterPane.setMaximumSize(new Dimension(PREVIEW_WIDTH+5+delta, PREVIEW_HEIGHT));
+		if (delta > 0) {
+			this.setSize(DIALOG_WIDTH+delta, DIALOG_HEIGHT);
+			this.previewRight.setPreferredSize(new Dimension(PREVIEW_WIDTH+10+delta, DIALOG_HEIGHT));
+			this.previewRight.setMaximumSize(new Dimension(PREVIEW_WIDTH+10+delta, DIALOG_HEIGHT));
+		} else {
+			this.setSize(DIALOG_WIDTH, DIALOG_HEIGHT);
+			this.previewRight.setPreferredSize(new Dimension(PREVIEW_WIDTH+10, DIALOG_HEIGHT));
+			this.previewRight.setMaximumSize(new Dimension(PREVIEW_WIDTH+10, DIALOG_HEIGHT));
+		}
+		this.setResizable(false);
 		
 		//プレビュー表示
 		try {
