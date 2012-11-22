@@ -1502,23 +1502,23 @@ public class AozoraEpub3Applet extends JApplet
 			Transferable transfer = dtde.getTransferable();
 			try {
 				DataFlavor[] flavars = transfer.getTransferDataFlavors();
-				if (flavars.length == 0) return;
-				if (flavars[0].isFlavorJavaFileListType()) {
-					@SuppressWarnings("unchecked")
-					List<File> files = (List<File>)transfer.getTransferData(DataFlavor.javaFileListFlavor);
-					if (files.size() > 0) {
-						jComboCover.setSelectedItem(files.get(0).getAbsolutePath());
-						return;
-					}
-				} else {
-					for (DataFlavor flavar : flavars) {
-						if (flavar.isFlavorTextType()) {
-							String path = (String)transfer.getTransferData(DataFlavor.stringFlavor);
-							if (path.startsWith("file://"))
-								try { path = URLDecoder.decode(path.substring(0, path.indexOf('\n')-1).substring(7).trim(),"UTF-8"); } catch (UnsupportedEncodingException e1) { }
-							jComboCover.setSelectedItem(path);
+				for (DataFlavor flavar : flavars) {
+					if (flavar.isFlavorJavaFileListType()) {
+						@SuppressWarnings("unchecked")
+						List<File> files = (List<File>)transfer.getTransferData(DataFlavor.javaFileListFlavor);
+						if (files.size() > 0) {
+							jComboCover.setSelectedItem(files.get(0).getAbsolutePath());
 							return;
 						}
+					}
+				}
+				for (DataFlavor flavar : flavars) {
+					if (flavar.isFlavorTextType()) {
+						String path = (String)transfer.getTransferData(DataFlavor.stringFlavor);
+						if (path.startsWith("file://"))
+							try { path = URLDecoder.decode(path.substring(0, path.indexOf('\n')-1).substring(7).trim(),"UTF-8"); } catch (UnsupportedEncodingException e1) { }
+						jComboCover.setSelectedItem(path);
+						return;
 					}
 				}
 			} catch (Exception e) {
@@ -1546,25 +1546,25 @@ public class AozoraEpub3Applet extends JApplet
 			Transferable transfer = dtde.getTransferable();
 			try {
 				DataFlavor[] flavars = transfer.getTransferDataFlavors();
-				if (flavars.length == 0) return;
-				if (flavars[0].isFlavorJavaFileListType()) {
-					@SuppressWarnings("unchecked")
-					List<File> files = (List<File>)transfer.getTransferData(DataFlavor.javaFileListFlavor);
-					if (files.size() > 0) {
-						File file = files.get(0);
-						if (!file.isDirectory()) file = file.getParentFile();
-						jComboDstPath.setSelectedItem(file.getAbsolutePath());
-						return;
-					}
-				} else {
-					for (DataFlavor flavar : flavars) {
-						if (flavar.isFlavorTextType()) {
-							String path = (String)transfer.getTransferData(DataFlavor.stringFlavor);
-							if (path.startsWith("file://"))
-								try { path = URLDecoder.decode(path.substring(0, path.indexOf('\n')-1).substring(7).trim(),"UTF-8"); } catch (UnsupportedEncodingException e1) { }
-							jComboDstPath.setSelectedItem(path);
+				for (DataFlavor flavar : flavars) {
+					if (flavar.isFlavorJavaFileListType()) {
+						@SuppressWarnings("unchecked")
+						List<File> files = (List<File>)transfer.getTransferData(DataFlavor.javaFileListFlavor);
+						if (files.size() > 0) {
+							File file = files.get(0);
+							if (!file.isDirectory()) file = file.getParentFile();
+							jComboDstPath.setSelectedItem(file.getAbsolutePath());
 							return;
 						}
+					}
+				}
+				for (DataFlavor flavar : flavars) {
+					if (flavar.isFlavorTextType()) {
+						String path = (String)transfer.getTransferData(DataFlavor.stringFlavor);
+						if (path.startsWith("file://"))
+							try { path = URLDecoder.decode(path.substring(0, path.indexOf('\n')-1).substring(7).trim(),"UTF-8"); } catch (UnsupportedEncodingException e1) { }
+						jComboDstPath.setSelectedItem(path);
+						return;
 					}
 				}
 			} catch (Exception e) {
@@ -1650,61 +1650,60 @@ public class AozoraEpub3Applet extends JApplet
 			Transferable transfer = dtde.getTransferable();
 			try {
 				DataFlavor[] flavars = transfer.getTransferDataFlavors();
-				if (flavars.length == 0) return;
-				if (flavars[0].isFlavorJavaFileListType()) {
-					@SuppressWarnings("unchecked")
-					List<File> files = (List<File>) transfer.getTransferData(DataFlavor.javaFileListFlavor);
-					
-					startConvertFilesWorker((File[])(files.toArray()));
-				} else {
-					for (DataFlavor flavar : flavars) {
-						if (flavar.isFlavorTextType()) {
-							//URLかどうか
-							String urlString = transfer.getTransferData(DataFlavor.stringFlavor).toString();
-							if (urlString.startsWith("http")) {
-								//出力先が指定されていない
+				for (DataFlavor flavar : flavars) {
+					if (flavar.isFlavorJavaFileListType()) {
+						@SuppressWarnings("unchecked")
+						List<File> files = (List<File>) transfer.getTransferData(DataFlavor.javaFileListFlavor);
+						startConvertFilesWorker((File[])(files.toArray()));
+						return;
+					}
+				}
+				for (DataFlavor flavar : flavars) {
+					if (flavar.isFlavorTextType()) {
+						//URLかどうか
+						String urlString = transfer.getTransferData(DataFlavor.stringFlavor).toString();
+						if (urlString.startsWith("http")) {
+							//出力先が指定されていない
+							if (jComboDstPath.getSelectedIndex() == 0) {
+								dstPathChooser.actionPerformed(null);
 								if (jComboDstPath.getSelectedIndex() == 0) {
-									dstPathChooser.actionPerformed(null);
-									if (jComboDstPath.getSelectedIndex() == 0) {
-										LogAppender.append("変換処理を中止しました\n");
-										return;
-									}
+									LogAppender.append("変換処理を中止しました\n");
+									return;
 								}
-								if (cachePath == null) {
-									//キャッシュパス
-									cachePath = new File(".cache");
-									cachePath .mkdir();
-								}
-								//出力先 URLと同じパス
-								String path = cachePath.getAbsolutePath()+"/"+urlString.substring(urlString.indexOf("//")+2).replaceAll("\\?\\*\\&\\|\\<\\>\"\\\\", "_");
-								File file = new File(path);
-								file.getParentFile().mkdirs();
-								//ダウンロード
-								BufferedInputStream bis = new BufferedInputStream(new URL(urlString).openStream(), 8192);
-								BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
-								IOUtils.copy(bis, bos);
-								bos.close();
-								bis.close();
-								startConvertFilesWorker(new File[]{file});
-								return;
-							} else if (urlString.startsWith("file://")) {
-								//Linux等 ファイルのパスでファイルがあれば変換
-								try {
-									String[] fileNames = urlString.split("\n");
-									Vector<File> vecFiles = new Vector<File>();
-									for (String path : fileNames) {
-										File file = new File(URLDecoder.decode(path.substring(7).trim(),"UTF-8"));
-										if (file.exists()) vecFiles.add(file);
-									}
-									File[] files = new File[vecFiles.size()];
-									for (int i=0; i<files.length; i++) { files[i] = vecFiles.get(i); }
-									if (vecFiles.size() > 0) {
-										startConvertFilesWorker(files);
-										return;
-									}
-								} catch (Exception e) { e.printStackTrace(); }
-								
 							}
+							if (cachePath == null) {
+								//キャッシュパス
+								cachePath = new File(".cache");
+								cachePath .mkdir();
+							}
+							//出力先 URLと同じパス
+							String path = cachePath.getAbsolutePath()+"/"+urlString.substring(urlString.indexOf("//")+2).replaceAll("\\?\\*\\&\\|\\<\\>\"\\\\", "_");
+							File file = new File(path);
+							file.getParentFile().mkdirs();
+							//ダウンロード
+							BufferedInputStream bis = new BufferedInputStream(new URL(urlString).openStream(), 8192);
+							BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
+							IOUtils.copy(bis, bos);
+							bos.close();
+							bis.close();
+							startConvertFilesWorker(new File[]{file});
+							return;
+						} else if (urlString.startsWith("file://")) {
+							//Linux等 ファイルのパスでファイルがあれば変換
+							try {
+								String[] fileNames = urlString.split("\n");
+								Vector<File> vecFiles = new Vector<File>();
+								for (String path : fileNames) {
+									File file = new File(URLDecoder.decode(path.substring(7).trim(),"UTF-8"));
+									if (file.exists()) vecFiles.add(file);
+								}
+								File[] files = new File[vecFiles.size()];
+								for (int i=0; i<files.length; i++) { files[i] = vecFiles.get(i); }
+								if (vecFiles.size() > 0) {
+									startConvertFilesWorker(files);
+									return;
+								}
+							} catch (Exception e) { e.printStackTrace(); }
 							
 						}
 					}

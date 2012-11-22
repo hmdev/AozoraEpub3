@@ -301,31 +301,32 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 		Transferable transfer = dtde.getTransferable();
 		try {
 			DataFlavor[] flavars = transfer.getTransferDataFlavors();
-			if (flavars.length == 0) return;
-			if (flavars[0].isFlavorJavaFileListType()) {
-				@SuppressWarnings("unchecked")
-				List<File> files = (List<File>)transfer.getTransferData(DataFlavor.javaFileListFlavor);
-				if (files.size() > 0) {
-					bookInfo.coverFileName = files.get(0).getAbsolutePath();
-					bookInfo.loadCoverImage(bookInfo.coverFileName);
-					bookInfo.coverImageIndex = -1;
-					this.fitType = FIT_ZOOM;
-					this.setFitType(FIT_ALL);
-					repaint();
-				}
-			} else {
-				for (DataFlavor flavar : flavars) {
-					if (flavar.isFlavorTextType()) {
-						bookInfo.coverFileName = transfer.getTransferData(DataFlavor.stringFlavor).toString();
-						if (bookInfo.coverFileName.startsWith("file://"))
-							bookInfo.coverFileName = URLDecoder.decode(bookInfo.coverFileName.substring(0, bookInfo.coverFileName.indexOf('\n')-1).substring(7).trim(),"UTF-8");
+			for (DataFlavor flavar : flavars) {
+				if (flavar.isFlavorJavaFileListType()) {
+					@SuppressWarnings("unchecked")
+					List<File> files = (List<File>)transfer.getTransferData(DataFlavor.javaFileListFlavor);
+					if (files.size() > 0) {
+						bookInfo.coverFileName = files.get(0).getAbsolutePath();
 						bookInfo.loadCoverImage(bookInfo.coverFileName);
 						bookInfo.coverImageIndex = -1;
 						this.fitType = FIT_ZOOM;
 						this.setFitType(FIT_ALL);
 						repaint();
-						return;
 					}
+					return;
+				}
+			}
+			for (DataFlavor flavar : flavars) {
+				if (flavar.isFlavorTextType()) {
+					bookInfo.coverFileName = transfer.getTransferData(DataFlavor.stringFlavor).toString();
+					if (bookInfo.coverFileName.startsWith("file://"))
+						bookInfo.coverFileName = URLDecoder.decode(bookInfo.coverFileName.substring(0, bookInfo.coverFileName.indexOf('\n')-1).substring(7).trim(),"UTF-8");
+					bookInfo.loadCoverImage(bookInfo.coverFileName);
+					bookInfo.coverImageIndex = -1;
+					this.fitType = FIT_ZOOM;
+					this.setFitType(FIT_ALL);
+					repaint();
+					return;
 				}
 			}
 		} catch (Exception e) {
