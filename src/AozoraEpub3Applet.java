@@ -234,6 +234,8 @@ public class AozoraEpub3Applet extends JApplet
 	/** 変換実行中 */
 	boolean running = false;
 	
+	Process kindleProcess;
+	
 	/** 設定ファイル */
 	Properties props;
 	/** 設定ファイル名 */
@@ -1241,9 +1243,11 @@ public class AozoraEpub3Applet extends JApplet
 		panel.add(jCheckChapterPattern);
 		propValue = props.getProperty("ChapterPatternText");
 		jComboChapterPattern = new JComboBox(new String[]{
-				"^(見出し１|見出し２|見出し３)$","^(†|【|▼)","^(0-9|０-９|一|二|三|四|五|六|七|八|九|十|〇)",
+				"^(見出し１|見出し２|見出し３)$",
+				"^(†|【|●|▼|■)",
+				"^(0-9|０-９|一|二|三|四|五|六|七|八|九|十|〇)",
 				"^[1|2|１|２]?[0-9|０-９]月[1-3|１-３]?[0-9|０-９]日",
-				"^(一|十)?(一|二|三|四|五|六|七|八|九|十|〇)月(一|二|三|十)?十?(一|二|三|四|五|六|七|八|九|十|〇)日"});
+				"^(一|十)?(一|二|三|四|五|六|七|八|九|十|〇)月(一|十|二十?|三十?)?(一|二|三|四|五|六|七|八|九|十|〇)日"});
 		jComboChapterPattern.setSelectedItem(propValue==null?"":propValue);
 		jComboChapterPattern.setBorder(padding0);
 		jComboChapterPattern.setMaximumSize(text300);
@@ -1304,6 +1308,7 @@ public class AozoraEpub3Applet extends JApplet
 				epub3ImageWriter.cancel();
 				aozoraConverter.cancel();
 				convertCanceled = true;
+				if (kindleProcess != null) kindleProcess.destroy(); 
 			}
 		});
 		panel.add(jButtonCancel);
@@ -1743,11 +1748,6 @@ public class AozoraEpub3Applet extends JApplet
 	{
 		if (srcFiles.length == 0 ) return;
 		
-		//テキスト入力を確定
-		//jComboExt.transferFocusUpCycle();
-		//jComboCover.transferFocusUpCycle();
-		//jComboDstPath.transferFocusUpCycle();
-		
 		convertCanceled = false;
 		
 		//共通パラメータ取得
@@ -2165,31 +2165,34 @@ public class AozoraEpub3Applet extends JApplet
 		////////////////////////////////
 		//kindlegen.exeがあれば実行
 		try {
-			if (kindlegen != null && !bookInfo.imageOnly) {
-				Runtime rt = Runtime.getRuntime();
-				//Linuxは""でくくるとkindlegenが読めないので要対策
-				String outFileName = "\""+outFile.getAbsolutePath()+"\"";
-				String exec = kindlegen.getAbsolutePath()+" -verbose "+outFileName;
-				LogAppender.append("kindlegenを実行します : "+kindlegen.getName()+" "+outFileName+"\n");
-				Process p =rt.exec(exec);
-				BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			if (kindlegen != null) {
+				String outFileName = outFile.getAbsolutePath();
+				LogAppender.append("kindlegenを実行します : "+kindlegen.getName()+" \""+outFileName+"\"\n");
+				ProcessBuilder pb = new ProcessBuilder(kindlegen.getAbsolutePath(), "-locale", "en","-verbose", outFileName);
+				this.kindleProcess = pb.start();
+				BufferedReader br = new BufferedReader(new InputStreamReader(this.kindleProcess.getInputStream()));
 				String line;
 				int idx = 0;
+				String msg = null;
 				while ((line = br.readLine()) != null) {
 					if (line.length() > 0) {
 						System.out.println(line);
+						msg = line;
 						if (idx++ % 2 == 0) LogAppender.append(".");
 					}
-					if (convertCanceled) {
-						LogAppender.append("\n");
-						return;
-					}
 				}
-				LogAppender.append("\nkindlegen変換完了\n");
 				br.close();
+				if (convertCanceled) {
+					LogAppender.append("\n"+msg+"\nkindlegenの変換を中断しました\n");
+				} else {
+					LogAppender.append("\n"+msg+"\nkindlegen変換完了\n");
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			if (this.kindleProcess != null) this.kindleProcess.destroy();
+			this.kindleProcess = null;
 		}
 		
 		////////////////////////////////

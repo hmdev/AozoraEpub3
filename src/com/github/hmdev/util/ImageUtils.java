@@ -24,29 +24,44 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.compress.utils.IOUtils;
 
 import com.github.hmdev.info.ImageInfo;
-import com.objectplanet.image.PngEncoder;
+//import com.objectplanet.image.PngEncoder;
 import com.sun.media.jai.codec.ImageCodec;
 import com.sun.media.jai.codec.ImageDecoder;
 
 public class ImageUtils
 {
-	/** 4bitグレースケール時のRGB階調 */
-	static final private byte[] GRAY16_VALUES = new byte[]{
-		0,17,34,51,68,85,102,119,-120,-103,-86,-69,-52,-35,-18,-1};
 	/** 4bitグレースケール時のRGB階調カラーモデル Singleton */
 	static ColorModel GRAY16_COLOR_MODEL;
-	/** 8bitグレースケール時のRGB階調 */
-	static final private byte[] GRAY256_VALUES = new byte[]{
-		0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,
-		32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,
-		64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,
-		96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,
-		-128,-127,-126,-125,-124,-123,-122,-121,-120,-119,-118,-117,-116,-115,-114,-113,-112,-111,-110,-109,-108,-107,-106,-105,-104,-103,-102,-101,-100,-99,-98,-97,
-		-96,-95,-94,-93,-92,-91,-90,-89,-88,-87,-86,-85,-84,-83,-82,-81,-80,-79,-78,-77,-76,-75,-74,-73,-72,-71,-70,-69,-68,-67,-66,-65,
-		-64,-63,-62,-61,-60,-59,-58,-57,-56,-55,-54,-53,-52,-51,-50,-49,-48,-47,-46,-45,-44,-43,-42,-41,-40,-39,-38,-37,-36,-35,-34,-33,
-		-32,-31,-30,-29,-28,-27,-26,-25,-24,-23,-22,-21,-20,-19,-18,-17,-16,-15,-14,-13,-12,-11,-10,-9,-8,-7,-6,-5,-4,-3,-2,-1};
 	/** 8bitグレースケール時のRGB階調カラーモデル Singleton */
 	static ColorModel GRAY256_COLOR_MODEL;
+	
+	/** 4bitグレースケール時のRGB階調カラーモデル取得 */
+	static ColorModel getGray16ColorModel()
+	{
+		if (GRAY16_COLOR_MODEL == null) {
+			byte[] GRAY16_VALUES = new byte[]{
+				0,17,34,51,68,85,102,119,-120,-103,-86,-69,-52,-35,-18,-1};
+			GRAY16_COLOR_MODEL = new IndexColorModel(4, GRAY16_VALUES.length, GRAY16_VALUES, GRAY16_VALUES, GRAY16_VALUES);
+		}
+		return GRAY16_COLOR_MODEL;
+	}
+	/** 8bitグレースケール時のRGB階調カラーモデル取得 */
+	static ColorModel getGray256ColorModel()
+	{
+		if (GRAY256_COLOR_MODEL == null) {
+			byte[] GRAY256_VALUES = new byte[]{
+				0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,
+				32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,
+				64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,
+				96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,
+				-128,-127,-126,-125,-124,-123,-122,-121,-120,-119,-118,-117,-116,-115,-114,-113,-112,-111,-110,-109,-108,-107,-106,-105,-104,-103,-102,-101,-100,-99,-98,-97,
+				-96,-95,-94,-93,-92,-91,-90,-89,-88,-87,-86,-85,-84,-83,-82,-81,-80,-79,-78,-77,-76,-75,-74,-73,-72,-71,-70,-69,-68,-67,-66,-65,
+				-64,-63,-62,-61,-60,-59,-58,-57,-56,-55,-54,-53,-52,-51,-50,-49,-48,-47,-46,-45,-44,-43,-42,-41,-40,-39,-38,-37,-36,-35,-34,-33,
+				-32,-31,-30,-29,-28,-27,-26,-25,-24,-23,-22,-21,-20,-19,-18,-17,-16,-15,-14,-13,-12,-11,-10,-9,-8,-7,-6,-5,-4,-3,-2,-1};
+			GRAY256_COLOR_MODEL = new IndexColorModel(8, GRAY256_VALUES.length, GRAY256_VALUES, GRAY256_VALUES, GRAY256_VALUES);
+		}
+		return GRAY256_COLOR_MODEL;
+	}
 	
 	
 	/** ファイルまたはURLの文字列から画像を読み込む
@@ -135,8 +150,8 @@ public class ImageUtils
 			}
 		} else {
 			//縮小
-			int scaledW = (int)(w*scale);
-			int scaledH = (int)(h*scale);
+			int scaledW = (int)(w*scale+0.5);
+			int scaledH = (int)(h*scale+0.5);
 			try {
 				//画像がなければ読み込み
 				if (srcImage == null) srcImage = readImage(ext, is);
@@ -151,14 +166,14 @@ public class ImageUtils
 					raster = colorModel.createCompatibleWritableRaster(scaledW, scaledH);
 					outImage = new BufferedImage(colorModel, raster, true, null);
 					break;
-				case BufferedImage.TYPE_BYTE_GRAY:
+				/*case BufferedImage.TYPE_BYTE_GRAY:
 					//PngEncoderのGRAYが薄くなるのでindexにする
 					colorModel = srcImage.getColorModel();
 					if (colorModel.getPixelSize() <= 4) colorModel = getGray16ColorModel();
 					else colorModel = getGray256ColorModel();
 					raster = colorModel.createCompatibleWritableRaster(scaledW, scaledH);
 					outImage = new BufferedImage(colorModel, raster, true, null);
-					break;
+					break;*/
 				case BufferedImage.TYPE_BYTE_INDEXED:
 					colorModel = srcImage.getColorModel();
 					raster = colorModel.createCompatibleWritableRaster(scaledW, scaledH);
@@ -177,7 +192,7 @@ public class ImageUtils
 					g.dispose();
 				}
 				//ImageIO.write(outImage, imageInfo.getExt(), zos);
-				_writeImage(zos, outImage, ext, margin, jpegQuality);
+				_writeImage(zos, outImage, ext, null, jpegQuality);
 				LogAppender.append("画像縮小: "+imageInfo.getOutFileName()+" ("+w+","+h+")→("+scaledW+","+scaledH+")\n");
 			} catch (Exception e) {
 				LogAppender.append("画像読み込みエラー: "+imageInfo.getOutFileName()+"\n");
@@ -186,24 +201,12 @@ public class ImageUtils
 			zos.flush();
 		}
 	}
-	static ColorModel getGray16ColorModel()
-	{
-		if (GRAY16_COLOR_MODEL == null) GRAY16_COLOR_MODEL = new IndexColorModel(4, GRAY16_VALUES.length, GRAY16_VALUES, GRAY16_VALUES, GRAY16_VALUES);
-		return GRAY16_COLOR_MODEL;
-	}
-	static ColorModel getGray256ColorModel()
-	{
-		if (GRAY256_COLOR_MODEL == null) GRAY256_COLOR_MODEL = new IndexColorModel(8, GRAY256_VALUES.length, GRAY256_VALUES, GRAY256_VALUES, GRAY256_VALUES);
-		return GRAY256_COLOR_MODEL;
-	}
-	
 	/** 画像を出力 マージン指定があればカット
 	 * @param margin カットするピクセル数(left, top, right, bottom) */
 	static private void _writeImage(ZipArchiveOutputStream zos, BufferedImage srcImage, String ext, int[] margin, float jpegQuality) throws IOException
 	{
-		if ("png".equals(ext)) {
+		/*if ("png".equals(ext)) {
 			PngEncoder pngEncoder = new PngEncoder();
-			pngEncoder.setCompression(PngEncoder.BEST_COMPRESSION);
 			int pngColorType = PngEncoder.COLOR_TRUECOLOR;
 			switch (srcImage.getType()) {
 			case BufferedImage.TYPE_BYTE_BINARY:
@@ -214,9 +217,11 @@ public class ImageUtils
 				pngColorType = PngEncoder.COLOR_GRAYSCALE; break;
 			}
 			pngEncoder.setColorType(pngColorType);
+			pngEncoder.setCompression(PngEncoder.BEST_COMPRESSION);
 			pngEncoder.setIndexedColorMode(PngEncoder.INDEXED_COLORS_ORIGINAL);
+			if (margin != null) srcImage = srcImage.getSubimage(margin[0], margin[1], srcImage.getWidth()-margin[2]-margin[0], srcImage.getHeight()-margin[3]-margin[1]);
 			pngEncoder.encode(srcImage, zos);
-		} else {
+		} else {*/
 			ImageWriter imageWriter = ImageIO.getImageWritersByFormatName(ext).next();
 			ImageWriteParam iwp = imageWriter.getDefaultWriteParam();
 			if (iwp.canWriteCompressed()) {
@@ -228,7 +233,7 @@ public class ImageUtils
 			if (margin != null) srcImage = srcImage.getSubimage(margin[0], margin[1], srcImage.getWidth()-margin[2]-margin[0], srcImage.getHeight()-margin[3]-margin[1]);
 			imageWriter.setOutput(ImageIO.createImageOutputStream(zos));
 			imageWriter.write(null, new IIOImage(srcImage, null, null), iwp);
-		}
+		//}
 		zos.flush();
 	}
 	

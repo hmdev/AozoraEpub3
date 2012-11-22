@@ -15,9 +15,15 @@
 #if (${bookInfo.InsertCoverPage})
 		<meta name="cover" content="img${coverImage.Id}"/>
 #end
+#if (${kindle} && ${bookInfo.ImageOnly})
+		<meta name="fixed-layout"  content="true"/>
+		<meta name="book-type" content="comic"/>
+#end
 	</metadata>
 	<manifest>
-#if (${bookInfo.Vertical})
+#if (${kindle} && ${bookInfo.ImageOnly})
+		<item id="k_image" href="css/kindle_image.css" media-type="text/css"/>
+#elseif (${bookInfo.Vertical})
 #if (${bookInfo.ImageOnly})
 		<item id="v_image" href="css/vertical_image.css" media-type="text/css"/>
 #else

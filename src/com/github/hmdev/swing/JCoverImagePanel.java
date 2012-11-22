@@ -382,10 +382,12 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e)
 	{
+		double rate = 1.01;
+		if (e.isShiftDown()) rate = 1.001;
 		if (e.getWheelRotation() > 0) {
-			this.setZoom(1/1.01);
+			this.setZoom(1/rate);
 		} else {
-			this.setZoom(1.01);
+			this.setZoom(rate);
 		}
 	}
 	
