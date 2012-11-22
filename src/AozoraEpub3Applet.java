@@ -706,7 +706,7 @@ public class AozoraEpub3Applet extends JApplet
 		panelV.add(panel);
 		//ピクセル
 		propValue = props.getProperty("Pixel");
-		jCheckPixel = new JCheckBox("画素数", propValue==null||"1".equals(propValue));
+		jCheckPixel = new JCheckBox("画素数", "1".equals(propValue));
 		jCheckPixel.setFocusPainted(false);
 		jCheckPixel.setBorder(padding2H);
 		jCheckPixel.addChangeListener(resizeChangeLister);
@@ -735,13 +735,13 @@ public class AozoraEpub3Applet extends JApplet
 		panel.add(label);
 		//横
 		propValue = props.getProperty("ResizeW");
-		jCheckResizeW = new JCheckBox("横", propValue!=null&&"1".equals(propValue));
+		jCheckResizeW = new JCheckBox("横", propValue==null||"1".equals(propValue));
 		jCheckResizeW.setFocusPainted(false);
 		jCheckResizeW.setBorder(padding2H);
 		jCheckResizeW.addChangeListener(resizeChangeLister);
 		panel.add(jCheckResizeW);
 		propValue = props.getProperty("ResizeNumW");
-		defaultValue = 1600; try { defaultValue = Integer.parseInt(propValue); } catch (Exception e) {}
+		defaultValue = 2048; try { defaultValue = Integer.parseInt(propValue); } catch (Exception e) {}
 		jTextResizeNumW = new JTextField(propValue==null?""+defaultValue:propValue);
 		jTextResizeNumW.setHorizontalAlignment(JTextField.RIGHT);
 		jTextResizeNumW.setInputVerifier(new IntegerInputVerifier(defaultValue, 100, 9999));
@@ -754,13 +754,13 @@ public class AozoraEpub3Applet extends JApplet
 		panel.add(label);
 		//縦
 		propValue = props.getProperty("ResizeH");
-		jCheckResizeH = new JCheckBox("縦", propValue!=null&"1".equals(propValue));
+		jCheckResizeH = new JCheckBox("縦", propValue==null||"1".equals(propValue));
 		jCheckResizeH.setFocusPainted(false);
 		jCheckResizeH.setBorder(padding2H);
 		jCheckResizeH.addChangeListener(resizeChangeLister);
 		panel.add(jCheckResizeH);
 		propValue = props.getProperty("ResizeNumH");
-		defaultValue = 1600; try { defaultValue = Integer.parseInt(propValue); } catch (Exception e) {}
+		defaultValue = 2048; try { defaultValue = Integer.parseInt(propValue); } catch (Exception e) {}
 		jTextResizeNumH = new JTextField(propValue==null?""+defaultValue:propValue);
 		jTextResizeNumH.setHorizontalAlignment(JTextField.RIGHT);
 		jTextResizeNumH.setInputVerifier(new IntegerInputVerifier(defaultValue, 100, 9999));

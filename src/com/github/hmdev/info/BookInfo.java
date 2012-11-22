@@ -4,7 +4,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import com.github.hmdev.util.ImageInfoReader;
+import com.github.hmdev.util.ImageUtils;
 
 /** タイトル著作者等のメタ情報を格納 */
 public class BookInfo
@@ -603,6 +603,6 @@ public class BookInfo
 	/** ファイルまたはURLの文字列から画像を読み込んで表紙イメージとして設定 */
 	public void loadCoverImage(String path)
 	{
-		this.coverImage = ImageInfoReader.loadImage(path);
+		this.coverImage = ImageUtils.loadImage(path);
 	}
 }

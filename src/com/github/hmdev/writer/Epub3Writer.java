@@ -502,7 +502,7 @@ public class Epub3Writer
 					if (!imgExt.startsWith("jp")) {
 						if (bookInfo.coverImage == null) {
 							ByteArrayInputStream bais = new ByteArrayInputStream(coverImageBytes);
-							bookInfo.coverImage = ImageInfoReader.readImage(imgExt, bais);
+							bookInfo.coverImage = ImageUtils.readImage(imgExt, bais);
 							bais.close();
 						}
 						coverImageInfo.setExt("jpeg");
@@ -511,13 +511,13 @@ public class Epub3Writer
 				if (bookInfo.coverImage != null) {
 					//プレビューで編集されている場合
 					zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+IMAGES_PATH+imageInfo.getOutFileName()));
-					this.writeImage(imageInfo.getOutFileName(), bookInfo.coverImage, zos, coverImageInfo);
+					this.writeImage(bookInfo.coverImage, zos, coverImageInfo);
 					zos.closeArchiveEntry();
 					bookInfo.coverImage = null; //同じ画像が使われている場合は以後はファイルから読み込ませる
 				} else {
 					ByteArrayInputStream bais = new ByteArrayInputStream(coverImageBytes);
 					zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+IMAGES_PATH+imageInfo.getOutFileName()));
-					this.writeCoverImage(imageInfo.getOutFileName(), bais, zos, coverImageInfo);
+					this.writeCoverImage(bais, zos, coverImageInfo);
 					zos.closeArchiveEntry();
 					bais.close();
 				}
@@ -545,7 +545,7 @@ public class Epub3Writer
 						if (imageFile.exists()) {
 							fis = new FileInputStream(imageFile);
 							zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+IMAGES_PATH+imageInfo.getOutFileName()));
-							this.writeImage(srcImageFileName, new BufferedInputStream(fis, 8192), zos, imageInfo);
+							this.writeImage(new BufferedInputStream(fis, 8192), zos, imageInfo);
 							zos.closeArchiveEntry();
 							fis.close();
 							outImageFileNames.remove(srcImageFileName);
@@ -577,7 +577,7 @@ public class Epub3Writer
 						byte[] bytes = baos.toByteArray();
 						baos.close();
 						ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-						this.writeImage(srcImageFileName, bais, zos, imageInfo);
+						this.writeImage(bais, zos, imageInfo);
 						bais.close();
 						zos.closeArchiveEntry();
 					}
@@ -601,23 +601,23 @@ public class Epub3Writer
 	}
 	
 	/** 表紙画像を出力 */
-	void writeCoverImage(String srcFileName, InputStream is, ZipArchiveOutputStream zos, ImageInfo imageInfo) throws IOException
+	void writeCoverImage(InputStream is, ZipArchiveOutputStream zos, ImageInfo imageInfo) throws IOException
 	{
-		ImageUtils.writeImage(imageInfo.getOutFileName(), is, null, zos,imageInfo, this.jpegQuality,
+		ImageUtils.writeImage(is, null, zos,imageInfo, this.jpegQuality,
 				0, this.coverW, this.coverH,
 				0, 0, 0, 0);
 	}
 	/** 画像を出力 */
-	void writeImage(String srcFileName, InputStream is,ZipArchiveOutputStream zos, ImageInfo imageInfo) throws IOException
+	void writeImage(InputStream is,ZipArchiveOutputStream zos, ImageInfo imageInfo) throws IOException
 	{
-		ImageUtils.writeImage(srcFileName, is, null, zos, imageInfo, this.jpegQuality,
+		ImageUtils.writeImage(is, null, zos, imageInfo, this.jpegQuality,
 				this.maxImagePixels, this.maxImageW, this.maxImageH,
 				this.autoMarginLimitH, this.autoMarginLimitV, this.autoMarginWhiteLevel, this.autoMarginPadding);
 	}
 	/** 画像を出力 */
-	void writeImage(String srcFileName, BufferedImage srcImage, ZipArchiveOutputStream zos, ImageInfo imageInfo) throws IOException
+	void writeImage(BufferedImage srcImage, ZipArchiveOutputStream zos, ImageInfo imageInfo) throws IOException
 	{
-		ImageUtils.writeImage(srcFileName, null, srcImage, zos, imageInfo, this.jpegQuality,
+		ImageUtils.writeImage(null, srcImage, zos, imageInfo, this.jpegQuality,
 				this.maxImagePixels, this.maxImageW, this.maxImageH,
 				this.autoMarginLimitH,  this.autoMarginLimitV, this.autoMarginWhiteLevel, this.autoMarginPadding);
 	}

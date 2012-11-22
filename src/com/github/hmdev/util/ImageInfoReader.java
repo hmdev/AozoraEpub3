@@ -1,19 +1,14 @@
 package com.github.hmdev.util;
 
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.awt.image.RenderedImage;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Vector;
-
-import javax.imageio.ImageIO;
 
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
@@ -21,8 +16,6 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.archivers.zip.ZipFile;
 
 import com.github.hmdev.info.ImageInfo;
-import com.sun.media.jai.codec.ImageCodec;
-import com.sun.media.jai.codec.ImageDecoder;
 
 /**
  * 画像情報を格納するクラス
@@ -222,7 +215,7 @@ public class ImageInfoReader
 			if (!file.exists()) return null; 
 			BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file), 8192);
 			try {
-				return readImage(srcImageFileName.substring(srcImageFileName.lastIndexOf('.')+1).toLowerCase(), bis);
+				return ImageUtils.readImage(srcImageFileName.substring(srcImageFileName.lastIndexOf('.')+1).toLowerCase(), bis);
 			} finally { bis.close(); }
 		} else {
 			ZipFile zf = new ZipFile(this.srcFile, "MS932");
@@ -230,7 +223,7 @@ public class ImageInfoReader
 			if (entry == null) return null;
 			InputStream is = zf.getInputStream(entry);
 			try {
-				return readImage(srcImageFileName.substring(srcImageFileName.lastIndexOf('.')+1).toLowerCase(), is);
+				return ImageUtils.readImage(srcImageFileName.substring(srcImageFileName.lastIndexOf('.')+1).toLowerCase(), is);
 			} catch (Exception e) {
 				e.printStackTrace();
 			} finally {
@@ -239,39 +232,5 @@ public class ImageInfoReader
 			}
 		}
 		return null;
-	}
-	
-	/** ファイルまたはURLの文字列から画像を読み込む
-	 * 読み込めなければnull */
-	static public BufferedImage loadImage(String path)
-	{
-		try {
-			InputStream is;
-			if (path.startsWith("http")) {
-				is = new BufferedInputStream(new URL(path).openStream(), 8192);
-			} else {
-				File file = new File(path);
-				if (!file.exists()) return null;
-				is = new BufferedInputStream(new FileInputStream(file), 8192);
-			}
-			return readImage(path.substring(path.lastIndexOf('.')+1).toLowerCase(), is);
-		} catch (Exception e) { return null; }
-	}
-	
-	final static AffineTransform NO_TRANSFORM = AffineTransform.getTranslateInstance(0, 0);
-	/** ストリームから画像を読み込み */
-	static public BufferedImage readImage(String ext, InputStream is) throws IOException
-	{
-		BufferedImage image;
-		if (ext.equals("jpg") || ext.equals("jpeg")) {
-			ImageDecoder dec = ImageCodec.createImageDecoder("jpeg", is, null);
-			RenderedImage ri = dec.decodeAsRenderedImage();
-			image = new BufferedImage(ri.getWidth(), ri.getHeight(), BufferedImage.TYPE_INT_RGB);
-			image.createGraphics().drawRenderedImage(ri, NO_TRANSFORM);
-		} else {
-			image = ImageIO.read(is);
-		}
-		is.close();
-		return image;
 	}
 }

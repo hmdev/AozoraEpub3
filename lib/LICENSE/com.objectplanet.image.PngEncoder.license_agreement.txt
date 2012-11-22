@@ -1,0 +1,99 @@
+ObjectPlanet Java PngEncoder (SOFTWARE) License Agreement
+
+The following is the end user license agreement ("agreement") 
+used for ObjectPlanet's Java PngEncoder product (SOFTWARE).
+
+This is a legal agreement between you (either an individual or 
+an entity) and ObjectPlanet Inc. ("ObjectPlanet"). If you do 
+not accept and agree with all of the terms of this agreement, 
+promptly delete any copies on your system(s).
+
+
+SOFTWARE LICENSE
+
+The SOFTWARE is protected by copyright laws and international 
+copyright treaties, as well as other intellectual property 
+laws and treaties. The SOFTWARE is licensed, not sold.
+
+
+THE SUBSECTIONS BELOW APPLY ONLY TO THOSE PngEncoder PRODUCTS 
+FOR WHICH YOU HAVE ACQUIRED A LICENSE.
+
+
+1. GRANT OF LICENSE: BINARY LICENSE 
+
+     This license is granted with the download and installation
+     of the SOFTWARE, and permits any number of developers in 
+     your organization to install and use the SOFTWARE as an 
+     integral part in your in-house or commercially available 
+     software.
+     
+     
+2. GRANT OF LICENSE: SOURCE CODE LICENSE
+
+     a) This license permits a single individual within the 
+     licensed company to download, store, inspect, modify, and 
+     use the PngEncoder java source code as a basis for 
+     developing java applications.
+     
+     b) The licensee must use reasonable efforts to maintain 
+     the confidentiality of the source code, including ensuring
+     that it is installed and used only on the single machine 
+     for which it is licensed, and that it is not otherwise 
+     used or copied. 
+
+     c) You may not use the source code as a basis for 
+     developing own software of similar nature to the 
+     PngEncoder software. You may not distribute the source 
+     code in any way.
+
+     
+3. GRANT OF LICENSE: SOURCE CODE SITE LICENSE
+
+     a) This license permits any number of developers at an 
+     addressable site within the licensed company to download,
+     store, inspect, modify, and use the PngEncoder java source 
+     code as a basis for developing java applications.
+     
+     b) All licensees must use reasonable efforts to maintain 
+     the confidentiality of the source code, including ensuring
+     that it is installed and used only on the single site 
+     for which it is licensed, and that it is not otherwise 
+     used or copied. 
+
+     c) You may not use the source code as a basis for 
+     developing own software of similar nature to the 
+     PngEncoder software. You may not distribute the source 
+     code in any way.
+
+
+4. COPYRIGHT.
+The SOFTWARE (including any images, photographs and text 
+incorporated into the SOFTWARE) is owned by ObjectPlanet or its
+suppliers and is protected by Norwegian and other countries' 
+copyright laws and international treaty provisions. Therefore 
+you must treat the SOFTWARE like any other copyrighted material
+and not reproduce it except that you may either: (a) make one 
+copy of the SOFTWARE solely for backup or archival purposes, or
+(b) transfer the SOFTWARE to a single hard disk provided you 
+keep the original solely for backup or archival purposes.
+
+
+5. OTHER RESTRICTIONS.
+You may not redistribute the software in any way, unless it is 
+an integral part of your application. You may not reverse 
+engineer, decompile, disassemble, or translate the SOFTWARE.
+
+
+6. LIMITATION OF LIABILITY.
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT 
+SHALL OBJECTPLANET OR ITS SUPPLIERS BE LIABLE FOR ANY SPECIAL, 
+INCIDENTAL, INDIRECT, OR CONSEQUENTIAL DAMAGES WHATSOEVER 
+(INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS 
+PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION, 
+OR ANY OTHER PECUNIARY LOSS) ARISING OUT OF THE USE OF OR 
+INABILITY TO USE THE SOFTWARE OR THE PROVISION OF OR FAILURE 
+TO PROVIDE SUPPORT SERVICES, EVEN IF OBJECTPLANET HAS BEEN 
+ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
+
+Last revision: 2008-12-04
