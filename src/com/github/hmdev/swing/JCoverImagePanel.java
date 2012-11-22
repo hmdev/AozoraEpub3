@@ -300,27 +300,11 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 		dtde.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
 		Transferable transfer = dtde.getTransferable();
 		try {
-			DataFlavor[] flavars = transfer.getTransferDataFlavors();
-			for (DataFlavor flavar : flavars) {
-				if (flavar.isFlavorJavaFileListType()) {
-					@SuppressWarnings("unchecked")
-					List<File> files = (List<File>)transfer.getTransferData(DataFlavor.javaFileListFlavor);
-					if (files.size() > 0) {
-						bookInfo.coverFileName = files.get(0).getAbsolutePath();
-						bookInfo.loadCoverImage(bookInfo.coverFileName);
-						bookInfo.coverImageIndex = -1;
-						this.fitType = FIT_ZOOM;
-						this.setFitType(FIT_ALL);
-						repaint();
-					}
-					return;
-				}
-			}
-			for (DataFlavor flavar : flavars) {
-				if (flavar.isFlavorTextType()) {
-					bookInfo.coverFileName = transfer.getTransferData(DataFlavor.stringFlavor).toString();
-					if (bookInfo.coverFileName.startsWith("file://"))
-						bookInfo.coverFileName = URLDecoder.decode(bookInfo.coverFileName.substring(0, bookInfo.coverFileName.indexOf('\n')-1).substring(7).trim(),"UTF-8");
+			if (transfer.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+				@SuppressWarnings("unchecked")
+				List<File> files = (List<File>)transfer.getTransferData(DataFlavor.javaFileListFlavor);
+				if (files.size() > 0) {
+					bookInfo.coverFileName = files.get(0).getAbsolutePath();
 					bookInfo.loadCoverImage(bookInfo.coverFileName);
 					bookInfo.coverImageIndex = -1;
 					this.fitType = FIT_ZOOM;
@@ -328,6 +312,17 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 					repaint();
 					return;
 				}
+			}
+			if (transfer.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+				bookInfo.coverFileName = transfer.getTransferData(DataFlavor.stringFlavor).toString();
+				if (bookInfo.coverFileName.startsWith("file://"))
+					bookInfo.coverFileName = URLDecoder.decode(bookInfo.coverFileName.substring(0, bookInfo.coverFileName.indexOf('\n')-1).substring(7).trim(),"UTF-8");
+				bookInfo.loadCoverImage(bookInfo.coverFileName);
+				bookInfo.coverImageIndex = -1;
+				this.fitType = FIT_ZOOM;
+				this.setFitType(FIT_ALL);
+				repaint();
+				return;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
