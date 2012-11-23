@@ -527,10 +527,12 @@ public class JConfirmDialog extends JDialog
 	void resetVisibleWidth()
 	{
 		this.jCoverImagePanel.resetVisibleWidth();
+		this.checkPreviewControlEnabled();
 	}
 	void setVisibleWidthOffset(int offset)
 	{
 		this.jCoverImagePanel.setVisibleWidthOffset(offset);
+		this.checkPreviewControlEnabled();
 	}
 	
 	void fitPreviewImage(int fitType)

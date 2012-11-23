@@ -68,6 +68,7 @@ public class ImageInfo
 		Iterator<ImageReader> readers = ImageIO.getImageReaders(iis);
 		if (readers.hasNext()) {
 			ImageReader reader = readers.next();
+			if (readers.hasNext() && reader.getClass().getName().endsWith("CLibPNGImageReader")) readers.next();
 			reader.setInput(iis);
 			String ext = reader.getFormatName();
 			return new ImageInfo(ext, reader.getWidth(0), reader.getHeight(0), zipIndex);

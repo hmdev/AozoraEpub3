@@ -13,7 +13,7 @@ Changes
 　- 縮小時にjpeg圧縮率の指定が効いていなかった
 　- 縮小時のpng保存修正
 　　　2値縮小時の4bitインデックスの値修正
-　　　jai-imageioがインストールされている場合でもCLibPNGImageWriterは使わない
+　　　jai-imageioがインストールされている場合にCLibPNGImageReader/Writerは使わない
 　- UbuntuとMacのDnD操作に対応
 　- ログ削除時にクリップボードにコピー
 　- ログの行番号を1～開始に修正
