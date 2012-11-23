@@ -2151,6 +2151,7 @@ public class AozoraEpub3Applet extends JApplet
 		//kindlegen.exeがあれば実行
 		try {
 			if (kindlegen != null) {
+				long time = System.currentTimeMillis();
 				String outFileName = outFile.getAbsolutePath();
 				LogAppender.append("kindlegenを実行します : "+kindlegen.getName()+" \""+outFileName+"\"\n");
 				ProcessBuilder pb = new ProcessBuilder(kindlegen.getAbsolutePath(), "-locale", "en","-verbose", outFileName);
@@ -2158,19 +2159,23 @@ public class AozoraEpub3Applet extends JApplet
 				BufferedReader br = new BufferedReader(new InputStreamReader(this.kindleProcess.getInputStream()));
 				String line;
 				int idx = 0;
+				int cnt = 0;
 				String msg = null;
 				while ((line = br.readLine()) != null) {
 					if (line.length() > 0) {
 						System.out.println(line);
 						msg = line;
-						if (idx++ % 2 == 0) LogAppender.append(".");
+						if (idx++ % 2 == 0) {
+							if (cnt++ > 100) { cnt = 1; LogAppender.append("\n"); }
+							LogAppender.append(".");
+						}
 					}
 				}
 				br.close();
 				if (convertCanceled) {
 					LogAppender.append("\n"+msg+"\nkindlegenの変換を中断しました\n");
 				} else {
-					LogAppender.append("\n"+msg+"\nkindlegen変換完了\n");
+					LogAppender.append("\n"+msg+"\nkindlegen変換完了 ["+(((System.currentTimeMillis()-time)/100)/10f)+"s]\n");
 				}
 			}
 		} catch (Exception e) {

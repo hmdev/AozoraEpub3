@@ -1,6 +1,8 @@
 package com.github.hmdev.util;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
@@ -14,6 +16,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Iterator;
 
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
@@ -24,7 +27,6 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.compress.utils.IOUtils;
 
 import com.github.hmdev.info.ImageInfo;
-//import com.objectplanet.image.PngEncoder;
 import com.sun.media.jai.codec.ImageCodec;
 import com.sun.media.jai.codec.ImageDecoder;
 
@@ -119,7 +121,6 @@ public class ImageUtils
 		
 		int w = imageInfo.getWidth();
 		int h = imageInfo.getHeight();
-		
 		int[] margin = null;
 		if (autoMarginLimitH > 0 || autoMarginLimitV > 0) {
 			int startPixel = (int)(w*0.01); //1%
@@ -145,8 +146,9 @@ public class ImageUtils
 				//変更なしならそのままファイル出力
 				IOUtils.copy(is, zos);
 			} else {
-				//編集済の画像がある場合 同じ形式で書き出し
-				_writeImage(zos, srcImage, ext, margin, jpegQuality);
+				//編集済の画像または余白除去の画像なら同じ画像形式で書き出し
+				if (margin != null) srcImage = srcImage.getSubimage(margin[0], margin[1], srcImage.getWidth()-margin[2]-margin[0], srcImage.getHeight()-margin[3]-margin[1]);
+				_writeImage(zos, srcImage, ext, jpegQuality);
 			}
 		} else {
 			//縮小
@@ -157,6 +159,7 @@ public class ImageUtils
 				if (srcImage == null) srcImage = readImage(ext, is);
 				int imageType = srcImage.getType();
 				BufferedImage outImage;
+				boolean hasAlpha = false;
 				ColorModel colorModel;
 				WritableRaster raster;
 				switch (imageType) {
@@ -165,6 +168,13 @@ public class ImageUtils
 					colorModel = getGray16ColorModel();
 					raster = colorModel.createCompatibleWritableRaster(scaledW, scaledH);
 					outImage = new BufferedImage(colorModel, raster, true, null);
+					hasAlpha = true;
+					break;
+				case BufferedImage.TYPE_BYTE_INDEXED:
+					colorModel = srcImage.getColorModel();
+					raster = colorModel.createCompatibleWritableRaster(scaledW, scaledH);
+					outImage = new BufferedImage(colorModel, raster, true, null);
+					hasAlpha = true;
 					break;
 				/*case BufferedImage.TYPE_BYTE_GRAY:
 					//PngEncoderのGRAYが薄くなるのでindexにする
@@ -174,16 +184,25 @@ public class ImageUtils
 					raster = colorModel.createCompatibleWritableRaster(scaledW, scaledH);
 					outImage = new BufferedImage(colorModel, raster, true, null);
 					break;*/
-				case BufferedImage.TYPE_BYTE_INDEXED:
-					colorModel = srcImage.getColorModel();
-					raster = colorModel.createCompatibleWritableRaster(scaledW, scaledH);
-					outImage = new BufferedImage(colorModel, raster, true, null);
+				case BufferedImage.TYPE_BYTE_GRAY:
+					outImage = new BufferedImage(scaledW, scaledH, BufferedImage.TYPE_BYTE_GRAY);
 					break;
+				case BufferedImage.TYPE_USHORT_GRAY:
+					outImage = new BufferedImage(scaledW, scaledH, BufferedImage.TYPE_USHORT_GRAY);
+					break;
+				case BufferedImage.TYPE_INT_ARGB:
+					hasAlpha = true;
 				default:
-					outImage = new BufferedImage(scaledW, scaledH, imageType);
+					outImage = new BufferedImage(scaledW, scaledH, BufferedImage.TYPE_INT_RGB);
 				}
 				Graphics2D g = outImage.createGraphics();
 				try {
+					if (hasAlpha) {
+						g.setColor(Color.WHITE);
+						g.fillRect(0, 0, scaledW, scaledH);
+					}
+					g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+					g.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
 					AffineTransform at = AffineTransform.getScaleInstance(scale, scale);
 					AffineTransformOp ato = new AffineTransformOp(at, AffineTransformOp.TYPE_BICUBIC);
 					if (margin == null) g.drawImage(srcImage, ato, 0, 0);
@@ -192,7 +211,7 @@ public class ImageUtils
 					g.dispose();
 				}
 				//ImageIO.write(outImage, imageInfo.getExt(), zos);
-				_writeImage(zos, outImage, ext, null, jpegQuality);
+				_writeImage(zos, outImage, ext, jpegQuality);
 				LogAppender.append("画像縮小: "+imageInfo.getOutFileName()+" ("+w+","+h+")→("+scaledW+","+scaledH+")\n");
 			} catch (Exception e) {
 				LogAppender.append("画像読み込みエラー: "+imageInfo.getOutFileName()+"\n");
@@ -203,7 +222,7 @@ public class ImageUtils
 	}
 	/** 画像を出力 マージン指定があればカット
 	 * @param margin カットするピクセル数(left, top, right, bottom) */
-	static private void _writeImage(ZipArchiveOutputStream zos, BufferedImage srcImage, String ext, int[] margin, float jpegQuality) throws IOException
+	static private void _writeImage(ZipArchiveOutputStream zos, BufferedImage srcImage, String ext, float jpegQuality) throws IOException
 	{
 		/*if ("png".equals(ext)) {
 			PngEncoder pngEncoder = new PngEncoder();
@@ -218,28 +237,33 @@ public class ImageUtils
 			}
 			pngEncoder.setColorType(pngColorType);
 			pngEncoder.setCompression(PngEncoder.BEST_COMPRESSION);
-			pngEncoder.setIndexedColorMode(PngEncoder.INDEXED_COLORS_ORIGINAL);
-			if (margin != null) srcImage = srcImage.getSubimage(margin[0], margin[1], srcImage.getWidth()-margin[2]-margin[0], srcImage.getHeight()-margin[3]-margin[1]);
+			pngEncoder.setIndexedColorMode(PngEncoder.INDEXED_COLORS_AUTO);
 			pngEncoder.encode(srcImage, zos);
 		} else {*/
-			ImageWriter imageWriter = ImageIO.getImageWritersByFormatName(ext).next();
+			Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName(ext);
+			ImageWriter imageWriter = writers.next();
+			//jai-imageioのpngの挙動がおかしいのでインストールされていても使わない
+			if (writers.hasNext() && imageWriter.getClass().getName().endsWith("CLibPNGImageWriter")) imageWriter = writers.next();
+			imageWriter.setOutput(ImageIO.createImageOutputStream(zos));
 			ImageWriteParam iwp = imageWriter.getDefaultWriteParam();
 			if (iwp.canWriteCompressed()) {
 				try {
 					iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
 					if (ext.charAt(0) == 'j') iwp.setCompressionQuality(jpegQuality);
+					//else if ("png".equals(ext)) iwp.setCompressionQuality(0);
+					imageWriter.write(null, new IIOImage(srcImage, null, null), iwp);
 				} catch (Exception e) { e.printStackTrace(); }
+			} else {
+				imageWriter.write(srcImage);
 			}
-			if (margin != null) srcImage = srcImage.getSubimage(margin[0], margin[1], srcImage.getWidth()-margin[2]-margin[0], srcImage.getHeight()-margin[3]-margin[1]);
-			imageWriter.setOutput(ImageIO.createImageOutputStream(zos));
-			imageWriter.write(null, new IIOImage(srcImage, null, null), iwp);
 		//}
 		zos.flush();
 	}
 	
 	/** 余白の画素数取得
 	 * @param image 余白を検出する画像
-	 * @param limit 余白検出制限 0.0-1.0
+	 * @param limitH 余白のサイズ横 0.0-1.0
+	 * @param limitV 余白のサイズ縦 0.0-1.0
 	 * @param whiteLevel 余白と判別する白レベル
 	 * @param startPixel 余白をチェック開始しする位置 初回が余白なら中へ違えば外が余白になるまで増やす
 	 * @param ignorePixels 連続で余白でなければ無視するピクセル数
@@ -260,7 +284,7 @@ public class ImageUtils
 		
 		//余白ではないpx数 余白の前がignorePixels以下ならゴミとして無視する
 		int noPlainCount = 0;
-		//初回判別
+		//TODO 初回判別
 		
 		for (int i=0; i<=limitPxH; i++) {
 			double whiteRate = getWhiteRateV(image, height, i, whiteLevel, 0.95);

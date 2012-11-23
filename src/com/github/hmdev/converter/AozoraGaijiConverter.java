@@ -47,10 +47,10 @@ public class AozoraGaijiConverter
 	{
 		BufferedReader src = new BufferedReader(new InputStreamReader(new FileInputStream(srcFile), "UTF-8"));
 		String line;
-		int linenum = 0;
+		int lineNum = 0;
 		try {
 			while ((line = src.readLine()) != null) {
-				linenum++;
+				lineNum++;
 				if (line.length() > 0 && line.charAt(0)!='#') {
 					try {
 						String[] values = line.split("\t");
@@ -65,7 +65,7 @@ public class AozoraGaijiConverter
 							chukiMap.put(values[1], values[0]);
 						}
 					} catch (Exception e) {
-						LogAppender.append("[ERROR] "+srcFile.getName()+" ("+linenum+") : "+line+"\n");
+						LogAppender.append("[ERROR] "+srcFile.getName()+" ("+(lineNum+1)+") : "+line+"\n");
 					}
 				}
 			}

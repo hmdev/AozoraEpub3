@@ -151,7 +151,7 @@ public class Epub3Writer
 	boolean isKindle = false;
 	
 	////////////////////////////////
-	/** 出力先ePubのZipストリーム */
+	/** 出力先ePubのZipストリーム ConverterからのnextSection呼び出しで利用 */
 	ZipArchiveOutputStream zos;
 	
 	/** ファイル名桁揃え用 */
@@ -251,8 +251,10 @@ public class Epub3Writer
 	 * @param bookInfo 書籍情報と縦横書き指定
 	 * @param zipImageFileInfos zipの場合はzip内画像の情報 key=サブフォルダ付きの画像ファイル名
 	 * @throws IOException */
-	public void write(AozoraEpub3Converter converter, BufferedReader src, File srcFile, String srcExt, File epubFile, BookInfo bookInfo, ImageInfoReader imageInfoReader) throws IOException
+	public void write(AozoraEpub3Converter converter, BufferedReader src, File srcFile, String srcExt, File epubFile, BookInfo bookInfo, ImageInfoReader imageInfoReader) throws Exception
 	{
+		try {
+		
 		this.canceled = false;
 		this.bookInfo = bookInfo;
 		this.imageInfoReader = imageInfoReader;
@@ -588,16 +590,18 @@ public class Epub3Writer
 			zis.close();
 		}
 		
-		//ePub3出力ファイルを閉じる
-		zos.close();
-		
-		this.velocityContext = null;
-		this.sectionInfos = null;
-		this.chapterInfos = null;
-		this.imageInfos = null;
-		this.outImageFileNames = null;
-		this.bookInfo = null;
-		this.imageInfoReader = null;
+		} finally {
+			//ePub3出力ファイルを閉じる
+			if (zos != null) zos.close();
+			//メンバ変数解放
+			this.velocityContext = null;
+			this.sectionInfos = null;
+			this.chapterInfos = null;
+			this.imageInfos = null;
+			this.outImageFileNames = null;
+			this.bookInfo = null;
+			this.imageInfoReader = null;
+		}
 	}
 	
 	/** 表紙画像を出力 */
@@ -623,7 +627,7 @@ public class Epub3Writer
 	}
 	
 	/** 本文を出力する */
-	void writeSections(AozoraEpub3Converter converter, BufferedReader src, BufferedWriter bw) throws IOException
+	void writeSections(AozoraEpub3Converter converter, BufferedReader src, BufferedWriter bw) throws Exception
 	{
 		//this.startSection(0, bookInfo.startMiddle);
 		
@@ -754,7 +758,7 @@ public class Epub3Writer
 				imageInfo = this.imageInfoReader.getImageInfo(srcImageFileName);
 			}
 			if (imageInfo != null) {
-				LogAppender.append("[WARN] 画像拡張子変更: ("+lineNum+") "+srcImageFileName+"\n");
+				LogAppender.append("[WARN] 画像拡張子変更: ("+(lineNum+1)+") "+srcImageFileName+"\n");
 				srcImageFileName = altImageFileName;
 			}
 		}
@@ -780,7 +784,7 @@ public class Epub3Writer
 			return "../"+IMAGES_PATH+outImageFileName;
 		} else {
 			this.imageIndex++;
-			LogAppender.append("[WARN] 画像ファイルなし: ("+lineNum+") "+srcImageFileName+"\n");
+			LogAppender.append("[WARN] 画像ファイルなし: ("+(lineNum+1)+") "+srcImageFileName+"\n");
 		}
 		return null;
 	}

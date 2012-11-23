@@ -26,10 +26,10 @@ public class LatinConverter
 		String srcFileName = "chuki_latin.txt";
 		BufferedReader src = new BufferedReader(new InputStreamReader(new FileInputStream(srcFileName), "UTF-8"));
 		String line;
-		int linenum = 0;
+		int lineNum = 0;
 		try {
 			while ((line = src.readLine()) != null) {
-				linenum++;
+				lineNum++;
 				if (line.length() > 0 && line.charAt(0)!='#') {
 					try {
 						String[] values = line.split("\t");
@@ -37,7 +37,7 @@ public class LatinConverter
 						if (values[0].length() > 0) latinMap.put(values[0], ch);
 						latinCidMap.put(ch, new String[]{values[2], values[3]});
 					} catch (Exception e) {
-						LogAppender.append("[ERROR] "+srcFileName+" ("+linenum+") : "+line+"\n");
+						LogAppender.append("[ERROR] "+srcFileName+" ("+(lineNum+1)+") : "+line+"\n");
 					}
 				}
 			}

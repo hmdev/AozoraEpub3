@@ -364,15 +364,12 @@ public class AozoraEpub3
 			String encType, BookInfo.TitleType titleType)
 	{
 		try {
-			if (is == null) {
-				return null;
-			}
+			if (is == null) return null;
 			
-			//タイトル取得
+			//タイトル、画像注記、左右中央注記、目次取得
 			BufferedReader src = new BufferedReader(new InputStreamReader(is, (String)encType));
 			BookInfo bookInfo = aozoraConverter.getBookInfo(src, imageInfoReader, titleType);
 			is.close();
-			
 			return bookInfo;
 			
 		} catch (Exception e) {
@@ -391,6 +388,7 @@ public class AozoraEpub3
 			String encType, BookInfo bookInfo, ImageInfoReader imageInfoReader, int txtIdx)
 	{
 		try {
+			long time = System.currentTimeMillis();
 			LogAppender.append("変換開始 : ");
 			LogAppender.append(srcFile.getPath());
 			LogAppender.append("\n");
@@ -404,13 +402,13 @@ public class AozoraEpub3
 			//ePub書き出し srcは中でクローズされる
 			epubWriter.write(aozoraConverter, src, srcFile, ext, outFile, bookInfo, imageInfoReader);
 			
-			LogAppender.append("変換完了 : ");
+			LogAppender.append("変換完了["+(((System.currentTimeMillis()-time)/100)/10f)+"s] : ");
 			LogAppender.append(outFile.getPath());
 			LogAppender.append("\n");
 			
 		} catch (Exception e) {
 			e.printStackTrace();
-			LogAppender.append("エラーが発生しました : ");
+			LogAppender.append("エラーが発生しました");
 			LogAppender.append(e.getMessage());
 			LogAppender.append("\n");
 		}

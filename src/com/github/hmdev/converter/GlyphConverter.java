@@ -37,16 +37,16 @@ public class GlyphConverter
 	{
 		BufferedReader src = new BufferedReader(new InputStreamReader(new FileInputStream(srcFile), "UTF-8"));
 		String line;
-		int linenum = 0;
+		int lineNum = 0;
 		try {
 			while ((line = src.readLine()) != null) {
-				linenum++;
+				lineNum++;
 				if (line.length() > 0 && line.charAt(0)!='#') {
 					try {
 						String[] values = line.split("\t");
 						char ch = values[0].charAt(0);
 						if (!cidMap.containsKey(ch)) cidMap.put(ch, values[1]);
-					} catch (Exception e) { log.append("[ERROR] "+srcFile.getName()+" ("+linenum+") : "+line+"\n"); }
+					} catch (Exception e) { log.append("[ERROR] "+srcFile.getName()+" ("+(lineNum+1)+") : "+line+"\n"); }
 				}
 			}
 		} finally {

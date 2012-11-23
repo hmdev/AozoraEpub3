@@ -1,6 +1,7 @@
 package com.github.hmdev.swing;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.datatransfer.DataFlavor;
@@ -42,10 +43,10 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 	private double minScale = 0;
 	
 	private double scale = 0;
-	private int offsetX = 0;
-	private int offsetY = 0;
+	private double offsetX = 0;
+	private double offsetY = 0;
 	
-	private int visibleWidth = 0;
+	private double visibleWidth = 0;
 	
 	private int fitType = 0;
 	final static int FIT_ALL = 0;
@@ -55,6 +56,7 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 	
 	private int startX = 0;
 	private int startY = 0;
+	private int prevX = 0;
 	
 	public JCoverImagePanel()
 	{
@@ -80,21 +82,21 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 			}
 			if (this.previewImage != null) {
 				if (this.visibleWidth <= 0) this.visibleWidth = this.getWidth();
-				int minX = this.visibleWidth-this.previewImage.getWidth();
-				int maxX = 0;
-				int x = minX/2;
+				double minX = this.visibleWidth-this.previewImage.getWidth();
+				double maxX = 0;
+				double x = minX/2;
 				if (minX < 0) x = Math.max(minX, Math.min(maxX, this.offsetX));
 				this.offsetX = x;
 				int minY = this.getHeight()-this.previewImage.getHeight();
 				int maxY = 0;
 				int y = minY/2;
-				if (minY < 0) y = Math.max(minY,  Math.min(maxY, this.offsetY));
+				if (minY < 0) y = Math.max(minY,  Math.min(maxY, (int)this.offsetY));
 				else y = 0;
 				this.offsetY = y;
-				g.setClip(0, 0, this.visibleWidth, this.previewImage.getHeight());
+				g.setClip(0, 0, (int)this.visibleWidth, this.getHeight());
 				g.setColor(Color.WHITE);
-				g.fillRect(x, 0, Math.min(this.previewImage.getWidth()-x, this.visibleWidth), this.previewImage.getHeight());
-				g.drawImage(this.previewImage, x, y, this);
+				g.fillRect((int)x, 0, (int)Math.min(this.previewImage.getWidth()-x, this.visibleWidth), this.previewImage.getHeight());
+				g.drawImage(this.previewImage, (int)x, (int)y, this);
 			}
 		}
 	}
@@ -115,6 +117,29 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 		this.previewImage = previewImage;
 	}
 	
+	/** パネルの表示高さ変更 */
+	public void setPaneSize(int width, int height)
+	{
+		//int w = this.getWidth();
+		int h = this.getHeight();
+		if (h == 0) return;
+		double scale = (double)height/h;
+		Dimension size = new Dimension(width, height);
+		this.setPreferredSize(size);
+		this.setMaximumSize(size);
+		this.setMinimumSize(size);
+		this.setSize(width, height);
+		if (scale != 1) {
+			this.offsetX *= scale;
+			this.offsetY *= scale;
+			this.visibleWidth *= scale;
+			this.scale *= scale;
+		}
+		this.setScale();
+		this.previewImage = null;
+		this.repaint();
+	}
+	
 	/** 画像ファイルを設定
 	 * 画像入れ替え時もこれで行う
 	 * プレビューはpaintで生成 */
@@ -130,9 +155,9 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 		this.repaint();
 	}
 	/** 幅高さに合わせる */
-	public void setFitType(int fitType)
+	public void setFitType(int fitType, boolean force)
 	{
-		if (this.fitType == fitType) return;
+		if (!force && this.fitType == fitType) return;
 		this.fitType = fitType;
 		this.previewImage = null;
 		this.offsetX = 0;
@@ -154,6 +179,9 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 			//最小スケールに制限
 			if (this.scale*zoom < this.minScale) return;
 		}
+		//2倍より大きくしない
+		if (zoom > 1 && this.scale > 2) { return; }
+		
 		this.fitType = FIT_ZOOM;
 		this.previewImage = null;
 		this.scale *= zoom;
@@ -173,7 +201,7 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 	
 	void setVisibleWidthOffset(int offset)
 	{
-		int width = this.visibleWidth+offset;
+		double width = this.visibleWidth+offset;
 		//プレビュー幅の方が狭ければプレビューを狭くする
 		if (offset < 0) {
 			if (this.previewImage != null && width > this.previewImage.getWidth()) width = this.previewImage.getWidth()-offset;
@@ -188,7 +216,7 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 			this.fitType = FIT_H;
 			break;
 		case FIT_ZOOM:
-			if (this.previewImage.getHeight() < this.getHeight()) {
+			if (this.previewImage != null && this.previewImage.getHeight() < this.getHeight()) {
 				this.fitType = FIT_H;
 			}
 		}
@@ -246,8 +274,8 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 		
 		//縮尺に合せてリサイズ 大きければ縮小
 		double coverScale = 1;
-		if (coverW > 0 && coverH > 0) coverScale = Math.min(coverW/this.getWidth(), coverH/this.getHeight()) * this.scale;
-		else if (coverW > 0) coverScale = (coverW/this.getWidth()) * this.scale;
+		if (coverW > 0 && coverH > 0) coverScale = Math.min(coverW/this.visibleWidth, coverH/this.getHeight()) * this.scale;
+		else if (coverW > 0) coverScale = (coverW/this.visibleWidth) * this.scale;
 		else if (coverH > 0) coverScale = (coverH/this.getHeight()) * this.scale;
 		coverW = Math.min(coverW, this.bookInfo.coverImage.getWidth()*coverScale);
 		coverH = Math.min(coverH, this.bookInfo.coverImage.getHeight()*coverScale);
@@ -256,15 +284,12 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 			coverH /= coverScale;
 			coverScale = 1;
 		}
+		coverW *= this.visibleWidth/Math.min(this.getWidth(), this.previewImage.getWidth());
+		int x = 0;
+		if (this.visibleWidth < this.previewImage.getWidth()) x = (int)Math.round(this.offsetX * coverW/this.visibleWidth);
+		int y = 0;
+		if (this.getHeight() < this.previewImage.getHeight()) y = (int)Math.round(this.offsetY * coverH/this.getHeight());
 		
-		double x = 0;
-		if (this.visibleWidth < this.previewImage.getWidth()) x = this.offsetX * coverW/this.getWidth();
-		double y = 0;
-		if (this.getHeight() < this.previewImage.getHeight()) y = this.offsetY * coverH/this.getHeight();
-		
-		//幅変更を反映
-		//x -= (this.getWidth()-this.visibleWidth)/2.0 * (double)coverW/this.getWidth();
-		coverW *= (double)this.visibleWidth/this.getWidth();
 		BufferedImage coverImage = new BufferedImage((int)coverW, (int)coverH, BufferedImage.TYPE_INT_RGB);
 		Graphics2D g2 = coverImage.createGraphics();
 		try {
@@ -272,7 +297,7 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 			AffineTransformOp ato = new AffineTransformOp(AffineTransform.getScaleInstance(coverScale, coverScale), AffineTransformOp.TYPE_BICUBIC);
 			g2.setColor(Color.WHITE);
 			g2.fillRect(0, 0, (int)coverW, (int)coverH);
-			g2.drawImage(this.bookInfo.coverImage, ato, (int)x, (int)y);
+			g2.drawImage(this.bookInfo.coverImage, ato, x, y);
 		} finally {
 			g2.dispose();
 		}
@@ -308,7 +333,7 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 					bookInfo.loadCoverImage(bookInfo.coverFileName);
 					bookInfo.coverImageIndex = -1;
 					this.fitType = FIT_ZOOM;
-					this.setFitType(FIT_ALL);
+					this.setFitType(FIT_ALL, true);
 					repaint();
 					return;
 				}
@@ -319,8 +344,7 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 					bookInfo.coverFileName = URLDecoder.decode(bookInfo.coverFileName.substring(0, bookInfo.coverFileName.indexOf('\n')-1).substring(7).trim(),"UTF-8");
 				bookInfo.loadCoverImage(bookInfo.coverFileName);
 				bookInfo.coverImageIndex = -1;
-				this.fitType = FIT_ZOOM;
-				this.setFitType(FIT_ALL);
+				this.setFitType(FIT_ALL, true);
 				repaint();
 				return;
 			}
@@ -348,6 +372,7 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 	public void mousePressed(MouseEvent e)
 	{
 		this.startX = e.getX();
+		this.prevX = e.getX();
 		this.startX -= this.offsetX;
 		this.startY = e.getY();
 		if (this.offsetY != 0) this.startY -= this.offsetY;
@@ -363,9 +388,14 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 	public void mouseDragged(MouseEvent e)
 	{
 		if (this.startX != Integer.MIN_VALUE) {
-			this.offsetX = e.getX()-this.startX;
-			this.offsetY = e.getY()-this.startY;
+			if (e.isControlDown()) {
+				setVisibleWidthOffset(e.getX()-this.prevX);
+			} else {
+				this.offsetX = e.getX()-this.startX;
+				this.offsetY = e.getY()-this.startY;
+			}
 			repaint();
+			this.prevX = e.getX();
 		}
 	}
 	/** マウス移動イベント */
@@ -379,7 +409,8 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 	public void mouseWheelMoved(MouseWheelEvent e)
 	{
 		double rate = 1.01;
-		if (e.isShiftDown()) rate = 1.001;
+		if (e.isControlDown()) rate = 1.001;
+		else if (e.isShiftDown()) rate = 1.05;
 		if (e.getWheelRotation() > 0) {
 			this.setZoom(1/rate);
 		} else {
@@ -391,11 +422,14 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 	public void keyPressed(KeyEvent e)
 	{
 		if (previewImage == null) return;
+		int delta = 1;
+		if (e.isControlDown()) delta = 5;
 		switch (e.getKeyCode()) {
-		case KeyEvent.VK_UP: this.offsetY--; break;
-		case KeyEvent.VK_DOWN: this.offsetY++; break;
-		case KeyEvent.VK_LEFT: this.offsetX--; break;
-		case KeyEvent.VK_RIGHT: this.offsetX++; break;
+		case KeyEvent.VK_UP: this.offsetY-=delta; break;
+		case KeyEvent.VK_DOWN: this.offsetY+=delta; break;
+		case KeyEvent.VK_LEFT: this.offsetX-=delta; break;
+		case KeyEvent.VK_RIGHT: this.offsetX+=delta; break;
+		case KeyEvent.VK_HOME: this.offsetX=0; break;
 		default: return;
 		}
 		repaint();
