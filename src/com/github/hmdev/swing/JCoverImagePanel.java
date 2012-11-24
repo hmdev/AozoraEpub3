@@ -172,6 +172,7 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 	 * 幅調整中は高さ100%まで */
 	public void setZoom(double zoom)
 	{
+		if (this.bookInfo.coverImage == null) return;
 		if (this.visibleWidth < this.getWidth()) {
 			//幅調整中なら高さ制限
 			if (this.scale*zoom*this.bookInfo.coverImage.getHeight() < this.getHeight()) return;

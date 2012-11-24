@@ -6,8 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Properties;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
@@ -307,7 +305,7 @@ public class AozoraEpub3
 					bookInfo.coverImageIndex = coverImageIndex;
 					bookInfo.coverFileName = coverFileName;
 					
-					String[] titleCreator = getFileTitleCreator(srcFile.getName());
+					String[] titleCreator = BookInfo.getFileTitleCreator(srcFile.getName());
 					if (titleCreator != null) {
 						if (useFileName) {
 							if (titleCreator[0] != null && titleCreator[0].trim().length() >0) bookInfo.title = titleCreator[0];
@@ -412,42 +410,6 @@ public class AozoraEpub3
 			LogAppender.append(e.getMessage());
 			LogAppender.append("\n");
 		}
-	}
-	
-	/** ファイル名からタイトルと著者名を取得 */
-	static public String[] getFileTitleCreator(String fileName)
-	{
-		//ファイル名からタイトル取得
-		String[] titleCreator = new String[2];
-		String noExtName = fileName.substring(0, fileName.lastIndexOf('.'));
-		//後ろの括弧から校正情報等を除外
-		noExtName = noExtName.replaceAll("（","\\(").replaceAll("）","\\)");
-		noExtName = noExtName.replaceAll("\\(青空[^\\)]*\\)", "");
-		noExtName = noExtName.replaceAll("\\([^\\)]*(校正|軽量|表紙|挿絵|補正|修正|ルビ)[^\\)]*\\)", "");
-		
-		Matcher m = Pattern.compile("[\\[|［](.+?)[\\]|］][ |　]*(.*)[ |　]*$").matcher(noExtName);
-		if (m.find()) {
-			titleCreator[0] = m.group(2);
-			titleCreator[1] = m.group(1);
-		} else {
-			m = Pattern.compile("^(.*?)( |　)*(\\(|（)").matcher(noExtName);
-			if (m.find()) {
-				titleCreator[0] = m.group(1);
-			} else {
-				//一致しなければ拡張子のみ除外
-				titleCreator[0] = noExtName;
-			}
-		}
-		//trimして長さが0ならnullにする
-		if (titleCreator[0] != null) {
-			titleCreator[0] = titleCreator[0].trim();
-			if (titleCreator[0].length() == 0) titleCreator[0] = null;
-		}
-		if (titleCreator[1] != null) {
-			titleCreator[1] = titleCreator[1].trim();
-			if (titleCreator[1].length() == 0) titleCreator[1] = null;
-		}
-		return titleCreator;
 	}
 	
 	/** 入力ファイルからStreamオープン

@@ -2,6 +2,8 @@ package com.github.hmdev.info;
 
 public class ChapterLineInfo
 {
+	public int lineNum;
+	
 	/** 見出しレベル 自動抽出は+10 */
 	public int level;
 	
@@ -9,27 +11,38 @@ public class ChapterLineInfo
 	public boolean emptyNext;
 	
 	/** 目次に使う文字列の開始位置 */
-	public String chapterName;
+	String chapterName;
 	
 	/** 改ページ後の先頭ならtrue で目次にアンカー追加しない */
 	public boolean sectionChapter;
 
-	public ChapterLineInfo(int level, boolean emptyLineNext)
+	public ChapterLineInfo(int lineNum, int level, boolean emptyLineNext)
 	{
-		this(level, emptyLineNext, null);
+		this(lineNum, level, emptyLineNext, null);
 	}
-	public ChapterLineInfo(int level, boolean emptyLineNext, String chapterName)
+	public ChapterLineInfo(int lineNum, int level, boolean emptyLineNext, String chapterName)
 	{
-		this(level, emptyLineNext, chapterName, false);
+		this(lineNum, level, emptyLineNext, chapterName, false);
 	}
-	public ChapterLineInfo(int level, boolean emptyLineNext, String chapterName, boolean sectionChapter)
+	public ChapterLineInfo(int lineNum, int level, boolean emptyLineNext, String chapterName, boolean sectionChapter)
 	{
+		this.lineNum = lineNum;
 		this.level = level;
 		this.emptyNext = emptyLineNext;
 		this.chapterName = chapterName;
 		this.sectionChapter = sectionChapter;
 	}
 	
+	@Override
+	public String toString()
+	{
+		return this.chapterName;
+	}
+	
+	public String getChapterName()
+	{
+		return this.chapterName;
+	}
 	public void setChapterName(String chapterName)
 	{
 		this.chapterName = chapterName;

@@ -1,8 +1,12 @@
 package com.github.hmdev.info;
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.github.hmdev.util.ImageUtils;
 
@@ -75,6 +79,8 @@ public class BookInfo
 	
 	/** タイトル行の最後 */
 	public int titleEndLine = -1;
+	
+	int firstCommentLineNum = -1;
 	
 	/** 発刊日時 */
 	public Date published;
@@ -212,10 +218,10 @@ public class BookInfo
 	}
 	
 	/** 見出し行と階層レベルを保存 */
-	public void addChapterLineInfo(int lineNum, ChapterLineInfo chapterLineInfo)
+	public void addChapterLineInfo(ChapterLineInfo chapterLineInfo)
 	{
 		if (this.mapChapterLine == null) this.mapChapterLine = new HashMap<Integer, ChapterLineInfo>();
-		this.mapChapterLine.put(lineNum, chapterLineInfo);
+		this.mapChapterLine.put(chapterLineInfo.lineNum, chapterLineInfo);
 	}
 	/** 見出し行と削除 */
 	public void removeChapterLineInfo(int lineNum)
@@ -235,6 +241,25 @@ public class BookInfo
 		if (this.mapChapterLine == null) return 0;
 		ChapterLineInfo info = this.mapChapterLine.get(lineNum);
 		return info == null ? 0 : info.level;
+	}
+	
+	/** 行番号順に並び替えた目次一覧リストを生成して返す */
+	public Vector<ChapterLineInfo> getChapterLineInfoList()
+	{
+		if (this.mapChapterLine == null) return null;
+		
+		Vector<ChapterLineInfo> list = new Vector<ChapterLineInfo>();
+		
+		int[] lines = new int[this.mapChapterLine.size()];
+		int i = 0;
+		for (Integer lineNum : this.mapChapterLine.keySet()) {
+			lines[i++] = lineNum;
+		}
+		Arrays.sort(lines);
+		for (int lineNum : lines) {
+			list.add(this.mapChapterLine.get(lineNum));
+		}
+		return list;
 	}
 	
 	/** 目次ページの自動抽出見出しを除外 */
@@ -421,7 +446,19 @@ public class BookInfo
 	/** 先頭行から表題と著者を取得 */
 	public void setMetaInfo(TitleType titleType, String[] metaLines, int metaLineStart, int firstCommentLineNum)
 	{
+		this.firstCommentLineNum = firstCommentLineNum;
+		
+		this.titleLine = -1;
+		this.orgTitleLine = -1;
+		this.subTitleLine = -1;
+		this.subOrgTitleLine = -1;
+		this.creatorLine = -1;
+		this.subCreatorLine = -1;
+		this.title = "";
+		this.creator = "";
+		
 		if (titleType != TitleType.NONE) {
+			
 			//バッファからタイトルと著者取得
 			this.metaLines = metaLines;
 			this.metaLineStart = metaLineStart;
@@ -614,6 +651,47 @@ public class BookInfo
 			
 			if (this.creator != null && (this.creator.startsWith("―") || this.creator.startsWith("【"))) this.creator = null;
 		}
+	}
+	/** 本文内のタイトル再読み込み */
+	public void reloadMetadata(TitleType titleType)
+	{
+		setMetaInfo(titleType, this.metaLines, this.metaLineStart, this.firstCommentLineNum);
+	}
+	
+	/** ファイル名からタイトルと著者名を取得 */
+	static public String[] getFileTitleCreator(String fileName)
+	{
+		//ファイル名からタイトル取得
+		String[] titleCreator = new String[2];
+		String noExtName = fileName.substring(0, fileName.lastIndexOf('.'));
+		//後ろの括弧から校正情報等を除外
+		noExtName = noExtName.replaceAll("（","\\(").replaceAll("）","\\)");
+		noExtName = noExtName.replaceAll("\\(青空[^\\)]*\\)", "");
+		noExtName = noExtName.replaceAll("\\([^\\)]*(校正|軽量|表紙|挿絵|補正|修正|ルビ)[^\\)]*\\)", "");
+		
+		Matcher m = Pattern.compile("[\\[|［](.+?)[\\]|］][ |　]*(.*)[ |　]*$").matcher(noExtName);
+		if (m.find()) {
+			titleCreator[0] = m.group(2);
+			titleCreator[1] = m.group(1);
+		} else {
+			m = Pattern.compile("^(.*?)( |　)*(\\(|（)").matcher(noExtName);
+			if (m.find()) {
+				titleCreator[0] = m.group(1);
+			} else {
+				//一致しなければ拡張子のみ除外
+				titleCreator[0] = noExtName;
+			}
+		}
+		//trimして長さが0ならnullにする
+		if (titleCreator[0] != null) {
+			titleCreator[0] = titleCreator[0].trim();
+			if (titleCreator[0].length() == 0) titleCreator[0] = null;
+		}
+		if (titleCreator[1] != null) {
+			titleCreator[1] = titleCreator[1].trim();
+			if (titleCreator[1].length() == 0) titleCreator[1] = null;
+		}
+		return titleCreator;
 	}
 	
 	/** ファイルまたはURLの文字列から画像を読み込んで表紙イメージとして設定 */

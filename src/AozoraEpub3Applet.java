@@ -205,7 +205,7 @@ public class AozoraEpub3Applet extends JApplet
 	JTextField jTextPageBreakChapterSize;
 	
 	//テキストエリア
-	JScrollPane jScrollPane;
+	//JScrollPane jScrollPane;
 	JTextArea jTextArea;
 	
 	//プログレスバー
@@ -1268,8 +1268,7 @@ public class AozoraEpub3Applet extends JApplet
 		jTextArea.setBorder(new LineBorder(Color.white, 3));
 		new DropTarget(jTextArea, DnDConstants.ACTION_COPY_OR_MOVE, new DropListener(), true);
 		
-		jScrollPane = new JScrollPane(jTextArea);
-		lowerPane.add(jScrollPane);
+		lowerPane.add(new JScrollPane(jTextArea));
 		
 		////////////////////////////////////////////////////////////////
 		//画面下 ステータス
@@ -1349,7 +1348,7 @@ public class AozoraEpub3Applet extends JApplet
 		
 		////////////////////////////////////////////////////////////////
 		//確認ダイアログ
-		jConfirmDialog = new JConfirmDialog((JApplet)this,
+		jConfirmDialog = new JConfirmDialog(
 			iconImage, AozoraEpub3Applet.class.getResource("images/icon.png").toString().replaceFirst("/icon\\.png", "/")
 		);
 		
@@ -1850,7 +1849,9 @@ public class AozoraEpub3Applet extends JApplet
 		
 		} catch (Exception e) {
 			e.printStackTrace();
-			LogAppender.append("パラメータ読み込みエラー\n");
+			LogAppender.append("エラーが発生しました : ");
+			LogAppender.append(e.getMessage());
+			LogAppender.append("\n");
 		}
 		////////////////////////////////
 		System.gc();
@@ -2025,7 +2026,7 @@ public class AozoraEpub3Applet extends JApplet
 		bookInfo.coverFileName = coverFileName;
 		bookInfo.coverImageIndex = coverImageIndex;
 		
-		String[] titleCreator = AozoraEpub3.getFileTitleCreator(srcFile.getName());
+		String[] titleCreator = BookInfo.getFileTitleCreator(srcFile.getName());
 		if (jCheckUserFileName.isSelected()) {
 			//ファイル名優先ならテキスト側の情報は不要
 			bookInfo.title = "";
@@ -2053,7 +2054,8 @@ public class AozoraEpub3Applet extends JApplet
 			this.jConfirmDialog.showDialog(
 				srcFile.getName(),
 				(dstPath!=null ? dstPath.getAbsolutePath() : srcFile.getParentFile().getAbsolutePath())+File.separator,
-				title, creator, bookInfo, imageInfoReader, this.jFrameParent.getLocation(),
+				title, creator, this.jComboTitle.getSelectedIndex(),
+				bookInfo, imageInfoReader, this.jFrameParent.getLocation(),
 				coverW, coverH
 			);
 			
@@ -2072,8 +2074,8 @@ public class AozoraEpub3Applet extends JApplet
 			if (!this.jConfirmDialog.jCheckConfirm2.isSelected()) jCheckConfirm.setSelected(false);
 			
 			//確認ダイアログの値をBookInfoに設定
-			bookInfo.title = this.jConfirmDialog.jTextTitle.getText().trim();
-			bookInfo.creator = this.jConfirmDialog.jTextCreator.getText().trim();
+			bookInfo.title = this.jConfirmDialog.getMetaTitle();
+			bookInfo.creator = this.jConfirmDialog.getMetaCreator();
 			//著者が空欄なら著者行もクリア
 			if (bookInfo.creator.length() == 0) bookInfo.creatorLine = -1;
 			
