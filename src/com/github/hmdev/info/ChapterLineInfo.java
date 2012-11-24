@@ -9,16 +9,34 @@ public class ChapterLineInfo
 	public boolean emptyNext;
 	
 	/** 目次に使う文字列の開始位置 */
-	public int nameStart = 0;
+	public String chapterName;
+	
+	/** 改ページ後の先頭ならtrue で目次にアンカー追加しない */
+	public boolean sectionChapter;
 
 	public ChapterLineInfo(int level, boolean emptyLineNext)
 	{
-		this(level, emptyLineNext, 0);
+		this(level, emptyLineNext, null);
 	}
-	public ChapterLineInfo(int level, boolean emptyLineNext, int nameStart)
+	public ChapterLineInfo(int level, boolean emptyLineNext, String chapterName)
+	{
+		this(level, emptyLineNext, chapterName, false);
+	}
+	public ChapterLineInfo(int level, boolean emptyLineNext, String chapterName, boolean sectionChapter)
 	{
 		this.level = level;
 		this.emptyNext = emptyLineNext;
-		this.nameStart = nameStart;
+		this.chapterName = chapterName;
+		this.sectionChapter = sectionChapter;
+	}
+	
+	public void setChapterName(String chapterName)
+	{
+		this.chapterName = chapterName;
+	}
+	public void joinChapterName(String chapterName)
+	{
+		if (this.chapterName == null) this.chapterName = chapterName;
+		else this.chapterName = this.chapterName+"　"+chapterName;
 	}
 }

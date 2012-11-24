@@ -429,6 +429,9 @@ public class Epub3Writer
 		bw.flush();
 		zos.closeArchiveEntry();
 		
+		//BookInfoから目次情報取得
+		
+		
 		//目次の階層情報を設定
 		//nullを除去
 		for (int i=chapterInfos.size()-1; i>=0; i--) {
@@ -692,7 +695,7 @@ public class Epub3Writer
 		else if (pageType == PageBreakTrigger.PAGE_BOTTOM) sectionInfo.setBottom(true);
 		this.sectionInfos.add(sectionInfo);
 		//セクション開始は名称がnullなので改ページ処理で文字列が設定されなければ出力されない 階層レベルは1
-		this.addChapter(null, null, 1);
+		//this.addChapter(null, null, 1);
 		
 		this.zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+XHTML_PATH+sectionId+".xhtml"));
 		
@@ -721,16 +724,16 @@ public class Epub3Writer
 		this.chapterInfos.add(new ChapterInfo(sectionInfo.sectionId, chapterId, name, chapterLevel));
 	}
 	/** 追加済の章の名称を変更 */
-	public void updateChapterName(String name)
+	/*public void updateChapterName(String name)
 	{
 		this.chapterInfos.lastElement().setChapterName(name);
 	}
 	/** 最後の章の情報を返却 */
-	public ChapterInfo getLastChapterInfo()
+	/*public ChapterInfo getLastChapterInfo()
 	{
 		if (this.chapterInfos.size() == 0) return null;
 		return this.chapterInfos.lastElement();
-	}
+	}*/
 	
 	/** 連番に変更した画像ファイル名を返却.
 	 * 重複していたら前に出力したときの連番ファイル名を返す
