@@ -83,6 +83,7 @@ public class JConfirmDialog extends JDialog
 	
 	/** 目次リスト */
 	JTable jTableToc;
+	JScrollPane jScrollToc;
 	TocTableDataModel tocDataModel;
 	
 	////////////////////////////////
@@ -127,14 +128,11 @@ public class JConfirmDialog extends JDialog
 	
 	//Size
 	static final int DIALOG_WIDTH = 640;
-	static final int DIALOG_HEIGHT = 330;
-	
-	//static final int PANE_HEIGHT = 380;
+	static final int DIALOG_HEIGHT = 340;
 	
 	static final int LEFT_PANE_WIDTH = 430;
 	static final int PREVIEW_WIDTH = 180;
 	static final int PREVIEW_HEIGHT = 240;
-	
 	
 	public JConfirmDialog(Image iconImage, String imageURLPath)
 	{
@@ -330,9 +328,9 @@ public class JConfirmDialog extends JDialog
 		////////////////////////////////////////////////////////////////
 		//目次プレビュー
 		jTableToc = new JTable();
-		JScrollPane tocPane = new JScrollPane(jTableToc);
+		jScrollToc = new JScrollPane(jTableToc);
 		//tocPane.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 0));
-		previewLeft.add(tocPane);
+		previewLeft.add(jScrollToc);
 		
 		////////////////////////////////////////////////////////////////
 		//右側プレビューパネル
@@ -634,15 +632,17 @@ public class JConfirmDialog extends JDialog
 			setVisible(false);
 			
 			//目次設定
-			if (this.jTableToc.isEditing()) this.jTableToc.getCellEditor().stopCellEditing(); //編集中なら確定
-			int cnt = this.tocDataModel.getRowCount();
-			for (int row=0; row<cnt; row++) {
-				int lineNum = this.tocDataModel.getLineNum(row)-1;
-				ChapterLineInfo chapterLineInfo = bookInfo.getChapterLineInfo(lineNum);
-				if (!this.tocDataModel.isSelected(row)) {
-					this.bookInfo.removeChapterLineInfo(chapterLineInfo.lineNum);
-				} else {
-					chapterLineInfo.setChapterName(this.tocDataModel.getTocName(row));
+			if (!this.bookInfo.isImageOnly() && this.tocDataModel != null) {
+				if (this.jTableToc.isEditing()) this.jTableToc.getCellEditor().stopCellEditing(); //編集中なら確定
+				int cnt = this.tocDataModel.getRowCount();
+				for (int row=0; row<cnt; row++) {
+					int lineNum = this.tocDataModel.getLineNum(row)-1;
+					ChapterLineInfo chapterLineInfo = bookInfo.getChapterLineInfo(lineNum);
+					if (!this.tocDataModel.isSelected(row)) {
+						this.bookInfo.removeChapterLineInfo(chapterLineInfo.lineNum);
+					} else {
+						chapterLineInfo.setChapterName(this.tocDataModel.getTocName(row));
+					}
 				}
 			}
 		}
@@ -684,20 +684,26 @@ public class JConfirmDialog extends JDialog
 		this.jCoverImagePanel.setBookInfo(bookInfo);
 		
 		//目次設定
-		Vector<ChapterLineInfo> vecChapterLineInfo = bookInfo.getChapterLineInfoList();
-		if (vecChapterLineInfo != null) {
-			this.tocDataModel = new TocTableDataModel(new String[]{"", "行", "目次名称"}, 0);
+		if (bookInfo.isImageOnly()) {
+			this.tocDataModel = null;
+			this.jTableToc.setModel(new DefaultTableModel());
+			this.jTableToc.setVisible(false);
+			this.jScrollToc.setVisible(false);
+		} else {
+			Vector<ChapterLineInfo> vecChapterLineInfo = bookInfo.getChapterLineInfoList();
+			this.tocDataModel = new TocTableDataModel(new String[]{"", "", "行", "目次名称"}, 0);
 			for (ChapterLineInfo chapterLineInfo : vecChapterLineInfo) {
-				tocDataModel.addRow(new Object[]{true, chapterLineInfo.lineNum+1, chapterLineInfo.getChapterName()});
+				tocDataModel.addRow(new Object[]{true, chapterLineInfo.getTypeId(), chapterLineInfo.lineNum+1, chapterLineInfo.getChapterName()});
 			}
 			this.jTableToc.setModel(tocDataModel);
 			this.jTableToc.getColumnModel().getColumn(0).setMaxWidth(22);
-			this.jTableToc.getColumnModel().getColumn(1).setMaxWidth(40);
+			this.jTableToc.getColumnModel().getColumn(1).setMaxWidth(30);
+			this.jTableToc.getColumnModel().getColumn(1).setPreferredWidth(20);
+			this.jTableToc.getColumnModel().getColumn(2).setMaxWidth(60);
+			this.jTableToc.getColumnModel().getColumn(2).setPreferredWidth(35);
 			this.jTableToc.getTableHeader().setPreferredSize(new Dimension(100, 20));
 			this.jTableToc.setVisible(true);
-		} else {
-			this.jTableToc.setModel(new DefaultTableModel());
-			this.jTableToc.setVisible(false);
+			this.jScrollToc.setVisible(true);
 		}
 		
 		//サイズ調整
@@ -785,15 +791,19 @@ public class JConfirmDialog extends JDialog
 		public Class getColumnClass(int col) {
 			switch (col) {
 			case 0: return Boolean.class;
-			case 1: return Integer.class;
-			case 2: return String.class;
+			case 2: return Integer.class;
 			}
 			return String.class;
 		}
 		@Override
 		public boolean isCellEditable(int row, int col)
 		{
-			return col != 1;
+			switch (col) {
+			case 1:
+			case 2:
+				return false;
+			}
+			return true;
 		}
 		public boolean isSelected(int row)
 		{
@@ -801,11 +811,11 @@ public class JConfirmDialog extends JDialog
 		}
 		public int getLineNum(int row)
 		{
-			return (Integer)this.getValueAt(row, 1);
+			return (Integer)this.getValueAt(row, 2);
 		}
 		public String getTocName(int row)
 		{
-			return (String)this.getValueAt(row, 2);
+			return (String)this.getValueAt(row, 3);
 		}
 	}
 }

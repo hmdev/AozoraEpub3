@@ -147,16 +147,18 @@ public class AozoraEpub3
 			int autoMarginLimitV = 0;
 			int autoMarginWhiteLevel = 80;
 			float autoMarginPadding = 0;
-			 if ("1".equals(props.getProperty("AutoMargin"))) {
-				try { autoMarginLimitH =Integer.parseInt(props.getProperty("AutoMarginLimitH")); } catch (Exception e) {}
-				try { autoMarginLimitV =Integer.parseInt(props.getProperty("AutoMarginLimitV")); } catch (Exception e) {}
-				try { autoMarginWhiteLevel =Integer.parseInt(props.getProperty("AutoMarginWhiteLevel")); } catch (Exception e) {}
-				try { autoMarginPadding =Float.parseFloat(props.getProperty("AutoMarginPadding")); } catch (Exception e) {}
+			int autoMarginNombre = 0;
+			if ("1".equals(props.getProperty("AutoMargin"))) {
+				try { autoMarginLimitH = Integer.parseInt(props.getProperty("AutoMarginLimitH")); } catch (Exception e) {}
+				try { autoMarginLimitV = Integer.parseInt(props.getProperty("AutoMarginLimitV")); } catch (Exception e) {}
+				try { autoMarginWhiteLevel = Integer.parseInt(props.getProperty("AutoMarginWhiteLevel")); } catch (Exception e) {}
+				try { autoMarginPadding = Float.parseFloat(props.getProperty("AutoMarginPadding")); } catch (Exception e) {}
+				try { autoMarginNombre = Integer.parseInt(props.getProperty("AutoMarginNombre")); } catch (Exception e) {} 
 			 }
 			epub3Writer.setImageParam(dispW, dispH, resizeW, resizeH, pixels, singlePageSizeW, singlePageSizeH, singlePageWidth, fitImage, coverW, coverH, jpegQualty,
-					autoMarginLimitH, autoMarginLimitV, autoMarginWhiteLevel, autoMarginPadding);
+					autoMarginLimitH, autoMarginLimitV, autoMarginWhiteLevel, autoMarginPadding, autoMarginNombre);
 			epub3ImageWriter.setImageParam(dispW, dispH, resizeW, resizeH, pixels, singlePageSizeW, singlePageSizeH, singlePageWidth, fitImage, coverW, coverH, jpegQualty,
-					autoMarginLimitH, autoMarginLimitV, autoMarginWhiteLevel, autoMarginPadding);
+					autoMarginLimitH, autoMarginLimitV, autoMarginWhiteLevel, autoMarginPadding, autoMarginNombre);
 			
 			//自動改ページ
 			int forcePageBreakSize = 0;

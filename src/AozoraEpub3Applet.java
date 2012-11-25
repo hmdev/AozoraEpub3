@@ -166,6 +166,7 @@ public class AozoraEpub3Applet extends JApplet
 	JTextField jTextAutoMarginLimitV;
 	JTextField jTextAutoMarginWhiteLevel;
 	JTextField jTextAutoMarginPadding;
+	JComboBox jComboAutoMarginNombre;
 	
 	JRadioButton jRadioSpaceHyp0;
 	JRadioButton jRadioSpaceHyp1;
@@ -910,9 +911,17 @@ public class AozoraEpub3Applet extends JApplet
 		jTextAutoMarginPadding.setPreferredSize(text4);
 		jTextAutoMarginPadding.setEditable(jCheckAutoMargin.isSelected());
 		panel.add(jTextAutoMarginPadding);
-		label = new JLabel("%");
+		label = new JLabel("%  ノンブル:");
 		label.setBorder(padding2H);
 		panel.add(label);
+		propValue = props.getProperty("AutoMarginNombre");
+		jComboAutoMarginNombre = new JComboBox(new String[]{"なし","上","下","上下"});
+		try { jComboAutoMarginNombre.setSelectedIndex(Integer.parseInt(propValue)); } catch (Exception e) {}
+		jComboAutoMarginNombre.setFocusable(false);
+		jComboAutoMarginNombre.setMaximumSize(new Dimension(text4.width+24, 20));
+		jComboAutoMarginNombre.setPreferredSize(new Dimension(text4.width+24, 20));
+		
+		panel.add(jComboAutoMarginNombre);
 		
 		////////////////////////////////////////////////////////////////
 		//Tab 詳細設定
@@ -1641,8 +1650,10 @@ public class AozoraEpub3Applet extends JApplet
 				if (transfer.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
 					@SuppressWarnings("unchecked")
 					List<File> files = (List<File>)transfer.getTransferData(DataFlavor.javaFileListFlavor);
-					startConvertFilesWorker((File[])(files.toArray()));
-					return;
+					if (files.size() > 0) {
+						startConvertFilesWorker((File[])(files.toArray()));
+						return;
+					}
 				}
 				if (transfer.isDataFlavorSupported(DataFlavor.stringFlavor)) {
 					//URLかどうか
@@ -1689,10 +1700,8 @@ public class AozoraEpub3Applet extends JApplet
 								return;
 							}
 						} catch (Exception e) { e.printStackTrace(); }
-						
 					}
 				}
-				
 			} catch (Exception e) {
 				e.printStackTrace();
 			} finally {
@@ -1780,14 +1789,16 @@ public class AozoraEpub3Applet extends JApplet
 		int autoMarginLimitV = 0;
 		int autoMarginWhiteLevel = 0;
 		float autoMarginPadding = 0;
+		int autoMarginNombre = 0;
 		if (jCheckAutoMargin.isSelected()) {
 			try { autoMarginLimitH =Integer.parseInt(jTextAutoMarginLimitH.getText()); } catch (Exception e) {}
 			try { autoMarginLimitV =Integer.parseInt(jTextAutoMarginLimitV.getText()); } catch (Exception e) {}
 			try { autoMarginWhiteLevel =Integer.parseInt(jTextAutoMarginWhiteLevel.getText()); } catch (Exception e) {}
 			try { autoMarginPadding =Float.parseFloat(jTextAutoMarginPadding.getText()); } catch (Exception e) {}
+			autoMarginNombre = jComboAutoMarginNombre.getSelectedIndex();
 		}
-		this.epub3Writer.setImageParam(dispW, dispH, resizeW, resizeH, pixels, singlePageSizeW, singlePageSizeH, singlePageWidth, jCheckFitImage.isSelected(), coverW, coverH, jpegQualty, autoMarginLimitH, autoMarginLimitV, autoMarginWhiteLevel, autoMarginPadding);
-		this.epub3ImageWriter.setImageParam(dispW, dispH, resizeW, resizeH, pixels, singlePageSizeW, singlePageSizeH, singlePageWidth, jCheckFitImage.isSelected(), coverW, coverH, jpegQualty, autoMarginLimitH, autoMarginLimitV, autoMarginWhiteLevel, autoMarginPadding);
+		this.epub3Writer.setImageParam(dispW, dispH, resizeW, resizeH, pixels, singlePageSizeW, singlePageSizeH, singlePageWidth, jCheckFitImage.isSelected(), coverW, coverH, jpegQualty, autoMarginLimitH, autoMarginLimitV, autoMarginWhiteLevel, autoMarginPadding, autoMarginNombre);
+		this.epub3ImageWriter.setImageParam(dispW, dispH, resizeW, resizeH, pixels, singlePageSizeW, singlePageSizeH, singlePageWidth, jCheckFitImage.isSelected(), coverW, coverH, jpegQualty, autoMarginLimitH, autoMarginLimitV, autoMarginWhiteLevel, autoMarginPadding, autoMarginNombre);
 		
 		try {
 			//栞用ID出力
@@ -2457,6 +2468,7 @@ public class AozoraEpub3Applet extends JApplet
 		this.props.setProperty("AutoMarginLimitV", this.jTextAutoMarginLimitV.getText());
 		this.props.setProperty("AutoMarginWhiteLevel", this.jTextAutoMarginWhiteLevel.getText());
 		this.props.setProperty("AutoMarginPadding", this.jTextAutoMarginPadding.getText());
+		this.props.setProperty("AutoMarginNombre", ""+this.jComboAutoMarginNombre.getSelectedIndex());
 		//空白の禁則処理
 		this.props.setProperty("SpaceHyphenation", this.jRadioSpaceHyp0.isSelected()?"0":(this.jRadioSpaceHyp1.isSelected()?"1":"2"));
 		//自動縦中横

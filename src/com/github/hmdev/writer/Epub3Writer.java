@@ -139,6 +139,8 @@ public class Epub3Writer
 	int autoMarginWhiteLevel = 100;
 	/** 余白除去後に追加する余白 */
 	float autoMarginPadding = 0;
+	/** ノンブル除去種別 */
+	int autoMarginNombre = 0;
 	
 	/** 表紙サイズ 横 */
 	int coverW = 600;
@@ -210,7 +212,7 @@ public class Epub3Writer
 	public void setImageParam(int dispW, int dispH, int resizeW, int resizeH, int pixels,
 			int singlePageSizeW, int singlePageSizeH, int singlePageWidth, boolean fitImage,
 			int coverW, int coverH, float jpegQuality,
-			int autoMarginLimitH, int autoMarginLimitV, int autoMarginWhiteLevel, float autoMarginPadding)
+			int autoMarginLimitH, int autoMarginLimitV, int autoMarginWhiteLevel, float autoMarginPadding, int autoMarginNombre)
 	{
 		this.dispW = dispW;
 		this.dispH = dispH;
@@ -234,6 +236,7 @@ public class Epub3Writer
 		this.autoMarginLimitV = autoMarginLimitV;
 		this.autoMarginWhiteLevel = autoMarginWhiteLevel;
 		this.autoMarginPadding = autoMarginPadding;
+		this.autoMarginNombre = autoMarginNombre;
 	}
 	
 	/** 処理を中止 */
@@ -612,21 +615,21 @@ public class Epub3Writer
 	{
 		ImageUtils.writeImage(is, null, zos,imageInfo, this.jpegQuality,
 				0, this.coverW, this.coverH,
-				0, 0, 0, 0);
+				0, 0, 0, 0, 0);
 	}
 	/** 画像を出力 */
 	void writeImage(InputStream is,ZipArchiveOutputStream zos, ImageInfo imageInfo) throws IOException
 	{
 		ImageUtils.writeImage(is, null, zos, imageInfo, this.jpegQuality,
 				this.maxImagePixels, this.maxImageW, this.maxImageH,
-				this.autoMarginLimitH, this.autoMarginLimitV, this.autoMarginWhiteLevel, this.autoMarginPadding);
+				this.autoMarginLimitH, this.autoMarginLimitV, this.autoMarginWhiteLevel, this.autoMarginPadding, this.autoMarginNombre);
 	}
 	/** 画像を出力 */
 	void writeImage(BufferedImage srcImage, ZipArchiveOutputStream zos, ImageInfo imageInfo) throws IOException
 	{
 		ImageUtils.writeImage(null, srcImage, zos, imageInfo, this.jpegQuality,
 				this.maxImagePixels, this.maxImageW, this.maxImageH,
-				this.autoMarginLimitH,  this.autoMarginLimitV, this.autoMarginWhiteLevel, this.autoMarginPadding);
+				this.autoMarginLimitH,  this.autoMarginLimitV, this.autoMarginWhiteLevel, this.autoMarginPadding, this.autoMarginNombre);
 	}
 	
 	/** 本文を出力する */

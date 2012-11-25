@@ -246,9 +246,9 @@ public class BookInfo
 	/** 行番号順に並び替えた目次一覧リストを生成して返す */
 	public Vector<ChapterLineInfo> getChapterLineInfoList()
 	{
-		if (this.mapChapterLine == null) return null;
-		
 		Vector<ChapterLineInfo> list = new Vector<ChapterLineInfo>();
+		
+		if (this.mapChapterLine == null) return list;
 		
 		int[] lines = new int[this.mapChapterLine.size()];
 		int i = 0;
