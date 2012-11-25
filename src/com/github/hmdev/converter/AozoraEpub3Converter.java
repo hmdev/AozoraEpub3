@@ -570,19 +570,17 @@ public class AozoraEpub3Converter
 				}
 			}
 			//改ページ後の注記以外の本文を追加
-			if (this.chapterSection && addSectionChapter) {
-				if (lineNum == bookInfo.titleLine || lineNum > bookInfo.titleEndLine) {
-					//底本：は目次に出さない
-					if (line.length() > 2 && line.charAt(0)=='底' && line.charAt(1)=='本' && line.charAt(2)=='：' ) {
+			if (this.chapterSection && (addSectionChapter || lineNum == bookInfo.titleLine)) {
+				//底本：は目次に出さない
+				if (line.length() > 2 && line.charAt(0)=='底' && line.charAt(1)=='本' && line.charAt(2)=='：' ) {
+					addSectionChapter = false; //改ページ後のChapter出力を抑止
+				} else {
+					//記号のみの行は無視して次の行へ
+					String name = this.getChapterName(line);
+					if (name.replaceAll("◇|◆|□|■|▽|▼|☆|★|＊|＋|×|†|　", "").length() > 0) {
+						bookInfo.addChapterLineInfo(new ChapterLineInfo(lineNum, ChapterLineInfo.TYPE_PAGEBREAK, 1, lastEmptyLine==lineNum-1, name, true));
+						if (this.useNextLineChapterName) addNextChapterName = lineNum+1;
 						addSectionChapter = false; //改ページ後のChapter出力を抑止
-					} else {
-						//記号のみの行は無視して次の行へ
-						if (line.replaceAll("◇|◆|□|■|▽|▼|☆|★|＊|＋|×|†|　", "").length() > 0) {
-							String name = this.getChapterName(line);
-							bookInfo.addChapterLineInfo(new ChapterLineInfo(lineNum, ChapterLineInfo.TYPE_PAGEBREAK, 1, lastEmptyLine==lineNum-1, name, true));
-							if (this.useNextLineChapterName) addNextChapterName = lineNum+1;
-							addSectionChapter = false; //改ページ後のChapter出力を抑止
-						}
 					}
 				}
 			}
@@ -780,9 +778,9 @@ public class AozoraEpub3Converter
 		bookInfo.setPreTitlePageBreak(preTitlePageBreak); //タイトルがあればタイトル前の改ページ状況を設定
 		
 		//見出しに追加されたタイトル行は削除
-		if (bookInfo.titleLine > 0) {
-			bookInfo.removeChapterLineInfo(bookInfo.titleLine);
-		}
+		//if (bookInfo.titleLine > 0) {
+		//	bookInfo.removeChapterLineInfo(bookInfo.titleLine);
+		//}
 		if (bookInfo.orgTitleLine > 0) bookInfo.removeChapterLineInfo(bookInfo.orgTitleLine);
 		if (bookInfo.subTitleLine > 0) bookInfo.removeChapterLineInfo(bookInfo.subTitleLine);
 		if (bookInfo.subOrgTitleLine > 0) bookInfo.removeChapterLineInfo(bookInfo.subOrgTitleLine);
