@@ -316,7 +316,7 @@ public class ImageUtils
 				if (coloredPixels == 0) break;
 			}
 		} else {//内側へ
-			margin[3] = height-1-startPixel;
+			margin[3] = startPixel;
 			for (int i=startPixel+1; i<=limitPxV; i++) {
 				coloredPixels = getColoredPixelsH(image, width, height-1-i, whiteLevel, 0, ignoreEdge, dustSize);
 				if (coloredPixels == 0) margin[3] = i;
@@ -394,7 +394,7 @@ public class ImageUtils
 				if (coloredPixels == 0) break;
 			}
 		} else {//内側へ
-			margin[2] = width-1-startPixel;
+			margin[2] = startPixel;
 			for (int i=startPixel+1; i<=limitPxH; i++) {
 				coloredPixels = getColordPixelsV(image, height, width-1-i, whiteLevel, 05, ignoreTop, ignoreBottom, dustSize);
 				if (coloredPixels == 0) margin[2] = i;
@@ -443,9 +443,11 @@ public class ImageUtils
 			if (isColored(image.getRGB(x, offsetY), rgbLimit)) {
 				//ゴミ除外 ゴミのサイズ分先に移動する
 				if (x > dustSize && isDustH(image, x-dustSize-1, x, offsetY, image.getHeight(), dustSize, rgbLimit)) {}
-				else coloredPixels++;
+				else {
+					coloredPixels++;
+					if (limitPixel < coloredPixels) return coloredPixels;
+				}
 			}
-			if (limitPixel < coloredPixels) return coloredPixels;
 		}
 		return coloredPixels;
 	}
@@ -466,9 +468,11 @@ public class ImageUtils
 			if (isColored(image.getRGB(offsetX, y), rgbLimit)) {
 				//ゴミ除外 ゴミのサイズ分先に移動する
 				if (y > dustSize && isDustV(image, y-dustSize-1, y, offsetX, image.getWidth(), dustSize, rgbLimit)) {}
-				else coloredPixels++;
+				else {
+					coloredPixels++;
+					if (limitPixel < coloredPixels) return coloredPixels;
+				}
 			}
-			if (limitPixel < coloredPixels) return coloredPixels;
 		}
 		return coloredPixels;
 	}
