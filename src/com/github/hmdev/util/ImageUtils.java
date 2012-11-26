@@ -130,7 +130,7 @@ public class ImageUtils
 			
 			int startPixel = (int)(w*0.02); //2%
 			int ignoreEdge = (int)(w*0.02); //2%
-			int dustSize = (int)(w*0.005); //0.5%
+			int dustSize = (int)(w*0.01); //1%
 			
 			//画像がなければ読み込み
 			if (srcImage == null) srcImage = readImage(ext, is);
@@ -336,7 +336,8 @@ public class ImageUtils
 			}
 			if (nombreEnd > 0 && nombreEnd <= nombreLimit) {
 				int whiteEnd = nombreEnd;
-				for (int i=nombreEnd+1; i<=limitPxV; i++) { 
+				int whiteLimit = limitPxV+(int)(height*0.05); //5%加算
+				for (int i=nombreEnd+1; i<=whiteLimit; i++) { 
 					coloredPixels = getColoredPixelsH(image, width, i, whiteLevel, 0, ignoreEdge, dustSize);
 					if (coloredPixels == 0) whiteEnd = i;
 					else break;
@@ -356,7 +357,8 @@ public class ImageUtils
 			}
 			if (nombreEnd > 0 && nombreEnd <= nombreLimit) {
 				int whiteEnd = nombreEnd;
-				for (int i=nombreEnd+1; i<=limitPxV; i++) { 
+				int whiteLimit = limitPxV+(int)(height*0.05); //5%加算
+				for (int i=nombreEnd+1; i<=whiteLimit; i++) { 
 					coloredPixels = getColoredPixelsH(image, width, height-1-i, whiteLevel, 0, ignoreEdge, dustSize);
 					if (coloredPixels == 0) whiteEnd = i;
 					else break;
@@ -442,8 +444,7 @@ public class ImageUtils
 		for (int x=w-1-ignoreEdge-ignoreEdge; x>=ignoreEdge; x--) {
 			if (isColored(image.getRGB(x, offsetY), rgbLimit)) {
 				//ゴミ除外 ゴミのサイズ分先に移動する
-				if (x > dustSize && isDustH(image, x-dustSize-1, x, offsetY, image.getHeight(), dustSize, rgbLimit)) {}
-				else {
+				if (!isDustH(image, x, image.getWidth(), offsetY, image.getHeight(), dustSize, rgbLimit)) {
 					coloredPixels++;
 					if (limitPixel < coloredPixels) return coloredPixels;
 				}
@@ -467,8 +468,7 @@ public class ImageUtils
 		for (int y=h-1-ignoreTop-ignoreBotttom; y>=ignoreTop; y--) {
 			if (isColored(image.getRGB(offsetX, y), rgbLimit)) {
 				//ゴミ除外 ゴミのサイズ分先に移動する
-				if (y > dustSize && isDustV(image, y-dustSize-1, y, offsetX, image.getWidth(), dustSize, rgbLimit)) {}
-				else {
+				if (!isDustV(image, y, image.getHeight(), offsetX, image.getWidth(), dustSize, rgbLimit)) {
 					coloredPixels++;
 					if (limitPixel < coloredPixels) return coloredPixels;
 				}
@@ -482,76 +482,96 @@ public class ImageUtils
 		return rgbLimit > (rgb>>16 & 0xFF) || rgbLimit > (rgb>>8 & 0xFF) || rgbLimit > (rgb & 0xFF);
 	}
 	
-	/** 列のゴミをチェック x2が現在の場所 */
-	static boolean isDustH(BufferedImage image, int x1, int x2, int offsetY, int maxY, int dustSize, int rgbLimit)
+	/** 列のゴミをチェック curXが現在の場所 */
+	static boolean isDustH(BufferedImage image, int curX, int maxX, int curY, int maxY, int dustSize, int rgbLimit)
 	{
 		if (dustSize == 0) return false;
-		int w = 1;
 		//現在行
-		for (int x=x2+1; x>=x1; x--) {
-			if (isColored(image.getRGB(x, offsetY), rgbLimit)) w++;
-			else break;
+		int minX = Math.max(0, curX-dustSize);
+		maxX = Math.min(maxX, curX+dustSize);
+		
+		int w = 0;
+		for (int x=curX-1; x>=minX; x--) {
+			if (isColored(image.getRGB(x, curY), rgbLimit)) w++; else break;
+		}
+		for (int x=curX+1; x<maxX; x++) {
+			if (isColored(image.getRGB(x, curY), rgbLimit)) w++; else break;
 		}
 		if (w > dustSize) return false;
+		
+		//幅をゴミのサイズにして黒画素をカウント
+		minX = Math.max(minX, curX-dustSize/2);
+		maxX = Math.min(maxX, curX+dustSize/2);
+		
 		//上
-		int h = 1; //幅がdustSize以下の高さ
-		int y2 = Math.max(0, offsetY-dustSize);
-		for (int y=offsetY-1; y>=y2; y--) {
+		int h = 1; //黒画素のある高さ
+		int y2 = Math.max(0, curY-dustSize);
+		for (int y=curY-1; y>=y2; y--) {
 			w = 0;
-			for (int x=x2; x>=x1; x--) {
+			for (int x=maxX-1; x>=minX; x--) {
 				if (isColored(image.getRGB(x, y), rgbLimit)) w++;
-				else break;
 			}
-			if (w > dustSize) break;
+			if (w > dustSize) return false;
+			if (w == 0) break; //すべて白なら抜ける
 			h++;
 		}
 		//下
-		y2 = Math.min(maxY-1, offsetY+dustSize);
-		for (int y=offsetY+1; y<=y2; y++) {
+		y2 = Math.min(maxY, curY+dustSize);
+		for (int y=curY+1; y<y2; y++) {
 			w = 0;
-			for (int x=x2; x>=x1; x--) {
+			for (int x=maxX-1; x>=minX; x--) {
 				if (isColored(image.getRGB(x, y), rgbLimit)) w++;
-				else break;
 			}
-			if (w > dustSize) break;
+			if (w > dustSize) return false;
+			if (w == 0) break; //すべて白なら抜ける
 			h++;
 		}
-		return h > dustSize;
+		return h <= dustSize;
 	}
 	
 	/** 横方向のゴミをチェック */
-	static boolean isDustV(BufferedImage image, int y1, int y2, int offsetX, int maxX, int dustSize, int rgbLimit)
+	static boolean isDustV(BufferedImage image, int curY, int maxY, int curX, int maxX, int dustSize, int rgbLimit)
 	{
 		if (dustSize == 0) return false;
-		int h = 1;
 		//現在列
-		for (int y=y2+1; y>=y1; y--) {
-			if (isColored(image.getRGB(offsetX, y), rgbLimit)) h++;
-			else break;
+		int minY = Math.max(0, curY-dustSize);
+		maxY = Math.min(maxY, curY+dustSize);
+		
+		int h = 1;
+		for (int y=curY-1; y>=minY; y--) {
+			if (isColored(image.getRGB(curX, y), rgbLimit)) h++; else break;
+		}
+		for (int y=curY+1; y<maxY; y++) {
+			if (isColored(image.getRGB(curX, y), rgbLimit)) h++; else break;
 		}
 		if (h > dustSize) return false;
+		
+		//高さをゴミのサイズにして黒画素をカウント
+		minY = Math.max(minY, curY-dustSize/2);
+		maxY = Math.min(maxY, curY+dustSize/2);
 		//左
-		int w = 1;
-		int x2 = Math.max(0, offsetX-dustSize);
-		for (int x=offsetX-1; x>=x2; x--) {
+		int w = 1; //黒画素のある幅
+		int x2 = Math.max(0, curX-dustSize);
+		for (int x=curX-1; x>=x2; x--) {
 			h = 0;
-			for (int y=y2; y>=y1; y--) {
+			for (int y=maxY-1; y>=minY; y--) {
 				if (isColored(image.getRGB(x, y), rgbLimit)) h++;
-				else break;
 			}
-			if (h > dustSize) break;
+			if (h > dustSize) return false;
+			if (h == 0) break; //すべて白なら抜ける
 			w++;
 		}
-		//下
-		x2 = Math.min(maxX-1, offsetX+dustSize);
-		for (int x=offsetX+1; x<=x2; x++) {
-			for (int y=y2; y>=y1; y--) {
+		//右
+		x2 = Math.min(maxX, curX+dustSize);
+		for (int x=curX+1; x<x2; x++) {
+			h = 0;
+			for (int y=maxY-1; y>=minY; y--) {
 				if (isColored(image.getRGB(x, y), rgbLimit)) h++;
-				else break;
 			}
-			if (h > dustSize) break;
+			if (h > dustSize) return false;
+			if (h == 0) break; //すべて白なら抜ける
 			w++;
 		}
-		return w > dustSize;
+		return w <= dustSize;
 	}
 }
