@@ -1,0 +1,12 @@
+###各話の抽出設定
+
+## 各話 Chapter 先頭の章のみ大見出しで出力
+chapter	.chapter_title
+## 各話 章タイトル 中見出しで出力
+subtitle	.novel_subtitle
+## 各話 本文
+contents	#novel_view
+##前書き
+preamble	.novel_p
+## 補足
+appendix	.novel_a

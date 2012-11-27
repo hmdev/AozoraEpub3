@@ -1,0 +1,16 @@
+###一覧ページから本の情報とリンク抽出
+
+## 各話へのリンク パターン & クラス名
+#href_regex	\/n\d+\w*\/\d+\/
+href	.long_subtitle,.period_subtitle
+
+## シリーズタイトル
+title	.series,.novel_title
+## 著者
+author	.novel_writername
+## 説明
+description	.novel_ex
+
+##更新日時
+update	long_update
+update_format	YYYY年 MM月 DD日

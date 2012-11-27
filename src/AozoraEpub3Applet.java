@@ -29,6 +29,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -73,12 +74,14 @@ import javax.swing.plaf.FontUIResource;
 
 import org.apache.commons.compress.utils.IOUtils;
 
+
 import com.github.hmdev.converter.AozoraEpub3Converter;
 import com.github.hmdev.info.BookInfo;
 import com.github.hmdev.swing.JConfirmDialog;
 import com.github.hmdev.swing.NarrowTitledBorder;
 import com.github.hmdev.util.ImageInfoReader;
 import com.github.hmdev.util.LogAppender;
+import com.github.hmdev.web.WebAozoraConverter;
 import com.github.hmdev.writer.Epub3ImageWriter;
 import com.github.hmdev.writer.Epub3Writer;
 
@@ -1647,17 +1650,24 @@ public class AozoraEpub3Applet extends JApplet
 			dtde.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
 			Transferable transfer = dtde.getTransferable();
 			try {
+				String urlString = null;
+				
 				if (transfer.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+					//IEはurlはショートカットになってくる
 					@SuppressWarnings("unchecked")
 					List<File> files = (List<File>)transfer.getTransferData(DataFlavor.javaFileListFlavor);
 					if (files.size() > 0) {
-						startConvertFilesWorker((File[])(files.toArray()));
-						return;
+						if (files.get(0).getName().endsWith(".url")) {
+							urlString = readInternetShortCut(files.get(0));
+						} else {
+							startConvertFilesWorker((File[])(files.toArray()));
+							return;
+						}
 					}
 				}
-				if (transfer.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+				if (urlString != null || transfer.isDataFlavorSupported(DataFlavor.stringFlavor)) {
 					//URLかどうか
-					String urlString = transfer.getTransferData(DataFlavor.stringFlavor).toString();
+					if (urlString == null) urlString = transfer.getTransferData(DataFlavor.stringFlavor).toString();
 					if (urlString.startsWith("http")) {
 						//出力先が指定されていない
 						if (jComboDstPath.getSelectedIndex() == 0) {
@@ -1672,17 +1682,30 @@ public class AozoraEpub3Applet extends JApplet
 							cachePath = new File(".cache");
 							cachePath .mkdir();
 						}
+						
+						String urlPath = urlString.substring(urlString.indexOf("//")+2).replaceAll("\\?\\*\\&\\|\\<\\>\"\\\\", "_");
+						//web以下に同じ名前のパスがあったらキャッシュ後青空変換
+						File webPath = new File("web");
+						if (webPath.isDirectory()) {
+							for (File file : webPath.listFiles()) {
+								if (file.isDirectory() && urlPath.startsWith(file.getName())) {
+									ConvertWebWorker convertWebWorker = new ConvertWebWorker(urlString);
+									convertWebWorker.execute();
+									return;
+								}
+							}
+						}
 						//出力先 URLと同じパス
-						String path = cachePath.getAbsolutePath()+"/"+urlString.substring(urlString.indexOf("//")+2).replaceAll("\\?\\*\\&\\|\\<\\>\"\\\\", "_");
-						File file = new File(path);
-						file.getParentFile().mkdirs();
+						String path = cachePath.getAbsolutePath()+"/"+urlPath;
+						File srcFile = new File(path);
+						srcFile.getParentFile().mkdirs();
 						//ダウンロード
 						BufferedInputStream bis = new BufferedInputStream(new URL(urlString).openStream(), 8192);
-						BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
+						BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(srcFile));
 						IOUtils.copy(bis, bos);
 						bos.close();
 						bis.close();
-						startConvertFilesWorker(new File[]{file});
+						startConvertFilesWorker(new File[]{srcFile});
 						return;
 					} else if (urlString.startsWith("file://")) {
 						//Linux等 ファイルのパスでファイルがあれば変換
@@ -1707,6 +1730,21 @@ public class AozoraEpub3Applet extends JApplet
 			} finally {
 				jTextArea.setCaretPosition(jTextArea.getDocument().getLength());
 			}
+		}
+	}
+	
+	/** Windowsのインターネットショートカットを読み込み */
+	String readInternetShortCut(File file) throws IOException
+	{
+		BufferedReader br = new BufferedReader(new FileReader(file));
+		try {
+			String line;
+			while ((line = br.readLine()) != null) {
+				if (line.startsWith("URL=")) return line.substring(4);
+			}
+			return null;
+		} finally {
+			br.close();
 		}
 	}
 	
@@ -2248,6 +2286,57 @@ public class AozoraEpub3Applet extends JApplet
 			this.applet.running = false;
 		}
 	}
+	
+	/** 別スレッド実行用SwingWorker */
+	class ConvertWebWorker extends SwingWorker<Object, Object>
+	{
+		/** 面倒なのでAppletを渡す */
+		AozoraEpub3Applet applet;
+		/** 変換対象ファイル */
+		String urlString;
+		
+		public ConvertWebWorker(String urlString)
+		{
+			this.applet = getApplet();
+			this.urlString = urlString;
+		}
+		
+		@Override
+		protected Object doInBackground() throws Exception
+		{
+			this.applet.running = true;
+			applet.setConvertEnabled(false);
+			try {
+				
+				LogAppender.append("--------\n");
+				LogAppender.append(urlString);
+				LogAppender.append(" を読み込みます\n");
+				File srcFile = WebAozoraConverter.convertToAozoraText(urlString, cachePath);
+				
+				if (srcFile == null) {
+					LogAppender.append(urlString);
+					LogAppender.append(" が取得できませんでした\n");
+					return null;
+				}
+				applet.convertFiles(new File[]{srcFile});
+			} catch (Exception e) {
+				e.printStackTrace(); LogAppender.append("エラーが発生しました: "+e.getMessage()+"\n");
+			} finally {
+				applet.setConvertEnabled(true);
+				this.applet.running = false;
+			}
+			return null;
+		}
+		
+		@Override
+		protected void done()
+		{
+			super.done();
+			applet.setConvertEnabled(true);
+			this.applet.running = false;
+		}
+	}
+	
 	/** イベント内でWorker初期化する用 */
 	private AozoraEpub3Applet getApplet()
 	{

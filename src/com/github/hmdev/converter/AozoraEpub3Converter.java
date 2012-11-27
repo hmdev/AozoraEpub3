@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -900,10 +899,9 @@ public class AozoraEpub3Converter
 	}
 	
 	/** 青空テキストをePub3のXHTMLに変換
-	 * @param _msgBuf ログ出力用バッファ
 	 * @param out 出力先Writer
 	 * @param src 入力テキストReader
-	 * @param titleType  */
+	 * @param bookInfo 事前読み込みで取得したメタ情報他  */
 	public void convertTextToEpub3(BufferedWriter out, BufferedReader src, BookInfo bookInfo) throws Exception
 	{
 		try {
@@ -1250,77 +1248,27 @@ public class AozoraEpub3Converter
 	{
 		//置換済みの文字列で注記追加位置を探す
 		int idx = chukiTagStart-1+chOffset;
-		boolean inTag = false;
 		//間にあるタグをスタック
-		Stack<String> tagStack = new Stack<String>();
-		boolean isEndTag = false;
-		int tagEnd = -1;
 		while (targetLength > 0 && idx >= 0) {
 			switch (buf.charAt(idx)) {
 			case '※':
 			case '｜':
 				break;
 			case '》':
-				inTag = true;
-				break;
-			case '］':
-				inTag = true;
-				isEndTag = (idx-3 > 0 && "終わり".equals(buf.substring(idx-3, idx)));
-				tagEnd = idx;
-				break;
-			case '《':
-				inTag = false;
-				break;
-			case '［':
-				if (inTag) {
-					inTag = false;
-					if (isEndTag) {
-						String tag = buf.substring(idx+2, tagEnd-3);
-						tagStack.push(tag);
-						//System.out.println("push: "+tag);
-					} else {
-						String tag = buf.substring(idx+2, tagEnd);
-						//System.out.println("pop: "+tag);
-						if (tagStack.size() > 0 && tag.equals(tagStack.peek())) {
-							tagStack.pop();
-						}
-					}
-				} else targetLength--; //文字として扱う
-				break;
-			default:
-				if (!inTag) {
-					targetLength--;
+				 idx--;
+				while (idx >= 0 && buf.charAt(idx) != '《') {
+					idx--;
 				}
-			}
-			idx--;
-		}
-		
-		//前のタグがStackにあれば含む
-		boolean exit = false;
-		while (idx >= 0) {
-			switch (buf.charAt(idx)) {
-			case '］':
-				inTag = true;
-				tagEnd = idx;
 				break;
-			case '［':
-				if (inTag) {
-					inTag = false;
-					String tag = buf.substring(idx+2, tagEnd);
-					if (tagStack.size() > 0 && tag.equals(tagStack.peek())) {
-						tagStack.pop();
-					} else {
-						idx = tagEnd;
-						exit = true;
-					}
-				} else {
-					exit = true;
+			case '］':
+				 idx--;
+				while (idx >= 0 && buf.charAt(idx) != '［') {
+					idx--;
 				}
 				break;
 			default:
-				if (!inTag) exit = true; //注記外で文字があったら終了
+				targetLength--;
 			}
-			if (exit) break;
 			idx--;
 		}
 		//一つ戻す

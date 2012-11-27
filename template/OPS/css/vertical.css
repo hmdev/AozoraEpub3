@@ -174,10 +174,12 @@ span.left_underline {
 .kogaki { font-size: 70%; }
 
 /* 縦中横 */
+/* 外字画像とは重なってしまう ただし字下げ折り返し内で画面外にずれる */ 
 /*span.tcy {
 	display: inline-block;
 }*/
 .tcy span {
+	width: 1em;
 	text-combine: horizontal;
 	-webkit-text-combine: horizontal;
 	-epub-text-combine: horizontal;
