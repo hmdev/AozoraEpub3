@@ -512,6 +512,8 @@ public class AozoraEpub3Converter
 			this.lineNum++;
 			
 			//外字変換後に前方参照注記変換
+			//ルビだけ先に除去してから外字変換
+			line = line.replaceAll("《[^》]+?》", "").replaceAll("｜", "");
 			line = this.replaceChukiSufTag(this.convertGaijiChuki(line, true, false));
 			
 			//コメント除外 50文字以上をコメントにする
@@ -2261,7 +2263,8 @@ public class AozoraEpub3Converter
 	}
 	private String getChapterName(String line)
 	{
-		String name = this.replaceToPlain(line).replaceFirst("^(=|＝|-|―|─)(=|＝|-|―|─)+", "").replaceFirst("(=|＝|-|―|─)(=|＝|-|―|─)+$", "");
+		String name = line.replaceAll("※", "").replaceFirst("^[ |　|―]+", "").replaceFirst("[ |　|―]+$","").replaceAll("［＃.+?］", "").replaceAll("<[^>]+>", "").replaceAll("〳〵", "く").replaceAll("〴〵", "ぐ").replaceAll("〻", "々")
+				.replaceFirst("^(=|＝|-|―|─)(=|＝|-|―|─)+", "").replaceFirst("(=|＝|-|―|─)(=|＝|-|―|─)+$", "");
 				//.replaceAll("<span class=\"fullsp\"> </span>", "　").replaceAll(String.valueOf((char)(0x2000))+(char)(0x2000), "　")
 				//.replaceAll("<rt>[^<]+</rt>", "").replaceAll("<[^>]+>", "")
 		return name.length()>maxChapterNameLength ? name.substring(0, maxChapterNameLength)+"..." : name;

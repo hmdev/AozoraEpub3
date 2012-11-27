@@ -2318,7 +2318,11 @@ public class AozoraEpub3Applet extends JApplet
 					LogAppender.append(" が取得できませんでした\n");
 					return null;
 				}
+				//エンコードを変換時のみUTF-8にする
+				int encIndex = applet.jComboEncType.getSelectedIndex();
+				applet.jComboEncType.setSelectedIndex(1);
 				applet.convertFiles(new File[]{srcFile});
+				applet.jComboEncType.setSelectedIndex(encIndex);
 			} catch (Exception e) {
 				e.printStackTrace(); LogAppender.append("エラーが発生しました: "+e.getMessage()+"\n");
 			} finally {
@@ -2483,12 +2487,14 @@ public class AozoraEpub3Applet extends JApplet
 	{
 		this.convertCanceled = true;
 		
+		/*
 		try {
 			//tmp削除
 			if (tmpPath != null) this.deleteFiles(this.tmpPath);
 			//キャッシュファイル削除
 			if (cachePath != null) this.deleteFiles(this.cachePath);
 		} catch (Exception e) { e.printStackTrace(); }
+		*/
 		
 		this.props.setProperty("DividerLocation", ""+this.jSplitPane.getDividerLocation());
 		
