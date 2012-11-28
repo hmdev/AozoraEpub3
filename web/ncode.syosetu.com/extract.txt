@@ -2,7 +2,7 @@
 ### CONTENT_ から始まる物は各話HTMLからの抽出用
 ###
 ### 書式:
-###内部ID	cssQuery
+###内部ID	cssQuery (カンマで複数指定 前を優先)
 ### または
 ###内部ID	正規表現
 ###
@@ -12,9 +12,9 @@
 ## シリーズタイトル
 SERIES	.series a
 ## タイトル
-TITLE	.novel_title
+TITLE	.novel_title,.novel_subtitle
 ## 著者
-AUTHOR	.novel_writername a
+AUTHOR	.novel_writername a,.novel_writername
 ## 説明
 DESCRIPTION	.novel_ex
 

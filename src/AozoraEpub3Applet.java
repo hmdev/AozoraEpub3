@@ -223,6 +223,9 @@ public class AozoraEpub3Applet extends JApplet
 	/** 青空→ePub3変換クラス */
 	AozoraEpub3Converter aozoraConverter;
 	
+	/** Web小説青空変換クラス */
+	WebAozoraConverter webConverter;
+	
 	/** ePub3出力クラス */
 	Epub3Writer epub3Writer;
 	
@@ -276,16 +279,17 @@ public class AozoraEpub3Applet extends JApplet
 		this.setSize(new Dimension(520, 360));
 		
 		//パス関連初期化
-		this.jarPath = System.getProperty("java.class.path");
-		System.out.println(jarPath);
+		/*this.jarPath = System.getProperty("java.class.path");
 		int idx = this.jarPath.indexOf(";");
 		if (idx > 0) this.jarPath = this.jarPath.substring(0, idx);
 		if (!this.jarPath.endsWith(".jar")) this.jarPath = "";
 		else this.jarPath = this.jarPath.substring(0, this.jarPath.lastIndexOf(File.separator)+1);
-		System.out.println(jarPath);
+		*/
+		//エラーになるのでとりあえず空文字に
+		this.jarPath = "";
+		
 		this.cachePath = new File(this.jarPath+".cache");
 		this.webConfigPath = new File(this.jarPath+"web");
-		
 		
 		//設定ファイル読み込み
 		props = new Properties(); 
@@ -1336,6 +1340,7 @@ public class AozoraEpub3Applet extends JApplet
 				epub3ImageWriter.cancel();
 				aozoraConverter.cancel();
 				convertCanceled = true;
+				if (webConverter != null) webConverter.canceled();
 				if (kindleProcess != null) kindleProcess.destroy(); 
 			}
 		});
@@ -2408,11 +2413,14 @@ public class AozoraEpub3Applet extends JApplet
 						LogAppender.append(urlString);
 						LogAppender.append(" を読み込みます\n");
 						
-						File srcFile = WebAozoraConverter.convertToAozoraText(urlString, cachePath, webConfigPath);
+						webConverter = WebAozoraConverter.createWebAozoraConverter(urlString, webConfigPath);
+						File srcFile = webConverter.convertToAozoraText(urlString, cachePath);
 						
 						if (srcFile == null) {
 							LogAppender.append(urlString);
-							LogAppender.append(" は変換できません\n");
+							if (webConverter != null && webConverter.isCanceled())
+								LogAppender.append(" の変換をキャンセルしました\n");
+							else LogAppender.append(" は変換できませんでした\n");
 							return null;
 						}
 						//エンコードを変換時のみUTF-8にする
@@ -2484,7 +2492,7 @@ public class AozoraEpub3Applet extends JApplet
 	}
 	
 	//ディレクトリ以下を削除  パス注意
-	private void deleteFiles(File path)
+	void deleteFiles(File path)
 	{
 		if (path.isDirectory()) {
 			for (File file : path.listFiles()) {

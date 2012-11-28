@@ -416,9 +416,13 @@ public class AozoraEpub3
 			
 		} catch (Exception e) {
 			e.printStackTrace();
-			LogAppender.append("エラーが発生しました");
+			LogAppender.append("エラーが発生しました:");
 			LogAppender.append(e.getMessage());
 			LogAppender.append("\n");
+			for (StackTraceElement ste : e.getStackTrace()) {
+				LogAppender.append(ste.getFileName()+","+ste.getLineNumber());
+				LogAppender.append("\n");
+			}
 		}
 	}
 	

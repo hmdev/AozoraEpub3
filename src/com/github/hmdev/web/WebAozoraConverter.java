@@ -43,6 +43,17 @@ public class WebAozoraConverter
 	HashMap<ExtractId, String[]> queryMap;
 	HashMap<ExtractId, Vector<String[]>> replaceMap;
 	
+	/** テキスト出力先パス 末尾は/ */
+	String dstPath;
+	
+	/** http?://fqdn/ の文字列 */
+	String baseUri;
+	
+	/** 変換中のHTMLファイルのあるパス 末尾は/ */
+	String htmlBaseUri;
+	
+	boolean canceled = false;
+	
 	/** fqdnに対応したパラメータ取得 
 	 * @throws IOException */
 	WebAozoraConverter(String fqdn, File configPath) throws IOException
@@ -103,38 +114,53 @@ public class WebAozoraConverter
 		return this.queryMap != null;
 	}
 	
+	public void canceled()
+	{
+		this.canceled = true;
+	}
+	public boolean isCanceled()
+	{
+		return this.canceled;
+	}
+	
 	/** fqdnに対応したインスタンスを生成してキャッシュして変換実行 */
-	public static File convertToAozoraText(String urlString, File cachePath, File configPath) throws IOException
+	public static WebAozoraConverter createWebAozoraConverter(String urlString, File configPath) throws IOException
 	{
 		String baseUri = urlString.substring(0, urlString.indexOf('/', urlString.indexOf("//")+2));
 		String fqdn = baseUri.substring(baseUri.indexOf("//")+2);
 		WebAozoraConverter converter = converters.get(fqdn);
 		if (converter == null) {
 			converter = new WebAozoraConverter(fqdn, configPath);
+			if (!converter.isValid()) {
+				LogAppender.append("サイトの定義がありません: "+configPath.getName()+"/"+fqdn);
+				LogAppender.append("\n");
+				return null;
+			}
 			converters.put(fqdn, converter);
 		}
-		if (!converter.isValid()) {
-			LogAppender.append("サイトの定義がありません: "+configPath.getName()+"/"+fqdn);
-			converters.remove(fqdn);
-			return null;
-		}
-		return converter._convertToAozoraText(urlString, baseUri, fqdn, cachePath);
+		return converter;
+		//return converter._convertToAozoraText(urlString, baseUri, fqdn, cachePath);
 	}
 	
 	/** 変換実行 */
-	private File _convertToAozoraText(String urlString, String baseUri, String fqdn, File cachePath) throws IOException
+	public File convertToAozoraText(String urlString, File cachePath) throws IOException
 	{
-		String urlFilePath = urlString.substring(urlString.indexOf("//")+2).replaceAll("\\?\\*\\&\\|\\<\\>\"\\\\", "_");
+		this.canceled = false;
+		this.baseUri = urlString.substring(0, urlString.indexOf('/', urlString.indexOf("//")+2));
+		//String fqdn = baseUri.substring(baseUri.indexOf("//")+2);
+		String listBaseUrl = urlString.substring(0, urlString.lastIndexOf('/')+1);
+		String urlFilePath = urlString.substring(urlString.indexOf("//")+2).replaceAll("(\\?|\\&)", "/").replaceAll("(\\*|\\||\\<|\\>|\"|\\\\)", "_");
 		String urlParentPath = urlFilePath;
 		if (urlFilePath.endsWith("/")) urlFilePath += "index.html";
-		else urlFilePath = urlFilePath.substring(0, urlFilePath.lastIndexOf('/')+1);
+		else urlParentPath = urlFilePath.substring(0, urlFilePath.lastIndexOf('/')+1);
 		
 		//変換結果
-		File txtFile = new File(cachePath.getAbsolutePath()+"/"+urlParentPath+"converted.txt");
+		this.dstPath = cachePath.getAbsolutePath()+"/"+urlParentPath;
+		File txtFile = new File(dstPath+"converted.txt");
 		txtFile.getParentFile().mkdirs();
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(txtFile), "UTF-8"));
 		try {
-			
+		
 		//更新情報格納先
 		File updateInfoFile = new File(cachePath.getAbsolutePath()+"/"+urlParentPath+"update.txt");
 		
@@ -154,13 +180,13 @@ public class WebAozoraConverter
 			
 			//タイトル
 			boolean hasTitle = false;
-			String title = getQueryText(doc, this.queryMap.get(ExtractId.SERIES));
-			if (title != null) {
-				printText(bw, title);
+			String series = getQueryText(doc, this.queryMap.get(ExtractId.SERIES));
+			if (series != null) {
+				printText(bw, series);
 				bw.append('\n');
 				hasTitle = true;
 			}
-			title = getQueryText(doc, this.queryMap.get(ExtractId.TITLE));
+			String title = getQueryText(doc, this.queryMap.get(ExtractId.TITLE));
 			if (title != null) {
 				printText(bw, title);
 				bw.append('\n');
@@ -173,6 +199,7 @@ public class WebAozoraConverter
 			//著者
 			String author = getQueryText(doc, this.queryMap.get(ExtractId.AUTHOR));
 			if (author != null) {
+				author = author.replaceAll("作者：", "");
 				printText(bw, author);
 			}
 			bw.append('\n');
@@ -181,7 +208,14 @@ public class WebAozoraConverter
 			if (description != null) {
 				bw.append('\n');
 				bw.append("［＃区切り線］\n");
+				bw.append('\n');
+				bw.append("［＃ここから２字下げ］\n");
+				bw.append("［＃ここから２字上げ］\n");
 				printText(bw, description);
+				bw.append('\n');
+				bw.append("［＃ここで字上げ終わり］\n");
+				bw.append("［＃ここで字下げ終わり］\n");
+				bw.append('\n');
 				bw.append("［＃区切り線］\n");
 				bw.append('\n');
 			}
@@ -189,101 +223,118 @@ public class WebAozoraConverter
 			String preChapterTitle = "";
 			
 			Elements hrefs = getQueryElements(doc, this.queryMap.get(ExtractId.HREF));
-			if (hrefs.size() == 0) {
-				LogAppender.append("一覧のリンクが取得できませんでした\n");
-				return null;
-			}
-			
-			//更新情報
-			HashMap<String, String> updateMap = new HashMap<String, String>();
-			
-			//更新分のみ取得するようにするためhrefに対応した日付タグの文字列(innerHTML)を取得して保存しておく
-			Elements updates = getQueryElements(doc, this.queryMap.get(ExtractId.UPDATE));
-			if (hrefs.size() != updates.size()) {
-				LogAppender.append("リンクに対応する更新情報が取得できませんでした\n");
+			if (hrefs == null) {
+				Element contentDiv = getQueryFirstElement(doc, this.queryMap.get(ExtractId.CONTENT_ARTICLE));
+				if (contentDiv != null) docToAozoraText(bw, doc, false);
+				else {
+					LogAppender.append("一覧のリンクが取得できませんでした\n");
+					return null;
+				}
 			} else {
-				if (updateInfoFile.exists()) {
-					//前回の更新情報を取得して比較
-					BufferedReader updateBr = new BufferedReader(new InputStreamReader(new FileInputStream(updateInfoFile), "UTF-8"));
-					try {
-						String line;
-						while ((line=updateBr.readLine()) != null) {
-							int idx = line.indexOf("\t");
-							if (idx > 0) {
-								updateMap.put(line.substring(0, idx), line.substring(idx+1));
+				//更新情報
+				HashMap<String, String> updateMap = new HashMap<String, String>();
+				
+				//更新分のみ取得するようにするためhrefに対応した日付タグの文字列(innerHTML)を取得して保存しておく
+				Elements updates = getQueryElements(doc, this.queryMap.get(ExtractId.UPDATE));
+				if (hrefs == null || updates == null ||hrefs.size() != updates.size()) {
+					//LogAppender.append("リンクに対応する更新情報が取得できませんでした\n");
+				} else {
+					if (updateInfoFile.exists()) {
+						//前回の更新情報を取得して比較
+						BufferedReader updateBr = new BufferedReader(new InputStreamReader(new FileInputStream(updateInfoFile), "UTF-8"));
+						try {
+							String line;
+							while ((line=updateBr.readLine()) != null) {
+								int idx = line.indexOf("\t");
+								if (idx > 0) {
+									updateMap.put(line.substring(0, idx), line.substring(idx+1));
+								}
 							}
+							
+						} catch (Exception e) {
+							e.printStackTrace();
+						} finally {
+							updateBr.close();
 						}
-						
+					}
+					
+					//ファイルに出力
+					BufferedWriter updateBw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(updateInfoFile), "UTF-8"));
+					try {
+						int i = 0;
+						for (Element update : updates) {
+							updateBw.append(hrefs.get(i++).attr("href"));
+							updateBw.append('\t');
+							updateBw.append(update.html());
+							updateBw.append('\n');
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 					} finally {
-						updateBr.close();
+						updateBw.close();
 					}
 				}
 				
-				//ファイルに出力
-				BufferedWriter updateBw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(updateInfoFile), "UTF-8"));
-				try {
-					int i = 0;
-					for (Element update : updates) {
-						updateBw.append(hrefs.get(i++).attr("href"));
-						updateBw.append('\t');
-						updateBw.append(update.html());
-						updateBw.append('\n');
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				} finally {
-					updateBw.close();
-				}
-			}
-			
-			//全話で更新や追加があるかチェック
-			boolean noUpdated = true;
-			
-			int i=-1;
-			for (Element href : hrefs) {
-				i++;
-				String hrefString = href.attr("href");
-				String chapterHref = baseUri+hrefString;
-				//変更がなければhrefsから除外
-				String update = updateMap.get(hrefString);
-				boolean updated = true;
-				if (update != null) {
-					if (update.equals(updates.get(i).html())) updated = false;
-				}
-				//debug
-				//updated = false;
+				//全話で更新や追加があるかチェック
+				boolean noUpdated = true;
 				
-				if (chapterHref != null && chapterHref.length() > 0) {
-					//キャッシュ取得 ロードされたらWait 500ms
-					String chapterPath = chapterHref.substring(chapterHref.indexOf("//")+2);
-					File chapterCacheFile = new File(cachePath.getAbsolutePath()+"/"+chapterPath+(chapterPath.endsWith("/")?"index.html":""));
-					if (updated || !chapterCacheFile.exists()) {
-						LogAppender.append(chapterHref);
-						cacheFile(chapterHref, chapterCacheFile);
-						LogAppender.append(" : Loaded\n");
-						try { Thread.sleep(500); } catch (InterruptedException e) { }
-						//ファイルがロードされたら更新有り
-						noUpdated = false;
+				int i=-1;
+				for (Element href : hrefs) {
+					if (this.canceled) return null;
+					i++;
+					String hrefString = href.attr("href");
+					if (hrefString == null || hrefString.length() == 0) continue;
+					String chapterHref = hrefString;
+					if (!hrefString.startsWith("http")) {
+						if (hrefString.charAt(0) == '/') chapterHref = baseUri+hrefString;
+						else chapterHref = listBaseUrl+hrefString;
 					}
+					//変更がなければhrefsから除外
+					String update = updateMap.get(hrefString);
+					boolean updated = true;
+					if (update != null) {
+						if (update.equals(updates.get(i).html())) updated = false;
+					}
+					//debug
+					//updated = false;
 					
-					//シリーズタイトルを出力
-					Document chapterDoc = Jsoup.parse(chapterCacheFile, null);
-					Element chapterTitle = getQueryFirstElement(doc, this.queryMap.get(ExtractId.CONTENT_CHAPTER));
-					if (chapterTitle != null && !preChapterTitle.equals(chapterTitle.text())) {
-						preChapterTitle = chapterTitle.text();
-						bw.append("［＃ページの左右中央］\n");
-						bw.append("［＃ここから大見出し］\n");
-						bw.append(preChapterTitle);
-						bw.append('\n');
-						bw.append("［＃ここで大見出し終わり］\n");
+					if (chapterHref != null && chapterHref.length() > 0) {
+						this.htmlBaseUri = chapterHref;
+						if (!chapterHref.endsWith("/")) this.htmlBaseUri = chapterHref.substring(0, chapterHref.indexOf('/')+1);
+						
+						//キャッシュ取得 ロードされたらWait 500ms
+						String chapterPath = chapterHref.substring(chapterHref.indexOf("//")+2).replaceAll("(\\?|\\&)", "/").replaceAll("(\\*|\\||\\<|\\>|\"|\\\\)", "_");
+						File chapterCacheFile = new File(cachePath.getAbsolutePath()+"/"+chapterPath+(chapterPath.endsWith("/")?"index.html":""));
+						if (updated || !chapterCacheFile.exists()) {
+							LogAppender.append(chapterHref);
+							cacheFile(chapterHref, chapterCacheFile);
+							LogAppender.append(" : Loaded.\n");
+							try { Thread.sleep(500); } catch (InterruptedException e) { }
+							//ファイルがロードされたら更新有り
+							noUpdated = false;
+						}
+						
+						//シリーズタイトルを出力
+						Document chapterDoc = Jsoup.parse(chapterCacheFile, null);
+						Element chapterTitle = getQueryFirstElement(chapterDoc, this.queryMap.get(ExtractId.CONTENT_CHAPTER));
+						boolean newChapter = false;
+						if (chapterTitle != null && !preChapterTitle.equals(chapterTitle.text())) {
+							newChapter = true;
+							preChapterTitle = chapterTitle.text();
+							bw.append("［＃改ページ］\n");
+							bw.append("［＃ここから大見出し］\n");
+							bw.append(preChapterTitle);
+							bw.append('\n');
+							bw.append("［＃ここで大見出し終わり］\n");
+							bw.append('\n');
+						}
+						docToAozoraText(bw, chapterDoc, newChapter);
 					}
-					docToAozoraText(bw, chapterDoc, txtFile);
 				}
-			}
-			if (noUpdated) {
-				LogAppender.append("更新はありません\n");
+				if (noUpdated) {
+					LogAppender.append(title);
+					LogAppender.append(" の更新はありません\n");
+				}
 			}
 		}
 		
@@ -291,15 +342,16 @@ public class WebAozoraConverter
 			bw.close();
 		}
 		
+		this.canceled = false;
 		return txtFile;
 	}
 	
 	/** 各話のHTMLの変換 */
-	private void docToAozoraText(BufferedWriter bw, Document doc, File outFile) throws IOException
+	private void docToAozoraText(BufferedWriter bw, Document doc, boolean newChapter) throws IOException
 	{
 		Element contentDiv = getQueryFirstElement(doc, this.queryMap.get(ExtractId.CONTENT_ARTICLE));
 		if (contentDiv != null) {
-			bw.append("［＃改ページ］\n");
+			if (!newChapter) bw.append("［＃改ページ］\n");
 			Element elem = getQueryFirstElement(doc, this.queryMap.get(ExtractId.CONTENT_SUBTITLE));
 			if (elem != null) {
 				List<TextNode> subTitleNodes = elem.textNodes();
@@ -319,16 +371,16 @@ public class WebAozoraConverter
 			Element preambleDiv = getQueryFirstElement(doc, this.queryMap.get(ExtractId.CONTENT_PREAMBLE));
 			if (preambleDiv != null) {
 				bw.append("［＃区切り線］\n");
-				bw.append('\n');
 				bw.append("［＃ここから２字下げ］\n");
 				bw.append("［＃ここから２字上げ］\n");
 				bw.append("［＃ここから１段階小さな文字］\n");
+				bw.append('\n');
 				printNode(bw, preambleDiv);
+				bw.append('\n');
 				bw.append('\n');
 				bw.append("［＃ここで小さな文字終わり］\n");
 				bw.append("［＃ここで字上げ終わり］\n");
 				bw.append("［＃ここで字下げ終わり］\n");
-				bw.append('\n');
 				bw.append("［＃区切り線］\n");
 				bw.append('\n');
 			}
@@ -341,11 +393,12 @@ public class WebAozoraConverter
 				bw.append('\n');
 				bw.append('\n');
 				bw.append("［＃区切り線］\n");
-				bw.append('\n');
 				bw.append("［＃ここから２字下げ］\n");
 				bw.append("［＃ここから２字上げ］\n");
 				bw.append("［＃ここから１段階小さな文字］\n");
+				bw.append('\n');
 				printNode(bw, appendixDiv);
+				bw.append('\n');
 				bw.append('\n');
 				bw.append("［＃ここで小さな文字終わり］\n");
 				bw.append("［＃ここで字上げ終わり］\n");
@@ -364,6 +417,8 @@ public class WebAozoraConverter
 				else if ("hr".equals(elem.tagName())) bw.append("［＃区切り線］\n");
 				else if ("ruby".equals(elem.tagName())) {
 					printRuby(bw, elem);
+				} else if ("img".equals(elem.tagName())) {
+						printImage(bw, elem);
 				} else if ("b".equals(elem.tagName())) {
 					bw.append("［＃ここから太字］");
 					//子を出力
@@ -395,6 +450,35 @@ public class WebAozoraConverter
 			}
 		}
 	}
+	/** 画像をキャッシュして相対パスの注記にする */
+	private void printImage(BufferedWriter bw, Element img) throws IOException
+	{
+		String src = img.attr("src");
+		if (src == null || src.length() == 0) return;
+		
+		String imagePath = null;
+		int idx = src.indexOf("//");
+		if (idx > 0) imagePath = src.substring(idx+2).replaceAll("\\?\\*\\&\\|\\<\\>\"\\\\", "_");
+		else if (src.charAt(0) == '/') {
+			src = this.baseUri+src.substring(1);
+			imagePath = "_"+src.replaceAll("\\?\\*\\&\\|\\<\\>\"\\\\", "_");
+		}
+		else {
+			src = this.htmlBaseUri+src;
+			imagePath = src.replaceAll("\\?\\*\\&\\|\\<\\>\"\\\\", "_");
+		}
+		
+		if (imagePath.endsWith("/")) imagePath += "image.png";
+		
+		File imageFile = new File(this.dstPath+"images/"+imagePath);
+		if (!imageFile.exists()) {
+			cacheFile(src, imageFile);
+		}
+		bw.append("［＃挿絵（");
+		bw.append("images/"+imagePath);
+		bw.append("）入る］");
+	}
+	
 	/** 文字を出力 特殊文字は注記に変換 */
 	private void printText(BufferedWriter bw, String text) throws IOException
 	{
