@@ -28,6 +28,14 @@ public class AozoraEpub3
 	/** コマンドライン実行用 */
 	public static void main(String args[])
 	{
+		String jarPath = System.getProperty("java.class.path");
+		int idx = jarPath.indexOf(";");
+		if (idx > 0) jarPath = jarPath.substring(0, idx);
+		if (!jarPath.endsWith(".jar")) jarPath = "";
+		else jarPath = jarPath.substring(0, jarPath.lastIndexOf(File.separator)+1);
+		//this.cachePath = new File(jarPath+".cache");
+		//this.webConfigPath = new File(jarPath+"web");
+		
 		/** ePub3出力クラス */
 		Epub3Writer epub3Writer;
 		/** ePub3画像出力クラス */
@@ -46,8 +54,8 @@ public class AozoraEpub3
 			//コマンドライン オプション設定
 			Options options = new Options();
 			options.addOption("h", "help", false, "show usage");
-			options.addOption("i", "ini", true, "指定したiniファイルから設定を読み込みます (コマンドラインオプション以外)");
-			options.addOption("t", true, "本文内の表題種別\n [0:表題→著者名] (default)\n[1:著者名→表題]\n[2:表題→著者名(副題優先)]\n[3:表題のみ]\n[4:なし]");
+			options.addOption("i", "ini", true, "指定したiniファイルから設定を読み込みます (コマンドラインオプション以外の設定)");
+			options.addOption("t", true, "本文内の表題種別\n[0:表題→著者名] (default)\n[1:著者名→表題]\n[2:表題→著者名(副題優先)]\n[3:表題のみ]\n[4:なし]");
 			options.addOption("tf", false, "入力ファイル名を表題に利用");
 			options.addOption("c", "cover", true, "表紙画像\n[0:先頭の挿絵]\n[1:ファイル名と同じ画像]\n[ファイル名 or URL]");
 			options.addOption("ext", true, "出力ファイル拡張子\n[.epub] (default)\n[.kepub.epub]");
@@ -98,8 +106,8 @@ public class AozoraEpub3
 				}
 			}
 			//ePub出力クラス初期化
-			epub3Writer = new Epub3Writer("template/");
-			epub3ImageWriter = new Epub3ImageWriter("template/");
+			epub3Writer = new Epub3Writer(jarPath+"template/");
+			epub3ImageWriter = new Epub3ImageWriter(jarPath+"template/");
 			
 			//propsから読み込み
 			props = new Properties();
@@ -210,7 +218,7 @@ public class AozoraEpub3
 			//if(commandLine.hasOption("hor")) vertical = false;
 			
 			//変換クラス生成とパラメータ設定
-			AozoraEpub3Converter  aozoraConverter = new AozoraEpub3Converter(epub3Writer);
+			AozoraEpub3Converter  aozoraConverter = new AozoraEpub3Converter(epub3Writer, jarPath);
 			//栞用span出力
 			aozoraConverter.setWithMarkId(withMarkId);
 			//変換オプション設定

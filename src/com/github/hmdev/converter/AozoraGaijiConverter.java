@@ -29,16 +29,15 @@ public class AozoraGaijiConverter
 	/** 青空文庫注記外字を代替文字に変換 */
 	HashMap<String, String> chukiAltMap = new HashMap<String, String>();
 	
-	public AozoraGaijiConverter() throws IOException
+	public AozoraGaijiConverter(String jarPath) throws IOException
 	{
 		//初期化
 		//外字変換
 		this.jisConverter = new JisConverter();
 		
 		//ファイルチェック取得
-		//this.loadChukiFile(log, new File("chuki_glyph.txt"), chukiCidMap, true);
-		this.loadChukiFile(new File("chuki_utf.txt"), chukiUtfMap, false);
-		this.loadChukiFile(new File("chuki_alt.txt"), chukiAltMap, true);
+		this.loadChukiFile(new File(jarPath+"chuki_utf.txt"), chukiUtfMap, false);
+		this.loadChukiFile(new File(jarPath+"chuki_alt.txt"), chukiAltMap, true);
 	}
 	
 	/** 注記変換ファイル読み込み 

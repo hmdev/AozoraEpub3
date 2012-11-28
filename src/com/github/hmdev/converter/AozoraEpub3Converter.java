@@ -238,7 +238,7 @@ public class AozoraEpub3Converter
 	 * 変換テーブルやクラスがstaticで初期化されていなければ初期化
 	 * @param _msgBuf ログ出力用バッファ
 	 * @throws IOException */
-	public AozoraEpub3Converter(Epub3Writer writer) throws IOException
+	public AozoraEpub3Converter(Epub3Writer writer, String jarPath) throws IOException
 	{
 		this.writer = writer;
 		
@@ -246,12 +246,12 @@ public class AozoraEpub3Converter
 		if (inited) return;
 		
 		//拡張ラテン変換
-		latinConverter = new LatinConverter();
+		latinConverter = new LatinConverter(new File(jarPath+"chuki_latin.txt"));
 		
-		ghukiConverter = new AozoraGaijiConverter();
+		ghukiConverter = new AozoraGaijiConverter(jarPath);
 		
 		//注記タグ変換
-		File chukiTagFile = new File("chuki_tag.txt");
+		File chukiTagFile = new File(jarPath+"chuki_tag.txt");
 		BufferedReader src = new BufferedReader(new InputStreamReader(new FileInputStream(chukiTagFile), "UTF-8"));
 		String line;
 		int lineNum = 0;
@@ -298,7 +298,7 @@ public class AozoraEpub3Converter
 		chukiPatternMap.put("字下げ終わり複合", Pattern.compile("^［＃ここで字下げ.*終わり"));
 		
 		//前方参照注記
-		File chukiSufFile = new File("chuki_tag_suf.txt");
+		File chukiSufFile = new File(jarPath+"chuki_tag_suf.txt");
 		src = new BufferedReader(new InputStreamReader(new FileInputStream(chukiSufFile), "UTF-8"));
 		lineNum = 0;
 		try {
@@ -325,7 +325,7 @@ public class AozoraEpub3Converter
 		}
 		
 		//単純文字置換
-		File replaceFile = new File("replace.txt");
+		File replaceFile = new File(jarPath+"replace.txt");
 		if (replaceFile.exists()) {
 			replaceMap = new HashMap<Character, String>();
 			replace2Map = new HashMap<String, String>();
@@ -511,9 +511,9 @@ public class AozoraEpub3Converter
 		while ((line = src.readLine()) != null) {
 			this.lineNum++;
 			
-			//外字変換後に前方参照注記変換
-			//ルビだけ先に除去してから外字変換
+			//注記と画像のチェックなのでルビだけ先に除去 他の特殊文字は"※"でエスケープ
 			line = line.replaceAll("《[^》]+?》", "").replaceAll("｜", "");
+			//見出し等の取得のため前方参照注記は変換 外字文字は置換
 			line = this.replaceChukiSufTag(this.convertGaijiChuki(line, true, false));
 			
 			//コメント除外 50文字以上をコメントにする
@@ -743,7 +743,7 @@ public class AozoraEpub3Converter
 			
 			//コメント行の後はタイトル取得はしない
 			if (!firstCommentStarted) {
-				String replaced = this.replaceToPlain(line);
+				String replaced = this.getChapterName(line);
 				if (firstLineStart == -1) {
 					//改ページチェック
 					//タイトル前の改ページ位置を保存
@@ -806,6 +806,26 @@ public class AozoraEpub3Converter
 			LogAppender.append("[ERROR] ("+(lineNum+1)+")\n");
 			throw e;
 		}
+	}
+	
+	/** タグのみ削除 */
+	private String removeTag(String line)
+	{
+		return line.replaceAll("［＃.+?］", "").replaceFirst("^[ |　|―]+", "").replaceAll("<[^>]+>", "").replaceAll("｜", "");
+	}
+	
+	/** 目次やタイトル用の文字列を取得 ルビ関連の文字 ｜《》 は除外済で他の特殊文字は'※'エスケープ */
+	private String getChapterName(String line)
+	{
+		String name = line.replaceAll("［＃.+?］", "").replaceAll("<[^>]+>", "") //タグ除去
+				.replaceAll("※", "") //エスケープ文字復元
+				.replaceFirst("^[ |　|―]+", "").replaceFirst("[ |　|―]+$","") //前後の不要な文字所除去
+				.replaceAll("〳〵", "く").replaceAll("〴〵", "ぐ").replaceAll("〻", "々")
+				.replaceFirst("^(=|＝|-|―|─)(=|＝|-|―|─)+", "").replaceFirst("(=|＝|-|―|─)(=|＝|-|―|─)+$", "");//連続する記号除去
+				//printLineBuffer内だと以下の変換が必要
+				/*.replaceAll("<span class=\"fullsp\"> </span>", "　").replaceAll(String.valueOf((char)(0x2000))+(char)(0x2000), "　")
+				.replaceAll("<rt>[^<]+</rt>", "").replaceAll("<[^>]+>", "");*/
+		return name.length()>maxChapterNameLength ? name.substring(0, maxChapterNameLength)+"..." : name;
 	}
 	
 	/** 文字が章の数字ならtrue */
@@ -2009,7 +2029,7 @@ public class AozoraEpub3Converter
 			case '㊶': case '㊷': case '㊸': case '㊹': case '㊺': case '㊻': case '㊼': case '㊽': case '㊾': case '㊿':
 			case '△': case '▽': case '▲': case '▼': case '☆': case '★':
 			case '♂': case '♀': case '♪': case '♭': case '§': case '†': case '‡': 
-			case '÷': case '±': case '∀': case '∞': case '∴': case '∵': 
+			case '÷': case '±': case '∀': case '∞': case '∴': case '∵':
 			case '‼': case '⁇': case '⁉': case '⁈':
 			case '©': case '®': case '⁑': case '⁂':
 			case '◐': case '◑': case '◒': case '◓': case '▷': case '▶': case '◁': case '◀':
@@ -2248,25 +2268,5 @@ public class AozoraEpub3Converter
 			//バッファクリア
 			buf.setLength(0);
 		}
-	}
-	
-	/** タグのみ削除 */
-	private String removeTag(String line)
-	{
-		return line.replaceAll("［＃.+?］", "").replaceFirst("^[ |　|―]+", "").replaceAll("<[^>]+>", "").replaceAll("｜", "");
-	}
-	
-	/** タグとルビのない文字列に置換 */
-	private String replaceToPlain(String str)
-	{
-		return str.replaceFirst("^[ |　|―]+", "").replaceFirst("[ |　|―]+$","").replaceAll("［＃.+?］", "").replaceAll("《[^》]+?》", "").replaceAll("｜", "").replaceAll("<[^>]+>", "").replaceAll("〳〵", "く").replaceAll("〴〵", "ぐ").replaceAll("〻", "々");
-	}
-	private String getChapterName(String line)
-	{
-		String name = line.replaceAll("※", "").replaceFirst("^[ |　|―]+", "").replaceFirst("[ |　|―]+$","").replaceAll("［＃.+?］", "").replaceAll("<[^>]+>", "").replaceAll("〳〵", "く").replaceAll("〴〵", "ぐ").replaceAll("〻", "々")
-				.replaceFirst("^(=|＝|-|―|─)(=|＝|-|―|─)+", "").replaceFirst("(=|＝|-|―|─)(=|＝|-|―|─)+$", "");
-				//.replaceAll("<span class=\"fullsp\"> </span>", "　").replaceAll(String.valueOf((char)(0x2000))+(char)(0x2000), "　")
-				//.replaceAll("<rt>[^<]+</rt>", "").replaceAll("<[^>]+>", "")
-		return name.length()>maxChapterNameLength ? name.substring(0, maxChapterNameLength)+"..." : name;
 	}
 }

@@ -1,6 +1,7 @@
 package com.github.hmdev.converter;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -21,10 +22,10 @@ public class LatinConverter
 	 * int[]{横書き時のグリフのCID, 縦書き時(右90度)のグリフのCID} */
 	HashMap<Character, String[]> latinCidMap = new HashMap<Character, String[]>();
 	
-	public LatinConverter() throws IOException
+	public LatinConverter(File file) throws IOException
 	{
-		String srcFileName = "chuki_latin.txt";
-		BufferedReader src = new BufferedReader(new InputStreamReader(new FileInputStream(srcFileName), "UTF-8"));
+		//String srcFileName = "chuki_latin.txt";
+		BufferedReader src = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
 		String line;
 		int lineNum = 0;
 		try {
@@ -37,7 +38,7 @@ public class LatinConverter
 						if (values[0].length() > 0) latinMap.put(values[0], ch);
 						latinCidMap.put(ch, new String[]{values[2], values[3]});
 					} catch (Exception e) {
-						LogAppender.append("[ERROR] "+srcFileName+" ("+(lineNum+1)+") : "+line+"\n");
+						LogAppender.append("[ERROR] "+file.getName()+" ("+(lineNum+1)+") : "+line+"\n");
 					}
 				}
 			}

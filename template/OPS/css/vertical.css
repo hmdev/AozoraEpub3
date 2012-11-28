@@ -28,6 +28,8 @@ h6 { font: small-caps 100%; }
 
 p { margin: 0; }
 
+hr { margin: .5em 0 .5em 0; }
+
 .strike { text-decoration:line-through; }
 .dbl_strike { text-decoration:line-through; }
 
@@ -372,6 +374,13 @@ div.jzm37 { max-height: 37em; }
 div.jzm38 { max-height: 38em; }
 div.jzm39 { max-height: 39em; }
 div.jzm40 { max-height: 40em; }
+
+div.pb1 { margin-bottom: 1em; }
+div.pb2 { margin-bottom: 2em; }
+div.pb3 { margin-bottom: 3em; }
+div.pb4 { margin-bottom: 4em; }
+div.pb5 { margin-bottom: 5em; }
+div.pb6 { margin-bottom: 6em; }
 
 /* 行内全角スペース調整用 */
 span.fullsp { padding-top:.5em; }

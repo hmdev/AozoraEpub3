@@ -1,0 +1,46 @@
+### 一覧ページから本の情報とリンク抽出
+### CONTENT_ から始まる物は各話HTMLからの抽出用
+###
+### 書式:
+###内部ID	cssQuery
+### または
+###内部ID	正規表現
+###
+
+################################
+##一覧ページの抽出設定
+## シリーズタイトル
+SERIES	.series a
+## タイトル
+TITLE	.novel_title
+## 著者
+AUTHOR	.novel_writername a
+## 説明
+DESCRIPTION	.novel_ex
+
+
+##各話へのリンクと更新日時取得用の外側のノード
+##CHILD_NODE	
+
+## 各話へのリンク cssQuery
+HREF	.period_subtitle a,.long_subtitle a
+## 各話へのリンク パターン
+#HREF_REGEX	\/n\d+\w*\/\d+\/
+
+##更新日時 比較文字列 (hrefに1:1で対応するタグ 内部のinnerHTML文字列で比較)
+UPDATE	.long_update
+
+
+################################
+###各話の抽出設定
+
+## 各話 Chapter 先頭の章のみ大見出しで出力
+CONTENT_CHAPTER	.chapter_title
+## 各話 章タイトル 中見出しで出力
+CONTENT_SUBTITLE	.novel_subtitle
+## 各話 本文
+CONTENT_ARTICLE	#novel_view
+##前書き
+CONTENT_PREAMBLE	.novel_p .novel_view
+## 補足
+CONTENT_APPENDIX	.novel_a .novel_view

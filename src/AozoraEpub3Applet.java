@@ -245,12 +245,17 @@ public class AozoraEpub3Applet extends JApplet
 	/** 設定ファイル名 */
 	String propFileName = "AozoraEpub3.ini";
 	
+	/** jarファイルのあるパス文字列 "/"含む */
+	String jarPath = null;
+	
 	/** 前回の出力パス */
 	File currentPath = null;
 	/** キャッシュ保存パス */
 	File cachePath = null;
 	/** RAR解凍先tmpパス */
 	File tmpPath = null;
+	/** Web小説取得情報格納パス */
+	File webConfigPath = null;
 	
 	//UIパラメータ
 	int coverW;
@@ -270,10 +275,22 @@ public class AozoraEpub3Applet extends JApplet
 		super.init();
 		this.setSize(new Dimension(520, 360));
 		
+		//パス関連初期化
+		this.jarPath = System.getProperty("java.class.path");
+		System.out.println(jarPath);
+		int idx = this.jarPath.indexOf(";");
+		if (idx > 0) this.jarPath = this.jarPath.substring(0, idx);
+		if (!this.jarPath.endsWith(".jar")) this.jarPath = "";
+		else this.jarPath = this.jarPath.substring(0, this.jarPath.lastIndexOf(File.separator)+1);
+		System.out.println(jarPath);
+		this.cachePath = new File(this.jarPath+".cache");
+		this.webConfigPath = new File(this.jarPath+"web");
+		
+		
 		//設定ファイル読み込み
 		props = new Properties(); 
 		try {
-			props.load(new FileInputStream(propFileName));
+			props.load(new FileInputStream(this.jarPath+propFileName));
 		} catch (Exception e) { }
 		String path = props.getProperty("LastDir");
 		if (path != null && path.length() >0) this.currentPath = new File(path);
@@ -1371,14 +1388,14 @@ public class AozoraEpub3Applet extends JApplet
 		//初期化
 		try {
 			//ePub出力クラス初期化
-			this.epub3Writer = new Epub3Writer("template/");
+			this.epub3Writer = new Epub3Writer(this.jarPath+"template/");
 			this.epub3Writer.setProgressBar(jProgressBar);
 			//ePub画像出力クラス初期化
-			this.epub3ImageWriter = new Epub3ImageWriter("template/");
+			this.epub3ImageWriter = new Epub3ImageWriter(this.jarPath+"template/");
 			this.epub3ImageWriter.setProgressBar(jProgressBar);
 			
 			//変換テーブルをstaticに生成
-			this.aozoraConverter = new AozoraEpub3Converter(this.epub3Writer);
+			this.aozoraConverter = new AozoraEpub3Converter(this.epub3Writer, this.jarPath);
 			
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -1586,7 +1603,6 @@ public class AozoraEpub3Applet extends JApplet
 		@Override
 		public void actionPerformed(ActionEvent e)
 		{
-			//キャッシュパスならnullにする
 			File path = currentPath;
 			File selectedPath = new File((String)jComboDstPath.getEditor().getItem());
 			if (selectedPath.isDirectory()) path = selectedPath;
@@ -1619,14 +1635,34 @@ public class AozoraEpub3Applet extends JApplet
 			
 			JFileChooser fileChooser = new JFileChooser(currentPath);
 			fileChooser.setDialogTitle("変換する青空文庫テキストを開く");
-			fileChooser.setFileFilter(new FileNameExtensionFilter("青空文庫テキスト(txt,zip,cbz,txtz)", new String[]{"txt","zip","cbz","txtz"}));
+			fileChooser.setFileFilter(new FileNameExtensionFilter("青空文庫'txt,zip),画像(zip),ショートカット(url)", new String[]{"txt","zip","cbz","txtz","url"}));
 			fileChooser.setMultiSelectionEnabled(true);
 			int state = fileChooser.showOpenDialog(parent);
 			switch (state) {
 			case JFileChooser.APPROVE_OPTION:
-				//convertFiles(fileChooser.getSelectedFiles());
-				//Worker初期化
-				startConvertFilesWorker(fileChooser.getSelectedFiles());
+				
+				Vector<File> vecFiles = new Vector<File>();
+				Vector<String> vecUrlString = null;
+				File dstPath = null;
+				try {
+				for (File file : fileChooser.getSelectedFiles()) {
+					if (file.getName().endsWith(".url")) {
+						if (vecUrlString == null) vecUrlString = new Vector<String>();
+						vecUrlString.add(readInternetShortCut(file));
+						dstPath = file.getParentFile();
+					} else {
+						vecFiles.add(file);
+					}
+				}
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+				if (vecFiles.size() > 0) {
+					startConvertFilesWorker(vecFiles);
+				}
+				if (vecUrlString != null) {
+					convertWeb(vecUrlString, dstPath);
+				}
 			}
 		}
 	}
@@ -1650,79 +1686,75 @@ public class AozoraEpub3Applet extends JApplet
 			dtde.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
 			Transferable transfer = dtde.getTransferable();
 			try {
-				String urlString = null;
+				Vector<File> vecFiles = new Vector<File>();
+				Vector<String> vecUrlString = null;
+				File dstPath = null;
 				
 				if (transfer.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
 					//IEはurlはショートカットになってくる
 					@SuppressWarnings("unchecked")
 					List<File> files = (List<File>)transfer.getTransferData(DataFlavor.javaFileListFlavor);
 					if (files.size() > 0) {
-						if (files.get(0).getName().endsWith(".url")) {
-							urlString = readInternetShortCut(files.get(0));
-						} else {
-							startConvertFilesWorker((File[])(files.toArray()));
-							return;
+						for (File file : files) {
+							if (file.getName().endsWith(".url")) {
+								if (vecUrlString == null) vecUrlString = new Vector<String>();
+								vecUrlString.add(readInternetShortCut(file));
+								dstPath = file.getParentFile();
+							} else {
+								vecFiles.add(file);
+							}
+						}
+						if (vecFiles.size() > 0) {
+							startConvertFilesWorker(vecFiles);
 						}
 					}
 				}
-				if (urlString != null || transfer.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+				if (vecUrlString != null || transfer.isDataFlavorSupported(DataFlavor.stringFlavor)) {
 					//URLかどうか
-					if (urlString == null) urlString = transfer.getTransferData(DataFlavor.stringFlavor).toString();
-					if (urlString.startsWith("http")) {
-						//出力先が指定されていない
-						if (jComboDstPath.getSelectedIndex() == 0) {
-							dstPathChooser.actionPerformed(null);
-							if (jComboDstPath.getSelectedIndex() == 0) {
-								LogAppender.append("変換処理を中止しました\n");
-								return;
-							}
-						}
-						if (cachePath == null) {
-							//キャッシュパス
-							cachePath = new File(".cache");
-							cachePath .mkdir();
-						}
-						
-						String urlPath = urlString.substring(urlString.indexOf("//")+2).replaceAll("\\?\\*\\&\\|\\<\\>\"\\\\", "_");
-						//web以下に同じ名前のパスがあったらキャッシュ後青空変換
-						File webPath = new File("web");
-						if (webPath.isDirectory()) {
-							for (File file : webPath.listFiles()) {
-								if (file.isDirectory() && urlPath.startsWith(file.getName())) {
-									ConvertWebWorker convertWebWorker = new ConvertWebWorker(urlString);
-									convertWebWorker.execute();
-									return;
-								}
-							}
-						}
-						//出力先 URLと同じパス
-						String path = cachePath.getAbsolutePath()+"/"+urlPath;
-						File srcFile = new File(path);
-						srcFile.getParentFile().mkdirs();
-						//ダウンロード
-						BufferedInputStream bis = new BufferedInputStream(new URL(urlString).openStream(), 8192);
-						BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(srcFile));
-						IOUtils.copy(bis, bos);
-						bos.close();
-						bis.close();
-						startConvertFilesWorker(new File[]{srcFile});
-						return;
-					} else if (urlString.startsWith("file://")) {
+					String urlString = null;
+					try {
+						Object transferData = transfer.getTransferData(DataFlavor.stringFlavor);
+						if (transferData != null) urlString = transferData.toString();
+					} catch (Exception e) {}
+					
+					if (urlString != null && urlString.startsWith("file://")) {
 						//Linux等 ファイルのパスでファイルがあれば変換
 						try {
 							String[] fileNames = urlString.split("\n");
-							Vector<File> vecFiles = new Vector<File>();
+							vecFiles = new Vector<File>();
 							for (String path : fileNames) {
 								File file = new File(URLDecoder.decode(path.substring(7).trim(),"UTF-8"));
-								if (file.exists()) vecFiles.add(file);
+								if (file.exists()) {
+									if (file.getName().endsWith(".url")) {
+										if (vecUrlString == null) vecUrlString = new Vector<String>();
+										vecUrlString.add(readInternetShortCut(file));
+										dstPath = file.getParentFile();
+									} else {
+										vecFiles.add(file);
+									}
+								}
 							}
-							File[] files = new File[vecFiles.size()];
-							for (int i=0; i<files.length; i++) { files[i] = vecFiles.get(i); }
 							if (vecFiles.size() > 0) {
-								startConvertFilesWorker(files);
-								return;
+								startConvertFilesWorker(vecFiles);
 							}
 						} catch (Exception e) { e.printStackTrace(); }
+					}
+					else if (urlString != null && urlString.startsWith("http")) {
+						//ブラウザからのDnD
+						if (vecUrlString == null) vecUrlString = new Vector<String>();
+						vecUrlString.add(urlString);
+					}
+					
+					//URL変換 の最後が .zip
+					if (urlString != null && urlString.endsWith(".zip")) {
+						convertZip(urlString);
+						return;
+					}
+					
+					//Webから取得
+					if (vecUrlString != null) {
+						convertWeb(vecUrlString, dstPath);
+						return;
 					}
 				}
 			} catch (Exception e) {
@@ -1731,6 +1763,52 @@ public class AozoraEpub3Applet extends JApplet
 				jTextArea.setCaretPosition(jTextArea.getDocument().getLength());
 			}
 		}
+	}
+	
+	void convertZip(String urlString) throws IOException
+	{
+		//出力先が指定されていない
+		if (jComboDstPath.getSelectedIndex() == 0) {
+			dstPathChooser.actionPerformed(null);
+			if (jComboDstPath.getSelectedIndex() == 0) {
+				LogAppender.append("変換処理を中止しました\n");
+				return;
+			}
+		}
+		//キャッシュパス
+		cachePath.mkdir();
+		
+		String urlPath = urlString.substring(urlString.indexOf("//")+2).replaceAll("\\?\\*\\&\\|\\<\\>\"\\\\", "_");
+		//青空zipのURLをキャッシュして変換
+		//出力先 URLと同じパス
+		String path = cachePath.getAbsolutePath()+"/"+urlPath;
+		File srcFile = new File(path);
+		srcFile.getParentFile().mkdirs();
+		//ダウンロード
+		BufferedInputStream bis = new BufferedInputStream(new URL(urlString).openStream(), 8192);
+		BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(srcFile));
+		IOUtils.copy(bis, bos);
+		bos.close();
+		bis.close();
+		startConvertFilesWorker(new File[]{srcFile});
+	}
+	
+	void convertWeb(Vector<String> vecUrlString, File dstPath)
+	{
+		//出力先が指定されていない
+		if (jComboDstPath.getSelectedIndex() == 0 && dstPath == null) {
+			dstPathChooser.actionPerformed(null);
+			if (jComboDstPath.getSelectedIndex() == 0) {
+				LogAppender.append("変換処理を中止しました\n");
+				return;
+			}
+		}
+		//キャッシュパス
+		cachePath.mkdir();
+		
+		//web以下に同じ名前のパスがあったらキャッシュ後青空変換
+		ConvertWebWorker convertWebWorker = new ConvertWebWorker(vecUrlString, dstPath);
+		convertWebWorker.execute();
 	}
 	
 	/** Windowsのインターネットショートカットを読み込み */
@@ -1773,8 +1851,9 @@ public class AozoraEpub3Applet extends JApplet
 	}
 	
 	////////////////////////////////////////////////////////////////
-	/** 複数ファイルを変換 */
-	private void convertFiles(File[] srcFiles)
+	/** 複数ファイルを変換
+	 * @param dstPath srcFileがキャッシュで入力ファイルを同じ場所に出力先指定をする場合 */
+	private void convertFiles(File[] srcFiles, File dstPath)
 	{
 		if (srcFiles.length == 0 ) return;
 		
@@ -1782,9 +1861,14 @@ public class AozoraEpub3Applet extends JApplet
 		
 		//共通パラメータ取得
 		//出力先取得
-		File dstPath = null;
-		if (jComboDstPath.getSelectedIndex() != 0) {
-			dstPath = new File(jComboDstPath.getEditor().getItem().toString());
+		if (jComboDstPath.getSelectedIndex() == 0) {
+			//出力先指定があればそれを設定
+			if (dstPath != null) currentPath = dstPath;
+			//入力先がキャッシュファイルでなければ設定
+			else if (!srcFiles[0].getAbsolutePath().startsWith(cachePath.getAbsolutePath())) currentPath = srcFiles[0].getParentFile();
+			
+		} else {
+			if (dstPath == null) dstPath = new File(jComboDstPath.getEditor().getItem().toString());
 			if (!dstPath.isDirectory()) {
 				String dstPathName = dstPath.getAbsolutePath();
 				if (dstPathName.length() > 70) dstPathName = dstPathName.substring(0, 32)+" ... "+dstPathName.substring(dstPathName.length()-32);
@@ -1797,13 +1881,9 @@ public class AozoraEpub3Applet extends JApplet
 					return;
 				}
 			}
+			//jComboDstPathに出力先履歴保存
+			this.addDstPath();
 		}
-		//jComboDstPathに出力先履歴保存
-		this.addDstPath();
-		
-		//入力先がファイルなら現在パスに設定
-		if (cachePath == null || !srcFiles[0].getAbsolutePath().startsWith(cachePath.getAbsolutePath())) currentPath = srcFiles[0].getParentFile();
-		if (currentPath == null) currentPath = dstPath;
 		
 		////////////////////////////////////////////////////////////////
 		//Appletのパラメータを取得
@@ -2170,9 +2250,9 @@ public class AozoraEpub3Applet extends JApplet
 		
 		////////////////////////////////
 		//Kindleチェック
-		File kindlegen = new File("kindlegen.exe");
+		File kindlegen = new File(this.jarPath+"kindlegen.exe");
 		if (!kindlegen.isFile()) {
-			kindlegen = new File("kindlegen");
+			kindlegen = new File(this.jarPath+"kindlegen");
 			if (!kindlegen.isFile()) {
 				kindlegen = null;
 			}
@@ -2244,9 +2324,15 @@ public class AozoraEpub3Applet extends JApplet
 	}
 	
 	////////////////////////////////////////////////////////////////
+	void startConvertFilesWorker(Vector<File> vecFiles)
+	{
+		File[] files = new File[vecFiles.size()];
+		for (int i=0; i<files.length; i++) files[i] = vecFiles.get(i);
+		startConvertFilesWorker(files);
+	}
 	void startConvertFilesWorker(File[] files)
 	{
-		ConvertFilesWorker convertFilesWorker = new ConvertFilesWorker(files);
+		ConvertFilesWorker convertFilesWorker = new ConvertFilesWorker(files, null);
 		convertFilesWorker.execute();
 	}
 	
@@ -2258,10 +2344,14 @@ public class AozoraEpub3Applet extends JApplet
 		/** 変換対象ファイル */
 		File[] srcFiles;
 		
-		public ConvertFilesWorker(File[] srcFiles)
+		//ショートカットのコピー等でsrcFileがキャッシュの場合で出力先が同じ場所を指定したときに利用
+		File dstPath = null;
+		
+		public ConvertFilesWorker(File[] srcFiles, File dstPath)
 		{
 			this.applet = getApplet();
 			this.srcFiles = srcFiles;
+			this.dstPath = dstPath;
 		}
 		
 		@Override
@@ -2270,7 +2360,7 @@ public class AozoraEpub3Applet extends JApplet
 			this.applet.running = true;
 			applet.setConvertEnabled(false);
 			try {
-				applet.convertFiles(srcFiles);
+				applet.convertFiles(srcFiles, dstPath);
 			} finally {
 				applet.setConvertEnabled(true);
 				this.applet.running = false;
@@ -2293,12 +2383,17 @@ public class AozoraEpub3Applet extends JApplet
 		/** 面倒なのでAppletを渡す */
 		AozoraEpub3Applet applet;
 		/** 変換対象ファイル */
-		String urlString;
+		Vector<String> vecUrlString;
 		
-		public ConvertWebWorker(String urlString)
+		File dstPath = null;
+		
+		/** @param dstPath ショートカットファイルなら同じ場所出力用に指定 */
+		public ConvertWebWorker(Vector<String> vecUrlString, File dstPath)
 		{
 			this.applet = getApplet();
-			this.urlString = urlString;
+			this.vecUrlString = vecUrlString;
+			
+			this.dstPath = dstPath;
 		}
 		
 		@Override
@@ -2307,24 +2402,28 @@ public class AozoraEpub3Applet extends JApplet
 			this.applet.running = true;
 			applet.setConvertEnabled(false);
 			try {
-				
-				LogAppender.append("--------\n");
-				LogAppender.append(urlString);
-				LogAppender.append(" を読み込みます\n");
-				File srcFile = WebAozoraConverter.convertToAozoraText(urlString, cachePath);
-				
-				if (srcFile == null) {
-					LogAppender.append(urlString);
-					LogAppender.append(" が取得できませんでした\n");
-					return null;
+				for (String urlString : vecUrlString) {
+					try {
+						LogAppender.append("--------\n");
+						LogAppender.append(urlString);
+						LogAppender.append(" を読み込みます\n");
+						
+						File srcFile = WebAozoraConverter.convertToAozoraText(urlString, cachePath, webConfigPath);
+						
+						if (srcFile == null) {
+							LogAppender.append(urlString);
+							LogAppender.append(" は変換できません\n");
+							return null;
+						}
+						//エンコードを変換時のみUTF-8にする
+						int encIndex = applet.jComboEncType.getSelectedIndex();
+						applet.jComboEncType.setSelectedIndex(1);
+						applet.convertFiles(new File[]{srcFile}, dstPath);
+						applet.jComboEncType.setSelectedIndex(encIndex);
+					} catch (Exception e) {
+						e.printStackTrace(); LogAppender.append("エラーが発生しました: "+e.getMessage()+"\n");
+					}
 				}
-				//エンコードを変換時のみUTF-8にする
-				int encIndex = applet.jComboEncType.getSelectedIndex();
-				applet.jComboEncType.setSelectedIndex(1);
-				applet.convertFiles(new File[]{srcFile});
-				applet.jComboEncType.setSelectedIndex(encIndex);
-			} catch (Exception e) {
-				e.printStackTrace(); LogAppender.append("エラーが発生しました: "+e.getMessage()+"\n");
 			} finally {
 				applet.setConvertEnabled(true);
 				this.applet.running = false;
@@ -2603,7 +2702,7 @@ public class AozoraEpub3Applet extends JApplet
 		this.props.setProperty("OverWrite", this.jCheckOverWrite.isSelected()?"1":"");
 		this.props.setProperty("LastDir", this.currentPath==null?"":this.currentPath.getAbsolutePath());
 		//設定ファイル更新
-		this.props.store(new FileOutputStream(this.propFileName), "AozoraEpub3 Parameters");
+		this.props.store(new FileOutputStream(this.jarPath+this.propFileName), "AozoraEpub3 Parameters");
 		
 		super.finalize();
 	}

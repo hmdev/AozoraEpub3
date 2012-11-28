@@ -347,5 +347,12 @@ div.jzm48 { max-width: 48em; }
 div.jzm49 { max-width: 49em; }
 div.jzm50 { max-width: 50em; }
 
+div.pb1 { margin-right: 1em; }
+div.pb2 { margin-right: 2em; }
+div.pb3 { margin-right: 3em; }
+div.pb4 { margin-right: 4em; }
+div.pb5 { margin-right: 5em; }
+div.pb6 { margin-right: 6em; }
+
 /* 行内全角スペース調整用 */
 span.fullsp { padding-left:.5em; }
