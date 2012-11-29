@@ -9,7 +9,7 @@
 #else
 	<link rel="stylesheet" type="text/css" href="../css/horizontal_image.css"/>
 #end
-	<title>${bookInfo.Title}</title>
+	<title>${title}</title>
 </head>
 #if (${sectionInfo.ImageFitW})
 <body class="fit_w">
