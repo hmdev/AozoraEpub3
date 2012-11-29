@@ -38,7 +38,7 @@ public class LatinConverter
 						if (values[0].length() > 0) latinMap.put(values[0], ch);
 						latinCidMap.put(ch, new String[]{values[2], values[3]});
 					} catch (Exception e) {
-						LogAppender.append("[ERROR] "+file.getName()+" ("+(lineNum+1)+") : "+line+"\n");
+						LogAppender.error(lineNum, file.getName(), line);
 					}
 				}
 			}

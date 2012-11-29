@@ -8,7 +8,7 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.github.hmdev.util.ImageUtils;
+import com.github.hmdev.image.ImageUtils;
 
 /** タイトル著作者等のメタ情報を格納 */
 public class BookInfo

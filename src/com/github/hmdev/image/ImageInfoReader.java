@@ -1,4 +1,4 @@
-package com.github.hmdev.util;
+package com.github.hmdev.image;
 
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
@@ -16,6 +16,8 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.archivers.zip.ZipFile;
 
 import com.github.hmdev.info.ImageInfo;
+import com.github.hmdev.util.FileNameComparator;
+import com.github.hmdev.util.LogAppender;
 
 /**
  * 画像情報を格納するクラス
@@ -172,8 +174,7 @@ public class ImageInfoReader
 					imageInfo = ImageInfo.getImageInfo(zis, zis.getCount());
 				} catch (Exception e) {
 					LogAppender.append("[ERROR] 画像が読み込めませんでした: ");
-					LogAppender.append(srcFile.getPath());
-					LogAppender.append("\n");
+					LogAppender.println(srcFile.getPath());
 					e.printStackTrace();
 				}
 				if (imageInfo != null) {

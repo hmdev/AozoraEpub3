@@ -132,8 +132,7 @@ public class WebAozoraConverter
 		if (converter == null) {
 			converter = new WebAozoraConverter(fqdn, configPath);
 			if (!converter.isValid()) {
-				LogAppender.append("サイトの定義がありません: "+configPath.getName()+"/"+fqdn);
-				LogAppender.append("\n");
+				LogAppender.println("サイトの定義がありません: "+configPath.getName()+"/"+fqdn);
 				return null;
 			}
 			converters.put(fqdn, converter);
@@ -168,7 +167,7 @@ public class WebAozoraConverter
 		File cacheFile = new File(cachePath.getAbsolutePath()+"/"+urlFilePath);
 		//LogAppender.append(urlString);
 		cacheFile(urlString, cacheFile);
-		//LogAppender.append(" : Loaded\n");
+		//LogAppender.println(" : List Loaded.");
 		try { Thread.sleep(500); } catch (InterruptedException e) { }
 		
 		//TODO パスのマッチングで一覧ページか判断
@@ -193,7 +192,7 @@ public class WebAozoraConverter
 				hasTitle = true;
 			}
 			if (!hasTitle) {
-				LogAppender.append("タイトルがありません\n");
+				LogAppender.println("タイトルがありません");
 				return null;
 			}
 			//著者
@@ -227,7 +226,7 @@ public class WebAozoraConverter
 				Element contentDiv = getQueryFirstElement(doc, this.queryMap.get(ExtractId.CONTENT_ARTICLE));
 				if (contentDiv != null) docToAozoraText(bw, doc, false);
 				else {
-					LogAppender.append("一覧のリンクが取得できませんでした\n");
+					LogAppender.println("一覧のリンクが取得できませんでした");
 					return null;
 				}
 			} else {
@@ -237,7 +236,7 @@ public class WebAozoraConverter
 				//更新分のみ取得するようにするためhrefに対応した日付タグの文字列(innerHTML)を取得して保存しておく
 				Elements updates = getQueryElements(doc, this.queryMap.get(ExtractId.UPDATE));
 				if (hrefs == null || updates == null ||hrefs.size() != updates.size()) {
-					//LogAppender.append("リンクに対応する更新情報が取得できませんでした\n");
+					//LogAppender.println("リンクに対応する更新情報が取得できませんでした");
 				} else {
 					if (updateInfoFile.exists()) {
 						//前回の更新情報を取得して比較
@@ -308,7 +307,7 @@ public class WebAozoraConverter
 						if (updated || !chapterCacheFile.exists()) {
 							LogAppender.append(chapterHref);
 							cacheFile(chapterHref, chapterCacheFile);
-							LogAppender.append(" : Loaded.\n");
+							LogAppender.println(" : Loaded.");
 							try { Thread.sleep(500); } catch (InterruptedException e) { }
 							//ファイルがロードされたら更新有り
 							noUpdated = false;
@@ -333,7 +332,7 @@ public class WebAozoraConverter
 				}
 				if (noUpdated) {
 					LogAppender.append(title);
-					LogAppender.append(" の更新はありません\n");
+					LogAppender.println(" の更新はありません");
 				}
 			}
 		}

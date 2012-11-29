@@ -64,7 +64,7 @@ public class AozoraGaijiConverter
 							chukiMap.put(values[1], values[0]);
 						}
 					} catch (Exception e) {
-						LogAppender.append("[ERROR] "+srcFile.getName()+" ("+(lineNum+1)+") : "+line+"\n");
+						LogAppender.error(lineNum, srcFile.getName(), line);
 					}
 				}
 			}

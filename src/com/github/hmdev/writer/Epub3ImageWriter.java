@@ -45,9 +45,9 @@ public class Epub3ImageWriter extends Epub3Writer
 	/** コンストラクタ
 	 * @param templatePath epubテンプレート格納パス文字列 最後は"/"
 	 */
-	public Epub3ImageWriter(String templatePath)
+	public Epub3ImageWriter(String jarPath)
 	{
-		super(templatePath);
+		super(jarPath);
 	}
 	
 	/** 本文を出力する
@@ -116,7 +116,7 @@ public class Epub3ImageWriter extends Epub3Writer
 			imageInfo.setId(imageId);
 			imageInfo.setOutFileName(imageId+"."+ext);
 			if (!imageInfo.getExt().matches("^(png|jpeg|gif|jpg)$")) {
-				LogAppender.append("画像フォーマットエラー: ("+(lineNum+1)+") "+srcImageFileName+"\n");
+				LogAppender.println("画像フォーマットエラー: ("+(lineNum+1)+") "+srcImageFileName);
 				return null;
 			}
 			if (this.imageIndex-1 == bookInfo.coverImageIndex) {

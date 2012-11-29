@@ -32,9 +32,9 @@ import javax.swing.JToggleButton;
 import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
 
+import com.github.hmdev.image.ImageInfoReader;
 import com.github.hmdev.info.BookInfo;
 import com.github.hmdev.info.ChapterLineInfo;
-import com.github.hmdev.util.ImageInfoReader;
 
 /**
  * 変換前確認ダイアログ

@@ -1,4 +1,4 @@
-package com.github.hmdev.util;
+package com.github.hmdev.image;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -27,6 +27,7 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.compress.utils.IOUtils;
 
 import com.github.hmdev.info.ImageInfo;
+import com.github.hmdev.util.LogAppender;
 import com.sun.media.jai.codec.ImageCodec;
 import com.sun.media.jai.codec.ImageDecoder;
 
@@ -218,9 +219,9 @@ public class ImageUtils
 				}
 				//ImageIO.write(outImage, imageInfo.getExt(), zos);
 				_writeImage(zos, outImage, ext, jpegQuality);
-				LogAppender.append("画像縮小: "+imageInfo.getOutFileName()+" ("+w+","+h+")→("+scaledW+","+scaledH+")\n");
+				LogAppender.println("画像縮小: "+imageInfo.getOutFileName()+" ("+w+","+h+")→("+scaledW+","+scaledH+")");
 			} catch (Exception e) {
-				LogAppender.append("画像読み込みエラー: "+imageInfo.getOutFileName()+"\n");
+				LogAppender.println("画像読み込みエラー: "+imageInfo.getOutFileName());
 				e.printStackTrace();
 			}
 			zos.flush();

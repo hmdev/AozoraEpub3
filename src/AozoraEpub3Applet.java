@@ -76,10 +76,10 @@ import org.apache.commons.compress.utils.IOUtils;
 
 
 import com.github.hmdev.converter.AozoraEpub3Converter;
+import com.github.hmdev.image.ImageInfoReader;
 import com.github.hmdev.info.BookInfo;
 import com.github.hmdev.swing.JConfirmDialog;
 import com.github.hmdev.swing.NarrowTitledBorder;
-import com.github.hmdev.util.ImageInfoReader;
 import com.github.hmdev.util.LogAppender;
 import com.github.hmdev.web.WebAozoraConverter;
 import com.github.hmdev.writer.Epub3ImageWriter;
@@ -279,13 +279,9 @@ public class AozoraEpub3Applet extends JApplet
 		this.setSize(new Dimension(520, 360));
 		
 		//パス関連初期化
-		/*this.jarPath = System.getProperty("java.class.path");
-		int idx = this.jarPath.indexOf(";");
-		if (idx > 0) this.jarPath = this.jarPath.substring(0, idx);
-		if (!this.jarPath.endsWith(".jar")) this.jarPath = "";
-		else this.jarPath = this.jarPath.substring(0, this.jarPath.lastIndexOf(File.separator)+1);
-		*/
-		//エラーになるのでとりあえず空文字に
+		//this.jarPath = getClass().getClassLoader().getResource("").getFile();
+		//this.jarPath = this.jarPath.replaceFirst("\\/bin\\/$", "/");
+		//AppletではVelocityでパスがエラーになるのでとりあえず空文字に
 		this.jarPath = "";
 		
 		this.cachePath = new File(this.jarPath+".cache");
@@ -1406,8 +1402,10 @@ public class AozoraEpub3Applet extends JApplet
 			e.printStackTrace();
 			jTextArea.append(e.getMessage());
 		}
+		
 	}
 	
+	////////////////////////////////////////////////////////////////
 	class IntegerInputVerifier extends InputVerifier
 	{
 		/** 基準値 */
@@ -1776,7 +1774,7 @@ public class AozoraEpub3Applet extends JApplet
 		if (jComboDstPath.getSelectedIndex() == 0) {
 			dstPathChooser.actionPerformed(null);
 			if (jComboDstPath.getSelectedIndex() == 0) {
-				LogAppender.append("変換処理を中止しました\n");
+				LogAppender.println("変換処理を中止しました");
 				return;
 			}
 		}
@@ -1804,7 +1802,7 @@ public class AozoraEpub3Applet extends JApplet
 		if (jComboDstPath.getSelectedIndex() == 0 && dstPath == null) {
 			dstPathChooser.actionPerformed(null);
 			if (jComboDstPath.getSelectedIndex() == 0) {
-				LogAppender.append("変換処理を中止しました\n");
+				LogAppender.println("変換処理を中止しました");
 				return;
 			}
 		}
@@ -1882,7 +1880,7 @@ public class AozoraEpub3Applet extends JApplet
 					//フォルダ作成
 					dstPath.mkdirs();
 				} else {
-					LogAppender.append("変換処理を中止しました\n");
+					LogAppender.println("変換処理を中止しました");
 					return;
 				}
 			}
@@ -1956,7 +1954,7 @@ public class AozoraEpub3Applet extends JApplet
 					//Converterに設定
 					this.aozoraConverter.setForcePageBreak(forcePageBreakSize, forcePageBreakEmpty, forcePageBreakEmptySize, forcePageBreakChapter, forcePageBreakChapterSize);
 				} catch (Exception e) {
-					LogAppender.append("強制改ページパラメータ読み込みエラー\n");
+					LogAppender.println("強制改ページパラメータ読み込みエラー");
 				}
 			}
 			
@@ -1984,8 +1982,7 @@ public class AozoraEpub3Applet extends JApplet
 		} catch (Exception e) {
 			e.printStackTrace();
 			LogAppender.append("エラーが発生しました : ");
-			LogAppender.append(e.getMessage());
-			LogAppender.append("\n");
+			LogAppender.println(e.getMessage());
 		}
 		////////////////////////////////
 		System.gc();
@@ -2016,7 +2013,7 @@ public class AozoraEpub3Applet extends JApplet
 		int txtCount = 1;
 		boolean imageOnly = false;
 		if("zip".equals(ext) || "txtz".equals(ext)) { 
-			LogAppender.append("--------\n");
+			LogAppender.println("--------");
 			try {
 				txtCount = AozoraEpub3.countZipText(srcFile);
 			} catch (IOException e) {
@@ -2024,13 +2021,13 @@ public class AozoraEpub3Applet extends JApplet
 			}
 			if (txtCount == 0) { txtCount = 1; imageOnly = true; }
 		} else if ("cbz".equals(ext)) {
-			LogAppender.append("--------\n");
+			LogAppender.println("--------");
 			imageOnly = true;
 		} else if ("txt".equals(ext)) {
-			LogAppender.append("--------\n");
+			LogAppender.println("--------");
 		}
 		if (this.convertCanceled){
-			LogAppender.append("変換処理を中止しました : "+srcFile.getAbsolutePath()+"\n");
+			LogAppender.println("変換処理を中止しました : "+srcFile.getAbsolutePath());
 			return;
 		}
 		for (int i=0; i<txtCount; i++) {
@@ -2045,11 +2042,11 @@ public class AozoraEpub3Applet extends JApplet
 	 */
 	private void convertFile(File srcFile, File dstPath, String ext, int txtIdx, boolean imageOnly)
 	{
-		if (txtIdx > 0) LogAppender.append("--------\n");
+		if (txtIdx > 0) LogAppender.println("--------");
 		//パラメータ設定
 		if (!"txt".equals(ext) && !"txtz".equals(ext) && !"zip".equals(ext) && !"cbz".equals(ext) ) {
 			if (!"png".equals(ext) && !"jpg".equals(ext) && !"jpeg".equals(ext) && !"gif".equals(ext)) {
-				LogAppender.append("txt, txtz, zip, cbz 以外は変換できません\n");
+				LogAppender.println("txt, txtz, zip, cbz 以外は変換できません");
 			}
 			return;
 		}
@@ -2084,12 +2081,12 @@ public class AozoraEpub3Applet extends JApplet
 				bookInfo.textEntryName = textEntryName[0];
 			}
 		} catch (Exception e) {
-			LogAppender.append("[ERROR] ファイルが読み込めませんでした\n");
+			LogAppender.println("[ERROR] ファイルが読み込めませんでした : "+srcFile.getPath());
 			return;
 		}
 		
 		if (this.convertCanceled){
-			LogAppender.append("変換処理を中止しました : "+srcFile.getAbsolutePath()+"\n");
+			LogAppender.println("変換処理を中止しました : "+srcFile.getAbsolutePath());
 			return;
 		}
 		
@@ -2099,7 +2096,7 @@ public class AozoraEpub3Applet extends JApplet
 				//Zip内の画像情報読み込み
 				imageInfoReader.loadZipImageInfos(srcFile, imageOnly);
 				if (imageOnly) {
-					LogAppender.append("画像のみのePubファイルを生成します\n");
+					LogAppender.println("画像のみのePubファイルを生成します");
 					//画像出力用のBookInfo生成
 					bookInfo = new BookInfo();
 					bookInfo.imageOnly = true;
@@ -2107,7 +2104,7 @@ public class AozoraEpub3Applet extends JApplet
 					writer = this.epub3ImageWriter;
 					
 					if (imageInfoReader.countImageFileInfos() == 0) {
-						LogAppender.append("[ERROR] 画像がありませんでした\n");
+						LogAppender.println("[ERROR] 画像がありませんでした");
 						return;
 					}
 					
@@ -2131,11 +2128,11 @@ public class AozoraEpub3Applet extends JApplet
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			LogAppender.append("[ERROR] "+e+"\n");
+			LogAppender.println("[ERROR] "+e);
 		}
 		
 		if (bookInfo == null) {
-			LogAppender.append("[ERROR] 書籍の情報が取得できませんでした\n");
+			LogAppender.println("[ERROR] 書籍の情報が取得できませんでした");
 			return;
 		}
 		
@@ -2174,7 +2171,7 @@ public class AozoraEpub3Applet extends JApplet
 		}
 		
 		if (this.convertCanceled){
-			LogAppender.append("変換処理を中止しました : "+srcFile.getAbsolutePath()+"\n");
+			LogAppender.println("変換処理を中止しました : "+srcFile.getAbsolutePath());
 			return;
 		}
 		
@@ -2196,11 +2193,11 @@ public class AozoraEpub3Applet extends JApplet
 			//ダイアログが閉じた後に再開
 			if (this.jConfirmDialog.canceled) {
 				this.convertCanceled = true;
-				LogAppender.append("変換処理を中止しました : "+srcFile.getAbsolutePath()+"\n");
+				LogAppender.println("変換処理を中止しました : "+srcFile.getAbsolutePath());
 				return;
 			}
 			if (this.jConfirmDialog.skipped) {
-				LogAppender.append("変換をスキップしました : "+srcFile.getAbsolutePath()+"\n");
+				LogAppender.println("変換をスキップしました : "+srcFile.getAbsolutePath());
 				return;
 			}
 			
@@ -2235,20 +2232,20 @@ public class AozoraEpub3Applet extends JApplet
 		
 		//上書き確認
 		if (!overWrite &&  outFile.exists()) {
-			LogAppender.append("変換中止: "+srcFile.getAbsolutePath()+"\n");
-			LogAppender.append("ファイルが存在します: "+outFile.getAbsolutePath()+"\n");
+			LogAppender.println("変換中止: "+srcFile.getAbsolutePath());
+			LogAppender.println("ファイルが存在します: "+outFile.getAbsolutePath());
 			return;
 		}
 		/*
 		if (overWrite &&  outFile.exists()) {
 			int ret = JOptionPane.showConfirmDialog(this, "ファイルが存在します\n上書きしますか？\n(取り消しで変換キャンセル)", "上書き確認", JOptionPane.YES_NO_CANCEL_OPTION);
 			if (ret == JOptionPane.NO_OPTION) {
-				LogAppender.append("変換中止: "+srcFile.getAbsolutePath()+"\n");
+				LogAppender.println("変換中止: "+srcFile.getAbsolutePath());
 				return;
 			} else if (ret == JOptionPane.CANCEL_OPTION) {
-				LogAppender.append("変換中止: "+srcFile.getAbsolutePath()+"\n");
+				LogAppender.println("変換中止: "+srcFile.getAbsolutePath());
 				convertCanceled = true;
-				LogAppender.append("変換処理をキャンセルしました\n");
+				LogAppender.println("変換処理をキャンセルしました");
 				return;
 			}
 		}*/
@@ -2279,7 +2276,7 @@ public class AozoraEpub3Applet extends JApplet
 		
 		//変換中にキャンセルされた場合
 		if (this.convertCanceled) {
-			LogAppender.append("変換処理を中止しました : "+srcFile.getAbsolutePath()+"\n");
+			LogAppender.println("変換処理を中止しました : "+srcFile.getAbsolutePath());
 			return;
 		}
 		
@@ -2289,7 +2286,7 @@ public class AozoraEpub3Applet extends JApplet
 			if (kindlegen != null) {
 				long time = System.currentTimeMillis();
 				String outFileName = outFile.getAbsolutePath();
-				LogAppender.append("kindlegenを実行します : "+kindlegen.getName()+" \""+outFileName+"\"\n");
+				LogAppender.println("kindlegenを実行します : "+kindlegen.getName()+" \""+outFileName+"\"");
 				ProcessBuilder pb = new ProcessBuilder(kindlegen.getAbsolutePath(), "-locale", "en","-verbose", outFileName);
 				this.kindleProcess = pb.start();
 				BufferedReader br = new BufferedReader(new InputStreamReader(this.kindleProcess.getInputStream()));
@@ -2302,16 +2299,16 @@ public class AozoraEpub3Applet extends JApplet
 						System.out.println(line);
 						msg = line;
 						if (idx++ % 2 == 0) {
-							if (cnt++ > 100) { cnt = 1; LogAppender.append("\n"); }
+							if (cnt++ > 100) { cnt = 1; LogAppender.println(); }
 							LogAppender.append(".");
 						}
 					}
 				}
 				br.close();
 				if (convertCanceled) {
-					LogAppender.append("\n"+msg+"\nkindlegenの変換を中断しました\n");
+					LogAppender.println("\n"+msg+"\nkindlegenの変換を中断しました");
 				} else {
-					LogAppender.append("\n"+msg+"\nkindlegen変換完了 ["+(((System.currentTimeMillis()-time)/100)/10f)+"s]\n");
+					LogAppender.println("\n"+msg+"\nkindlegen変換完了 ["+(((System.currentTimeMillis()-time)/100)/10f)+"s]");
 				}
 			}
 		} catch (Exception e) {
@@ -2409,9 +2406,9 @@ public class AozoraEpub3Applet extends JApplet
 			try {
 				for (String urlString : vecUrlString) {
 					try {
-						LogAppender.append("--------\n");
+						LogAppender.println("--------");
 						LogAppender.append(urlString);
-						LogAppender.append(" を読み込みます\n");
+						LogAppender.println(" を読み込みます");
 						
 						webConverter = WebAozoraConverter.createWebAozoraConverter(urlString, webConfigPath);
 						File srcFile = webConverter.convertToAozoraText(urlString, cachePath);
@@ -2419,8 +2416,8 @@ public class AozoraEpub3Applet extends JApplet
 						if (srcFile == null) {
 							LogAppender.append(urlString);
 							if (webConverter != null && webConverter.isCanceled())
-								LogAppender.append(" の変換をキャンセルしました\n");
-							else LogAppender.append(" は変換できませんでした\n");
+								LogAppender.println(" の変換をキャンセルしました");
+							else LogAppender.println(" は変換できませんでした");
 							return null;
 						}
 						//エンコードを変換時のみUTF-8にする
@@ -2429,7 +2426,7 @@ public class AozoraEpub3Applet extends JApplet
 						applet.convertFiles(new File[]{srcFile}, dstPath);
 						applet.jComboEncType.setSelectedIndex(encIndex);
 					} catch (Exception e) {
-						e.printStackTrace(); LogAppender.append("エラーが発生しました: "+e.getMessage()+"\n");
+						e.printStackTrace(); LogAppender.println("エラーが発生しました: "+e.getMessage());
 					}
 				}
 			} finally {

@@ -8,6 +8,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.HashMap;
 
+import com.github.hmdev.util.LogAppender;
+
 /**
  * パラメータファイルで指定されたUTF-8をグリフタグに変換するクラス
  * XMDF変換で利用していてePub3では未使用
@@ -46,7 +48,7 @@ public class GlyphConverter
 						String[] values = line.split("\t");
 						char ch = values[0].charAt(0);
 						if (!cidMap.containsKey(ch)) cidMap.put(ch, values[1]);
-					} catch (Exception e) { log.append("[ERROR] "+srcFile.getName()+" ("+(lineNum+1)+") : "+line+"\n"); }
+					} catch (Exception e) { LogAppender.error(lineNum, srcFile.getName(), line); }
 				}
 			}
 		} finally {
