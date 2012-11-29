@@ -7,7 +7,7 @@
 <meta name="dtb:maxPageNumber" content="0"/>
 </head>
 <docTitle>
-	<text>${bookInfo.Title}</text>
+	<text>${title}</text>
 </docTitle>
 <navMap>
 #set($idx=0)

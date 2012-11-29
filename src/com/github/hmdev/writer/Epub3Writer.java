@@ -276,12 +276,17 @@ public class Epub3Writer
 		String title = bookInfo.title==null?"":bookInfo.title;
 		String creator = bookInfo.creator==null?"":bookInfo.creator;
 		if ("".equals(bookInfo.creator)) bookInfo.creator = null;
+		
 		//固有ID
 		velocityContext.put("identifier", UUID.nameUUIDFromBytes((title+"-"+creator).getBytes()));
 		//目次名称
 		velocityContext.put("toc_name", "目次");
 		//表紙
 		velocityContext.put("cover_name", "表紙");
+		//タイトル &<>はエスケープ
+		velocityContext.put("title", title.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;"));
+		//タイトル &<>はエスケープ
+		velocityContext.put("creator", creator.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;"));
 		//書籍情報
 		velocityContext.put("bookInfo", bookInfo);
 		//更新日時
@@ -435,13 +440,13 @@ public class Epub3Writer
 		//BookInfoから目次情報取得
 		
 		
-		//目次の階層情報を設定
 		//nullを除去
 		for (int i=chapterInfos.size()-1; i>=0; i--) {
 			if (chapterInfos.get(i).getChapterName() == null) chapterInfos.remove(i);
 		}
+		//目次の階層情報を設定
 		//レベルを0から開始に変更
-		int[] chapterCounts = new int[10];
+		/*int[] chapterCounts = new int[10];
 		for (ChapterInfo chapterInfo : chapterInfos) {
 			chapterCounts[chapterInfo.getChapterLevel()]++;
 		}
@@ -470,7 +475,19 @@ public class Epub3Writer
 		if (chapterInfos.size() > 0) {
 			ChapterInfo chapterInfo = chapterInfos.lastElement();
 			if (chapterInfo != null) chapterInfo.levelEnd = chapterInfo.chapterLevel;
+		}*/
+		
+		//出力前に縦中横とエスケープ処理
+		boolean vertical = bookInfo.vertical;
+		bookInfo.vertical = bookInfo.tocVertical;
+		StringBuilder buf = new StringBuilder();
+		for (ChapterInfo chapterInfo : chapterInfos) {
+			buf.setLength(0);
+			char[] ch = chapterInfo.getChapterName().toCharArray();
+			converter.convertRubyText(buf, ch, 0, ch.length, false);
+			chapterInfo.setChapterName(buf.toString());
 		}
+		bookInfo.vertical = vertical;//戻す
 		
 		//navファイル
 		velocityContext.put("chapters", chapterInfos);

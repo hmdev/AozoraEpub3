@@ -29,7 +29,7 @@
 	<link rel="stylesheet" type="text/css" href="../css/horizontal.css"/>
 #end
 #end
-	<title>${bookInfo.Title}</title>
+	<title>${title}</title>
 </head>
 #if (${sectionInfo.ImageFitW})
 <body class="fit_w">

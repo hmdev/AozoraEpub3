@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <package xmlns="http://www.idpf.org/2007/opf" unique-identifier="pub-id" xml:lang="ja" version="3.0">
 	<metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
-		<dc:title id="title">${bookInfo.Title}</dc:title>
-		<meta refines="#title" property="dcterms:title">${bookInfo.Title}</meta>
+		<dc:title id="title">${title}</dc:title>
+		<meta refines="#title" property="dcterms:title">${title}</meta>
 #if (${bookInfo.Creator})
-		<dc:creator id="creator">${bookInfo.Creator}</dc:creator>
-		<meta refines="#creator" property="dcterms:creator">${bookInfo.Creator}</meta>
+		<dc:creator id="creator">${creator}</dc:creator>
+		<meta refines="#creator" property="dcterms:creator">${creator}</meta>
 #end
 		<dc:language id="pub-lang">ja</dc:language>
 		<meta refines="#pub-lang" property="dcterms:language">ja</meta>

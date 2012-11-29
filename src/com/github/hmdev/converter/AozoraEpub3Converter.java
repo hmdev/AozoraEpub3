@@ -1023,8 +1023,6 @@ public class AozoraEpub3Converter
 				this.writer.jProgressBar.repaint();
 			}
 		}
-		//終了処理
-		this.bookInfo = null;
 		
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1665,7 +1663,7 @@ public class AozoraEpub3Converter
 	 * @param begin 変換範囲開始位置
 	 * @param end 変換範囲終了位置
 	 * @param noRuby ルビタグ禁止 縦横中変換も禁止 */
-	private void convertRubyText(StringBuilder buf, char[] ch, int begin, int end, boolean noRuby) throws IOException
+	public void convertRubyText(StringBuilder buf, char[] ch, int begin, int end, boolean noRuby) throws IOException
 	{
 		//事前に《》の代替文字をエスケープ済※《 ※》 に変換
 		//全角ひらがな漢字スペースの存在もついでにチェック
