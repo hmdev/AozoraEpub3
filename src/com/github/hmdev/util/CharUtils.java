@@ -109,6 +109,11 @@ public class CharUtils
 		return false;
 	}
 	
+	static public String escapeUrlToFile(String str)
+	{
+		return str.replaceAll("(\\?|\\&)", "/").replaceAll("(:|\\*|\\||\\<|\\>|\"|\\\\)", "_");
+	}
+	
 	/** Test用 */
 	/*public static void main(String[] args)
 	{
