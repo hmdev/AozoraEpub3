@@ -812,6 +812,11 @@ public class Epub3Writer
 		return null;
 	}
 	
+	public boolean isCoverImage()
+	{
+		return (this.imageIndex == this.bookInfo.coverImageIndex); 
+	}
+	
 	/** 現在の出力済画像枚数を返す 0なら未出力 */
 	public int getImageIndex()
 	{

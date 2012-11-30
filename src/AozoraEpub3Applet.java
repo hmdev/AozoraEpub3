@@ -142,7 +142,12 @@ public class AozoraEpub3Applet extends JApplet
 	JButton jButtonCover;
 	JButton jButtonDstPath;
 	
+	//画像関連
+	/** 挿絵なし */
+	JCheckBox jCheckNoIllust;
+	/** 画面幅 */
 	JTextField jTextDispW;
+	/** 画面高さ */
 	JTextField jTextDispH;
 	
 	JTextField jTextSinglePageSizeW;
@@ -178,6 +183,7 @@ public class AozoraEpub3Applet extends JApplet
 	JCheckBox jCheckAutoYoko;
 	JCheckBox jCheckAutoYokoNum1;
 	JCheckBox jCheckAutoYokoNum3;
+	JCheckBox jCheckAutoEQ1;
 	
 	JCheckBox jCheckCommentPrint;
 	JCheckBox jCheckCommentConvert;
@@ -619,6 +625,20 @@ public class AozoraEpub3Applet extends JApplet
 		jTabbedPane.add("画像設定", tabPanel);
 		
 		////////////////////////////////
+		//挿絵なし
+		////////////////////////////////
+		panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		panel.setBorder(new NarrowTitledBorder("挿絵画像"));
+		tabPanel.add(panel);
+		propValue = props.getProperty("NoIllust");
+		jCheckNoIllust = new JCheckBox("挿絵非表示 ", "1".equals(propValue));
+		jCheckNoIllust.setFocusPainted(false);
+		jCheckNoIllust.setToolTipText("表紙と外字画像以外は表示されません 画像ファイルはePubファイル内に格納されます");
+		jCheckNoIllust.setBorder(padding2);
+		panel.add(jCheckNoIllust);
+		
+		////////////////////////////////
 		//画面サイズ
 		////////////////////////////////
 		panel = new JPanel();
@@ -652,7 +672,7 @@ public class AozoraEpub3Applet extends JApplet
 		label = new JLabel("px");
 		label.setBorder(padding2H);
 		panel.add(label);
-		label = new JLabel("(※縦横比と小さい画像拡大時の判別に利用します)");
+		label = new JLabel("(※縦横比と画像拡大の判別に利用します)");
 		label.setBorder(padding2H);
 		panel.add(label);
 		
@@ -994,8 +1014,8 @@ public class AozoraEpub3Applet extends JApplet
 		jCheckAutoYoko.setToolTipText("半角の2文字の数字、2～3文字の!?を縦中横で表示します。(前後に半角が無い場合)");
 		jCheckAutoYoko.setBorder(padding2);
 		panel.add(jCheckAutoYoko);
-		label = new JLabel("数字:");
-		label.setBorder(padding2);
+		label = new JLabel("数字(");
+		label.setBorder(padding0);
 		panel.add(label);
 		//半角数字1文字縦書き
 		propValue = props.getProperty("AutoYokoNum1");
@@ -1009,6 +1029,15 @@ public class AozoraEpub3Applet extends JApplet
 		jCheckAutoYokoNum3.setFocusPainted(false);
 		jCheckAutoYokoNum3.setBorder(padding2);
 		panel.add(jCheckAutoYokoNum3);
+		label = new JLabel(")");
+		label.setBorder(padding0);
+		panel.add(label);
+		//!? 1文字
+		propValue = props.getProperty("AutoYokoEQ1");
+		jCheckAutoEQ1 = new JCheckBox("!? 1文字 ", "1".equals(propValue));
+		jCheckAutoEQ1.setFocusPainted(false);
+		jCheckAutoEQ1.setBorder(padding2);
+		panel.add(jCheckAutoEQ1);
 		
 		////////////////////////////////
 		//コメント出力
@@ -1922,10 +1951,11 @@ public class AozoraEpub3Applet extends JApplet
 		this.epub3ImageWriter.setImageParam(dispW, dispH, resizeW, resizeH, pixels, singlePageSizeW, singlePageSizeH, singlePageWidth, jCheckFitImage.isSelected(), coverW, coverH, jpegQualty, autoMarginLimitH, autoMarginLimitV, autoMarginWhiteLevel, autoMarginPadding, autoMarginNombre);
 		
 		try {
+			this.aozoraConverter.setNoIllust(jCheckNoIllust.isSelected()); 
 			//栞用ID出力
 			this.aozoraConverter.setWithMarkId(this.jCheckMarkId.isSelected());
 			//変換オプション設定
-			this.aozoraConverter.setAutoYoko(this.jCheckAutoYoko.isSelected(), this.jCheckAutoYokoNum1.isSelected(), this.jCheckAutoYokoNum3.isSelected());
+			this.aozoraConverter.setAutoYoko(this.jCheckAutoYoko.isSelected(), this.jCheckAutoYokoNum1.isSelected(), this.jCheckAutoYokoNum3.isSelected(), this.jCheckAutoEQ1.isSelected());
 			//4バイト文字出力
 			this.aozoraConverter.setGaiji32(this.jCheckGaiji32.isSelected());
 			//表題左右中央
@@ -2674,6 +2704,7 @@ public class AozoraEpub3Applet extends JApplet
 		this.props.setProperty("AutoYoko", this.jCheckAutoYoko.isSelected()?"1":"");
 		this.props.setProperty("AutoYokoNum1", this.jCheckAutoYokoNum1.isSelected()?"1":"");
 		this.props.setProperty("AutoYokoNum3", this.jCheckAutoYokoNum3.isSelected()?"1":"");
+		this.props.setProperty("AutoYokoEQ1", this.jCheckAutoEQ1.isSelected()?"1":"");
 		//コメント出力
 		this.props.setProperty("CommentPrint", this.jCheckCommentPrint.isSelected()?"1":"");
 		this.props.setProperty("CommentConvert", this.jCheckCommentConvert.isSelected()?"1":"");

@@ -35,8 +35,13 @@ public class AozoraEpub3Converter
 	boolean autoYokoNum1 = true;
 	/** 半角数字3桁を自動縦中横 */
 	boolean autoYokoNum3 = true;
+	/** !か?の1文字(前後は全角)を自動縦中横 */
+	boolean autoYokoEQ1 = true;
 	/** !か?の3文字連続を自動縦中横 */
 	boolean autoYokoEQ3 = true;
+	
+	/** 挿絵無し 外字画像は出力する */
+	boolean noIllust = false;
 	
 	/** 栞用のidを行頭の<p>につけるならtrue */
 	boolean withMarkId = false;
@@ -357,6 +362,11 @@ public class AozoraEpub3Converter
 		inited = true;
 	}
 	
+	/** 挿絵なし設定 */
+	public void setNoIllust(boolean noIllust)
+	{
+		this.noIllust = noIllust;
+	}
 	/**  栞用id付きspanの出力設定
 	 * @param withIdSpan 栞用id付きspanを出力するならtrue */
 	public void setWithMarkId(boolean withIdSpan)
@@ -365,11 +375,12 @@ public class AozoraEpub3Converter
 	}
 	/**  3文字の半角数字 3文字の!か?の回転を設定
 	 * @param autoYoko 回転を設定するならtrue */
-	public void setAutoYoko(boolean autoYoko, boolean autoYokoNum1, boolean autoYokoNum3)
+	public void setAutoYoko(boolean autoYoko, boolean autoYokoNum1, boolean autoYokoNum3, boolean autoYokoEQ1)
 	{
 		this.autoYoko = autoYoko;
 		this.autoYokoNum1 = autoYokoNum1;
 		this.autoYokoNum3 = autoYokoNum3;
+		this.autoYokoEQ1 = autoYokoEQ1;
 	}
 	/**  4バイト文字変換を設定
 	 * @param gaiji32 4バイト文字変換するならtrue */
@@ -548,10 +559,9 @@ public class AozoraEpub3Converter
 			}
 			
 			if (inComment && !this.commentPrint) continue;
-			if (commentConvert) continue;
 			
 			//2行前が改ページと画像の行かをチェックして行番号をbookInfoに保存
-			this.checkImageOnly(bookInfo, preLines, line, this.lineNum);
+			if (!noIllust) this.checkImageOnly(bookInfo, preLines, line, this.lineNum);
 			
 			//見出しのChapter追加
 			if (addChapterName) {
@@ -1113,7 +1123,7 @@ public class AozoraEpub3Converter
 				//if (unsupportGaiji.contains(gaiji)) {
 				//Unicode32文字なら後ろに小書きで注記追加
 				if (gaiji != null && gaiji.getBytes().length ==4) {
-					if (logged) LogAppender.println("外字4バイト: ("+(lineNum+1)+") "+chuki);
+					if (logged) LogAppender.info(lineNum, "外字4バイト", chuki);
 					if (!gaiji32) {
 						gaiji = "〓";
 						if (!isInnerChuki(line, m.start())) {
@@ -1131,10 +1141,10 @@ public class AozoraEpub3Converter
 						if (imageStartIdx > -1 && chuki.indexOf('.', 2) != -1) {
 							//※を消して画像注記に変更
 							gaiji = chuki.substring(1, chuki.length()-1)+"#GAIJI#］";
-							if (logged) LogAppender.println("外字画像利用: ("+(lineNum+1)+") "+chuki);
+							if (logged) LogAppender.info(lineNum, "外字画像利用", chuki);
 						} else {
 							//画像以外
-							if (logged) LogAppender.println("外字未変換: ("+(lineNum+1)+") "+chuki);
+							if (logged) LogAppender.info(lineNum, "外字未変換", chuki);
 							gaiji = "〓［＃行右小書き］（"+chukiValues[0]+"）［＃行右小書き終わり］";
 						}
 					}
@@ -1421,7 +1431,7 @@ public class AozoraEpub3Converter
 				}
 				else if (chukiTag.endsWith("字下げ終わり］")) {
 					 if (inJisage == -1) {
-						 LogAppender.println("字下げ注記省略：("+(lineNum+1)+")");
+						 LogAppender.info(lineNum, "字下げ注記省略");
 						 noAppend = true;
 					 }
 					inJisage = -1;
@@ -1452,12 +1462,12 @@ public class AozoraEpub3Converter
 						buf.append(chukiMap.get("行右小書き終わり")[0]);
 					} else if (chukiTag.indexOf('.', 2) == -1) {
 						//拡張子を含まない
-						LogAppender.println("注記未変換: ("+(lineNum+1)+") "+chukiTag);
+						LogAppender.info(lineNum, "注記未変換", chukiTag);
 					} else {
 						//画像ファイル名置換処理実行
 						String srcFilePath = this.getImageChukiFileName(chukiTag, imageStartIdx);
 						if (srcFilePath == null) {
-							LogAppender.println("注記エラー: ("+(lineNum+1)+") "+chukiTag);
+							LogAppender.error(lineNum, "注記エラー", chukiTag);
 						} else {
 							String fileName = writer.getImageFilePath(srcFilePath.trim(), lineNum);
 							if (fileName != null) { //先頭に移動してここで出力しない場合はnull
@@ -1466,8 +1476,51 @@ public class AozoraEpub3Converter
 									buf.append(chukiMap.get("外字画像開始")[0]);
 									buf.append(fileName);
 									buf.append(chukiMap.get("外字画像終了")[0]);
-								} else if (bookInfo.isImageSectionLine(lineNum)) {
-									//単ページ画像の場合は<p>タグを出さない
+								} else if (noIllust && !writer.isCoverImage()) {
+									LogAppender.info(lineNum, "挿絵なし", chukiTag);
+								} else {
+									if (bookInfo.isImageSectionLine(lineNum)) {
+										//単ページ画像の場合は<p>タグを出さない
+										noBr = true;
+										buf.append(chukiMap.get("画像開始")[0]);
+										buf.append(fileName);
+										buf.append(chukiMap.get("画像終了")[0]);
+									} else {
+										//画像ページ種別取得
+										int imagePageType = this.writer.getImagePageType(srcFilePath, this.tagLevel);
+										if (imagePageType != PageBreakTrigger.IMAGE_PAGE_NONE) {
+											//改ページの前に文字があれば出力
+											if (buf.length() > 0) this.printLineBuffer(out, buf, lineNum, true);
+											//単一ページ出力
+											buf.append(chukiMap.get("画像開始")[0]);
+											buf.append(fileName);
+											buf.append(chukiMap.get("画像終了")[0]);
+											this.printImagePage(out, buf, lineNum, fileName, imagePageType);
+										} else {
+											buf.append(chukiMap.get("画像開始")[0]);
+											buf.append(fileName);
+											buf.append(chukiMap.get("画像終了")[0]);
+										}
+									}
+								}
+							}
+						}
+					}
+				} else if (lowerChukiTag.startsWith("<img")) {
+					if (noIllust && !writer.isCoverImage()) {
+						LogAppender.info(lineNum, "挿絵なし", chukiTag);
+					} else {
+						//src=の値抽出
+						String srcFilePath = this.getImageTagFileName(chukiTag);
+						if (srcFilePath == null) {
+							LogAppender.error(lineNum, "画像注記エラー", chukiTag);
+						} else {
+							//単ページ画像の場合は<p>タグを出さない
+							if (bookInfo.isImageSectionLine(lineNum)) noBr = true;
+							String fileName = writer.getImageFilePath(srcFilePath.trim(), lineNum);
+							if (fileName != null) { //先頭に移動してここで出力しない場合はnull
+								//単ページ画像の場合は<p>タグを出さない
+								if (bookInfo.isImageSectionLine(lineNum)) {
 									noBr = true;
 									buf.append(chukiMap.get("画像開始")[0]);
 									buf.append(fileName);
@@ -1489,63 +1542,7 @@ public class AozoraEpub3Converter
 										buf.append(chukiMap.get("画像終了")[0]);
 									}
 								}
-								//本文がなければ画像ファイル名が目次になる
-								/*if (!this.chapterStarted && this.chapterFirstImageTitle == null) {
-									String imageTitle = srcFilePath.substring(srcFilePath.lastIndexOf('/')+1);
-									if (imageStartIdx > 0) imageTitle = chukiTag.substring(2, imageStartIdx);
-									String chapterName = imageTitle;
-									this.chapterFirstImageTitle = chapterName.length()>64 ? chapterName.substring(0, 64) : chapterName;
-								}*/
 							}
-						}
-					}
-				} else if (lowerChukiTag.startsWith("<img")) {
-					//src=の値抽出
-					String srcFilePath = this.getImageTagFileName(chukiTag);
-					if (srcFilePath == null) {
-						LogAppender.println("画像注記エラー: ("+(lineNum+1)+") "+chukiTag);
-					} else {
-						//単ページ画像の場合は<p>タグを出さない
-						if (bookInfo.isImageSectionLine(lineNum)) noBr = true;
-						String fileName = writer.getImageFilePath(srcFilePath.trim(), lineNum);
-						if (fileName != null) { //先頭に移動してここで出力しない場合はnull
-							//単ページ画像の場合は<p>タグを出さない
-							if (bookInfo.isImageSectionLine(lineNum)) {
-								noBr = true;
-								buf.append(chukiMap.get("画像開始")[0]);
-								buf.append(fileName);
-								buf.append(chukiMap.get("画像終了")[0]);
-							} else {
-								//画像ページ種別取得
-								int imagePageType = this.writer.getImagePageType(srcFilePath, this.tagLevel);
-								if (imagePageType != PageBreakTrigger.IMAGE_PAGE_NONE) {
-									//改ページの前に文字があれば出力
-									if (buf.length() > 0) this.printLineBuffer(out, buf, lineNum, true);
-									//単一ページ出力
-									buf.append(chukiMap.get("画像開始")[0]);
-									buf.append(fileName);
-									buf.append(chukiMap.get("画像終了")[0]);
-									this.printImagePage(out, buf, lineNum, fileName, imagePageType);
-								} else {
-									buf.append(chukiMap.get("画像開始")[0]);
-									buf.append(fileName);
-									buf.append(chukiMap.get("画像終了")[0]);
-								}
-							}
-							//本文がなければ画像ファイル名が目次になる
-							/*if (!this.chapterStarted && this.chapterFirstImageTitle == null) {
-								String imageTitle = srcFilePath.substring(srcFilePath.lastIndexOf('/')+1);
-								int altIdx = lowerChukiTag.indexOf(" alt=");
-								if (altIdx > -1) {
-									start = altIdx + 5;
-									end = -1;
-									if (chukiTag.charAt(start) == '"') end = chukiTag.indexOf('"', start+1);
-									if (chukiTag.charAt(start) == '\'') end = chukiTag.indexOf('\'', start+1);
-									if (end > -1) imageTitle = chukiTag.substring(start+1, end);
-								}
-								String chapterName = imageTitle;
-								this.chapterFirstImageTitle = chapterName.length()>64 ? chapterName.substring(0, 64) : chapterName;
-							}*/
 						}
 					}
 				}
@@ -1612,7 +1609,7 @@ public class AozoraEpub3Converter
 					if (!patternMatched) {
 						m2 = chukiPatternMap.get("字下げ終わり複合").matcher(chukiTag);
 						if (m2.find()) {
-							if (inJisage == -1) LogAppender.println("字下げ注記エラー：("+(lineNum+1)+")");
+							if (inJisage == -1) LogAppender.error(lineNum, "字下げ注記エラー");
 							else buf.append(chukiMap.get("ここで字下げ終わり")[0]);
 							inJisage = -1;
 							
@@ -1624,7 +1621,7 @@ public class AozoraEpub3Converter
 					//注記未変換
 					if (!patternMatched) {
 						if (chukiTag.indexOf("底本では") == -1 && chukiTag.indexOf("に「ママ」") == -1 && chukiTag.indexOf("」はママ") == -1)
-							LogAppender.println("注記未変換: ("+(lineNum+1)+") "+chukiTag);
+							LogAppender.info(lineNum, "注記未変換", chukiTag);
 					}
 				}
 			}
@@ -1812,27 +1809,27 @@ public class AozoraEpub3Converter
 				}
 				break;
 			case '!': case '?':
-				//!?3文字を縦中横で出力
-				if (autoYoko && autoYokoEQ3 && !(inYoko || inTcy || noTcy || inRuby) && i+2<ch.length && (ch[i+1]=='!' || ch[i+1]=='?') && (ch[i+2]=='!' || ch[i+2]=='?')) {
-					//前後が半角かチェック
-					if (i!=0 && CharUtils.isHalf(ch[i-1])) break;
-					if (i+3<ch.length && CharUtils.isHalf(ch[i+3])) break;
-					//半角スペースの前後が半角文字
-					if (i>1 && ch[i-1]==' ' && CharUtils.isHalf(ch[i-2])) break;
-					if (i+4<ch.length && ch[i+3]==' ' && CharUtils.isHalf(ch[i+4])) break;
-					//前まで出力
-					if (rubyStart != -1) convertChars(buf, ch, rubyStart, i - rubyStart, false);
-					rubyStart = -1;
-					buf.append(chukiMap.get("縦中横")[0]);
-					buf.append(ch[i]);
-					buf.append(ch[i+1]);
-					buf.append(ch[i+2]);
-					buf.append(chukiMap.get("縦中横終わり")[0]);
-					i+=2;
-					continue;
-				} else {
-					//!?2文字を縦横中で出力
-					if (autoYoko && !(inYoko || inTcy || noTcy || inRuby) && i+1<ch.length && (ch[i+1]=='!' || ch[i+1]=='?')) {
+				if (autoYoko  && !(inYoko || inTcy || noTcy || inRuby)) {
+					if (autoYokoEQ3 && i+2<ch.length && (ch[i+1]=='!' || ch[i+1]=='?') && (ch[i+2]=='!' || ch[i+2]=='?')) {
+						//!? 3文字を縦中横で出力
+						//前後が半角かチェック
+						if (i!=0 && CharUtils.isHalf(ch[i-1])) break;
+						if (i+3<ch.length && CharUtils.isHalf(ch[i+3])) break;
+						//半角スペースの前後が半角文字
+						if (i>1 && ch[i-1]==' ' && CharUtils.isHalf(ch[i-2])) break;
+						if (i+4<ch.length && ch[i+3]==' ' && CharUtils.isHalf(ch[i+4])) break;
+						//前まで出力
+						if (rubyStart != -1) convertChars(buf, ch, rubyStart, i - rubyStart, false);
+						rubyStart = -1;
+						buf.append(chukiMap.get("縦中横")[0]);
+						buf.append(ch[i]);
+						buf.append(ch[i+1]);
+						buf.append(ch[i+2]);
+						buf.append(chukiMap.get("縦中横終わり")[0]);
+						i+=2;
+						continue;
+					} else if (i+1<ch.length && (ch[i+1]=='!' || ch[i+1]=='?')) {
+						//!? 2文字を縦横中で出力
 						//前後が半角かチェック
 						if (i!=0 && CharUtils.isHalf(ch[i-1])) break;
 						if (i+2<ch.length && CharUtils.isHalf(ch[i+2])) break;
@@ -1847,6 +1844,21 @@ public class AozoraEpub3Converter
 						buf.append(ch[i+1]);
 						buf.append(chukiMap.get("縦中横終わり")[0]);
 						i++;
+						continue;
+					} else if (autoYokoEQ1 && (i==0 || !CharUtils.isHalfNum(ch[i-1])) && (i+1==ch.length || !CharUtils.isHalfNum(ch[i+1]))) {
+						//!? 1文字
+						//前後が半角かチェック
+						if (i>0 && CharUtils.isHalf(ch[i-1])) break;
+						if (i+1<ch.length && CharUtils.isHalf(ch[i+1])) break;
+						//半角スペースの前後が半角文字
+						if (i>1 && ch[i-1]==' ' && CharUtils.isHalf(ch[i-2])) break;
+						if (i+2<ch.length && ch[i+1]==' ' && CharUtils.isHalf(ch[i+2])) break;
+						//前まで出力
+						if (rubyStart != -1) convertChars(buf, ch, rubyStart, i - rubyStart, false);
+						rubyStart = -1;
+						buf.append(chukiMap.get("縦中横")[0]);
+						buf.append(ch[i]);
+						buf.append(chukiMap.get("縦中横終わり")[0]);
 						continue;
 					}
 				}

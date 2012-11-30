@@ -75,4 +75,9 @@ public class LogAppender
 		LogAppender.append("[INFO] ");
 		LogAppender.msg(lineNum, msg, desc);
 	}
+	static public void info(int lineNum, String msg)
+	{
+		LogAppender.append("[INFO] ");
+		LogAppender.msg(lineNum, msg, null);
+	}
 }

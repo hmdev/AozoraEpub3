@@ -133,6 +133,7 @@ public class AozoraEpub3
 			boolean commentConvert = "1".equals(props.getProperty("CommentConvert"));
 			boolean autoYokoNum1 = "1".equals(props.getProperty("AutoYokoNum1"));
 			boolean autoYokoNum3 = "1".equals(props.getProperty("AutoYokoNum3"));
+			boolean autoYokoEQ1 = "1".equals(props.getProperty("AutoYokoEQ1"));
 			int spaceHyp = 0; try { spaceHyp = Integer.parseInt(props.getProperty("SpaceHyphenation")); } catch (Exception e) {}
 			boolean tocPage = "1".equals(props.getProperty("TocPage"));//目次追加
 			boolean tocVertical = "1".equals(props.getProperty("TocVertical"));//目次縦書き
@@ -222,7 +223,7 @@ public class AozoraEpub3
 			//栞用span出力
 			aozoraConverter.setWithMarkId(withMarkId);
 			//変換オプション設定
-			aozoraConverter.setAutoYoko(autoYoko, autoYokoNum1, autoYokoNum3);
+			aozoraConverter.setAutoYoko(autoYoko, autoYokoNum1, autoYokoNum3, autoYokoEQ1);
 			//4バイト文字出力
 			aozoraConverter.setGaiji32(gaiji32);
 			//表題左右中央
