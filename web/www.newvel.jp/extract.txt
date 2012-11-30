@@ -1,26 +1,13 @@
-### 一覧ページから本の情報とリンク抽出
-### CONTENT_ から始まる物は各話HTMLからの抽出用
-###
-### 書式: タブ区切り
-###       (cssQueryはカンマで複数指定 前を優先 :の後にElemtnsの位置0～)
-###内部ID	cssQuery1
-###内部ID	cssQuery1,cssQuery2
-###内部ID	cssQuery1:位置[,cssQuery2]
-### または
-###内部ID_REGEX	正規表現
-###
-
 ################################
 ### NEWVEL-LIBRARY
 ### http://www.newvel.jp/library/
+################################
 
-## 読み込み対象
-PAGE_REGEX	^/library/.*-index.html
+## 変換対象URLパターン
+##PAGE_REGEX		.*/library/.*-index.html$
 
 ################################
 ##一覧ページの抽出設定
-## シリーズタイトル
-#SERIES	.series a
 ## タイトル
 TITLE	.hpb-cnt-tb2 td:1
 ## 著者
@@ -28,10 +15,9 @@ AUTHOR	.hpb-cnt-tb2 td:3
 ## 説明
 DESCRIPTION	.hpb-cnt-tb2:13
 
-## 各話へのリンク cssQuery
+## 各話へのリンク
 HREF	.hpb-cnt-tb2 a
-## 各話へのリンク パターン
-HREF_REGEX	^\/library\/(ca-)?\d+.+\.html
+##HREF	.hpb-cnt-tb2 a	^/library/(ca-)?\d+.+\.html$
 
 ##全体の更新日時 比較文字列 (hrefに1:1で対応するタグ 内部のinnerHTML文字列で比較)
 UPDATE	.hpb-cnt-tb2 td:9
@@ -49,15 +35,3 @@ CONTENT_SUBTITLE	.new1 table span:1
 
 ## 各話 本文
 CONTENT_ARTICLE	.new1 table span:2,.new1 table table:0
-
-##本文タグ外に画像がある場合本文の前に出力
-#CONTENT_IMG	
-
-##前書き
-#CONTENT_PREAMBLE
-
-## 補足
-#CONTENT_APPENDIX	
-
-##各話内に記載されている更新日時
-#CONTENT_UPDATE
