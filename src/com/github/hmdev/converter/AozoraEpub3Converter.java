@@ -565,9 +565,10 @@ public class AozoraEpub3Converter
 						addChapterName = false;
 						//次の行を繋げる設定
 						if (this.useNextLineChapterName) addNextChapterName = lineNum+1;
-						preChapterLineInfo = null;
 						addSectionChapter = false; //改ページ後のChapter出力を抑止
 					}
+					//必ず文字が入る
+					preChapterLineInfo = null;
 				}
 			}
 			//改ページ後の注記以外の本文を追加
@@ -817,7 +818,7 @@ public class AozoraEpub3Converter
 	/** 目次やタイトル用の文字列を取得 ルビ関連の文字 ｜《》 は除外済で他の特殊文字は'※'エスケープ */
 	private String getChapterName(String line)
 	{
-		String name = line.replaceAll("［＃.+?］", "").replaceAll("<[^>]+>", "") //タグ除去
+		String name = line.replaceAll("［＃.+?］", "").replaceAll("<a [^>]+>", "").replaceAll("<img [^>]+>", "") //注記とaタグとimgタグ除去
 				.replaceAll("※", "") //エスケープ文字復元
 				.replaceFirst("^[ |　|―]+", "").replaceFirst("[ |　|―]+$","") //前後の不要な文字所除去
 				.replaceAll("〳〵", "く").replaceAll("〴〵", "ぐ").replaceAll("〻", "々")
@@ -1342,7 +1343,7 @@ public class AozoraEpub3Converter
 			
 			//注記の前まで本文出力
 			if (begin < chukiStart) {
-				this.convertRubyText(buf, ch, begin, chukiStart, noRubyLevel>0);
+				this.convertRubyText(buf, ch, begin, chukiStart, noRubyLevel>0, noRubyLevel>0);
 			}
 			
 			//注記→タグ変換
@@ -1631,7 +1632,7 @@ public class AozoraEpub3Converter
 		}
 		//注記の後ろの残りの文字
 		if (begin < ch.length) {
-			this.convertRubyText(buf, ch, begin, ch.length, false);
+			this.convertRubyText(buf, ch, begin, ch.length, false, false);
 		}
 		//行末タグを追加
 		if (bufSuf.length() > 0) buf.append(bufSuf.toString());
@@ -1663,7 +1664,7 @@ public class AozoraEpub3Converter
 	 * @param begin 変換範囲開始位置
 	 * @param end 変換範囲終了位置
 	 * @param noRuby ルビタグ禁止 縦横中変換も禁止 */
-	public void convertRubyText(StringBuilder buf, char[] ch, int begin, int end, boolean noRuby) throws IOException
+	public void convertRubyText(StringBuilder buf, char[] ch, int begin, int end, boolean noRuby, boolean noTcy) throws IOException
 	{
 		//事前に《》の代替文字をエスケープ済※《 ※》 に変換
 		//全角ひらがな漢字スペースの存在もついでにチェック
@@ -1724,7 +1725,7 @@ public class AozoraEpub3Converter
 				break;
 			case '0': case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9':
 				//数字2文字を縦横中で出力
-				if (this.autoYoko && !(this.inYoko || this.inTcy || noRuby || inRuby)) {
+				if (this.autoYoko && !(this.inYoko || this.inTcy || noTcy || inRuby)) {
 					if (this.autoYokoNum3 && i+2<ch.length && CharUtils.isHalfNum(ch[i+1]) && CharUtils.isHalfNum(ch[i+2])) {
 						//数字3文字
 						//前後が半角かチェック
@@ -1812,7 +1813,7 @@ public class AozoraEpub3Converter
 				break;
 			case '!': case '?':
 				//!?3文字を縦中横で出力
-				if (autoYoko && autoYokoEQ3 && !(inYoko || inTcy || noRuby || inRuby) && i+2<ch.length && (ch[i+1]=='!' || ch[i+1]=='?') && (ch[i+2]=='!' || ch[i+2]=='?')) {
+				if (autoYoko && autoYokoEQ3 && !(inYoko || inTcy || noTcy || inRuby) && i+2<ch.length && (ch[i+1]=='!' || ch[i+1]=='?') && (ch[i+2]=='!' || ch[i+2]=='?')) {
 					//前後が半角かチェック
 					if (i!=0 && CharUtils.isHalf(ch[i-1])) break;
 					if (i+3<ch.length && CharUtils.isHalf(ch[i+3])) break;
@@ -1831,7 +1832,7 @@ public class AozoraEpub3Converter
 					continue;
 				} else {
 					//!?2文字を縦横中で出力
-					if (autoYoko && !(inYoko || inTcy || noRuby || inRuby) && i+1<ch.length && (ch[i+1]=='!' || ch[i+1]=='?')) {
+					if (autoYoko && !(inYoko || inTcy || noTcy || inRuby) && i+1<ch.length && (ch[i+1]=='!' || ch[i+1]=='?')) {
 						//前後が半角かチェック
 						if (i!=0 && CharUtils.isHalf(ch[i-1])) break;
 						if (i+2<ch.length && CharUtils.isHalf(ch[i+2])) break;
@@ -1888,7 +1889,7 @@ public class AozoraEpub3Converter
 							}
 						}
 					}
-					if (rubyStart == -1) {
+					if (rubyStart == -1 && !noRuby) {
 						LogAppender.warn(lineNum, "ルビ開始文字無し");
 					}
 					inRuby = false;
@@ -2254,7 +2255,7 @@ public class AozoraEpub3Converter
 			//見出しのChapterをWriterに追加 同じ行で数回呼ばれるので初回のみ
 			if (chapterLineInfo != null && lastChapterLine != lineNum) {
 				String name = chapterLineInfo.getChapterName();
-				if (name.length() > 0) {
+				if (name != null && name.length() > 0) {
 					//自動抽出で+10されているのは1桁のレベルに戻す
 					if (chapterLineInfo.sectionChapter) this.writer.addChapter(null, name, chapterLineInfo.level%10);
 					else this.writer.addChapter(chapterId, name, chapterLineInfo.level%10);

@@ -483,8 +483,8 @@ public class Epub3Writer
 		StringBuilder buf = new StringBuilder();
 		for (ChapterInfo chapterInfo : chapterInfos) {
 			buf.setLength(0);
-			char[] ch = chapterInfo.getChapterName().toCharArray();
-			converter.convertRubyText(buf, ch, 0, ch.length, false);
+			char[] ch = chapterInfo.getChapterName().replaceAll("《","※《").replaceAll("》","※》").toCharArray();
+			converter.convertRubyText(buf, ch, 0, ch.length, true, false);
 			chapterInfo.setChapterName(buf.toString());
 		}
 		bookInfo.vertical = vertical;//戻す

@@ -364,7 +364,7 @@ public class WebAozoraConverter
 							preChapterTitle = chapterTitle;
 							bw.append("［＃改ページ］\n");
 							bw.append("［＃ここから大見出し］\n");
-							bw.append(preChapterTitle);
+							printText(bw, preChapterTitle);
 							bw.append('\n');
 							bw.append("［＃ここで大見出し終わり］\n");
 							bw.append('\n');
