@@ -16,8 +16,7 @@ AUTHOR	.hpb-cnt-tb2 td:3
 DESCRIPTION	.hpb-cnt-tb2:13
 
 ## 各話へのリンク
-HREF	.hpb-cnt-tb2 a
-##HREF	.hpb-cnt-tb2 a	^/library/(ca-)?\d+.+\.html$
+HREF	.hpb-cnt-tb2 a	.*/library/(ca-)?\d+.+\.html$
 
 ##全体の更新日時 比較文字列 (hrefに1:1で対応するタグ 内部のinnerHTML文字列で比較)
 UPDATE	.hpb-cnt-tb2 td:9

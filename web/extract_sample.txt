@@ -65,11 +65,15 @@ CONTENT_IMG	.novel_img img
 
 ## 各話 本文 (再帰的に出力するので置換設定無効)
 CONTENT_ARTICLE	.novel_body
-## 本文抽出範囲
+
+## 本文抽出開始 このタグの次から
 ##CONTENT_ARTICLE_START	.novel_body hr:0
+
+## 本文抽出終了 このタグの前まで
 ##CONTENT_ARTICLE_END	.novel_body hr:-1
 
 ## 前書き (再帰的に出力するので置換設定無効)
 CONTENT_PREAMBLE	.novel_p .novel_view:0
+
 ## 補足 (再帰的に出力するので置換設定無効)
 CONTENT_APPENDIX	.novel_a .novel_view:0

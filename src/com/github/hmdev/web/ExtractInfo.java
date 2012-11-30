@@ -41,6 +41,15 @@ public class ExtractInfo
 			this.replacement = replaceString.replaceAll("\\\\n", "\n");
 	}
 	
+	public boolean hasPattern()
+	{
+		return this.pattern != null;
+	}
+	public boolean isReplacable()
+	{
+		return this.pattern != null && this.replacement != null;
+	}
+	
 	public String replace(String str)
 	{
 		if (this.pattern == null || this.replacement == null) return str;

@@ -33,21 +33,11 @@ PAGE_URL	.novel_first a:0	^(.*pg=)\d+\t(\d+)$	$1$2
 ################################
 ###各話の抽出設定
 
-## 各話 Chapter 先頭の章のみ大見出しで出力
-#CONTENT_CHAPTER	.chapter_title
 ## 各話 章タイトル 中見出しで出力
-CONTENT_SUBTITLE	.novel_subtitle
+CONTENT_SUBTITLE	.novel_maincontent .novel_subtitle:0
 
 ##本文タグ外に画像がある場合本文の前に出力
 CONTENT_IMG	.novel_maincontent .novel_img img
 
 ## 各話 本文
-CONTENT_ARTICLE	.novel_body
-## 本文抽出範囲
-##CONTENT_ARTICLE_START	.novel_body hr:0
-##CONTENT_ARTICLE_END	.novel_body hr:-1
-
-## 前書き
-#CONTENT_PREAMBLE	.novel_p:0
-## 補足
-#CONTENT_APPENDIX	.novel_a:0
+CONTENT_ARTICLE	.novel_maincontent .novel_body:0

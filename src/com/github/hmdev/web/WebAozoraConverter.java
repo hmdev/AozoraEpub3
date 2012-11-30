@@ -308,12 +308,16 @@ public class WebAozoraConverter
 				for (Element href : hrefs) {
 					String hrefString = href.attr("href");
 					if (hrefString == null || hrefString.length() == 0) continue;
-					String chapterHref = hrefString;
-					if (!hrefString.startsWith("http")) {
-						if (hrefString.charAt(0) == '/') chapterHref = baseUri+hrefString;
-						else chapterHref = listBaseUrl+hrefString;
+					//パターンがあればマッチング
+					ExtractInfo extractInfo = this.queryMap.get(ExtractId.HREF)[0];
+					if (!extractInfo.hasPattern() || extractInfo.matches(hrefString)) {
+						String chapterHref = hrefString;
+						if (!hrefString.startsWith("http")) {
+							if (hrefString.charAt(0) == '/') chapterHref = baseUri+hrefString;
+							else chapterHref = listBaseUrl+hrefString;
+						}
+						chapterHrefs.add(chapterHref);
 					}
-					chapterHrefs.add(chapterHref);
 				}
 			}
 			
@@ -499,7 +503,11 @@ public class WebAozoraConverter
 				bw.append('\n');
 			}
 			//本文
-			for (Element elem : contentDivs) printNode(bw, elem);
+			for (Element elem : contentDivs) {
+				Element startElement = getExtractFirstElement(doc, this.queryMap.get(ExtractId.CONTENT_ARTICLE_START));
+				Element endElement = getExtractFirstElement(doc, this.queryMap.get(ExtractId.CONTENT_ARTICLE_END));
+				printNode(bw, elem, startElement, endElement);
+			}
 			
 			//後書き
 			Elements appendixDivs = getExtractElements(doc, this.queryMap.get(ExtractId.CONTENT_APPENDIX));
@@ -520,10 +528,22 @@ public class WebAozoraConverter
 			}
 		}
 	}
+	
 	/** ノードを出力 子ノード内のテキストも出力 */
 	private void printNode(BufferedWriter bw, Node parent) throws IOException
 	{
+		printNode(bw, parent, null, null);
+	}
+	private void printNode(BufferedWriter bw, Node parent, Node start, Node end) throws IOException
+	{
 		for (Node node : parent.childNodes()) {
+			if (start != null) {
+				if (node.equals(start)) start = null; 
+				continue;
+			}
+			if (end != null && node.equals(end)) {
+				return;
+			}
 			if (node instanceof TextNode) printText(bw, ((TextNode)node).text());
 			else if (node instanceof Element) {
 				Element elem = (Element)node;
@@ -717,7 +737,7 @@ public class WebAozoraConverter
 		for (ExtractInfo extractInfo : extractInfos) {
 			Elements elements = doc.select(extractInfo.query);
 			if (elements == null || elements.size() == 0) return null;
-			return elements.get(0);
+			return elements.get(extractInfo.idx[0]);
 		}
 		return null;
 	}
