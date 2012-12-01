@@ -12,6 +12,8 @@ import java.awt.dnd.DropTargetDragEvent;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -310,6 +312,13 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 	}
 	
 	////////////////////////////////////////////////////////////////
+	ActionListener linstener;
+	public void addActionListener(ActionListener linstener)
+	{
+		this.linstener = linstener;
+	}
+	
+	////////////////////////////////////////////////////////////////
 	//Events
 	////////////////////////////////////////////////////////////////
 	@Override
@@ -359,6 +368,10 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 	@Override
 	public void mouseClicked(MouseEvent e)
 	{
+		if (e.getClickCount() == 2) {
+			//2倍表示をコールバック
+			if (this.linstener != null) this.linstener.actionPerformed(new ActionEvent(this, 1, "dbkclick"));
+		}
 	}
 	@Override
 	public void mouseEntered(MouseEvent e)

@@ -188,6 +188,8 @@ public class AozoraEpub3Applet extends JApplet
 	JCheckBox jCheckCommentPrint;
 	JCheckBox jCheckCommentConvert;
 	
+	JComboBox jComboxRemoveEmptyLine;
+	
 	JTextField jTextMaxChapterNameLength;
 	JCheckBox jCheckCoverPageToc;
 	JCheckBox jCheckChapterSection;
@@ -972,33 +974,57 @@ public class AozoraEpub3Applet extends JApplet
 		jTabbedPane.add("詳細設定", tabPanel);
 		
 		////////////////////////////////
-		//詳細設定
+		//文中全角スペースの処理
 		////////////////////////////////
 		panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 		panel.setBorder(new NarrowTitledBorder("文中全角スペースの処理"));
 		tabPanel.add(panel);
 		//ピクセル
+		label = new JLabel("行末で非表示:(");
+		label.setBorder(padding2);
+		panel.add(label);
 		propValue = props.getProperty("SpaceHyphenation");
 		buttonGroup = new ButtonGroup();
-		jRadioSpaceHyp1 = new JRadioButton("行末非表示 (Kobo・Kindle用)  ", propValue==null||"1".equals(propValue));
-		jRadioSpaceHyp1.setToolTipText("Readerでは何もしないと同じ表示になります");
+		jRadioSpaceHyp1 = new JRadioButton("Kobo・Kindle ", propValue==null||"1".equals(propValue));
+		jRadioSpaceHyp1.setToolTipText("Kobo・Kindleで行末で非表示にします Readerではそのままと同じ表示になります");
 		jRadioSpaceHyp1.setFocusPainted(false);
 		jRadioSpaceHyp1.setBorder(padding2);
 		panel.add(jRadioSpaceHyp1);
 		buttonGroup.add(jRadioSpaceHyp1);
-		jRadioSpaceHyp2 = new JRadioButton("行末非表示 (Reader用)  ", "2".equals(propValue));
-		jRadioSpaceHyp2.setToolTipText("Reader以外では追い出しの禁則処理になります");
+		jRadioSpaceHyp2 = new JRadioButton("Reader ) ", "2".equals(propValue));
+		jRadioSpaceHyp2.setToolTipText("Reader以外では次行に追い出しの禁則処理になります");
 		jRadioSpaceHyp2.setFocusPainted(false);
 		jRadioSpaceHyp2.setBorder(padding2);
 		panel.add(jRadioSpaceHyp2);
 		buttonGroup.add(jRadioSpaceHyp2);
-		jRadioSpaceHyp0 = new JRadioButton("何もしない", "0".equals(propValue));
+		jRadioSpaceHyp0 = new JRadioButton("そのまま", "0".equals(propValue));
 		jRadioSpaceHyp0.setToolTipText("行の折り返し部分にある全角スペースが行頭に表示されます");
 		jRadioSpaceHyp0.setFocusPainted(false);
 		jRadioSpaceHyp0.setBorder(padding2);
 		panel.add(jRadioSpaceHyp0);
 		buttonGroup.add(jRadioSpaceHyp0);
+		
+		////////////////////////////////
+		//空行除去
+		////////////////////////////////
+		panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		panel.setBorder(new NarrowTitledBorder("空行除去"));
+		tabPanel.add(panel);
+		jComboxRemoveEmptyLine = new JComboBox(new String[]{"0", "1", "2", "3", "4", "5"});
+		jComboxRemoveEmptyLine.setToolTipText("空行の行数を減らします 見出し行の後ろ3行以内は1行残します");
+		jComboxRemoveEmptyLine.setFocusable(false);
+		jComboxRemoveEmptyLine.setBorder(padding0);
+		jComboxRemoveEmptyLine.setMaximumSize(new Dimension(42, 19));
+		jComboxRemoveEmptyLine.setPreferredSize(new Dimension(42, 19));
+		((JLabel)jComboxRemoveEmptyLine.getRenderer()).setBorder(padding2);
+		propValue = props.getProperty("RemoveEmptyLine");
+		jComboxRemoveEmptyLine.setSelectedItem(propValue==null?"0":propValue);
+		panel.add(jComboxRemoveEmptyLine);
+		label = new JLabel("行減らす");
+		label.setBorder(padding2);
+		panel.add(label);
 		
 		////////////////////////////////
 		//自動縦中横
@@ -1965,6 +1991,9 @@ public class AozoraEpub3Applet extends JApplet
 			//コメント
 			this.aozoraConverter.setCommentPrint(this.jCheckCommentPrint.isSelected(), this.jCheckCommentConvert.isSelected());
 			
+			int removeEmptyLine = 0; try { removeEmptyLine =  Integer.parseInt(jComboxRemoveEmptyLine.getSelectedItem().toString()); } catch (Exception e) {}
+			this.aozoraConverter.setRemoveEmptyLine(removeEmptyLine);
+			
 			//強制改ページ
 			if (jCheckPageBreak.isSelected()) {
 				try {
@@ -2498,7 +2527,7 @@ public class AozoraEpub3Applet extends JApplet
 	{
 		if (c instanceof JPanel) {
 			for (Component c2 : ((Container)c).getComponents()) setEnabledAll(c2, b);
-		} else if (!(c instanceof JLabel)) {
+		} else {//if (!(c instanceof JLabel)) {
 			c.setEnabled(b);
 		}
 	}
@@ -2710,6 +2739,8 @@ public class AozoraEpub3Applet extends JApplet
 		//コメント出力
 		this.props.setProperty("CommentPrint", this.jCheckCommentPrint.isSelected()?"1":"");
 		this.props.setProperty("CommentConvert", this.jCheckCommentConvert.isSelected()?"1":"");
+		//空行除去
+		this.props.setProperty("RemoveEmptyLine", ""+this.jComboxRemoveEmptyLine.getSelectedItem().toString().trim());
 		//強制改ページ
 		this.props.setProperty("PageBreak", this.jCheckPageBreak.isSelected()?"1":"");
 		this.props.setProperty("PageBreakSize", ""+this.jTextPageBreakSize.getText().trim());

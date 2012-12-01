@@ -388,14 +388,15 @@ public class Epub3Writer
 			this.imageInfos.add(0, coverImageInfo);
 		}else {
 			//表紙は出力対象に追加
-			outImageFileNames.add(imageInfoReader.getImageFileName(bookInfo.coverImageIndex));
+			if (bookInfo.coverImageIndex > -1 && imageInfoReader.countImageFileNames() > bookInfo.coverImageIndex)
+				outImageFileNames.add(imageInfoReader.getImageFileName(bookInfo.coverImageIndex));
 		}
 		
 		//表紙ページ出力 先頭画像表示時は画像出力時にカバー指定するので出力しない
 		if (bookInfo.insertCoverPage) {
 			//追加用の情報取得にのみ使う
 			ImageInfo insertCoverInfo = coverImageInfo;
-			if (insertCoverInfo == null && bookInfo.coverImageIndex >= 0) {
+			if (insertCoverInfo == null && bookInfo.coverImageIndex > -1) {
 				//本文中の挿絵の場合
 				insertCoverInfo = imageInfoReader.getImageInfo(bookInfo.coverImageIndex);
 				if (insertCoverInfo != null) {

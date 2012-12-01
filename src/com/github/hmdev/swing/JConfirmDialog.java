@@ -357,6 +357,11 @@ public class JConfirmDialog extends JDialog
 		jCoverImagePanel.setSize(size);
 		previewOuterPane.add(jCoverImagePanel);
 		
+		jCoverImagePanel.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent arg0) { jButtonScale.setSelected(!jButtonScale.isSelected()); setCoverPaneSize(jButtonScale.isSelected()?2:1); }
+		});
+		
 		//操作パネル
 		panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 1, 1));
 		panel.setMaximumSize(new Dimension(190, 72));
@@ -755,7 +760,6 @@ public class JConfirmDialog extends JDialog
 		int dialogHeight = DIALOG_HEIGHT+incHeight;
 		
 		this.setResizable(true);
-		this.jCoverImagePanel.setPaneSize(previewWidth+delta, previewHeight);
 		Dimension size = new Dimension(previewWidth+5+delta, previewHeight+5);
 		this.previewOuterPane.setPreferredSize(size);
 		this.previewOuterPane.setMaximumSize(size);
@@ -779,6 +783,7 @@ public class JConfirmDialog extends JDialog
 		this.previewLeft.setPreferredSize(size);
 		this.previewLeft.setMaximumSize(size);
 		this.previewLeft.setMinimumSize(size);
+		this.jCoverImagePanel.setPaneSize(previewWidth+delta, previewHeight);
 		this.setResizable(false);
 		this.repaint();
 	}
