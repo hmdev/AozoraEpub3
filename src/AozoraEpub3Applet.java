@@ -321,6 +321,7 @@ public class AozoraEpub3Applet extends JApplet
 		FontMetrics fm = this.getFontMetrics(text.getFont());
 		Dimension text3 = new Dimension(fm.stringWidth("000")+is.left+is.right+2, 19);
 		Dimension text4 = new Dimension(fm.stringWidth("0000")+is.left+is.right+2, 19);
+		Dimension text5 = new Dimension(fm.stringWidth("00000")+is.left+is.right+2, 19);
 		Dimension text300 = new Dimension(300, 19);
 		
 		//アップレットのレイアウト設定
@@ -592,7 +593,6 @@ public class AozoraEpub3Applet extends JApplet
 		jComboEncType.setToolTipText("入力ファイルのテキストファイルの文字コード 青空文庫の標準はMS932(SJIS) 外字等変換済テキストはUTF-8を選択");
 		jComboEncType.setFocusable(false);
 		jComboEncType.setPreferredSize(new Dimension(100, 22));
-		((JLabel)jComboEncType.getRenderer()).setBorder(padding2H);
 		try { jComboEncType.setSelectedIndex(Integer.parseInt(props.getProperty("EncType"))); } catch (Exception e) {}
 		panel1.add(jComboEncType);
 		panel.add(panel1);
@@ -998,7 +998,7 @@ public class AozoraEpub3Applet extends JApplet
 		jRadioSpaceHyp2.setBorder(padding2);
 		panel.add(jRadioSpaceHyp2);
 		buttonGroup.add(jRadioSpaceHyp2);
-		jRadioSpaceHyp0 = new JRadioButton("そのまま", "0".equals(propValue));
+		jRadioSpaceHyp0 = new JRadioButton("そのまま  ", "0".equals(propValue));
 		jRadioSpaceHyp0.setToolTipText("行の折り返し部分にある全角スペースが行頭に表示されます");
 		jRadioSpaceHyp0.setFocusPainted(false);
 		jRadioSpaceHyp0.setBorder(padding2);
@@ -1016,8 +1016,8 @@ public class AozoraEpub3Applet extends JApplet
 		jComboxRemoveEmptyLine.setToolTipText("空行の行数を減らします 見出し行の後ろ3行以内は1行残します");
 		jComboxRemoveEmptyLine.setFocusable(false);
 		jComboxRemoveEmptyLine.setBorder(padding0);
-		jComboxRemoveEmptyLine.setMaximumSize(new Dimension(42, 19));
-		jComboxRemoveEmptyLine.setPreferredSize(new Dimension(42, 19));
+		jComboxRemoveEmptyLine.setMaximumSize(text5);
+		jComboxRemoveEmptyLine.setPreferredSize(text5);
 		((JLabel)jComboxRemoveEmptyLine.getRenderer()).setBorder(padding2);
 		propValue = props.getProperty("RemoveEmptyLine");
 		jComboxRemoveEmptyLine.setSelectedItem(propValue==null?"0":propValue);
@@ -1139,8 +1139,8 @@ public class AozoraEpub3Applet extends JApplet
 		jComboxPageBreakEmptyLine = new JComboBox(new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9"});
 		jComboxPageBreakEmptyLine.setFocusable(false);
 		jComboxPageBreakEmptyLine.setBorder(padding0);
-		jComboxPageBreakEmptyLine.setMaximumSize(new Dimension(42, 19));
-		jComboxPageBreakEmptyLine.setPreferredSize(new Dimension(42, 19));
+		jComboxPageBreakEmptyLine.setMaximumSize(text5);
+		jComboxPageBreakEmptyLine.setPreferredSize(text5);
 		((JLabel)jComboxPageBreakEmptyLine.getRenderer()).setBorder(padding2);
 		propValue = props.getProperty("PageBreakEmptyLine");
 		jComboxPageBreakEmptyLine.setSelectedItem(propValue==null?"2":propValue);

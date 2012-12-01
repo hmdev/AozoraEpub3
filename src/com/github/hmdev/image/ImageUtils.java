@@ -11,6 +11,8 @@ import java.awt.image.IndexColorModel;
 import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -122,19 +124,28 @@ public class ImageUtils
 			float jpegQuality, int maxImagePixels, int maxImageW, int maxImageH,
 			int autoMarginLimitH, int autoMarginLimitV, int autoMarginWhiteLevel, float autoMarginPadding, int autoMarginNombre) throws IOException
 	{
+		try {
 		String ext = imageInfo.getExt();
 		
 		int w = imageInfo.getWidth();
 		int h = imageInfo.getHeight();
+		//余白チェック時に読み込んだ画像のバッファ
+		byte[] imgBuf = null;
+		
 		int[] margin = null;
 		if (autoMarginLimitH > 0 || autoMarginLimitV > 0) {
-			
 			int startPixel = (int)(w*0.02); //2%
 			int ignoreEdge = (int)(w*0.02); //2%
 			int dustSize = (int)(w*0.01); //1%
 			
-			//画像がなければ読み込み
-			if (srcImage == null) srcImage = readImage(ext, is);
+			//画像がなければ読み込み 変更なしの時にそのまま出力できるように一旦バッファに読み込む
+			if (srcImage == null) {
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				IOUtils.copy(is, baos);
+				imgBuf = baos.toByteArray();
+				ByteArrayInputStream bais = new ByteArrayInputStream(imgBuf);
+				try { srcImage = readImage(ext, bais); } finally { bais.close(); }
+			}
 			margin = getPlainMargin(srcImage, autoMarginLimitH/100f, autoMarginLimitV/100f, autoMarginWhiteLevel/100f, autoMarginPadding/100f, startPixel, ignoreEdge, dustSize, autoMarginNombre);
 			if (margin[0]==0 && margin[1]==0 && margin[2]==0 && margin[3]==0) margin = null;
 			if (margin != null) {
@@ -153,15 +164,20 @@ public class ImageUtils
 				//変更なしならそのままファイル出力
 				IOUtils.copy(is, zos);
 			} else {
-				//編集済の画像または余白除去の画像なら同じ画像形式で書き出し
-				if (margin != null) srcImage = srcImage.getSubimage(margin[0], margin[1], srcImage.getWidth()-margin[2]-margin[0], srcImage.getHeight()-margin[3]-margin[1]);
-				_writeImage(zos, srcImage, ext, jpegQuality);
+				if (margin == null && imgBuf != null) {
+					//余白除去が無く画像も編集されていなければバッファからそのまま出力
+					ByteArrayInputStream bais = new ByteArrayInputStream(imgBuf);
+					try { IOUtils.copy(bais, zos); } finally { bais.close(); }
+				} else {
+					//編集済の画像なら同じ画像形式で書き出し 余白があれば切り取る
+					if (margin != null) srcImage = srcImage.getSubimage(margin[0], margin[1], srcImage.getWidth()-margin[2]-margin[0], srcImage.getHeight()-margin[3]-margin[1]);
+					_writeImage(zos, srcImage, ext, jpegQuality);
+				}
 			}
 		} else {
 			//縮小
 			int scaledW = (int)(w*scale+0.5);
 			int scaledH = (int)(h*scale+0.5);
-			try {
 				//画像がなければ読み込み
 				if (srcImage == null) srcImage = readImage(ext, is);
 				int imageType = srcImage.getType();
@@ -220,18 +236,19 @@ public class ImageUtils
 				//ImageIO.write(outImage, imageInfo.getExt(), zos);
 				_writeImage(zos, outImage, ext, jpegQuality);
 				LogAppender.println("画像縮小: "+imageInfo.getOutFileName()+" ("+w+","+h+")→("+scaledW+","+scaledH+")");
-			} catch (Exception e) {
-				LogAppender.println("画像読み込みエラー: "+imageInfo.getOutFileName());
-				e.printStackTrace();
-			}
 			zos.flush();
+		}
+		} catch (Exception e) {
+			LogAppender.println("画像読み込みエラー: "+imageInfo.getOutFileName());
+			e.printStackTrace();
 		}
 	}
 	/** 画像を出力 マージン指定があればカット
 	 * @param margin カットするピクセル数(left, top, right, bottom) */
 	static private void _writeImage(ZipArchiveOutputStream zos, BufferedImage srcImage, String ext, float jpegQuality) throws IOException
 	{
-		/*if ("png".equals(ext)) {
+		if ("png".equals(ext)) {
+			/*//PNGEncoder kindlegenでエラーになるのと色が反映されない
 			PngEncoder pngEncoder = new PngEncoder();
 			int pngColorType = PngEncoder.COLOR_TRUECOLOR;
 			switch (srcImage.getType()) {
@@ -246,11 +263,17 @@ public class ImageUtils
 			pngEncoder.setCompression(PngEncoder.BEST_COMPRESSION);
 			pngEncoder.setIndexedColorMode(PngEncoder.INDEXED_COLORS_AUTO);
 			pngEncoder.encode(srcImage, zos);
-		} else {*/
+			*/
+			//ImageIO.write(srcImage, "PNG", zos);
 			Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName(ext);
 			ImageWriter imageWriter = writers.next();
 			//jai-imageioのpngの挙動がおかしいのでインストールされていても使わない
 			if (writers.hasNext() && imageWriter.getClass().getName().endsWith("CLibPNGImageWriter")) imageWriter = writers.next();
+			imageWriter.setOutput(ImageIO.createImageOutputStream(zos));
+			imageWriter.write(srcImage);
+		} else if ("jpeg".equals(ext) || "jpg".equals(ext)) {
+			Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName(ext);
+			ImageWriter imageWriter = writers.next();
 			imageWriter.setOutput(ImageIO.createImageOutputStream(zos));
 			ImageWriteParam iwp = imageWriter.getDefaultWriteParam();
 			if (iwp.canWriteCompressed()) {
@@ -263,7 +286,9 @@ public class ImageUtils
 			} else {
 				imageWriter.write(srcImage);
 			}
-		//}
+		} else {
+			ImageIO.write(srcImage, ext, zos);
+		}
 		zos.flush();
 	}
 	
@@ -298,8 +323,6 @@ public class ImageUtils
 		if (nombreType == NOMBRE_BOTTOM || nombreType == NOMBRE_TOPBOTTOM) {
 			limitPxB += (int)(height*0.05); //5%加算
 		}
-		
-		//dustSize = 0;
 		
 		//上
 		int coloredPixels = getColoredPixelsH(image, width, startPixel, whiteLevel, 0, ignoreEdge, dustSize);
@@ -465,7 +488,7 @@ public class ImageUtils
 		for (int x=w-1-ignoreEdge-ignoreEdge; x>=ignoreEdge; x--) {
 			if (isColored(image.getRGB(x, offsetY), rgbLimit)) {
 				//ゴミ除外 ゴミのサイズ分先に移動する
-				if (!isDustH(image, x, image.getWidth(), offsetY, image.getHeight(), dustSize, rgbLimit)) {
+				if (dustSize < 4 || !isDust(image, x, image.getWidth(), offsetY, image.getHeight(), dustSize, rgbLimit)) {
 					coloredPixels++;
 					if (limitPixel < coloredPixels) return coloredPixels;
 				}
@@ -477,7 +500,7 @@ public class ImageUtils
 	 * @param image 比率をチェックする画像
 	 * @param h 比率をチェックする高さ
 	 * @param offsetX 画像内の横位置
-	 * @param limit これよりも白比率が小さくなったら終了 値はlimit+1が帰る
+	 * @param limitPixel これよりも白比率が小さくなったら終了 値はlimit+1が帰る
 	 * @return 白画素の比率 0.0-1.0 */
 	static private int getColordPixelsV(BufferedImage image, int h, int offsetX, double whiteLevel, int limitPixel, int ignoreTop, int ignoreBotttom, int dustSize)
 	{
@@ -489,7 +512,7 @@ public class ImageUtils
 		for (int y=h-1-ignoreTop-ignoreBotttom; y>=ignoreTop; y--) {
 			if (isColored(image.getRGB(offsetX, y), rgbLimit)) {
 				//ゴミ除外 ゴミのサイズ分先に移動する
-				if (!isDustV(image, y, image.getHeight(), offsetX, image.getWidth(), dustSize, rgbLimit)) {
+				if (dustSize < 4 || !isDust(image, offsetX, image.getWidth(), y, image.getHeight(), dustSize, rgbLimit)) {
 					coloredPixels++;
 					if (limitPixel < coloredPixels) return coloredPixels;
 				}
@@ -503,60 +526,15 @@ public class ImageUtils
 		return rgbLimit > (rgb>>16 & 0xFF) || rgbLimit > (rgb>>8 & 0xFF) || rgbLimit > (rgb & 0xFF);
 	}
 	
-	/** 列のゴミをチェック curXが現在の場所 */
-	static boolean isDustH(BufferedImage image, int curX, int maxX, int curY, int maxY, int dustSize, int rgbLimit)
-	{
-		if (dustSize == 0) return false;
-		//現在行
-		int minX = Math.max(0, curX-dustSize);
-		maxX = Math.min(maxX, curX+dustSize);
-		
-		int w = 0;
-		for (int x=curX-1; x>=minX; x--) {
-			if (isColored(image.getRGB(x, curY), rgbLimit)) w++; else break;
-		}
-		for (int x=curX+1; x<maxX; x++) {
-			if (isColored(image.getRGB(x, curY), rgbLimit)) w++; else break;
-		}
-		if (w > dustSize) return false;
-		
-		//幅をゴミのサイズにして黒画素をカウント
-		minX = Math.max(minX, curX-dustSize/2);
-		maxX = Math.min(maxX, curX+dustSize/2);
-		
-		//上
-		int h = 1; //黒画素のある高さ
-		int y2 = Math.max(0, curY-dustSize);
-		for (int y=curY-1; y>=y2; y--) {
-			w = 0;
-			for (int x=maxX-1; x>=minX; x--) {
-				if (isColored(image.getRGB(x, y), rgbLimit)) w++;
-			}
-			if (w > dustSize) return false;
-			if (w == 0) break; //すべて白なら抜ける
-			h++;
-		}
-		//下
-		y2 = Math.min(maxY, curY+dustSize);
-		for (int y=curY+1; y<y2; y++) {
-			w = 0;
-			for (int x=maxX-1; x>=minX; x--) {
-				if (isColored(image.getRGB(x, y), rgbLimit)) w++;
-			}
-			if (w > dustSize) return false;
-			if (w == 0) break; //すべて白なら抜ける
-			h++;
-		}
-		return h <= dustSize;
-	}
-	
-	/** 横方向のゴミをチェック */
-	static boolean isDustV(BufferedImage image, int curY, int maxY, int curX, int maxX, int dustSize, int rgbLimit)
+	/** ゴミをチェック */
+	static boolean isDust(BufferedImage image, int curX, int maxX, int curY, int maxY, int dustSize, int rgbLimit)
 	{
 		if (dustSize == 0) return false;
 		//現在列
-		int minY = Math.max(0, curY-dustSize);
-		maxY = Math.min(maxY, curY+dustSize);
+		int minX = Math.max(0, curX-dustSize/2-1);
+		maxX = Math.min(maxY, curX+dustSize/2+1);
+		int minY = Math.max(0, curY-dustSize/2-1);
+		maxY = Math.min(maxY, curY+dustSize/2+1);
 		
 		int h = 1;
 		for (int y=curY-1; y>=minY; y--) {
@@ -567,13 +545,19 @@ public class ImageUtils
 		}
 		if (h > dustSize) return false;
 		
+		int w = 1;
+		for (int x=curX-1; x>=minX; x--) {
+			if (isColored(image.getRGB(x, curY), rgbLimit)) h++; else break;
+		}
+		for (int x=curX+1; x<maxX; x++) {
+			if (isColored(image.getRGB(x, curY), rgbLimit)) h++; else break;
+		}
+		if (w > dustSize) return false;
+		
 		//高さをゴミのサイズにして黒画素をカウント
-		minY = Math.max(minY, curY-dustSize/2);
-		maxY = Math.min(maxY, curY+dustSize/2);
 		//左
-		int w = 1; //黒画素のある幅
-		int x2 = Math.max(0, curX-dustSize);
-		for (int x=curX-1; x>=x2; x--) {
+		w = 1; //黒画素のある幅
+		for (int x=curX-1; x>=minX; x--) {
 			h = 0;
 			for (int y=maxY-1; y>=minY; y--) {
 				if (isColored(image.getRGB(x, y), rgbLimit)) h++;
@@ -583,8 +567,7 @@ public class ImageUtils
 			w++;
 		}
 		//右
-		x2 = Math.min(maxX, curX+dustSize);
-		for (int x=curX+1; x<x2; x++) {
+		for (int x=curX+1; x<minX; x++) {
 			h = 0;
 			for (int y=maxY-1; y>=minY; y--) {
 				if (isColored(image.getRGB(x, y), rgbLimit)) h++;
@@ -593,6 +576,28 @@ public class ImageUtils
 			if (h == 0) break; //すべて白なら抜ける
 			w++;
 		}
-		return w <= dustSize;
+		if (w > dustSize) return false;
+		//上
+		h = 1; //黒画素のある高さ
+		for (int y=curY-1; y>=minY; y--) {
+			w = 0;
+			for (int x=maxX-1; x>=minX; x--) {
+				if (isColored(image.getRGB(x, y), rgbLimit)) w++;
+			}
+			if (w > dustSize) return false;
+			if (w == 0) break; //すべて白なら抜ける
+			h++;
+		}
+		//下
+		for (int y=curY+1; y<maxY; y++) {
+			w = 0;
+			for (int x=maxX-1; x>=minX; x--) {
+				if (isColored(image.getRGB(x, y), rgbLimit)) w++;
+			}
+			if (w > dustSize) return false;
+			if (w == 0) break; //すべて白なら抜ける
+			h++;
+		}
+		return h <= dustSize;
 	}
 }
