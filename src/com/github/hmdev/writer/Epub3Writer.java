@@ -386,6 +386,9 @@ public class Epub3Writer
 			coverImageInfo.setOutFileName("0000."+ext);
 			coverImageInfo.setIsCover(true);
 			this.imageInfos.add(0, coverImageInfo);
+		}else {
+			//表紙は出力対象に追加
+			outImageFileNames.add(imageInfoReader.getImageFileName(bookInfo.coverImageIndex));
 		}
 		
 		//表紙ページ出力 先頭画像表示時は画像出力時にカバー指定するので出力しない
@@ -561,7 +564,7 @@ public class Epub3Writer
 			////////////////////////////////
 			//txtの場合はファイルシステムから取得
 			for (String srcImageFileName : imageInfoReader.getImageFileNames()) {
-				if (outImageFileNames.contains(srcImageFileName)) {
+				if (bookInfo.imageOnly || outImageFileNames.contains(srcImageFileName)) {
 					ImageInfo imageInfo = imageInfoReader.getImageInfo(srcImageFileName);
 					if (imageInfo == null) {
 						LogAppender.println("[WARN] 画像ファイルなし: "+srcImageFileName);
@@ -582,7 +585,7 @@ public class Epub3Writer
 			}
 		} else {
 			////////////////////////////////
-			//zipの場合はzip内画像をすべて出力
+			//zipの場合
 			int zipPathLength = 0;
 			if (this.bookInfo.textEntryName != null) zipPathLength = this.bookInfo.textEntryName.indexOf('/')+1;
 			ZipArchiveInputStream zis = new ZipArchiveInputStream(new BufferedInputStream(new FileInputStream(srcFile), 65536), "MS932", false);
@@ -590,28 +593,32 @@ public class Epub3Writer
 			while( (entry = zis.getNextZipEntry()) != null ) {
 				//Zip内のサブフォルダは除外してテキストからのパスにする
 				String srcImageFileName = entry.getName().substring(zipPathLength);
-				//if (outImageFileNames.contains(srcImageFileName)) {
-				ImageInfo imageInfo = imageInfoReader.getImageInfo(srcImageFileName);
-				//Zip内テキストの場合はidと出力ファイル名が登録されていなければ出力しない。
-				if (imageInfo != null) {
-					if (imageInfo.getId() != null) {
-						zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+IMAGES_PATH+imageInfo.getOutFileName()));
-						//Zipからの直接読み込みは失敗するので一旦バイト配列にする
-						ByteArrayOutputStream baos = new ByteArrayOutputStream();
-						IOUtils.copy(zis, baos);
-						byte[] bytes = baos.toByteArray();
-						baos.close();
-						ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-						this.writeImage(bais, zos, imageInfo);
-						bais.close();
-						zos.closeArchiveEntry();
+				if (bookInfo.imageOnly || outImageFileNames.contains(srcImageFileName)) {
+					ImageInfo imageInfo = imageInfoReader.getImageInfo(srcImageFileName);
+					//Zip内テキストの場合はidと出力ファイル名が登録されていなければ出力しない。
+					if (imageInfo != null) {
+						if (imageInfo.getId() != null) {
+							zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+IMAGES_PATH+imageInfo.getOutFileName()));
+							//Zipからの直接読み込みは失敗するので一旦バイト配列にする
+							ByteArrayOutputStream baos = new ByteArrayOutputStream();
+							IOUtils.copy(zis, baos);
+							byte[] bytes = baos.toByteArray();
+							baos.close();
+							ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+							this.writeImage(bais, zos, imageInfo);
+							bais.close();
+							zos.closeArchiveEntry();
+						}
+						if (this.canceled) return;
+						if (this.jProgressBar != null) this.jProgressBar.setValue(this.jProgressBar.getValue()+10);
 					}
-					if (this.canceled) return;
-					if (this.jProgressBar != null) this.jProgressBar.setValue(this.jProgressBar.getValue()+10);
 				}
 			}
 			zis.close();
 		}
+		
+		//エラーがなければ100%
+		this.jProgressBar.setValue(this.jProgressBar.getMaximum());
 		
 		} finally {
 			//ePub3出力ファイルを閉じる

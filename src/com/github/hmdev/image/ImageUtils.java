@@ -287,8 +287,17 @@ public class ImageUtils
 		int paddingV = Math.max(2, (int)(height*padding));
 		
 		//除去制限をピクセルに変更 上下、左右それぞれでの最大値
-		int limitPxH = (int)(width*limitH)/2;
+		int limitPxH = (int)(width*limitH);//後で合計から中央に寄せる
 		int limitPxV = (int)(height*limitV)/2;
+		//ノンブルがあった場合の最大マージン
+		int limitPxT = (int)(height*limitV)/2;
+		int limitPxB = (int)(height*limitV)/2;
+		if (nombreType == NOMBRE_TOP || nombreType == NOMBRE_TOPBOTTOM) {
+			limitPxT += (int)(height*0.05); //5%加算
+		}
+		if (nombreType == NOMBRE_BOTTOM || nombreType == NOMBRE_TOPBOTTOM) {
+			limitPxB += (int)(height*0.05); //5%加算
+		}
 		
 		//dustSize = 0;
 		
@@ -302,7 +311,7 @@ public class ImageUtils
 			}
 		} else {//内側へ
 			margin[1] = startPixel;
-			for (int i=startPixel+1; i<=limitPxV; i++) { 
+			for (int i=startPixel+1; i<=limitPxT; i++) { 
 				coloredPixels = getColoredPixelsH(image, width, i, whiteLevel, 0, ignoreEdge, dustSize);
 				if (coloredPixels == 0) margin[1] = i;
 				else break;
@@ -318,7 +327,7 @@ public class ImageUtils
 			}
 		} else {//内側へ
 			margin[3] = startPixel;
-			for (int i=startPixel+1; i<=limitPxV; i++) {
+			for (int i=startPixel+1; i<=limitPxB; i++) {
 				coloredPixels = getColoredPixelsH(image, width, height-1-i, whiteLevel, 0, ignoreEdge, dustSize);
 				if (coloredPixels == 0) margin[3] = i;
 				else break;
@@ -326,6 +335,8 @@ public class ImageUtils
 		}
 		
 		//ノンブル除去
+		boolean hasNombreT = false;
+		boolean hasNombreB = false;
 		if (nombreType == NOMBRE_TOP || nombreType == NOMBRE_TOPBOTTOM) {
 			//これ以下ならノンブルとして除去
 			int nombreLimit = (int)(height * 0.03)+margin[1];
@@ -337,14 +348,17 @@ public class ImageUtils
 			}
 			if (nombreEnd > 0 && nombreEnd <= nombreLimit) {
 				int whiteEnd = nombreEnd;
-				int whiteLimit = limitPxV+(int)(height*0.05); //5%加算
+				int whiteLimit = limitPxT+(int)(height*0.05); //5%加算
 				for (int i=nombreEnd+1; i<=whiteLimit; i++) { 
 					coloredPixels = getColoredPixelsH(image, width, i, whiteLevel, 0, ignoreEdge, dustSize);
 					if (coloredPixels == 0) whiteEnd = i;
 					else break;
 				}
 				//10%未満の空白
-				if (whiteEnd-nombreEnd > nombreEnd-margin[1] && whiteEnd-nombreEnd < (int)(height * 0.1)) margin[1] = whiteEnd;
+				if (whiteEnd-nombreEnd > nombreEnd-margin[1] && whiteEnd-nombreEnd < (int)(height * 0.1)) {
+					margin[1] = whiteEnd;
+					hasNombreT = true;
+				}
 			}
 		}
 		if (nombreType == NOMBRE_BOTTOM || nombreType == NOMBRE_TOPBOTTOM) {
@@ -358,18 +372,21 @@ public class ImageUtils
 			}
 			if (nombreEnd > 0 && nombreEnd <= nombreLimit) {
 				int whiteEnd = nombreEnd;
-				int whiteLimit = limitPxV+(int)(height*0.05); //5%加算
+				int whiteLimit = limitPxB+(int)(height*0.05); //5%加算
 				for (int i=nombreEnd+1; i<=whiteLimit; i++) { 
 					coloredPixels = getColoredPixelsH(image, width, height-1-i, whiteLevel, 0, ignoreEdge, dustSize);
 					if (coloredPixels == 0) whiteEnd = i;
 					else break;
 				}
 				//10%未満の空白
-				if (whiteEnd-nombreEnd > nombreEnd-margin[3] && whiteEnd-nombreEnd < (int)(height * 0.1)) margin[3] = whiteEnd;
+				if (whiteEnd-nombreEnd > nombreEnd-margin[3] && whiteEnd-nombreEnd < (int)(height * 0.1)) {
+					margin[3] = whiteEnd;
+					hasNombreB = true;
+				}
 			}
 		}
 		
-		//左右に反映
+		//左右にノンブル分反映
 		int ignoreTop = Math.max(ignoreEdge, margin[1]);
 		int ignoreBottom = Math.max(ignoreEdge, margin[3]);
 		//左
@@ -420,6 +437,9 @@ public class ImageUtils
 			margin[3] = (int)(margin[3]*rate);
 		}*/
 		
+		//ノンブルがなければ指定値以下にする
+		if (!hasNombreT) margin[1] = Math.min(margin[1], limitPxV);
+		if (!hasNombreB) margin[3] = Math.min(margin[3], limitPxV);
 		
 		//余白分広げる
 		margin[0] -= paddingH; if (margin[0] < 0) margin[0] = 0;

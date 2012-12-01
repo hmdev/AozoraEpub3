@@ -424,14 +424,22 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 	{
 		if (previewImage == null) return;
 		int delta = 1;
-		if (e.isControlDown()) delta = 5;
-		switch (e.getKeyCode()) {
-		case KeyEvent.VK_UP: this.offsetY-=delta; break;
-		case KeyEvent.VK_DOWN: this.offsetY+=delta; break;
-		case KeyEvent.VK_LEFT: this.offsetX-=delta; break;
-		case KeyEvent.VK_RIGHT: this.offsetX+=delta; break;
-		case KeyEvent.VK_HOME: this.offsetX=0; break;
-		default: return;
+		if (e.isControlDown()) {
+			switch (e.getKeyCode()) {
+			case KeyEvent.VK_LEFT: setVisibleWidthOffset(-1); break;
+			case KeyEvent.VK_RIGHT: setVisibleWidthOffset(1); break;
+			default: return;
+			}
+		} else {
+			if (e.isShiftDown()) delta = 5;
+			switch (e.getKeyCode()) {
+			case KeyEvent.VK_UP: this.offsetY-=delta; break;
+			case KeyEvent.VK_DOWN: this.offsetY+=delta; break;
+			case KeyEvent.VK_LEFT: this.offsetX-=delta; break;
+			case KeyEvent.VK_RIGHT: this.offsetX+=delta; break;
+			case KeyEvent.VK_HOME: this.offsetX=0; break;
+			default: return;
+			}
 		}
 		repaint();
 	}

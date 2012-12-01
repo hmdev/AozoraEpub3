@@ -632,9 +632,9 @@ public class AozoraEpub3Applet extends JApplet
 		panel.setBorder(new NarrowTitledBorder("挿絵画像"));
 		tabPanel.add(panel);
 		propValue = props.getProperty("NoIllust");
-		jCheckNoIllust = new JCheckBox("挿絵非表示 ", "1".equals(propValue));
+		jCheckNoIllust = new JCheckBox("挿絵なし ", "1".equals(propValue));
 		jCheckNoIllust.setFocusPainted(false);
-		jCheckNoIllust.setToolTipText("表紙と外字画像以外は表示されません 画像ファイルはePubファイル内に格納されます");
+		jCheckNoIllust.setToolTipText("表紙と外字画像以外はePubに格納されません");
 		jCheckNoIllust.setBorder(padding2);
 		panel.add(jCheckNoIllust);
 		
@@ -874,7 +874,7 @@ public class AozoraEpub3Applet extends JApplet
 		////////////////////////////////
 		panelV = new JPanel();
 		panelV.setLayout(new BoxLayout(panelV, BoxLayout.Y_AXIS));
-		panelV.setBorder(new NarrowTitledBorder("余白除去（仮）"));
+		panelV.setBorder(new NarrowTitledBorder("余白除去"));
 		tabPanel.add(panelV);
 		panel = new JPanel();
 		panel.setLayout(new FlowLayout(FlowLayout.LEFT, 1, 0));
@@ -2670,6 +2670,8 @@ public class AozoraEpub3Applet extends JApplet
 		this.props.setProperty("CoverPage", this.jCheckCoverPage.isSelected()?"1":"");
 		this.props.setProperty("TocPage", this.jCheckTocPage.isSelected()?"1":"");
 		this.props.setProperty("TocVertical", this.jRadioTocV.isSelected()?"1":"");
+		//挿絵非表示
+		this.props.setProperty("NoIllust", this.jCheckNoIllust.isSelected()?"1":"");
 		//画面サイズ
 		this.props.setProperty("DispW", this.jTextDispW.getText());
 		this.props.setProperty("DispH", this.jTextDispH.getText());

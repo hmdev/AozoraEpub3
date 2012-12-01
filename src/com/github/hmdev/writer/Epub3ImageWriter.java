@@ -124,6 +124,7 @@ public class Epub3ImageWriter extends Epub3Writer
 				isCover = true;
 			}
 			this.imageInfos.add(imageInfo);
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;

@@ -534,6 +534,8 @@ public class JConfirmDialog extends JDialog
 			public void actionPerformed(ActionEvent arg0) { deleteCover(); }
 		});
 		panel.add(jButtonDelete);
+		
+		
 	}
 	
 	public String getMetaTitle()
@@ -726,7 +728,7 @@ public class JConfirmDialog extends JDialog
 		this.jCheckReplaceCover.setVisible(bookInfo.insertCoverPage);
 		
 		//本情報設定ダイアログ表示
-		this.setLocation(location.x+20, location.y+20);
+		this.setLocation(location.x+100, location.y+20);
 		this.setVisible(true);
 	}
 	
