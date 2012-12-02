@@ -485,7 +485,7 @@ public class ImageUtils
 		//白でないピクセル数
 		int coloredPixels = 0;
 		
-		for (int x=w-1-ignoreEdge-ignoreEdge; x>=ignoreEdge; x--) {
+		for (int x=w-1-ignoreEdge; x>=ignoreEdge; x--) {
 			if (isColored(image.getRGB(x, offsetY), rgbLimit)) {
 				//ゴミ除外 ゴミのサイズ分先に移動する
 				if (dustSize < 4 || !isDust(image, x, image.getWidth(), offsetY, image.getHeight(), dustSize, rgbLimit)) {
@@ -509,7 +509,7 @@ public class ImageUtils
 		//白でないピクセル数
 		int coloredPixels = 0;
 		
-		for (int y=h-1-ignoreTop-ignoreBotttom; y>=ignoreTop; y--) {
+		for (int y=h-1-ignoreBotttom; y>=ignoreTop; y--) {
 			if (isColored(image.getRGB(offsetX, y), rgbLimit)) {
 				//ゴミ除外 ゴミのサイズ分先に移動する
 				if (dustSize < 4 || !isDust(image, offsetX, image.getWidth(), y, image.getHeight(), dustSize, rgbLimit)) {

@@ -10,8 +10,22 @@ img {
 	max-height: 100%;
 }
 span.img {
+	/*clear: both;*/
 	display: inline-block;
 }
+span.img.ft {
+	/*clear: both;*/
+	display: inline;
+	float: left;
+	padding-right: 0.5em;
+}
+span.img.fb {
+	/*clear: both;*/
+	display: inline;
+	float: right;
+	padding-left: 0.5em;
+}
+
 :link { color: #00C; background: transparent; }
 :visited { color: #609; background: transparent; }
 a:active { color: #C00; background: transparent; }

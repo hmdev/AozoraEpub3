@@ -9,8 +9,21 @@ img {
 	max-height: 100%;
 }
 span.img {
+	/*clear: both;*/
 	display: inline-block;
 	vertical-align: middle;
+}
+span.img.ft {
+	/*clear: both;*/
+	display: inline;
+	float: left;
+	padding-bottom: 0.5em;
+}
+span.img.fb {
+	/*clear: both;*/
+	display: inline;
+	float: right;
+	padding-top: 0.5em;
 }
 
 :link { color: #00C; background: transparent; }

@@ -605,6 +605,8 @@
 
 画像開始	<span class="img"><img src="
 画像終了	"/></span>
+画像開始上	<span class="img ft"><img src="
+画像開始下	<span class="img fb"><img src="
 外字画像開始	<span class="gaiji"><img src="
 外字画像終了	"/></span>
 

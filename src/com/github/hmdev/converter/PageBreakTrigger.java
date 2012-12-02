@@ -11,6 +11,9 @@ public class PageBreakTrigger
 	final static public int IMAGE_PAGE_NOFIT = 5;
 	final static public int IMAGE_PAGE_AUTO = 10;
 	
+	final static public int IMAGE_PAGE_TOP = 20;
+	final static public int IMAGE_PAGE_BOTTOM = 21;
+	
 	final static public int PAGE_NORMAL = 0;
 	final static public int PAGE_MIDDLE = 1;
 	final static public int PAGE_BOTTOM = 2;

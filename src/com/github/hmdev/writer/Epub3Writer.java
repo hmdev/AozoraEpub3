@@ -121,6 +121,14 @@ public class Epub3Writer
 	/** 最大画素数 10000未満は指定なし */
 	int maxImagePixels = 0;
 	
+	/** 画像回り込み設定 0:なし 1:上 2:下 */
+	int imageFloatType = 0;
+	/** 画像回り込み幅 幅高さが以下なら回り込み */
+	int imageFloatW = 0;
+	/** 画像回り込み高さ 幅高さが以下なら回り込み */
+	int imageFloatH = 0;
+	
+	
 	/** 縦横指定サイズ以上を単ページ化する時の横 */
 	int singlePageSizeW = 400;
 	/** 縦横指定サイズ以上を単ページ化する時の縦 */
@@ -213,9 +221,11 @@ public class Epub3Writer
 		this.jProgressBar = jProgressBar;
 	}
 	/** 画像のリサイズ用パラメータを設定 */
-	public void setImageParam(int dispW, int dispH, int resizeW, int resizeH, int pixels,
+	public void setImageParam(int dispW, int dispH, int coverW, int coverH,
+			int resizeW, int resizeH,
 			int singlePageSizeW, int singlePageSizeH, int singlePageWidth, boolean fitImage,
-			int coverW, int coverH, float jpegQuality,
+			int imageFloatType, int imageFloatW, int imageFloatH,
+			float jpegQuality,
 			int autoMarginLimitH, int autoMarginLimitV, int autoMarginWhiteLevel, float autoMarginPadding, int autoMarginNombre)
 	{
 		this.dispW = dispW;
@@ -223,11 +233,14 @@ public class Epub3Writer
 		
 		this.maxImageW = resizeW;
 		this.maxImageH = resizeH;
-		this.maxImagePixels = pixels;
 		
 		this.singlePageSizeW = singlePageSizeW;
 		this.singlePageSizeH = singlePageSizeH;
 		this.singlePageWidth = singlePageWidth;
+		
+		this.imageFloatType = imageFloatType;
+		this.imageFloatW = imageFloatW;
+		this.imageFloatH = imageFloatH;
 		
 		this.fitImage = fitImage;
 		
@@ -837,12 +850,19 @@ public class Epub3Writer
 	 * @throws IOException */
 	public int getImagePageType(String srcFilePath, int tagLevel)
 	{
-		//タグ内ならそのまま出力
-		if (tagLevel > 0) return PageBreakTrigger.IMAGE_PAGE_NONE;
 		try {
 			ImageInfo imageInfo = this.imageInfoReader.getImageInfo(srcFilePath);
 			if (imageInfo == null) return PageBreakTrigger.IMAGE_PAGE_NONE;
-			
+			//回り込みサイズ以下
+			if (this.imageFloatType != 0 &&
+				imageInfo.getWidth() >=64 &&  imageInfo.getHeight() >= 64 &&
+				imageInfo.getWidth() <= this.imageFloatW && imageInfo.getHeight() <= this.imageFloatH) {
+				return this.imageFloatType==1 ? PageBreakTrigger.IMAGE_PAGE_TOP : PageBreakTrigger.IMAGE_PAGE_BOTTOM;
+			}
+			//タグ内ならそのまま出力
+			if (tagLevel > 0) {
+				return PageBreakTrigger.IMAGE_PAGE_NONE;
+			}
 			if (imageInfo.getWidth() >= this.singlePageWidth || imageInfo.getWidth() >= singlePageSizeW && imageInfo.getHeight() >= singlePageSizeH) {
 				//拡大しない＆画面より小さい場合
 				if (!this.fitImage && imageInfo.getWidth() <= this.dispW && imageInfo.getHeight() < this.dispH)
