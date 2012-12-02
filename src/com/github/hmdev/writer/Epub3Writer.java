@@ -202,6 +202,10 @@ public class Epub3Writer
 		this.templatePath = templatePath;
 		//初回実行時のみ有効
 		Velocity.init();
+		this.sectionInfos = new Vector<SectionInfo>();
+		this.chapterInfos = new Vector<ChapterInfo>();
+		this.imageInfos = new Vector<ImageInfo>();
+		this.outImageFileNames = new HashSet<String>();
 	}
 	/** プログレスバー設定 */
 	public void setProgressBar(JProgressBar jProgressBar)
@@ -264,10 +268,10 @@ public class Epub3Writer
 		//インデックス初期化
 		this.sectionIndex = 0;
 		this.imageIndex = 0;
-		this.sectionInfos = new Vector<SectionInfo>();
-		this.chapterInfos = new Vector<ChapterInfo>();
-		this.imageInfos = new Vector<ImageInfo>();
-		this.outImageFileNames = new HashSet<String>();
+		this.sectionInfos.clear();
+		this.chapterInfos.clear();
+		this.imageInfos.clear();
+		this.outImageFileNames.clear();
 		
 		//Velocity用 共通コンテキスト設定
 		this.velocityContext = new VelocityContext();
@@ -441,9 +445,6 @@ public class Epub3Writer
 		bw.flush();
 		zos.closeArchiveEntry();
 		
-		//BookInfoから目次情報取得
-		
-		
 		//nullを除去
 		for (int i=chapterInfos.size()-1; i>=0; i--) {
 			if (chapterInfos.get(i).getChapterName() == null) chapterInfos.remove(i);
@@ -482,16 +483,19 @@ public class Epub3Writer
 		}*/
 		
 		//出力前に縦中横とエスケープ処理
-		boolean vertical = bookInfo.vertical;
-		bookInfo.vertical = bookInfo.tocVertical;
-		StringBuilder buf = new StringBuilder();
-		for (ChapterInfo chapterInfo : chapterInfos) {
-			buf.setLength(0);
-			char[] ch = chapterInfo.getChapterName().replaceAll("《","※《").replaceAll("》","※》").toCharArray();
-			converter.convertRubyText(buf, ch, 0, ch.length, true, false);
-			chapterInfo.setChapterName(buf.toString());
+		if (!bookInfo.imageOnly) {
+			boolean vertical = bookInfo.vertical;
+			bookInfo.vertical = bookInfo.tocVertical;
+			converter.bookInfo = bookInfo; //nullの場合があるので設定
+			StringBuilder buf = new StringBuilder();
+			for (ChapterInfo chapterInfo : chapterInfos) {
+				buf.setLength(0);
+				char[] ch = chapterInfo.getChapterName().replaceAll("《","※《").replaceAll("》","※》").toCharArray();
+				converter.convertRubyText(buf, ch, 0, ch.length, true, false);
+				chapterInfo.setChapterName(buf.toString());
+			}
+			bookInfo.vertical = vertical;//戻す
 		}
-		bookInfo.vertical = vertical;//戻す
 		
 		//navファイル
 		velocityContext.put("chapters", chapterInfos);
@@ -590,6 +594,7 @@ public class Epub3Writer
 			int zipPathLength = 0;
 			if (this.bookInfo.textEntryName != null) zipPathLength = this.bookInfo.textEntryName.indexOf('/')+1;
 			ZipArchiveInputStream zis = new ZipArchiveInputStream(new BufferedInputStream(new FileInputStream(srcFile), 65536), "MS932", false);
+			try {
 			ArchiveEntry entry;
 			while( (entry = zis.getNextZipEntry()) != null ) {
 				//Zip内のサブフォルダは除外してテキストからのパスにする
@@ -615,21 +620,17 @@ public class Epub3Writer
 					}
 				}
 			}
-			zis.close();
+			} finally { zis.close(); }
 		}
 		
 		//エラーがなければ100%
-		this.jProgressBar.setValue(this.jProgressBar.getMaximum());
+		if (this.jProgressBar != null) this.jProgressBar.setValue(this.jProgressBar.getMaximum());
 		
 		} finally {
 			//ePub3出力ファイルを閉じる
 			if (zos != null) zos.close();
 			//メンバ変数解放
 			this.velocityContext = null;
-			this.sectionInfos = null;
-			this.chapterInfos = null;
-			this.imageInfos = null;
-			this.outImageFileNames = null;
 			this.bookInfo = null;
 			this.imageInfoReader = null;
 		}

@@ -2485,7 +2485,7 @@ public class AozoraEpub3Applet extends JApplet
 						applet.convertFiles(new File[]{srcFile}, dstPath);
 						applet.jComboEncType.setSelectedIndex(encIndex);
 					} catch (Exception e) {
-						e.printStackTrace(); LogAppender.println("エラーが発生しました: "+e.getMessage());
+						e.printStackTrace(); LogAppender.println("エラーが発生しました : "+e.getMessage());
 					}
 				}
 			} finally {
