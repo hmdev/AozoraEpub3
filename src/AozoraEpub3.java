@@ -138,6 +138,8 @@ public class AozoraEpub3
 			boolean tocPage = "1".equals(props.getProperty("TocPage"));//目次追加
 			boolean tocVertical = "1".equals(props.getProperty("TocVertical"));//目次縦書き
 			boolean coverPageToc = "1".equals(props.getProperty("CoverPageToc"));
+			int removeEmptyLine = 0; try { removeEmptyLine = Integer.parseInt(props.getProperty("RemoveEmptyLine")); } catch (Exception e) {}
+			int maxEmptyLine = 0; try { maxEmptyLine = Integer.parseInt(props.getProperty("MaxEmptyLine")); } catch (Exception e) {}
 			
 			//画面サイズと画像リサイズ
 			int dispW = 600; try { dispW =Integer.parseInt(props.getProperty("DispW")); } catch (Exception e) {}
@@ -153,6 +155,7 @@ public class AozoraEpub3
 			int imageFloatW = 0; try { imageFloatW = Integer.parseInt(props.getProperty("ImageFloatW")); } catch (Exception e) {}
 			int imageFloatH = 0; try { imageFloatH = Integer.parseInt(props.getProperty("ImageFloatH")); } catch (Exception e) {}
 			boolean fitImage = "1".equals(props.getProperty("FitImage"));
+			int rotateImage = 0; if ("1".equals(props.getProperty("RorateImage"))) rotateImage = 90; else if ("2".equals(props.getProperty("RorateImage"))) rotateImage = -90;
 			float jpegQualty = 80; try { jpegQualty = Integer.parseInt(props.getProperty("JpegQuality"))/100f; } catch (Exception e) {}
 			int autoMarginLimitH = 0;
 			int autoMarginLimitV = 0;
@@ -166,9 +169,9 @@ public class AozoraEpub3
 				try { autoMarginPadding = Float.parseFloat(props.getProperty("AutoMarginPadding")); } catch (Exception e) {}
 				try { autoMarginNombre = Integer.parseInt(props.getProperty("AutoMarginNombre")); } catch (Exception e) {} 
 			 }
-			epub3Writer.setImageParam(dispW, dispH, coverW, coverH, resizeW, resizeH, singlePageSizeW, singlePageSizeH, singlePageWidth, fitImage,
+			epub3Writer.setImageParam(dispW, dispH, coverW, coverH, resizeW, resizeH, singlePageSizeW, singlePageSizeH, singlePageWidth, fitImage, rotateImage,
 					imageFloatType, imageFloatW, imageFloatH, jpegQualty, autoMarginLimitH, autoMarginLimitV, autoMarginWhiteLevel, autoMarginPadding, autoMarginNombre);
-			epub3ImageWriter.setImageParam(dispW, dispH, coverW, coverH, resizeW, resizeH, singlePageSizeW, singlePageSizeH, singlePageWidth, fitImage,
+			epub3ImageWriter.setImageParam(dispW, dispH, coverW, coverH, resizeW, resizeH, singlePageSizeW, singlePageSizeH, singlePageWidth, fitImage, rotateImage,
 					imageFloatType, imageFloatW, imageFloatH, jpegQualty, autoMarginLimitH, autoMarginLimitV, autoMarginWhiteLevel, autoMarginPadding, autoMarginNombre);
 			
 			//自動改ページ
@@ -234,6 +237,9 @@ public class AozoraEpub3
 			aozoraConverter.setSpaceHyphenation(spaceHyp);
 			//コメント
 			aozoraConverter.setCommentPrint(commentPrint, commentConvert);
+			
+			aozoraConverter.setRemoveEmptyLine(removeEmptyLine, maxEmptyLine);
+			
 			//強制改ページ
 			aozoraConverter.setForcePageBreak(forcePageBreakSize, forcePageBreakEmpty, forcePageBreakEmptySize, forcePageBreakChapter, forcePageBreakChapterSize);
 			//目次設定

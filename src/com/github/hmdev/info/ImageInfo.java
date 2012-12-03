@@ -34,6 +34,9 @@ public class ImageInfo
 	/** カバー画像ならtrue */
 	boolean isCover;
 	
+	/** 回転角度 */
+	public int rotateAngle = 0;
+	
 	/** 画像の情報を生成
 	 * @param ext png jpg gif の文字列 */
 	public ImageInfo(String ext, int width, int height, int zipIndex)

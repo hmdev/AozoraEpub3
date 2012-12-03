@@ -406,10 +406,13 @@ public class AozoraEpub3Converter
 		this.commentConvert = commentConvert;
 	}
 	
-	/** 空行除去 */
-	public void setRemoveEmptyLine(int removeEmptyLine)
+	/** 空行除去
+	 * @param maxEmptyLine 空行最大 0なら制限なし */
+	public void setRemoveEmptyLine(int removeEmptyLine, int maxEmptyLine)
 	{
 		this.removeEmptyLine = removeEmptyLine;
+		this.maxEmptyLine = maxEmptyLine;
+		if (this.maxEmptyLine == 0) this.maxEmptyLine = Integer.MAX_VALUE; 
 	}
 	
 	/** 目次抽出 */
@@ -2178,7 +2181,8 @@ public class AozoraEpub3Converter
 		String chapterId = null;
 		
 		ChapterLineInfo chapterLineInfo = null;
-		
+		//1文字の空白は空行
+		if (length == 1 && (line.charAt(0) == ' ' || line.charAt(0) == '　')) length = 0; 
 		if (length == 0) {
 			//空行なら行数をカウント 左右中央の時の本文前の空行は無視
 			if (!this.skipMiddleEmpty && !noBr) {

@@ -127,10 +127,15 @@ public class ImageUtils
 		try {
 		String ext = imageInfo.getExt();
 		
-		int w = imageInfo.getWidth();
-		int h = imageInfo.getHeight();
+		int imgW = imageInfo.getWidth();
+		int imgH = imageInfo.getHeight();
+		int w = imgW;
+		int h = imgH;
 		//余白チェック時に読み込んだ画像のバッファ
 		byte[] imgBuf = null;
+		
+		//回転なら読み込んでおく
+		if (imageInfo.rotateAngle != 0 && srcImage == null) srcImage = readImage(ext, is);
 		
 		int[] margin = null;
 		if (autoMarginLimitH > 0 || autoMarginLimitV > 0) {
@@ -164,78 +169,137 @@ public class ImageUtils
 				//変更なしならそのままファイル出力
 				IOUtils.copy(is, zos);
 			} else {
-				if (margin == null && imgBuf != null) {
+				if (margin == null && imgBuf != null && imageInfo.rotateAngle==0) {
 					//余白除去が無く画像も編集されていなければバッファからそのまま出力
 					ByteArrayInputStream bais = new ByteArrayInputStream(imgBuf);
 					try { IOUtils.copy(bais, zos); } finally { bais.close(); }
 				} else {
 					//編集済の画像なら同じ画像形式で書き出し 余白があれば切り取る
-					if (margin != null) srcImage = srcImage.getSubimage(margin[0], margin[1], srcImage.getWidth()-margin[2]-margin[0], srcImage.getHeight()-margin[3]-margin[1]);
+					if (imageInfo.rotateAngle != 0) {
+						BufferedImage outImage = new BufferedImage(h, w, srcImage.getType());
+						Graphics2D g = outImage.createGraphics();
+						try {
+							g.setColor(Color.WHITE);
+							g.fillRect(0, 0, h, w);
+							g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+							g.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
+							int x = 0; int y = 0;
+							AffineTransform at;
+							if (imageInfo.rotateAngle == 90) {
+								at = AffineTransform.getQuadrantRotateInstance(1, 0, 0);
+								at.translate(0, -imgH);
+								if (margin != null) {
+									x = -margin[3];
+									y = -margin[0];
+								}
+							} else {
+								at = AffineTransform.getQuadrantRotateInstance(-1, 0, 0);
+								at.translate(-imgW, 0);
+								if (margin != null) {
+									x = -margin[1];
+									y = -margin[2];
+								}
+							}
+							AffineTransformOp ato = new AffineTransformOp(at, AffineTransformOp.TYPE_BICUBIC);
+							g.drawImage(srcImage, ato, x, y);
+						} finally {
+							g.dispose();
+						}
+						srcImage = outImage;//入れ替え
+					} else if (margin != null) srcImage = srcImage.getSubimage(margin[0], margin[1], srcImage.getWidth()-margin[2]-margin[0], srcImage.getHeight()-margin[3]-margin[1]);
 					_writeImage(zos, srcImage, ext, jpegQuality);
+					if (imageInfo.rotateAngle != 0) LogAppender.println("画像回転"+": "+imageInfo.getOutFileName()+"("+h+","+w+")");
 				}
 			}
 		} else {
 			//縮小
 			int scaledW = (int)(w*scale+0.5);
 			int scaledH = (int)(h*scale+0.5);
-				//画像がなければ読み込み
-				if (srcImage == null) srcImage = readImage(ext, is);
-				int imageType = srcImage.getType();
-				BufferedImage outImage;
-				boolean hasAlpha = false;
-				ColorModel colorModel;
-				WritableRaster raster;
-				switch (imageType) {
-				case BufferedImage.TYPE_BYTE_BINARY:
-					colorModel = srcImage.getColorModel();
-					colorModel = getGray16ColorModel();
-					raster = colorModel.createCompatibleWritableRaster(scaledW, scaledH);
-					outImage = new BufferedImage(colorModel, raster, true, null);
-					hasAlpha = true;
-					break;
-				case BufferedImage.TYPE_BYTE_INDEXED:
-					colorModel = srcImage.getColorModel();
-					raster = colorModel.createCompatibleWritableRaster(scaledW, scaledH);
-					outImage = new BufferedImage(colorModel, raster, true, null);
-					hasAlpha = true;
-					break;
-				/*case BufferedImage.TYPE_BYTE_GRAY:
-					//PngEncoderのGRAYが薄くなるのでindexにする
-					colorModel = srcImage.getColorModel();
-					if (colorModel.getPixelSize() <= 4) colorModel = getGray16ColorModel();
-					else colorModel = getGray256ColorModel();
-					raster = colorModel.createCompatibleWritableRaster(scaledW, scaledH);
-					outImage = new BufferedImage(colorModel, raster, true, null);
-					break;*/
-				case BufferedImage.TYPE_BYTE_GRAY:
-					outImage = new BufferedImage(scaledW, scaledH, BufferedImage.TYPE_BYTE_GRAY);
-					break;
-				case BufferedImage.TYPE_USHORT_GRAY:
-					outImage = new BufferedImage(scaledW, scaledH, BufferedImage.TYPE_USHORT_GRAY);
-					break;
-				case BufferedImage.TYPE_INT_ARGB:
-					hasAlpha = true;
-				default:
-					outImage = new BufferedImage(scaledW, scaledH, BufferedImage.TYPE_INT_RGB);
+			if (imageInfo.rotateAngle != 0) {
+				scaledW = (int)(h*scale+0.5);
+				scaledH = (int)(w*scale+0.5);
+			}
+			//画像がなければ読み込み
+			if (srcImage == null) srcImage = readImage(ext, is);
+			int imageType = srcImage.getType();
+			BufferedImage outImage;
+			boolean hasAlpha = false;
+			ColorModel colorModel;
+			WritableRaster raster;
+			switch (imageType) {
+			case BufferedImage.TYPE_BYTE_BINARY:
+				colorModel = srcImage.getColorModel();
+				colorModel = getGray16ColorModel();
+				raster = colorModel.createCompatibleWritableRaster(scaledW, scaledH);
+				outImage = new BufferedImage(colorModel, raster, true, null);
+				hasAlpha = true;
+				break;
+			case BufferedImage.TYPE_BYTE_INDEXED:
+				colorModel = srcImage.getColorModel();
+				raster = colorModel.createCompatibleWritableRaster(scaledW, scaledH);
+				outImage = new BufferedImage(colorModel, raster, true, null);
+				hasAlpha = true;
+				break;
+			/*case BufferedImage.TYPE_BYTE_GRAY:
+				//PngEncoderのGRAYが薄くなるのでindexにする
+				colorModel = srcImage.getColorModel();
+				if (colorModel.getPixelSize() <= 4) colorModel = getGray16ColorModel();
+				else colorModel = getGray256ColorModel();
+				raster = colorModel.createCompatibleWritableRaster(scaledW, scaledH);
+				outImage = new BufferedImage(colorModel, raster, true, null);
+				break;*/
+			case BufferedImage.TYPE_BYTE_GRAY:
+				outImage = new BufferedImage(scaledW, scaledH, BufferedImage.TYPE_BYTE_GRAY);
+				break;
+			case BufferedImage.TYPE_USHORT_GRAY:
+				outImage = new BufferedImage(scaledW, scaledH, BufferedImage.TYPE_USHORT_GRAY);
+				break;
+			case BufferedImage.TYPE_INT_ARGB:
+				hasAlpha = true;
+			default:
+				outImage = new BufferedImage(scaledW, scaledH, BufferedImage.TYPE_INT_RGB);
+			}
+			Graphics2D g = outImage.createGraphics();
+			try {
+				if (hasAlpha) {
+					g.setColor(Color.WHITE);
+					g.fillRect(0, 0, scaledW, scaledH);
 				}
-				Graphics2D g = outImage.createGraphics();
-				try {
-					if (hasAlpha) {
-						g.setColor(Color.WHITE);
-						g.fillRect(0, 0, scaledW, scaledH);
+				g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+				g.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
+				AffineTransform at = AffineTransform.getScaleInstance(scale, scale);
+				int x = 0;
+				int y = 0;
+				if (imageInfo.rotateAngle == 0) {
+					if (margin != null) {
+						x = (int)(-margin[0]*scale+0.5);
+						y = (int)(-margin[1]*scale+0.5);
 					}
-					g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-					g.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
-					AffineTransform at = AffineTransform.getScaleInstance(scale, scale);
-					AffineTransformOp ato = new AffineTransformOp(at, AffineTransformOp.TYPE_BICUBIC);
-					if (margin == null) g.drawImage(srcImage, ato, 0, 0);
-					else g.drawImage(srcImage, ato, (int)(-margin[0]*scale+0.5), (int)(-margin[1]*scale+0.5));
-				} finally {
-					g.dispose();
+				} else if (imageInfo.rotateAngle == 90) {
+					at.rotate(Math.toRadians(imageInfo.rotateAngle), 0, 0);
+					at.translate(0, -imgH);
+					if (margin != null) {
+						x = (int)(-margin[3]*scale+0.5);
+						y = (int)(-margin[0]*scale+0.5);
+					}
+				} else {
+					at.quadrantRotate(-1, 0, 0);
+					at.translate(-imgW, 0);
+					if (margin != null) {
+						x = (int)(-margin[1]*scale+0.5);
+						y = (int)(-margin[2]*scale+0.5);
+					}
 				}
-				//ImageIO.write(outImage, imageInfo.getExt(), zos);
-				_writeImage(zos, outImage, ext, jpegQuality);
-				LogAppender.println("画像縮小: "+imageInfo.getOutFileName()+" ("+w+","+h+")→("+scaledW+","+scaledH+")");
+				AffineTransformOp ato = new AffineTransformOp(at, AffineTransformOp.TYPE_BICUBIC);
+				g.drawImage(srcImage, ato, x, y);
+			} finally {
+				g.dispose();
+			}
+			//ImageIO.write(outImage, imageInfo.getExt(), zos);
+			_writeImage(zos, outImage, ext, jpegQuality);
+			LogAppender.append("画像縮小");
+			if (imageInfo.rotateAngle!=0) LogAppender.append("回転");
+			LogAppender.println(": "+imageInfo.getOutFileName()+" ("+w+","+h+")→("+scaledW+","+scaledH+")");
 			zos.flush();
 		}
 		} catch (Exception e) {
@@ -307,9 +371,9 @@ public class ImageUtils
 		int width = image.getWidth();
 		int height = image.getHeight();
 		
-		//余白除去後に追加する余白 (削れ過ぎるので最低で2にしておく)
-		int paddingH = Math.max(2, (int)(width*padding));
-		int paddingV = Math.max(2, (int)(height*padding));
+		//余白除去後に追加する余白 (削れ過ぎるので最低で1にしておく)
+		int paddingH = Math.max(1, (int)(width*padding));
+		int paddingV = Math.max(1, (int)(height*padding));
 		
 		//除去制限をピクセルに変更 上下、左右それぞれでの最大値
 		int limitPxH = (int)(width*limitH);//後で合計から中央に寄せる

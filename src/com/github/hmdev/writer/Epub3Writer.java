@@ -139,6 +139,9 @@ public class Epub3Writer
 	/** 画像を拡大する */
 	boolean fitImage = true;
 	
+	/** 画像を縦横比に合わせて回転する */
+	int rotateAngle = 0;
+	
 	/** 余白自動調整 横 除去% */
 	int autoMarginLimitH = 0;
 	/** 余白自動調整 縦 除去% */
@@ -223,7 +226,7 @@ public class Epub3Writer
 	/** 画像のリサイズ用パラメータを設定 */
 	public void setImageParam(int dispW, int dispH, int coverW, int coverH,
 			int resizeW, int resizeH,
-			int singlePageSizeW, int singlePageSizeH, int singlePageWidth, boolean fitImage,
+			int singlePageSizeW, int singlePageSizeH, int singlePageWidth, boolean fitImage, int rotateAngle,
 			int imageFloatType, int imageFloatW, int imageFloatH,
 			float jpegQuality,
 			int autoMarginLimitH, int autoMarginLimitV, int autoMarginWhiteLevel, float autoMarginPadding, int autoMarginNombre)
@@ -243,6 +246,7 @@ public class Epub3Writer
 		this.imageFloatH = imageFloatH;
 		
 		this.fitImage = fitImage;
+		this.rotateAngle = rotateAngle;
 		
 		this.coverW = coverW;
 		this.coverH = coverH;
@@ -652,6 +656,7 @@ public class Epub3Writer
 	/** 表紙画像を出力 */
 	void writeCoverImage(InputStream is, ZipArchiveOutputStream zos, ImageInfo imageInfo) throws IOException
 	{
+		imageInfo.rotateAngle = 0; //回転させない
 		ImageUtils.writeImage(is, null, zos,imageInfo, this.jpegQuality,
 				0, this.coverW, this.coverH,
 				0, 0, 0, 0, 0);
@@ -868,9 +873,17 @@ public class Epub3Writer
 				if (!this.fitImage && imageInfo.getWidth() <= this.dispW && imageInfo.getHeight() < this.dispH)
 					return PageBreakTrigger.IMAGE_PAGE_NOFIT;
 				//拡大するか画面より多きい場合
-				if ((double)imageInfo.getWidth()/imageInfo.getHeight() > (double)this.dispW/this.dispH)
-					return PageBreakTrigger.IMAGE_PAGE_W;
-				else return PageBreakTrigger.IMAGE_PAGE_H;
+				if ((double)imageInfo.getWidth()/imageInfo.getHeight() > (double)this.dispW/this.dispH) {
+					if (this.rotateAngle != 0 && this.dispW < this.dispH) { //縦長画面で横長
+						imageInfo.rotateAngle = this.rotateAngle;
+						return PageBreakTrigger.IMAGE_PAGE_H;
+					} else return PageBreakTrigger.IMAGE_PAGE_W;
+				} else {
+					if (this.rotateAngle != 0 && this.dispW > this.dispH) { //横長画面で縦長
+						imageInfo.rotateAngle = this.rotateAngle;
+						return PageBreakTrigger.IMAGE_PAGE_W;
+					} else return PageBreakTrigger.IMAGE_PAGE_H;
+				}
 			}
 		} catch (Exception e) { e.printStackTrace(); }
 		return PageBreakTrigger.IMAGE_PAGE_NONE;
