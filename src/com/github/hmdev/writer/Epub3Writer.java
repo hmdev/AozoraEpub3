@@ -874,12 +874,12 @@ public class Epub3Writer
 					return PageBreakTrigger.IMAGE_PAGE_NOFIT;
 				//拡大するか画面より多きい場合
 				if ((double)imageInfo.getWidth()/imageInfo.getHeight() > (double)this.dispW/this.dispH) {
-					if (this.rotateAngle != 0 && this.dispW < this.dispH) { //縦長画面で横長
+					if (this.rotateAngle != 0 && this.dispW < this.dispH && (double)imageInfo.getHeight()/imageInfo.getWidth() < (double)this.dispW/this.dispH) { //縦長画面で横長
 						imageInfo.rotateAngle = this.rotateAngle;
 						return PageBreakTrigger.IMAGE_PAGE_H;
 					} else return PageBreakTrigger.IMAGE_PAGE_W;
 				} else {
-					if (this.rotateAngle != 0 && this.dispW > this.dispH) { //横長画面で縦長
+					if (this.rotateAngle != 0 && this.dispW > this.dispH && (double)imageInfo.getHeight()/imageInfo.getWidth() > (double)this.dispW/this.dispH) { //横長画面で縦長
 						imageInfo.rotateAngle = this.rotateAngle;
 						return PageBreakTrigger.IMAGE_PAGE_W;
 					} else return PageBreakTrigger.IMAGE_PAGE_H;

@@ -87,13 +87,13 @@ public class Epub3ImageWriter extends Epub3Writer
 		ImageInfo imageInfo = this.imageInfoReader.getImageInfo(srcImageFilePath);
 		if (imageInfo != null) {
 			if ((double)imageInfo.getWidth()/imageInfo.getHeight() >= (double)this.dispW/this.dispH) {
-				if (this.rotateAngle != 0 && this.dispW < this.dispH) { //縦長画面で横長
+				if (this.rotateAngle != 0 && this.dispW < this.dispH && (double)imageInfo.getHeight()/imageInfo.getWidth() < (double)this.dispW/this.dispH) { //縦長画面で横長
 					imageInfo.rotateAngle = this.rotateAngle;
 					sectionInfo.setImageFitH(true);
 				} else 	sectionInfo.setImageFitW(true);
 			}
 			else {
-				if (this.rotateAngle != 0 && this.dispW > this.dispH) { //横長画面で縦長
+				if (this.rotateAngle != 0 && this.dispW > this.dispH && (double)imageInfo.getHeight()/imageInfo.getWidth() > (double)this.dispW/this.dispH) { //横長画面で縦長
 					imageInfo.rotateAngle = this.rotateAngle;
 					sectionInfo.setImageFitW(true);
 				} else sectionInfo.setImageFitH(true);
