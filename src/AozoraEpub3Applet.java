@@ -730,7 +730,7 @@ public class AozoraEpub3Applet extends JApplet
 		panel.setLayout(new FlowLayout(FlowLayout.LEFT, 1, 0));
 		
 		panelV.add(panel);
-		label = new JLabel("回り込み 画像位置");
+		label = new JLabel("回り込み: 画像位置");
 		label.setBorder(padding2H);
 		panel.add(label);
 		propValue = props.getProperty("ImageFloatType");
@@ -741,7 +741,6 @@ public class AozoraEpub3Applet extends JApplet
 		jComboImageFloatType.setPreferredSize(new Dimension(text4.width+24, 19));
 		panel.add(jComboImageFloatType);
 		label = new JLabel(" 横");
-		label.setBorder(padding2H);
 		panel.add(label);
 		propValue = props.getProperty("ImageFloatW");
 		defaultValue = 600; try { defaultValue = Integer.parseInt(propValue); } catch (Exception e) {}
@@ -752,8 +751,10 @@ public class AozoraEpub3Applet extends JApplet
 		jTextImageFloatW.setPreferredSize(text4);
 		jTextImageFloatW.addFocusListener(new TextSelectFocusListener(jTextImageFloatW));
 		panel.add(jTextImageFloatW);
-		label = new JLabel("x 縦");
+		label = new JLabel("x");
 		label.setBorder(padding2H);
+		panel.add(label);
+		label = new JLabel("縦");
 		panel.add(label);
 		propValue = props.getProperty("ImageFloatH");
 		defaultValue = 400; try { defaultValue = Integer.parseInt(propValue); } catch (Exception e) {}
@@ -1022,7 +1023,7 @@ public class AozoraEpub3Applet extends JApplet
 		jTextAutoMarginPadding.setEditable(jCheckAutoMargin.isSelected());
 		jTextAutoMarginPadding.addFocusListener(new TextSelectFocusListener(jTextAutoMarginPadding));
 		panel.add(jTextAutoMarginPadding);
-		label = new JLabel("%  ノンブル:");
+		label = new JLabel("%  ノンブル");
 		label.setBorder(padding2H);
 		panel.add(label);
 		propValue = props.getProperty("AutoMarginNombre");

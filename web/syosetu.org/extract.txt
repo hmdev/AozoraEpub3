@@ -11,7 +11,7 @@
 ## シリーズタイトル
 #SERIES	
 ## タイトル
-TITLE	#maind .ss font:0
+TITLE	#maind .ss font:0,#maind .ss font a:0
 ## 著者
 AUTHOR	#maind .ss a:0
 ## 説明

@@ -10,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashMap;
@@ -156,6 +157,14 @@ public class WebAozoraConverter
 	public File convertToAozoraText(String urlString, File cachePath) throws IOException
 	{
 		this.canceled = false;
+		//リダイレクトされていたら置き換え
+		if (!urlString.endsWith("/") && !urlString.endsWith(".html") && urlString.indexOf("?") == -1 ) {
+			HttpURLConnection connection = (HttpURLConnection) new URL(urlString).openConnection();
+			connection.getResponseCode();
+			urlString = connection.getURL().toString();
+			connection.disconnect();
+		}
+		
 		this.baseUri = urlString.substring(0, urlString.indexOf('/', urlString.indexOf("//")+2));
 		//String fqdn = baseUri.substring(baseUri.indexOf("//")+2);
 		String listBaseUrl = urlString.substring(0, urlString.lastIndexOf('/')+1);
