@@ -565,7 +565,7 @@ public class AozoraEpub3Converter
 			}
 			
 			//空行チェック
-			if (line.equals("")) {
+			if (line.equals("") || line.equals(" ") || line.equals("　")) {
 				lastEmptyLine = lineNum;
 				//空行なので次の行へ
 				continue;
@@ -2181,145 +2181,151 @@ public class AozoraEpub3Converter
 		String chapterId = null;
 		
 		ChapterLineInfo chapterLineInfo = null;
-		//1文字の空白は空行
-		if (length == 1 && (line.charAt(0) == ' ' || line.charAt(0) == '　')) length = 0; 
+		//空白除去の時はスペースのみの行は空行扱い
+		if (this.removeEmptyLine > 0 && length > 0 && CharUtils.isSpace(line)) {
+			line = "";
+			length = 0;
+		}
 		if (length == 0) {
 			//空行なら行数をカウント 左右中央の時の本文前の空行は無視
 			if (!this.skipMiddleEmpty && !noBr) {
 				this.printEmptyLines++;
 			}
-		} else {
-			//バッファ内の文字列出力
-			//見出し階層レベル
-			chapterLineInfo = this.bookInfo.getChapterLineInfo(lineNum);
-			
-			//タグの階層をチェック (強制改ページ判別用に先にやっておく)
-			int tagStart = 0;
-			int tagEnd = 0;
-			boolean inTag = false;
-			for (int i=0; i<length; i++) {
-				if (inTag) {
-					if (line.charAt(i) == '/' && line.charAt(i+1) == '>') tagEnd++;
-					if (line.charAt(i) == '>') inTag = false;
-				} else {
-					if (line.charAt(i) == '<') {
-						if (i<length-1 && line.charAt(i+1) == '/') tagEnd++;
-						else tagStart++;
-						inTag = true;
-					}
-				}
-			}
-			//強制改ページ処理
-			//改ページトリガが設定されていない＆タグの外
-			if (this.forcePageBreak && this.pageBreakTrigger == null && this.tagLevel == 0) {
-				//行単位で強制改ページ
-				if (this.pageByteSize > this.forcePageBreakSize) {
-					this.setPageBreakTrigger(pageBreakNoChapter);
-				} else {
-					if (forcePageBreakEmptyLine > 0 && this.printEmptyLines >= forcePageBreakEmptyLine && this.pageByteSize > this.forcePageBreakEmptySize) {
-						//空行での分割
-						this.setPageBreakTrigger(pageBreakNoChapter);
-					} else if (forcePageBreakChapterLevel > 0 && this.pageByteSize > this.forcePageBreakChapterSize) {
-						//章での分割 次の行が見出しで次の行がタグの中になる場合１行前で改ページ
-						if (chapterLineInfo != null) this.setPageBreakTrigger(pageBreakNoChapter);
-						else if (tagStart-tagEnd > 0 && this.bookInfo.getChapterLevel(lineNum+1) > 0) this.setPageBreakTrigger(pageBreakNoChapter);
-					}
-				}
-			}
-			
-			//改ページフラグが設定されていて、空行で無い場合
-			if (this.pageBreakTrigger != null) {
-				//空ページでの改ページ
-				//if (sectionCharLength == 0) {
-				//	out.write(chukiMap.get("改行")[0]);
-				//}
-				
-				//改ページ処理
-				if (this.pageBreakTrigger.pageType != PageBreakTrigger.PAGE_NORMAL) {
-					//左右中央
-					this.writer.nextSection(out, lineNum, this.pageBreakTrigger.pageType, PageBreakTrigger.IMAGE_PAGE_NONE, null);
-				} else {
-					//その他
-					this.writer.nextSection(out, lineNum, PageBreakTrigger.PAGE_NORMAL, this.pageBreakTrigger.imagePageType, this.pageBreakTrigger.imageFileName);
-				}
-				
-				//ページ情報初期化
-				this.pageByteSize = 0;
-				this.sectionCharLength = 0;
-				if (tagLevel > 0) LogAppender.error(lineNum, "タグが閉じていません");
-				this.tagLevel = 0;
-				this.lineIdNum = 0;
-				
-				this.pageBreakTrigger = null;
-			}
-			
-			this.skipMiddleEmpty = false;
-			//空行は行数がカウントされているので文字出力前に出力
-			if (this.printEmptyLines > 0) {
-				String br = chukiMap.get("改行")[0];
-				int lines = Math.min(this.maxEmptyLine, this.printEmptyLines-this.removeEmptyLine);
-				//見出し後3行以内開始の空行は1行は残す
-				if (lastChapterLine >= lineNum-this.printEmptyLines-2) {
-					lines = Math.max(1, lines);
-				}
-				for (int i=lines-1; i>=0; i--) {
-					out.write("<p>");
-					out.write(br);
-					out.write("</p>\n");
-				}
-				this.pageByteSize += (br.length()+8)*lines;
-				this.printEmptyLines = 0;
-			}
-			
-			this.lineIdNum++;
-			if (noBr) {
-				//見出し用のID設定
-				if (chapterLineInfo != null) {
-					chapterId = "kobo."+this.lineIdNum+"."+(idIdx++);
-					out.write("<span id=\""+chapterId+"\">");
-					this.pageByteSize += (chapterId.length() + 19);
-				}
-			} else {
-				//改行用のp出力 見出しなら強制ID出力
-				if (this.withMarkId || chapterLineInfo != null) {
-					chapterId = "kobo."+this.lineIdNum+"."+(idIdx++);
-					out.write("<p id=\""+chapterId+"\">");
-					this.pageByteSize += (chapterId.length() + 14);
-				}
-				else {
-					out.write("<p>");
-					this.pageByteSize += 7;
-				}
-			}
-			out.write(line);
-			//ページバイト数加算
-			if (this.forcePageBreak) this.pageByteSize += line.getBytes("UTF-8").length;
-			
-			//改行のpまたは見出しspanを閉じる
-			if (noBr) {
-				if (chapterLineInfo != null) out.write("</span>");
-			} else {
-				out.write("</p>");
-				out.write("\n");
-			}
-			
-			//タグの階層を変更
-			this.tagLevel += tagStart-tagEnd;
-			
-			//見出しのChapterをWriterに追加 同じ行で数回呼ばれるので初回のみ
-			if (chapterLineInfo != null && lastChapterLine != lineNum) {
-				String name = chapterLineInfo.getChapterName();
-				if (name != null && name.length() > 0) {
-					//自動抽出で+10されているのは1桁のレベルに戻す
-					if (chapterLineInfo.sectionChapter) this.writer.addChapter(null, name, chapterLineInfo.level%10);
-					else this.writer.addChapter(chapterId, name, chapterLineInfo.level%10);
-					lastChapterLine = lineNum;
-				}
-			}
-			
-			this.sectionCharLength += length;
 			//バッファクリア
 			buf.setLength(0);
+			return;
 		}
+		
+		//バッファ内の文字列出力
+		//見出し階層レベル
+		chapterLineInfo = this.bookInfo.getChapterLineInfo(lineNum);
+		
+		//タグの階層をチェック (強制改ページ判別用に先にやっておく)
+		int tagStart = 0;
+		int tagEnd = 0;
+		boolean inTag = false;
+		for (int i=0; i<length; i++) {
+			if (inTag) {
+				if (line.charAt(i) == '/' && line.charAt(i+1) == '>') tagEnd++;
+				if (line.charAt(i) == '>') inTag = false;
+			} else {
+				if (line.charAt(i) == '<') {
+					if (i<length-1 && line.charAt(i+1) == '/') tagEnd++;
+					else tagStart++;
+					inTag = true;
+				}
+			}
+		}
+		//強制改ページ処理
+		//改ページトリガが設定されていない＆タグの外
+		if (this.forcePageBreak && this.pageBreakTrigger == null && this.tagLevel == 0) {
+			//行単位で強制改ページ
+			if (this.pageByteSize > this.forcePageBreakSize) {
+				this.setPageBreakTrigger(pageBreakNoChapter);
+			} else {
+				if (forcePageBreakEmptyLine > 0 && this.printEmptyLines >= forcePageBreakEmptyLine && this.pageByteSize > this.forcePageBreakEmptySize) {
+					//空行での分割
+					this.setPageBreakTrigger(pageBreakNoChapter);
+				} else if (forcePageBreakChapterLevel > 0 && this.pageByteSize > this.forcePageBreakChapterSize) {
+					//章での分割 次の行が見出しで次の行がタグの中になる場合１行前で改ページ
+					if (chapterLineInfo != null) this.setPageBreakTrigger(pageBreakNoChapter);
+					else if (tagStart-tagEnd > 0 && this.bookInfo.getChapterLevel(lineNum+1) > 0) this.setPageBreakTrigger(pageBreakNoChapter);
+				}
+			}
+		}
+		
+		//改ページフラグが設定されていて、空行で無い場合
+		if (this.pageBreakTrigger != null) {
+			//空ページでの改ページ
+			//if (sectionCharLength == 0) {
+			//	out.write(chukiMap.get("改行")[0]);
+			//}
+			
+			//改ページ処理
+			if (this.pageBreakTrigger.pageType != PageBreakTrigger.PAGE_NORMAL) {
+				//左右中央
+				this.writer.nextSection(out, lineNum, this.pageBreakTrigger.pageType, PageBreakTrigger.IMAGE_PAGE_NONE, null);
+			} else {
+				//その他
+				this.writer.nextSection(out, lineNum, PageBreakTrigger.PAGE_NORMAL, this.pageBreakTrigger.imagePageType, this.pageBreakTrigger.imageFileName);
+			}
+			
+			//ページ情報初期化
+			this.pageByteSize = 0;
+			this.sectionCharLength = 0;
+			if (tagLevel > 0) LogAppender.error(lineNum, "タグが閉じていません");
+			this.tagLevel = 0;
+			this.lineIdNum = 0;
+			
+			this.pageBreakTrigger = null;
+		}
+		
+		this.skipMiddleEmpty = false;
+		//空行は行数がカウントされているので文字出力前に出力
+		if (this.printEmptyLines > 0) {
+			String br = chukiMap.get("改行")[0];
+			int lines = Math.min(this.maxEmptyLine, this.printEmptyLines-this.removeEmptyLine);
+			//見出し後3行以内開始の空行は1行は残す
+			if (lastChapterLine >= lineNum-this.printEmptyLines-2) {
+				lines = Math.max(1, lines);
+			}
+			for (int i=lines-1; i>=0; i--) {
+				out.write("<p>");
+				out.write(br);
+				out.write("</p>\n");
+			}
+			this.pageByteSize += (br.length()+8)*lines;
+			this.printEmptyLines = 0;
+		}
+		
+		this.lineIdNum++;
+		if (noBr) {
+			//見出し用のID設定
+			if (chapterLineInfo != null) {
+				chapterId = "kobo."+this.lineIdNum+"."+(idIdx++);
+				out.write("<span id=\""+chapterId+"\">");
+				this.pageByteSize += (chapterId.length() + 19);
+			}
+		} else {
+			//改行用のp出力 見出しなら強制ID出力
+			if (this.withMarkId || chapterLineInfo != null) {
+				chapterId = "kobo."+this.lineIdNum+"."+(idIdx++);
+				out.write("<p id=\""+chapterId+"\">");
+				this.pageByteSize += (chapterId.length() + 14);
+			}
+			else {
+				out.write("<p>");
+				this.pageByteSize += 7;
+			}
+		}
+		out.write(line);
+		//ページバイト数加算
+		if (this.forcePageBreak) this.pageByteSize += line.getBytes("UTF-8").length;
+		
+		//改行のpまたは見出しspanを閉じる
+		if (noBr) {
+			if (chapterLineInfo != null) out.write("</span>");
+		} else {
+			out.write("</p>");
+			out.write("\n");
+		}
+		
+		//タグの階層を変更
+		this.tagLevel += tagStart-tagEnd;
+		
+		//見出しのChapterをWriterに追加 同じ行で数回呼ばれるので初回のみ
+		if (chapterLineInfo != null && lastChapterLine != lineNum) {
+			String name = chapterLineInfo.getChapterName();
+			if (name != null && name.length() > 0) {
+				//自動抽出で+10されているのは1桁のレベルに戻す
+				if (chapterLineInfo.sectionChapter) this.writer.addChapter(null, name, chapterLineInfo.level%10);
+				else this.writer.addChapter(chapterId, name, chapterLineInfo.level%10);
+				lastChapterLine = lineNum;
+			}
+		}
+		
+		this.sectionCharLength += length;
+		//バッファクリア
+		buf.setLength(0);
 	}
 }

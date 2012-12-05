@@ -1838,7 +1838,7 @@ public class AozoraEpub3Applet extends JApplet
 				File dstPath = null;
 				
 				if (transfer.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
-					//IEはurlはショートカットになってくる
+					//IEはurlはショートカットとURL文字列の両方がくる
 					@SuppressWarnings("unchecked")
 					List<File> files = (List<File>)transfer.getTransferData(DataFlavor.javaFileListFlavor);
 					if (files.size() > 0) {
@@ -1887,9 +1887,10 @@ public class AozoraEpub3Applet extends JApplet
 						} catch (Exception e) { e.printStackTrace(); }
 					}
 					else if (urlString != null && urlString.startsWith("http")) {
-						//ブラウザからのDnD
-						if (vecUrlString == null) vecUrlString = new Vector<String>();
+						//ブラウザからのDnDならファイルの方は削除
+						vecUrlString = new Vector<String>();
 						vecUrlString.add(urlString);
+						dstPath = null;
 					}
 					
 					//URL変換 の最後が .zip

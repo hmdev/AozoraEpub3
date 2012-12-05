@@ -68,6 +68,16 @@ public class CharUtils
 		return true;
 	}
 	
+	static public boolean isSpace(String line)
+	{
+		char c;
+		for (int i=line.length()-1; i>=0; i--) {
+			c = line.charAt(i);
+			if (c != ' ' && c != '　' && c != ' ') return false;
+		}
+		return true;
+	}
+	
 	/** 英字かどうかをチェック 拡張ラテン文字含む */
 	static public boolean isAlpha(char ch)
 	{

@@ -658,21 +658,21 @@ public class Epub3Writer
 	{
 		imageInfo.rotateAngle = 0; //回転させない
 		ImageUtils.writeImage(is, null, zos,imageInfo, this.jpegQuality,
-				0, this.coverW, this.coverH,
+				0, this.coverW, this.coverH, this.dispW, this.dispH,
 				0, 0, 0, 0, 0);
 	}
 	/** 画像を出力 */
 	void writeImage(InputStream is,ZipArchiveOutputStream zos, ImageInfo imageInfo) throws IOException
 	{
 		ImageUtils.writeImage(is, null, zos, imageInfo, this.jpegQuality,
-				this.maxImagePixels, this.maxImageW, this.maxImageH,
+				this.maxImagePixels, this.maxImageW, this.maxImageH, this.dispW, this.dispH,
 				this.autoMarginLimitH, this.autoMarginLimitV, this.autoMarginWhiteLevel, this.autoMarginPadding, this.autoMarginNombre);
 	}
 	/** 画像を出力 */
 	void writeImage(BufferedImage srcImage, ZipArchiveOutputStream zos, ImageInfo imageInfo) throws IOException
 	{
 		ImageUtils.writeImage(null, srcImage, zos, imageInfo, this.jpegQuality,
-				this.maxImagePixels, this.maxImageW, this.maxImageH,
+				this.maxImagePixels, this.maxImageW, this.maxImageH, this.dispW, this.dispH,
 				this.autoMarginLimitH,  this.autoMarginLimitV, this.autoMarginWhiteLevel, this.autoMarginPadding, this.autoMarginNombre);
 	}
 	
