@@ -605,8 +605,13 @@
 
 画像開始	<span class="img"><img src="
 画像終了	"/></span>
+##画面サイズよりも大きい
+画像開始横	<span class="img fw"><img src="
+画像開始縦	<span class="img fh"><img src="
+##回り込み
 画像開始上	<span class="img ft"><img src="
 画像開始下	<span class="img fb"><img src="
+##外字注記の画像
 外字画像開始	<span class="gaiji"><img src="
 外字画像終了	"/></span>
 

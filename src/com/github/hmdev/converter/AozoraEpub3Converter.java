@@ -1504,16 +1504,22 @@ public class AozoraEpub3Converter
 										} else {
 											//画像ページ種別取得
 											int imagePageType = this.writer.getImagePageType(srcFilePath, this.tagLevel);
-											if (imagePageType == PageBreakTrigger.IMAGE_PAGE_TOP) {
+											if (imagePageType == PageBreakTrigger.IMAGE_INLINE_W) {
+												buf.append(chukiMap.get("画像開始横")[0]);
+												buf.append(fileName);
+												buf.append(chukiMap.get("画像終了")[0]);
+											} else if (imagePageType == PageBreakTrigger.IMAGE_INLINE_H) {
+												buf.append(chukiMap.get("画像開始縦")[0]);
+												buf.append(fileName);
+												buf.append(chukiMap.get("画像終了")[0]);
+											} else if (imagePageType == PageBreakTrigger.IMAGE_INLINE_TOP) {
 												buf.append(chukiMap.get("画像開始上")[0]);
 												buf.append(fileName);
 												buf.append(chukiMap.get("画像終了")[0]);
-												noBr = true;
-											} else if (imagePageType == PageBreakTrigger.IMAGE_PAGE_BOTTOM) {
+											} else if (imagePageType == PageBreakTrigger.IMAGE_INLINE_BOTTOM) {
 												buf.append(chukiMap.get("画像開始下")[0]);
 												buf.append(fileName);
 												buf.append(chukiMap.get("画像終了")[0]);
-												noBr = true;
 											} else if (imagePageType != PageBreakTrigger.IMAGE_PAGE_NONE) {
 												//改ページの前に文字があれば出力
 												if (buf.length() > 0) this.printLineBuffer(out, buf, lineNum, true);
@@ -1555,16 +1561,22 @@ public class AozoraEpub3Converter
 								} else {
 									//画像ページ種別取得
 									int imagePageType = this.writer.getImagePageType(srcFilePath, this.tagLevel);
-									if (imagePageType == PageBreakTrigger.IMAGE_PAGE_TOP) {
+									if (imagePageType == PageBreakTrigger.IMAGE_INLINE_W) {
+										buf.append(chukiMap.get("画像開始横")[0]);
+										buf.append(fileName);
+										buf.append(chukiMap.get("画像終了")[0]);
+									} else if (imagePageType == PageBreakTrigger.IMAGE_INLINE_H) {
+										buf.append(chukiMap.get("画像開始縦")[0]);
+										buf.append(fileName);
+										buf.append(chukiMap.get("画像終了")[0]);
+									} else if (imagePageType == PageBreakTrigger.IMAGE_INLINE_TOP) {
 										buf.append(chukiMap.get("画像開始上")[0]);
 										buf.append(fileName);
 										buf.append(chukiMap.get("画像終了")[0]);
-										noBr = true;
-									} else if (imagePageType == PageBreakTrigger.IMAGE_PAGE_BOTTOM) {
+									} else if (imagePageType == PageBreakTrigger.IMAGE_INLINE_BOTTOM) {
 										buf.append(chukiMap.get("画像開始下")[0]);
 										buf.append(fileName);
 										buf.append(chukiMap.get("画像終了")[0]);
-										noBr = true;
 									} else if (imagePageType != PageBreakTrigger.IMAGE_PAGE_NONE) {
 										//改ページの前に文字があれば出力
 										if (buf.length() > 0) this.printLineBuffer(out, buf, lineNum, true);

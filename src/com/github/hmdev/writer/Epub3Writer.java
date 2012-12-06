@@ -862,29 +862,41 @@ public class Epub3Writer
 			if (this.imageFloatType != 0 &&
 				imageInfo.getWidth() >=64 &&  imageInfo.getHeight() >= 64 &&
 				imageInfo.getWidth() <= this.imageFloatW && imageInfo.getHeight() <= this.imageFloatH) {
-				return this.imageFloatType==1 ? PageBreakTrigger.IMAGE_PAGE_TOP : PageBreakTrigger.IMAGE_PAGE_BOTTOM;
-			}
-			//タグ内ならそのまま出力
-			if (tagLevel > 0) {
-				return PageBreakTrigger.IMAGE_PAGE_NONE;
-			}
-			if (imageInfo.getWidth() >= this.singlePageWidth || imageInfo.getWidth() >= singlePageSizeW && imageInfo.getHeight() >= singlePageSizeH) {
-				//拡大しない＆画面より小さい場合
-				if (!this.fitImage && imageInfo.getWidth() <= this.dispW && imageInfo.getHeight() < this.dispH)
-					return PageBreakTrigger.IMAGE_PAGE_NOFIT;
-				//拡大するか画面より多きい場合
-				if ((double)imageInfo.getWidth()/imageInfo.getHeight() > (double)this.dispW/this.dispH) {
-					if (this.rotateAngle != 0 && this.dispW < this.dispH && imageInfo.getWidth() > imageInfo.getHeight()*1.1) { //縦長画面で110%以上横長
-						imageInfo.rotateAngle = this.rotateAngle;
-						return PageBreakTrigger.IMAGE_PAGE_H;
-					} else return PageBreakTrigger.IMAGE_PAGE_W;
+				if (this.imageFloatType==1) {
+					return PageBreakTrigger.IMAGE_INLINE_TOP;
 				} else {
-					if (this.rotateAngle != 0 && this.dispW > this.dispH && imageInfo.getWidth()*1.1 < imageInfo.getHeight()) { //横長画面で110%以上縦長
-						imageInfo.rotateAngle = this.rotateAngle;
-						return PageBreakTrigger.IMAGE_PAGE_W;
-					} else return PageBreakTrigger.IMAGE_PAGE_H;
+					return PageBreakTrigger.IMAGE_INLINE_BOTTOM;
 				}
 			}
+			//タグ内ならそのまま出力
+			if (tagLevel == 0) {
+				if (imageInfo.getWidth() >= this.singlePageWidth || imageInfo.getWidth() >= singlePageSizeW && imageInfo.getHeight() >= singlePageSizeH) {
+					//拡大しない＆画面より小さい場合
+					if (!this.fitImage && imageInfo.getWidth() <= this.dispW && imageInfo.getHeight() < this.dispH)
+						return PageBreakTrigger.IMAGE_PAGE_NOFIT;
+					//拡大するか画面より多きい場合
+					if ((double)imageInfo.getWidth()/imageInfo.getHeight() > (double)this.dispW/this.dispH) {
+						if (this.rotateAngle != 0 && this.dispW < this.dispH && imageInfo.getWidth() > imageInfo.getHeight()*1.1) { //縦長画面で110%以上横長
+							imageInfo.rotateAngle = this.rotateAngle;
+							return PageBreakTrigger.IMAGE_PAGE_H;
+						} else return PageBreakTrigger.IMAGE_PAGE_W;
+					} else {
+						if (this.rotateAngle != 0 && this.dispW > this.dispH && imageInfo.getWidth()*1.1 < imageInfo.getHeight()) { //横長画面で110%以上縦長
+							imageInfo.rotateAngle = this.rotateAngle;
+							return PageBreakTrigger.IMAGE_PAGE_W;
+						} else return PageBreakTrigger.IMAGE_PAGE_H;
+					}
+				}
+			}
+			
+			//単ページ化も回り込みもない
+			if (imageInfo.getWidth() > dispW) { //横がはみ出している
+				if ((double)imageInfo.getWidth()/imageInfo.getHeight() > (double)dispW/dispH) return PageBreakTrigger.IMAGE_INLINE_W;
+				else return PageBreakTrigger.IMAGE_INLINE_H; //縦の方が長い
+			}
+			if (imageInfo.getHeight() > dispH) return PageBreakTrigger.IMAGE_INLINE_H; //縦がはみ出している
+			
+			
 		} catch (Exception e) { e.printStackTrace(); }
 		return PageBreakTrigger.IMAGE_PAGE_NONE;
 	}
