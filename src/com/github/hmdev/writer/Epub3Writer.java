@@ -350,6 +350,7 @@ public class Epub3Writer
 		
 		//本文を出力
 		this.writeSections(converter, src, bw);
+		if (this.canceled) return;
 		
 		//表紙データと表示の画像情報
 		byte[] coverImageBytes = null;
@@ -534,7 +535,7 @@ public class Epub3Writer
 		
 		if (this.canceled) return;
 		//プログレスバーにテキスト進捗分を追加
-		if (this.jProgressBar != null) this.jProgressBar.setValue(bookInfo.totalLineNum/10);
+		if (this.jProgressBar != null && !bookInfo.imageOnly) this.jProgressBar.setValue(bookInfo.totalLineNum/10);
 		
 		zos.setLevel(0);
 		////////////////////////////////////////////////////////////////////////////////////////////////
@@ -710,8 +711,7 @@ public class Epub3Writer
 		SectionInfo sectionInfo = new SectionInfo(sectionId);
 		//次の行が単一画像なら画像専用指定
 		switch (imagePageType) {
-		case PageBreakTrigger.IMAGE_PAGE_AUTO:
-			//未使用
+		/*case PageBreakTrigger.IMAGE_PAGE_AUTO:
 			sectionInfo.setImagePage(true);
 			//画像サイズが横長なら幅に合わせる
 			ImageInfo imageInfo = this.imageInfoReader.getImageInfo(srcImageFilePath);
@@ -725,7 +725,7 @@ public class Epub3Writer
 					else sectionInfo.setImageFitH(true);
 				}
 			}
-			break;
+			break;*/
 		case PageBreakTrigger.IMAGE_PAGE_W:
 			sectionInfo.setImagePage(true);
 			sectionInfo.setImageFitW(true);
@@ -874,12 +874,12 @@ public class Epub3Writer
 					return PageBreakTrigger.IMAGE_PAGE_NOFIT;
 				//拡大するか画面より多きい場合
 				if ((double)imageInfo.getWidth()/imageInfo.getHeight() > (double)this.dispW/this.dispH) {
-					if (this.rotateAngle != 0 && this.dispW < this.dispH && (double)imageInfo.getHeight()/imageInfo.getWidth() < (double)this.dispW/this.dispH) { //縦長画面で横長
+					if (this.rotateAngle != 0 && this.dispW < this.dispH && imageInfo.getWidth() > imageInfo.getHeight()*1.1) { //縦長画面で110%以上横長
 						imageInfo.rotateAngle = this.rotateAngle;
 						return PageBreakTrigger.IMAGE_PAGE_H;
 					} else return PageBreakTrigger.IMAGE_PAGE_W;
 				} else {
-					if (this.rotateAngle != 0 && this.dispW > this.dispH && (double)imageInfo.getHeight()/imageInfo.getWidth() > (double)this.dispW/this.dispH) { //横長画面で縦長
+					if (this.rotateAngle != 0 && this.dispW > this.dispH && imageInfo.getWidth()*1.1 < imageInfo.getHeight()) { //横長画面で110%以上縦長
 						imageInfo.rotateAngle = this.rotateAngle;
 						return PageBreakTrigger.IMAGE_PAGE_W;
 					} else return PageBreakTrigger.IMAGE_PAGE_H;

@@ -1425,6 +1425,7 @@ public class AozoraEpub3Converter
 						} else {
 							this.setPageBreakTrigger(pageBreakImageAuto);
 							pageBreakImageAuto.imageFileName = bookInfo.getImageSectionFileName(lineNum+1);
+							pageBreakImageAuto.imagePageType = this.writer.getImagePageType(this.pageBreakTrigger.imageFileName, this.tagLevel);
 						}
 					} else {
 						this.setPageBreakTrigger(pageBreakNormal);

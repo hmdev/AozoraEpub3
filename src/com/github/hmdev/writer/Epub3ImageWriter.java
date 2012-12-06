@@ -58,6 +58,7 @@ public class Epub3ImageWriter extends Epub3Writer
 		//画像xhtmlを出力
 		int pageNum = 0;
 		for (String srcFilePath : this.imageInfoReader.getImageFileNames()) {
+			if (this.canceled) return;
 			pageNum++;
 			srcFilePath = srcFilePath.trim();
 			String fileName = this.getImageFilePath(srcFilePath, pageNum);
@@ -69,6 +70,7 @@ public class Epub3ImageWriter extends Epub3Writer
 				bw.flush();
 				this.endSection();
 			}
+			if (this.jProgressBar != null) this.jProgressBar.setValue(this.jProgressBar.getValue()+1);
 		}
 	}
 	

@@ -1,0 +1,34 @@
+################################
+### Arcadia SS投稿掲示板
+### http://www.mai-net.net/bbs/sst/sst.php
+################################
+
+## 変換対象URLパターン
+##PAGE_REGEX		.*/bbs/sst/sst.php.*&n=.*$
+
+################################
+##一覧ページの抽出設定
+## タイトル
+TITLE	table.brdr td.bgb font:0
+## 著者
+AUTHOR	table.brdr td.bgc td tt:0	^Name: (.+?)(◆.+)?$	$1
+## 説明
+##DESCRIPTION	
+
+## 各話へのリンク
+HREF	#table td b a
+
+##全体の更新日時 比較文字列 (hrefに1:1で対応するタグ 内部のinnerHTML文字列で比較)
+##UPDATE	
+
+##一覧に記載されている各話の更新日時
+#SUB_UPDATE
+
+################################
+###各話の抽出設定
+
+## 各話 章タイトル 中見出しで出力
+CONTENT_SUBTITLE	table.brdr td.bgb font:0
+
+## 各話 本文
+CONTENT_ARTICLE	table.brdr td.bgc blockquote div:0

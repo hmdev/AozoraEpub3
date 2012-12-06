@@ -2271,8 +2271,8 @@ public class AozoraEpub3Applet extends JApplet
 					//if (coverImageIndex == 0) {
 					//	bookInfo.coverImage = imageInfoReader.getImage(0);
 					//}
-					//画像数をプログレスバーに設定
-					this.jProgressBar.setMaximum(imageInfoReader.countImageFileInfos()*10);
+					//画像数をプログレスバーに設定 xhtml出力で+1 画像出力で+10
+					this.jProgressBar.setMaximum(imageInfoReader.countImageFileInfos()*11);
 					jProgressBar.setValue(0);
 					jProgressBar.setStringPainted(true);
 				} else {

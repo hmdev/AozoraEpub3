@@ -449,11 +449,12 @@ public class ImageUtils
 		if (nombreType == NOMBRE_TOP || nombreType == NOMBRE_TOPBOTTOM) {
 			//これ以下ならノンブルとして除去
 			int nombreLimit = (int)(height * 0.03)+margin[1];
+			int nombreDust = (int)(height * 0.005);
 			//ノンブル上
 			int nombreEnd = 0;
 			for (int i=margin[1]+1; i<=nombreLimit; i++) { 
 				coloredPixels = getColoredPixelsH(image, width, i, rgbLimit, 0, ignoreEdge, 0);
-				if (coloredPixels == 0) { nombreEnd = i; break; }//白い列
+				if (coloredPixels == 0) { nombreEnd = i; if (nombreEnd-margin[1] > nombreDust) break; }//白い列
 			}
 			if (nombreEnd > 0 && nombreEnd <= nombreLimit) {
 				int whiteEnd = nombreEnd;
@@ -461,7 +462,7 @@ public class ImageUtils
 				for (int i=nombreEnd+1; i<=whiteLimit; i++) { 
 					coloredPixels = getColoredPixelsH(image, width, i, rgbLimit, 0, ignoreEdge, dustSize);
 					if (coloredPixels == 0) whiteEnd = i;
-					else break;
+					else if (whiteEnd-nombreEnd > nombreDust) break;
 				}
 				//10%未満の空白
 				if (whiteEnd-nombreEnd > nombreEnd-margin[1] && whiteEnd-nombreEnd < (int)(height * 0.1)) {
@@ -471,13 +472,14 @@ public class ImageUtils
 			}
 		}
 		if (nombreType == NOMBRE_BOTTOM || nombreType == NOMBRE_TOPBOTTOM) {
-			//ノンブル下
 			//これ以下ならノンブルとして除去
 			int nombreLimit = (int)(height * 0.03)+margin[3];
+			int nombreDust = (int)(height * 0.005);
+			//ノンブル下
 			int nombreEnd = 0;
 			for (int i=margin[3]+1; i<=nombreLimit; i++) { 
 				coloredPixels = getColoredPixelsH(image, width, height-1-i, rgbLimit, 0, ignoreEdge, 0);
-				if (coloredPixels == 0) { nombreEnd = i; break; }//白い列
+				if (coloredPixels == 0) { nombreEnd = i; if (nombreEnd-margin[1] > nombreDust) break; }//白い列
 			}
 			if (nombreEnd > 0 && nombreEnd <= nombreLimit) {
 				int whiteEnd = nombreEnd;
@@ -485,7 +487,7 @@ public class ImageUtils
 				for (int i=nombreEnd+1; i<=whiteLimit; i++) { 
 					coloredPixels = getColoredPixelsH(image, width, height-1-i, rgbLimit, 0, ignoreEdge, dustSize);
 					if (coloredPixels == 0) whiteEnd = i;
-					else break;
+					else if (whiteEnd-nombreEnd > nombreDust) break;
 				}
 				//10%未満の空白
 				if (whiteEnd-nombreEnd > nombreEnd-margin[3] && whiteEnd-nombreEnd < (int)(height * 0.1)) {
@@ -572,7 +574,7 @@ public class ImageUtils
 		for (int x=w-1-ignoreEdge; x>=ignoreEdge; x--) {
 			if (isColored(image.getRGB(x, offsetY), rgbLimit)) {
 				//ゴミ除外 ゴミのサイズ分先に移動する
-				if (dustSize < 4 || !isDustH(image, x, image.getWidth(), offsetY, image.getHeight(), dustSize, rgbLimit)) {
+				if (dustSize < 4 || !isDust(image, x, image.getWidth(), offsetY, image.getHeight(), dustSize, rgbLimit)) {
 					coloredPixels++;
 					if (limitPixel < coloredPixels) return coloredPixels;
 				}
@@ -594,7 +596,7 @@ public class ImageUtils
 		for (int y=h-1-ignoreBotttom; y>=ignoreTop; y--) {
 			if (isColored(image.getRGB(offsetX, y), rgbLimit)) {
 				//ゴミ除外 ゴミのサイズ分先に移動する
-				if (dustSize < 4 || !isDustV(image, offsetX, image.getWidth(), y, image.getHeight(), dustSize, rgbLimit)) {
+				if (dustSize < 4 || !isDust(image, offsetX, image.getWidth(), y, image.getHeight(), dustSize, rgbLimit)) {
 					coloredPixels++;
 					if (limitPixel < coloredPixels) return coloredPixels;
 				}
@@ -608,31 +610,18 @@ public class ImageUtils
 		return rgbLimit > (rgb>>16 & 0xFF) || rgbLimit > (rgb>>8 & 0xFF) || rgbLimit > (rgb & 0xFF);
 	}
 	
-	/** ゴミをチェック 行(横) */
-	static boolean isDustH(BufferedImage image, int curX, int maxX, int curY, int maxY, int dustSize, int rgbLimit)
+	/** ゴミをチェック */
+	static boolean isDust(BufferedImage image, int curX, int maxX, int curY, int maxY, int dustSize, int rgbLimit)
 	{
 		if (dustSize == 0) return false;
-		//現在列
+		
+		//ゴミサイズの縦横2倍の範囲
 		int minX = Math.max(0, curX-dustSize-1);
 		maxX = Math.min(maxX, curX+dustSize+1);
 		int minY = Math.max(0, curY-dustSize-1);
 		maxY = Math.min(maxY, curY+dustSize+1);
-		return isDust(image, minX, curX, maxX, minY, curY, maxY, dustSize, rgbLimit);
-	}
-	/** ゴミをチェック 列(縦) */
-	static boolean isDustV(BufferedImage image, int curX, int maxX, int curY, int maxY, int dustSize, int rgbLimit)
-	{
-		if (dustSize == 0) return false;
+		
 		//現在列
-		int minX = Math.max(0, curX-dustSize-1);
-		maxX = Math.min(maxX, curX+dustSize+1);
-		int minY = Math.max(0, curY-dustSize-1);
-		maxY = Math.min(maxY, curY+dustSize+1);
-		return isDust(image, minX, curX, maxX, minY, curY, maxY, dustSize, rgbLimit);
-	}
-	
-	static boolean isDust(BufferedImage image, int minX, int curX, int maxX, int minY, int curY, int maxY, int dustSize, int rgbLimit)
-	{
 		int h = 1;
 		for (int y=curY-1; y>=minY; y--) {
 			if (isColored(image.getRGB(curX, y), rgbLimit)) h++; else break;
@@ -644,14 +633,13 @@ public class ImageUtils
 		
 		int w = 1;
 		for (int x=curX-1; x>=minX; x--) {
-			if (isColored(image.getRGB(x, curY), rgbLimit)) h++; else break;
+			if (isColored(image.getRGB(x, curY), rgbLimit)) w++; else break;
 		}
 		for (int x=curX+1; x<maxX; x++) {
-			if (isColored(image.getRGB(x, curY), rgbLimit)) h++; else break;
+			if (isColored(image.getRGB(x, curY), rgbLimit)) w++; else break;
 		}
 		if (w > dustSize) return false;
 		
-		//高さをゴミのサイズにして黒画素をカウント
 		//左
 		w = 1; //黒画素のある幅
 		for (int x=curX-1; x>=minX; x--) {
@@ -664,7 +652,7 @@ public class ImageUtils
 			w++;
 		}
 		//右
-		for (int x=curX+1; x<minX; x++) {
+		for (int x=curX+1; x<maxX; x++) {
 			h = 0;
 			for (int y=maxY-1; y>=minY; y--) {
 				if (isColored(image.getRGB(x, y), rgbLimit)) h++;
