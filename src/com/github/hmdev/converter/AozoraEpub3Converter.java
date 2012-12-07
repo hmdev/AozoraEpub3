@@ -74,6 +74,9 @@ public class AozoraEpub3Converter
 	/** 最大空行制限 */
 	int maxEmptyLine = Integer.MAX_VALUE;
 	
+	/** 行頭字下げ */
+	boolean forceIndent = false;
+	
 	/** 強制改ページが有効ならtrue*/
 	boolean forcePageBreak = false;
 	/** 強制改ページバイト数 */
@@ -413,6 +416,13 @@ public class AozoraEpub3Converter
 		this.removeEmptyLine = removeEmptyLine;
 		this.maxEmptyLine = maxEmptyLine;
 		if (this.maxEmptyLine == 0) this.maxEmptyLine = Integer.MAX_VALUE; 
+	}
+	
+	/** 行頭字下げ
+	 * @param forceIndent */
+	public void setForceIndent(boolean forceIndent)
+	{
+		this.forceIndent = forceIndent;
 	}
 	
 	/** 目次抽出 */
@@ -1338,6 +1348,19 @@ public class AozoraEpub3Converter
 		line = this.replaceChukiSufTag(this.convertGaijiChuki(line, true));
 		
 		char[] ch = line.toCharArray();
+		int begin = 0;
+		
+		//行頭インデント 先頭が「『―（以外 半角空白は除去
+		if (this.forceIndent && line.length() > begin+1) {
+			switch (line.charAt(begin)) {
+			case '　': case '「': case '『':  case '（': case '”': case '〈': break;
+			case ' ': case ' ':
+				char c1 = line.charAt(begin+1);
+				if (c1 != ' ' && c1 != ' ') ch[begin] = '　';
+				break;
+			default: buf.append('　');
+			}
+		}
 		
 		//ルビなしタグ開始なら+1
 		int noRubyLevel = 0;
@@ -1345,7 +1368,6 @@ public class AozoraEpub3Converter
 		StringBuilder bufSuf = new StringBuilder();
 		// 注記タグ変換
 		Matcher m = chukiPattern.matcher(line);
-		int begin = 0;
 		int chukiStart = 0;
 		
 		while (m.find()) {
