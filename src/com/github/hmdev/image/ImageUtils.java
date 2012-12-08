@@ -169,8 +169,9 @@ public class ImageUtils
 				} else { //元が横
 					if (mw/mh < dispW/dispH && mh > dispH) { //余白除去で縦にはみ出す
 						mw = mh*dispW/dispH;
-						margin[0] = w-margin[2]-mw;//左マージンを伸ばす
-						if (margin[0] < 0) { margin[0] = 0; margin[2] = w-mw; }
+						double m02 = margin[0]+margin[2];
+						margin[0] = (int)((w-mw)*margin[0]/m02);
+						margin[2] = (int)((w-mw)*margin[2]/m02);
 					}
 				}
 				w = mw;
@@ -454,18 +455,17 @@ public class ImageUtils
 			int nombreEnd = 0;
 			for (int i=margin[1]+1; i<=nombreLimit; i++) { 
 				coloredPixels = getColoredPixelsH(image, width, i, rgbLimit, 0, ignoreEdge, 0);
-				if (coloredPixels == 0) { nombreEnd = i; if (nombreEnd-margin[1] > nombreDust) break; }//白い列
+				if (coloredPixels == 0) { nombreEnd = i; if (nombreEnd-margin[1] > nombreDust) break; } //ノンブル上のゴミは無視
 			}
-			if (nombreEnd > 0 && nombreEnd <= nombreLimit) {
+			if (nombreEnd > margin[1]+height*0.005 && nombreEnd <= nombreLimit) { //0.5%-3％以下
 				int whiteEnd = nombreEnd;
 				int whiteLimit = limitPxT+(int)(height*0.05); //5%加算
 				for (int i=nombreEnd+1; i<=whiteLimit; i++) { 
 					coloredPixels = getColoredPixelsH(image, width, i, rgbLimit, 0, ignoreEdge, dustSize);
 					if (coloredPixels == 0) whiteEnd = i;
-					else if (whiteEnd-nombreEnd > nombreDust) break;
+					else if (i-nombreEnd > nombreDust) break;
 				}
-				//10%未満の空白
-				if (whiteEnd-nombreEnd > nombreEnd-margin[1] && whiteEnd-nombreEnd < (int)(height * 0.1)) {
+				if (whiteEnd > nombreEnd+height*0.01 && whiteEnd < nombreEnd+(int)(height * 0.1)) { //1-10%の空白
 					margin[1] = whiteEnd;
 					hasNombreT = true;
 				}
@@ -479,18 +479,17 @@ public class ImageUtils
 			int nombreEnd = 0;
 			for (int i=margin[3]+1; i<=nombreLimit; i++) { 
 				coloredPixels = getColoredPixelsH(image, width, height-1-i, rgbLimit, 0, ignoreEdge, 0);
-				if (coloredPixels == 0) { nombreEnd = i; if (nombreEnd-margin[1] > nombreDust) break; }//白い列
+				if (coloredPixels == 0) { nombreEnd = i; if (nombreEnd-margin[1] > nombreDust) break; } //ノンブル上のゴミは無視
 			}
-			if (nombreEnd > 0 && nombreEnd <= nombreLimit) {
+			if (nombreEnd > margin[3]+height*0.005 && nombreEnd <= nombreLimit) { //0.5%-3％以下
 				int whiteEnd = nombreEnd;
 				int whiteLimit = limitPxB+(int)(height*0.05); //5%加算
 				for (int i=nombreEnd+1; i<=whiteLimit; i++) { 
 					coloredPixels = getColoredPixelsH(image, width, height-1-i, rgbLimit, 0, ignoreEdge, dustSize);
 					if (coloredPixels == 0) whiteEnd = i;
-					else if (whiteEnd-nombreEnd > nombreDust) break;
+					else if (i-nombreEnd > nombreDust) break;
 				}
-				//10%未満の空白
-				if (whiteEnd-nombreEnd > nombreEnd-margin[3] && whiteEnd-nombreEnd < (int)(height * 0.1)) {
+				if (whiteEnd > nombreEnd+height*0.01 && whiteEnd < nombreEnd+(int)(height * 0.1)) { //1-10%の空白
 					margin[3] = whiteEnd;
 					hasNombreB = true;
 				}

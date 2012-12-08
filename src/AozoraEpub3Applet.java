@@ -1197,7 +1197,7 @@ public class AozoraEpub3Applet extends JApplet
 		tabPanel.add(panel);
 		propValue = props.getProperty("ForceIndent");
 		jCheckForceIndent = new JCheckBox("有効    ", "1".equals(propValue));
-		jCheckForceIndent.setToolTipText("行頭が全角空白,「,『,―,”,（,〈以外なら全角空白を追加します 半角空白のみは全角に置き換えます");
+		jCheckForceIndent.setToolTipText("行頭が「『―”（〈〔【と全角空白以外なら行頭に全角空白を追加します 半角空白のみは全角に置き換えます");
 		jCheckForceIndent.setFocusPainted(false);
 		jCheckForceIndent.setBorder(padding2);
 		panel.add(jCheckForceIndent);
