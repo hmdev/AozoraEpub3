@@ -553,7 +553,7 @@ public class WebAozoraConverter
 			if (end != null && node.equals(end)) {
 				return;
 			}
-			if (node instanceof TextNode) printText(bw, ((TextNode)node).text());
+			if (node instanceof TextNode) printText(bw, ((TextNode)node).getWholeText());
 			else if (node instanceof Element) {
 				Element elem = (Element)node;
 				if ("br".equals(elem.tagName())) {
@@ -584,7 +584,7 @@ public class WebAozoraConverter
 					bw.append("［＃下付き小文字］");
 					printNode(bw, node); //子を出力
 					bw.append("［＃下付き小文字終わり］");
-				} else if ("strike".equals(elem.tagName())) {
+				} else if ("strike".equals(elem.tagName()) || "s".equals(elem.tagName()) ) {
 					bw.append("［＃取消線］");
 					printNode(bw, node); //子を出力
 					bw.append("［＃取消線終わり］");
@@ -667,6 +667,7 @@ public class WebAozoraConverter
 			case '｜': bw.append("※［＃縦線、1-1-35］"); break;
 			case '＃': bw.append("※［＃井げた、1-1-84］"); break;
 			case '※': bw.append("※［＃米印、1-2-8］"); break;
+			case '\n': case '\r': break;
 			default: bw.append(ch); 
 			}
 		}
@@ -758,9 +759,9 @@ public class WebAozoraConverter
 			List<TextNode> nodes = elem.textNodes();
 			for (Node node : nodes) {
 				if (node instanceof TextNode) {
-					String text = ((TextNode) node).text().trim();
+					String text = ((TextNode) node).getWholeText();
 					if (text != null && text.length() > 0) {
-						return text;
+						return text.replaceAll("[\n|\r]", "").trim();
 					}
 				}
 			}

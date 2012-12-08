@@ -465,7 +465,7 @@ public class ImageUtils
 					if (coloredPixels == 0) whiteEnd = i;
 					else if (i-nombreEnd > nombreDust) break;
 				}
-				if (whiteEnd > nombreEnd+height*0.01 && whiteEnd < nombreEnd+(int)(height * 0.1)) { //1-10%の空白
+				if (whiteEnd > nombreEnd+height*0.01) { //1%より大きい空白
 					margin[1] = whiteEnd;
 					hasNombreT = true;
 				}
@@ -479,7 +479,7 @@ public class ImageUtils
 			int nombreEnd = 0;
 			for (int i=margin[3]+1; i<=nombreLimit; i++) { 
 				coloredPixels = getColoredPixelsH(image, width, height-1-i, rgbLimit, 0, ignoreEdge, 0);
-				if (coloredPixels == 0) { nombreEnd = i; if (nombreEnd-margin[1] > nombreDust) break; } //ノンブル上のゴミは無視
+				if (coloredPixels == 0) { nombreEnd = i; if (nombreEnd-margin[3] > nombreDust) break; } //ノンブル下のゴミは無視
 			}
 			if (nombreEnd > margin[3]+height*0.005 && nombreEnd <= nombreLimit) { //0.5%-3％以下
 				int whiteEnd = nombreEnd;
@@ -489,7 +489,7 @@ public class ImageUtils
 					if (coloredPixels == 0) whiteEnd = i;
 					else if (i-nombreEnd > nombreDust) break;
 				}
-				if (whiteEnd > nombreEnd+height*0.01 && whiteEnd < nombreEnd+(int)(height * 0.1)) { //1-10%の空白
+				if (whiteEnd > nombreEnd+height*0.01) { //1%より大きい空白
 					margin[3] = whiteEnd;
 					hasNombreB = true;
 				}

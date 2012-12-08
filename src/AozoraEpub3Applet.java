@@ -1046,7 +1046,7 @@ public class AozoraEpub3Applet extends JApplet
 		jComboAutoMarginNombre = new JComboBox(new String[]{"なし","上","下","上下"});
 		try { jComboAutoMarginNombre.setSelectedIndex(Integer.parseInt(propValue)); } catch (Exception e) {}
 		jComboAutoMarginNombre.setFocusable(false);
-		jComboAutoMarginNombre.setPreferredSize(new Dimension(text4.width+12, 19));
+		jComboAutoMarginNombre.setPreferredSize(new Dimension(text4.width+24, 19));
 		
 		panel.add(jComboAutoMarginNombre);
 		

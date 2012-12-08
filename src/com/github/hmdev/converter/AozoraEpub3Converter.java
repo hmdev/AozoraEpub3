@@ -76,6 +76,8 @@ public class AozoraEpub3Converter
 	
 	/** 行頭字下げ */
 	boolean forceIndent = false;
+	/** 行頭半角スペース除去 */
+	boolean removeHeadSpace = false;
 	
 	/** 強制改ページが有効ならtrue*/
 	boolean forcePageBreak = false;
@@ -1350,13 +1352,20 @@ public class AozoraEpub3Converter
 		char[] ch = line.toCharArray();
 		int begin = 0;
 		
+		//行頭半角スペース除去
+		/*if (this.removeHeadSpace && line.length() > begin+1) {
+			switch (line.charAt(begin)) {
+			case ' ': case ' ': begin++;
+			}
+		}*/
 		//行頭インデント 先頭が「『―（以外 半角空白は除去
 		if (this.forceIndent && line.length() > begin+1) {
 			switch (line.charAt(begin)) {
 			case '　': case '「': case '『':  case '（': case '”': case '〈': case '【': case '〔': break;
 			case ' ': case ' ':
 				char c1 = line.charAt(begin+1);
-				if (c1 != ' ' && c1 != ' ') ch[begin] = '　';
+				if (c1 == ' ' || c1 == ' ' || c1 == '　') begin++;
+				ch[begin] = '　';
 				break;
 			default: buf.append('　');
 			}
