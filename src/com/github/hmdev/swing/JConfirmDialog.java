@@ -698,16 +698,18 @@ public class JConfirmDialog extends JDialog
 			this.jScrollToc.setVisible(false);
 		} else {
 			Vector<ChapterLineInfo> vecChapterLineInfo = bookInfo.getChapterLineInfoList();
-			this.tocDataModel = new TocTableDataModel(new String[]{"", "", "行", "目次名称"}, 0);
+			this.tocDataModel = new TocTableDataModel(new String[]{"", "", "", "行", "目次名称"}, 0);
 			for (ChapterLineInfo chapterLineInfo : vecChapterLineInfo) {
-				tocDataModel.addRow(new Object[]{true, chapterLineInfo.getTypeId(), chapterLineInfo.lineNum+1, chapterLineInfo.getChapterName()});
+				tocDataModel.addRow(new Object[]{true, chapterLineInfo.pageBreakChapter?"改":"", chapterLineInfo.getTypeId(), chapterLineInfo.lineNum+1, chapterLineInfo.getChapterName()});
 			}
 			this.jTableToc.setModel(tocDataModel);
 			this.jTableToc.getColumnModel().getColumn(0).setMaxWidth(22);
 			this.jTableToc.getColumnModel().getColumn(1).setMaxWidth(30);
 			this.jTableToc.getColumnModel().getColumn(1).setPreferredWidth(20);
-			this.jTableToc.getColumnModel().getColumn(2).setMaxWidth(60);
-			this.jTableToc.getColumnModel().getColumn(2).setPreferredWidth(35);
+			this.jTableToc.getColumnModel().getColumn(2).setMaxWidth(30);
+			this.jTableToc.getColumnModel().getColumn(2).setPreferredWidth(20);
+			this.jTableToc.getColumnModel().getColumn(3).setMaxWidth(60);
+			this.jTableToc.getColumnModel().getColumn(3).setPreferredWidth(35);
 			this.jTableToc.getTableHeader().setPreferredSize(new Dimension(100, 20));
 			this.jTableToc.setVisible(true);
 			this.jScrollToc.setVisible(true);
@@ -798,7 +800,7 @@ public class JConfirmDialog extends JDialog
 		public Class getColumnClass(int col) {
 			switch (col) {
 			case 0: return Boolean.class;
-			case 2: return Integer.class;
+			case 3: return Integer.class;
 			}
 			return String.class;
 		}
@@ -806,11 +808,11 @@ public class JConfirmDialog extends JDialog
 		public boolean isCellEditable(int row, int col)
 		{
 			switch (col) {
-			case 1:
-			case 2:
-				return false;
+			case 0:
+			case 4:
+				return true;
 			}
-			return true;
+			return false;
 		}
 		public boolean isSelected(int row)
 		{
@@ -818,11 +820,11 @@ public class JConfirmDialog extends JDialog
 		}
 		public int getLineNum(int row)
 		{
-			return (Integer)this.getValueAt(row, 2);
+			return (Integer)this.getValueAt(row, 3);
 		}
 		public String getTocName(int row)
 		{
-			return (String)this.getValueAt(row, 3);
+			return (String)this.getValueAt(row, 4);
 		}
 	}
 }
