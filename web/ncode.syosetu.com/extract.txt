@@ -26,6 +26,9 @@ HREF	.period_subtitle a,.long_subtitle a
 ##一覧に記載されている各話の更新日時
 SUB_UPDATE	.long_update
 
+##本文に日付が無い場合 innerHTML文字列を置換して公開文字列を出力
+CONTENT_UPDATE_LIST	.long_update	^(.+?)(<span title=\"(.+?)\".*)?$	$1 公開　$3
+
 ################################
 ###各話の抽出設定
 

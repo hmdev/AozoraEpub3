@@ -8,8 +8,8 @@ public class FileNameComparator implements Comparator<String>
 	@Override
 	public int compare(String o1, String o2)
 	{
-		char[] c1 = o1.toCharArray();
-		char[] c2 = o2.toCharArray();
+		char[] c1 = o1.toLowerCase().toCharArray();
+		char[] c2 = o2.toLowerCase().toCharArray();
 		int len = Math.min(c1.length, c2.length);
 		int diff;
 		for (int i=0; i<len; i++) {

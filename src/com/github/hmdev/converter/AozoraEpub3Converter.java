@@ -126,7 +126,7 @@ public class AozoraEpub3Converter
 	char[] chapterSeparator = {' ','　','-','－','「','―','『'};
 	
 	/** 章名数字無し */
-	String[] chapterName = new String[]{"プロローグ","エピローグ","モノローグ","序","序章","終章","間章","転章","幕間"};
+	String[] chapterName = new String[]{"プロローグ","エピローグ","モノローグ","序","序章","序　章","終章","終　章","間章","間　章","転章","転　章","幕間","幕　間"};
 	/** 章名数字前 suffixのみは空文字 */
 	String[] chapterNumPrefix = new String[]{"第","その", ""};
 	/** 章名数字後 prefixに対応する複数のsuffixを指定 指定なしなら空文字 */
@@ -1361,7 +1361,8 @@ public class AozoraEpub3Converter
 		//行頭インデント 先頭が「『―（以外 半角空白は除去
 		if (this.forceIndent && line.length() > begin+1) {
 			switch (line.charAt(begin)) {
-			case '　': case '「': case '『':  case '（': case '”': case '〈': case '【': case '〔': break;
+			case '　': case '「': case '『':  case '（': case '”': case '〈': case '【': case '〔':
+				break;
 			case ' ': case ' ':
 				char c1 = line.charAt(begin+1);
 				if (c1 == ' ' || c1 == ' ' || c1 == '　') begin++;

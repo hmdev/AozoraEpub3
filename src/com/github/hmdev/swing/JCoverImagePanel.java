@@ -59,6 +59,7 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 	private int startX = 0;
 	private int startY = 0;
 	private int prevX = 0;
+	private int mouseType = 0;
 	
 	public JCoverImagePanel()
 	{
@@ -391,6 +392,12 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 		this.startY = e.getY();
 		if (this.offsetY != 0) this.startY -= this.offsetY;
 		this.requestFocus();
+		this.mouseType = e.getButton();
+		if (e.isControlDown()) this.mouseType = MouseEvent.BUTTON3;
+		//中ボタンは縦合わせ
+		if (this.mouseType == MouseEvent.BUTTON2) {
+			setFitType(FIT_H, false);
+		}
 	}
 	@Override
 	public void mouseReleased(MouseEvent e)
@@ -402,7 +409,7 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 	public void mouseDragged(MouseEvent e)
 	{
 		if (this.startX != Integer.MIN_VALUE) {
-			if (e.isControlDown()) {
+			if (this.mouseType == MouseEvent.BUTTON3) {
 				setVisibleWidthOffset(e.getX()-this.prevX);
 			} else {
 				this.offsetX = e.getX()-this.startX;

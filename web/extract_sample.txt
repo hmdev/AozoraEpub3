@@ -40,8 +40,12 @@ COVER_IMG	.novel_img img:0
 ## 各話へのリンク
 HREF	a	^\/novel\.php\?mode=rd\&
 
-## 一覧に記載されている各話の更新日時 (HREFと1:1で対応している必要有り)
+## 一覧に記載されている各話の更新日時チェック用にタグ全体の文字列を利用
+## (HREFと1:1で対応している必要有り)
 SUB_UPDATE	.long_update
+
+##本文に日付が無い場合 innerHTML文字列を置換して公開文字列を出力
+#CONTENT_UPDATE_LIST	.long_update	^(.+?)(<span title=\"(.+?)\".*)?$	$1 公開　$3
 
 ################
 ## ページ番号 数字のみ利用 (前優先 ^[^\d]*(\d+) )
@@ -58,7 +62,7 @@ SUB_UPDATE	.long_update
 ## 各話 章タイトル 中見出しで出力
 CONTENT_SUBTITLE	.novel_subtitle
 ##各話内に記載されている更新日時
-#CONTENT_UPDATE
+#CONTENT_UPDATE	.date	^(.*)$	$1
 
 ##本文タグ外に画像がある場合本文の前に出力
 CONTENT_IMG	.novel_img img

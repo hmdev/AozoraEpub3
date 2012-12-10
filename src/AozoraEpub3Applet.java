@@ -941,11 +941,12 @@ public class AozoraEpub3Applet extends JApplet
 		//横
 		panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-		panel.setBorder(new NarrowTitledBorder("Jpeg圧縮率"));
+		panel.setBorder(new NarrowTitledBorder("Jpeg画質"));
 		tabPanel.add(panel);
 		propValue = props.getProperty("JpegQuality");
 		defaultValue = 80; try { defaultValue = Integer.parseInt(propValue); } catch (Exception e) {}
 		jTextJpegQuality = new JTextField(propValue==null?""+defaultValue:propValue);
+		jTextJpegQuality.setToolTipText("Jpeg保存時の画質(100が最高) 表紙編集、縮小、回転、余白除去後の保存時に利用します");
 		jTextJpegQuality.setHorizontalAlignment(JTextField.RIGHT);
 		jTextJpegQuality.setInputVerifier(new IntegerInputVerifier(defaultValue, 30, 100));
 		jTextJpegQuality.setMaximumSize(text3);
@@ -953,6 +954,7 @@ public class AozoraEpub3Applet extends JApplet
 		jTextJpegQuality.addFocusListener(new TextSelectFocusListener(jTextJpegQuality));
 		panel.add(jTextJpegQuality);
 		label = new JLabel("(30～100)");
+		label.setToolTipText("Jpeg保存時の画質(100が最高) 表紙編集、縮小、回転、余白除去後の保存時に利用します");
 		label.setBorder(padding2H);
 		panel.add(label);
 		

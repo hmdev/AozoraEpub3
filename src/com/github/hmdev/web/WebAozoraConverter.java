@@ -274,7 +274,7 @@ public class WebAozoraConverter
 			//更新のない各話のURL(フルパス)を格納
 			//nullならキャッシュ更新無しで、空ならすべて更新される
 			HashSet<String> noUpdateUrls = null;
-			
+			String[] postDateList = null;
 			if (hrefs == null) {
 				//ページ番号取得
 				String pageNumString = getExtractText(doc, this.queryMap.get(ExtractId.PAGE_NUM));
@@ -301,7 +301,7 @@ public class WebAozoraConverter
 					Elements contentDivs = getExtractElements(doc, this.queryMap.get(ExtractId.CONTENT_ARTICLE));
 					if (contentDivs != null) {
 						//一覧のリンクはないが本文がある場合
-						docToAozoraText(bw, doc, false);
+						docToAozoraText(bw, doc, false, null);
 					} else {
 						LogAppender.println("一覧のリンク先が取得できませんでした");
 						return null;
@@ -311,9 +311,10 @@ public class WebAozoraConverter
 				//更新分のみ取得するようにするためhrefに対応した日付タグの文字列(innerHTML)を取得して保存しておく
 				Elements updates = getExtractElements(doc, this.queryMap.get(ExtractId.SUB_UPDATE));
 				if (updates != null) {
-					//更新情報
+					//更新しないURLのチェック用
 					noUpdateUrls = createNoUpdateUrls(updateInfoFile, urlString, listBaseUrl, contentsUpdate, hrefs, updates);
 				}
+				//一覧のhrefをすべて取得
 				for (Element href : hrefs) {
 					String hrefString = href.attr("href");
 					if (hrefString == null || hrefString.length() == 0) continue;
@@ -328,12 +329,15 @@ public class WebAozoraConverter
 						chapterHrefs.add(chapterHref);
 					}
 				}
+				
+				postDateList = getPostDateList(doc, this.queryMap.get(ExtractId.CONTENT_UPDATE_LIST));
 			}
 			
 			if (chapterHrefs.size() > 0) {
 				//全話で更新や追加があるかチェック
 				boolean updated = false;
 				
+				int i = 0;
 				for (String chapterHref : chapterHrefs) {
 					if (this.canceled) return null;
 					
@@ -382,8 +386,14 @@ public class WebAozoraConverter
 							bw.append("［＃ここで大見出し終わり］\n");
 							bw.append('\n');
 						}
-						docToAozoraText(bw, chapterDoc, newChapter);
+						//更新日時を一覧から取得
+						String postDate = null;
+						if (postDateList != null && postDateList.length > i) {
+							postDate = postDateList[i];
+						}
+						docToAozoraText(bw, chapterDoc, newChapter, postDate);
 					}
+					i++;
 				}
 				if (!updated) {
 					LogAppender.append(title);
@@ -476,8 +486,24 @@ public class WebAozoraConverter
 		return noUpdateUrls;
 	}
 	
+	/** 一覧から更新日時を取得 */
+	private String[] getPostDateList(Document doc, ExtractInfo[] extractInfos)
+	{
+		if (extractInfos == null) return null;
+		for (ExtractInfo extractInfo : extractInfos) {
+			Elements elements = doc.select(extractInfo.query);
+			if (elements == null || elements.size() == 0) continue;
+			String[] postDateList = new String[elements.size()];
+			for (int i=0; i<postDateList.length; i++) {
+				postDateList[i] = extractInfo.replace(elements.get(i).html());
+			}
+			return postDateList;
+		}
+		return null;
+	}
+	
 	/** 各話のHTMLの変換 */
-	private void docToAozoraText(BufferedWriter bw, Document doc, boolean newChapter) throws IOException
+	private void docToAozoraText(BufferedWriter bw, Document doc, boolean newChapter, String postDate) throws IOException
 	{
 		Elements contentDivs = getExtractElements(doc, this.queryMap.get(ExtractId.CONTENT_ARTICLE));
 		if (contentDivs != null && contentDivs.size() > 0) {
@@ -487,8 +513,19 @@ public class WebAozoraConverter
 				bw.append("［＃ここから中見出し］\n");
 				printText(bw, subTitle);
 				bw.append('\n');
-				bw.append("［＃ここで中見出し終わり］\n\n");
+				bw.append("［＃ここで中見出し終わり］\n");
 			}
+			//公開日付
+			String coutentUpdate = getExtractText(doc, this.queryMap.get(ExtractId.CONTENT_UPDATE));
+			if (coutentUpdate != null && coutentUpdate.length() > 0) postDate = coutentUpdate;
+			if (postDate != null) {
+				bw.append("［＃ここから地から１字上げ］\n［＃ここから１段階小さな文字］\n");
+				bw.append(postDate);
+				bw.append('\n');
+				bw.append("［＃ここで小さな文字終わり］\n［＃ここで字上げ終わり］\n");
+			}
+			
+			bw.append('\n');
 			
 			//画像 取り合えず前に
 			Elements images = getExtractElements(doc, this.queryMap.get(ExtractId.CONTENT_IMG));
@@ -498,18 +535,15 @@ public class WebAozoraConverter
 			Elements preambleDivs = getExtractElements(doc, this.queryMap.get(ExtractId.CONTENT_PREAMBLE));
 			if (preambleDivs != null) {
 				bw.append("［＃区切り線］\n");
-				bw.append("［＃ここから２字下げ］\n");
-				bw.append("［＃ここから２字上げ］\n");
+				bw.append("［＃ここから２字下げ］\n［＃ここから２字上げ］\n");
 				bw.append("［＃ここから１段階小さな文字］\n");
-				bw.append('\n');
+				bw.append("\n");
 				for (Element elem : preambleDivs) printNode(bw, elem);
-				bw.append('\n');
-				bw.append('\n');
+				bw.append("\n\n");
 				bw.append("［＃ここで小さな文字終わり］\n");
-				bw.append("［＃ここで字上げ終わり］\n");
-				bw.append("［＃ここで字下げ終わり］\n");
+				bw.append("［＃ここで字上げ終わり］\n［＃ここで字下げ終わり］\n");
 				bw.append("［＃区切り線］\n");
-				bw.append('\n');
+				bw.append("\n\n");
 			}
 			//本文
 			for (Element elem : contentDivs) {
@@ -521,19 +555,15 @@ public class WebAozoraConverter
 			//後書き
 			Elements appendixDivs = getExtractElements(doc, this.queryMap.get(ExtractId.CONTENT_APPENDIX));
 			if (appendixDivs != null) {
-				bw.append('\n');
-				bw.append('\n');
+				bw.append("\n\n");
 				bw.append("［＃区切り線］\n");
-				bw.append("［＃ここから２字下げ］\n");
-				bw.append("［＃ここから２字上げ］\n");
+				bw.append("［＃ここから２字下げ］\n［＃ここから２字上げ］\n");
 				bw.append("［＃ここから１段階小さな文字］\n");
-				bw.append('\n');
+				bw.append("\n");
 				for (Element elem : appendixDivs) printNode(bw, elem);
-				bw.append('\n');
-				bw.append('\n');
+				bw.append("\n");
 				bw.append("［＃ここで小さな文字終わり］\n");
-				bw.append("［＃ここで字上げ終わり］\n");
-				bw.append("［＃ここで字下げ終わり］\n");
+				bw.append("［＃ここで字上げ終わり］\n［＃ここで字下げ終わり］\n");
 			}
 		}
 	}
