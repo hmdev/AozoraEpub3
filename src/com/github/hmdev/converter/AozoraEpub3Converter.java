@@ -439,20 +439,20 @@ public class AozoraEpub3Converter
 		if (chapterChukiMap == null) chapterChukiMap = new HashMap<String, Integer>();
 		else chapterChukiMap.clear();
 		if (h) {
-			chapterChukiMap.put("ここから見出し", ChapterLineInfo.LEVEL_H1);
-			chapterChukiMap.put("見出し", ChapterLineInfo.LEVEL_H1);
+			chapterChukiMap.put("ここから見出し", ChapterLineInfo.TYPE_CHUKI_H);
+			chapterChukiMap.put("見出し", ChapterLineInfo.TYPE_CHUKI_H);
 		}
 		if (h1) {
-			chapterChukiMap.put("ここから大見出し", ChapterLineInfo.LEVEL_H1);
-			chapterChukiMap.put("大見出し", ChapterLineInfo.LEVEL_H1);
+			chapterChukiMap.put("ここから大見出し", ChapterLineInfo.TYPE_CHUKI_H1);
+			chapterChukiMap.put("大見出し", ChapterLineInfo.TYPE_CHUKI_H1);
 		}
 		if (h2) {
-			chapterChukiMap.put("ここから中見出し", ChapterLineInfo.LEVEL_H2);
-			chapterChukiMap.put("中見出し", ChapterLineInfo.LEVEL_H2);
+			chapterChukiMap.put("ここから中見出し", ChapterLineInfo.TYPE_CHUKI_H2);
+			chapterChukiMap.put("中見出し", ChapterLineInfo.TYPE_CHUKI_H2);
 		}
 		if (h3) {
-			chapterChukiMap.put("ここから小見出し", ChapterLineInfo.LEVEL_H3);
-			chapterChukiMap.put("小見出し", ChapterLineInfo.LEVEL_H3);
+			chapterChukiMap.put("ここから小見出し", ChapterLineInfo.TYPE_CHUKI_H2);
+			chapterChukiMap.put("小見出し", ChapterLineInfo.TYPE_CHUKI_H2);
 		}
 		
 		this.useNextLineChapterName = useNextLineChapterName;
@@ -618,15 +618,16 @@ public class AozoraEpub3Converter
 				} else if (chapterChukiMap.containsKey(chukiName)) {
 					//見出し注記
 					//注記の後に文字がなければブロックなので次の行 (次の行にブロック注記はこない？)
+					int chapterType = chapterChukiMap.get(chukiName);
 					if (line.length() == m.start()+chukiTag.length())  {
-						preChapterLineInfo = new ChapterLineInfo(lineNum+1, ChapterLineInfo.TYPE_CHUKI, addSectionChapter, chapterChukiMap.get(chukiName), lastEmptyLine==lineNum-1);
+						preChapterLineInfo = new ChapterLineInfo(lineNum+1, chapterType, addSectionChapter, ChapterLineInfo.getLevel(chapterType), lastEmptyLine==lineNum-1);
 						bookInfo.addChapterLineInfo(preChapterLineInfo);
 						addChapterName = true; //次の行を見出しとして利用
 						addNextChapterName = -1;
 					}
 					else {
 						bookInfo.addChapterLineInfo(
-								new ChapterLineInfo(lineNum, ChapterLineInfo.TYPE_CHUKI, addSectionChapter, chapterChukiMap.get(chukiName), lastEmptyLine==lineNum-1, this.getChapterName(line.substring(m.end()))) );
+								new ChapterLineInfo(lineNum, chapterType, addSectionChapter, ChapterLineInfo.getLevel(chapterType), lastEmptyLine==lineNum-1, this.getChapterName(line.substring(m.end()))) );
 						if (this.useNextLineChapterName) addNextChapterName = lineNum+1; //次の行を連結
 						addChapterName = false; //次の行を見出しとして利用しない
 					}
@@ -750,7 +751,7 @@ public class AozoraEpub3Converter
 				}
 			}
 			//改ページ後の注記以外の本文を追加
-			if (this.chapterSection && (addSectionChapter || lineNum == bookInfo.titleLine)) {
+			if (this.chapterSection && addSectionChapter) {
 				//底本：は目次に出さない
 				if (line.length() > 2 && line.charAt(0)=='底' && line.charAt(1)=='本' && line.charAt(2)=='：' ) {
 					addSectionChapter = false; //改ページ後のChapter出力を抑止
@@ -813,6 +814,14 @@ public class AozoraEpub3Converter
 		bookInfo.setMetaInfo(titleType, firstLines, firstLineStart, firstCommentLineNum);
 		bookInfo.setPreTitlePageBreak(preTitlePageBreak); //タイトルがあればタイトル前の改ページ状況を設定
 		
+		//タイトルのChapter追加
+		if (bookInfo.titleLine > -1) {
+			String name = this.getChapterName(bookInfo.title);
+			ChapterLineInfo chapterLineInfo = bookInfo.getChapterLineInfo(bookInfo.titleLine);
+			if (chapterLineInfo == null) bookInfo.addChapterLineInfo(new ChapterLineInfo(bookInfo.titleLine, ChapterLineInfo.TYPE_TITLE, true, 0, false, name));
+			else { chapterLineInfo.type = ChapterLineInfo.TYPE_TITLE; chapterLineInfo.level = 0; }
+		}
+		
 		//見出しに追加されたタイトル行は削除
 		//if (bookInfo.titleLine > 0) {
 		//	bookInfo.removeChapterLineInfo(bookInfo.titleLine);
@@ -854,7 +863,7 @@ public class AozoraEpub3Converter
 	{
 		String name = line.replaceAll("［＃.+?］", "").replaceAll("<a [^>]+>", "").replaceAll("<img [^>]+>", "") //注記とaタグとimgタグ除去
 				.replaceAll("※", "") //エスケープ文字復元
-				.replaceFirst("^[ |　|―]+", "").replaceFirst("[ |　|―]+$","") //前後の不要な文字所除去
+				.replaceFirst("^[\t| |　|―]+", "").replaceFirst("[\t| |　|―]+$","") //前後の不要な文字所除去
 				.replaceAll("〳〵", "く").replaceAll("〴〵", "ぐ").replaceAll("〻", "々")
 				.replaceFirst("^(=|＝|-|―|─)(=|＝|-|―|─)+", "").replaceFirst("(=|＝|-|―|─)(=|＝|-|―|─)+$", "");//連続する記号除去
 				//printLineBuffer内だと以下の変換が必要

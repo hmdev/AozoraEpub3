@@ -30,6 +30,8 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.border.Border;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableModel;
 
 import com.github.hmdev.image.ImageInfoReader;
@@ -85,6 +87,16 @@ public class JConfirmDialog extends JDialog
 	JTable jTableToc;
 	JScrollPane jScrollToc;
 	TocTableDataModel tocDataModel;
+	
+	/** 目次選択 */
+	JCheckBox jCheckChapterSection;
+	JCheckBox jCheckChapterH;
+	JCheckBox jCheckChapterH1;
+	JCheckBox jCheckChapterH2;
+	JCheckBox jCheckChapterH3;
+	JCheckBox jCheckChapterName;
+	JCheckBox jCheckChapterNum;
+	JCheckBox jCheckChapterPattern;
 	
 	////////////////////////////////
 	//Preview Controls
@@ -331,6 +343,54 @@ public class JConfirmDialog extends JDialog
 		jScrollToc = new JScrollPane(jTableToc);
 		//tocPane.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 0));
 		previewLeft.add(jScrollToc);
+		
+		//目次選択
+		panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		panel.setBorder(padding0);
+		label = new JLabel("目次選択:");
+		label.setBorder(padding2H);
+		panel.add(label);
+		jCheckChapterSection = new JCheckBox("改");
+		jCheckChapterSection.setFocusPainted(false);
+		jCheckChapterSection.setBorder(padding2H);
+		jCheckChapterSection.addChangeListener(new ChangeListener() { public void stateChanged(ChangeEvent arg0){ selectChapterType(ChapterLineInfo.TYPE_PAGEBREAK); } });
+		panel.add(jCheckChapterSection);
+		jCheckChapterH = new JCheckBox("見");
+		jCheckChapterH.setFocusPainted(false);
+		jCheckChapterH.setBorder(padding2H);
+		jCheckChapterH.addChangeListener(new ChangeListener() { public void stateChanged(ChangeEvent arg0){ selectChapterType(ChapterLineInfo.TYPE_CHUKI_H); } });
+		panel.add(jCheckChapterH);
+		jCheckChapterH1 = new JCheckBox("大");
+		jCheckChapterH1.setFocusPainted(false);
+		jCheckChapterH1.setBorder(padding2H);
+		jCheckChapterH1.addChangeListener(new ChangeListener() { public void stateChanged(ChangeEvent arg0){ selectChapterType(ChapterLineInfo.TYPE_CHUKI_H1); } });
+		panel.add(jCheckChapterH1);
+		jCheckChapterH2 = new JCheckBox("中");
+		jCheckChapterH2.setFocusPainted(false);
+		jCheckChapterH2.setBorder(padding2H);
+		jCheckChapterH2.addChangeListener(new ChangeListener() { public void stateChanged(ChangeEvent arg0){ selectChapterType(ChapterLineInfo.TYPE_CHUKI_H2); } });
+		panel.add(jCheckChapterH2);
+		jCheckChapterH3 = new JCheckBox("小");
+		jCheckChapterH3.setFocusPainted(false);
+		jCheckChapterH3.setBorder(padding2H);
+		jCheckChapterH3.addChangeListener(new ChangeListener() { public void stateChanged(ChangeEvent arg0){ selectChapterType(ChapterLineInfo.TYPE_CHUKI_H3); } });
+		panel.add(jCheckChapterH3);
+		jCheckChapterName = new JCheckBox("章");
+		jCheckChapterName.setFocusPainted(false);
+		jCheckChapterName.setBorder(padding2H);
+		jCheckChapterName.addChangeListener(new ChangeListener() { public void stateChanged(ChangeEvent arg0){ selectChapterType(ChapterLineInfo.TYPE_CHAPTER_NAME); } });
+		panel.add(jCheckChapterName);
+		jCheckChapterNum = new JCheckBox("数");
+		jCheckChapterNum.setFocusPainted(false);
+		jCheckChapterNum.setBorder(padding2H);
+		jCheckChapterNum.addChangeListener(new ChangeListener() { public void stateChanged(ChangeEvent arg0){ selectChapterType(ChapterLineInfo.TYPE_CHAPTER_NUM); } });
+		panel.add(jCheckChapterNum);
+		jCheckChapterPattern = new JCheckBox("他");
+		jCheckChapterPattern.setFocusPainted(false);
+		jCheckChapterPattern.setBorder(padding2H);
+		jCheckChapterPattern.addChangeListener(new ChangeListener() { public void stateChanged(ChangeEvent arg0){ selectChapterType(ChapterLineInfo.TYPE_PATTERN); } });
+		panel.add(jCheckChapterPattern);
+		previewLeft.add(panel);
 		
 		////////////////////////////////////////////////////////////////
 		//右側プレビューパネル
@@ -655,6 +715,49 @@ public class JConfirmDialog extends JDialog
 		}
 	}
 	
+	void selectChapterType(int chapterType)
+	{
+		if (this.tocDataModel == null) return;
+		boolean sectionSelected = jCheckChapterSection.isSelected();
+		for (int row=this.tocDataModel.getRowCount()-1; row>=0; row--) {
+			int rowChapterType = this.tocDataModel.getChapterType(row);
+			boolean rowSectionSelected = this.tocDataModel.isPageBreak(row);
+			if (chapterType == rowChapterType || (chapterType == ChapterLineInfo.TYPE_PAGEBREAK && rowSectionSelected)) {
+				switch (rowChapterType) {
+				case ChapterLineInfo.TYPE_CHUKI_H:
+					this.tocDataModel.setSelected(row, jCheckChapterH.isSelected()||(sectionSelected&&rowSectionSelected)); break;
+				case ChapterLineInfo.TYPE_CHUKI_H1:
+					this.tocDataModel.setSelected(row, jCheckChapterH1.isSelected()||(sectionSelected&&rowSectionSelected)); break;
+				case ChapterLineInfo.TYPE_CHUKI_H2:
+					this.tocDataModel.setSelected(row, jCheckChapterH2.isSelected()||(sectionSelected&&rowSectionSelected)); break;
+				case ChapterLineInfo.TYPE_CHUKI_H3:
+					this.tocDataModel.setSelected(row, jCheckChapterH3.isSelected()||(sectionSelected&&rowSectionSelected)); break;
+				case ChapterLineInfo.TYPE_CHAPTER_NAME:
+					this.tocDataModel.setSelected(row, jCheckChapterName.isSelected()||(sectionSelected&&rowSectionSelected)); break;
+				case ChapterLineInfo.TYPE_CHAPTER_NUM:
+					this.tocDataModel.setSelected(row, jCheckChapterNum.isSelected()||(sectionSelected&&rowSectionSelected)); break;
+				case ChapterLineInfo.TYPE_PATTERN:
+					this.tocDataModel.setSelected(row, jCheckChapterPattern.isSelected()||(sectionSelected&&rowSectionSelected)); break;
+				default:
+					this.tocDataModel.setSelected(row, (sectionSelected&&rowSectionSelected)); break;
+				}
+			}
+		}
+	}
+	
+	/** 目次一括変更のチェックを設定 */
+	public void setChapterCheck(boolean section, boolean h, boolean h1, boolean h2, boolean h3, boolean name, boolean num, boolean pattern)
+	{
+		jCheckChapterSection.setSelected(section);
+		jCheckChapterH.setSelected(h);
+		jCheckChapterH1.setSelected(h1);
+		jCheckChapterH2.setSelected(h2);
+		jCheckChapterH3.setSelected(h3);
+		jCheckChapterName.setSelected(name);
+		jCheckChapterNum.setSelected(num);
+		jCheckChapterPattern.setSelected(pattern);
+	}
+	
 	/** 確認ダイアログを表示
 	 * @param location ダイアログ表示位置 */
 	public void showDialog(String srcFile, String dstPath, String title, String creator, int titleTypeIndex,
@@ -690,6 +793,15 @@ public class JConfirmDialog extends JDialog
 		
 		this.jCoverImagePanel.setBookInfo(bookInfo);
 		
+		//目次に無いものはdisabled
+		jCheckChapterH.setEnabled(false);
+		jCheckChapterH1.setEnabled(false);
+		jCheckChapterH2.setEnabled(false);
+		jCheckChapterH3.setEnabled(false);
+		jCheckChapterName.setEnabled(false);
+		jCheckChapterNum.setEnabled(false);
+		jCheckChapterPattern.setEnabled(false);
+		jCheckChapterSection.setEnabled(false);
 		//目次設定
 		if (bookInfo.isImageOnly()) {
 			this.tocDataModel = null;
@@ -697,10 +809,24 @@ public class JConfirmDialog extends JDialog
 			this.jTableToc.setVisible(false);
 			this.jScrollToc.setVisible(false);
 		} else {
+			
 			Vector<ChapterLineInfo> vecChapterLineInfo = bookInfo.getChapterLineInfoList();
 			this.tocDataModel = new TocTableDataModel(new String[]{"", "", "", "行", "目次名称"}, 0);
 			for (ChapterLineInfo chapterLineInfo : vecChapterLineInfo) {
-				tocDataModel.addRow(new Object[]{true, chapterLineInfo.pageBreakChapter?"改":"", chapterLineInfo.getTypeId(), chapterLineInfo.lineNum+1, chapterLineInfo.getChapterName()});
+				if (chapterLineInfo.pageBreakChapter) jCheckChapterSection.setEnabled(true);
+				switch (chapterLineInfo.type) {
+				case ChapterLineInfo.TYPE_CHUKI_H: jCheckChapterH.setEnabled(true); break;
+				case ChapterLineInfo.TYPE_CHUKI_H1: jCheckChapterH1.setEnabled(true); break;
+				case ChapterLineInfo.TYPE_CHUKI_H2: jCheckChapterH2.setEnabled(true); break;
+				case ChapterLineInfo.TYPE_CHUKI_H3: jCheckChapterH3.setEnabled(true); break;
+				case ChapterLineInfo.TYPE_CHAPTER_NAME: jCheckChapterName.setEnabled(true); break;
+				case ChapterLineInfo.TYPE_CHAPTER_NUM: jCheckChapterNum.setEnabled(true); break;
+				case ChapterLineInfo.TYPE_PATTERN: jCheckChapterPattern.setEnabled(true); break;
+				}
+				//行の値設定
+				tocDataModel.addRow(new Object[]{
+					true, chapterLineInfo.pageBreakChapter?"改":"", chapterLineInfo.getTypeId(), chapterLineInfo.lineNum+1, chapterLineInfo.getChapterName()
+				});
 			}
 			this.jTableToc.setModel(tocDataModel);
 			this.jTableToc.getColumnModel().getColumn(0).setMaxWidth(22);
@@ -814,9 +940,24 @@ public class JConfirmDialog extends JDialog
 			}
 			return false;
 		}
+		
+		public void setSelected(int row, boolean select)
+		{
+			this.setValueAt(select, row, 0);
+		}
 		public boolean isSelected(int row)
 		{
 			return (Boolean)this.getValueAt(row, 0);
+		}
+		public boolean isPageBreak(int row)
+		{
+			return "改".equals((String)this.getValueAt(row, 1));
+		}
+		public int getChapterType(int row)
+		{
+			String value = (String)this.getValueAt(row, 2);
+			if (value.length() == 0) return 0;
+			return ChapterLineInfo.getChapterType(value.charAt(0));
 		}
 		public int getLineNum(int row)
 		{

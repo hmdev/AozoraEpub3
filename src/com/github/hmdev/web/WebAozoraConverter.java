@@ -697,8 +697,9 @@ public class WebAozoraConverter
 			case '｜': bw.append("※［＃縦線、1-1-35］"); break;
 			case '＃': bw.append("※［＃井げた、1-1-84］"); break;
 			case '※': bw.append("※［＃米印、1-2-8］"); break;
+			case '\t': bw.append(' '); break;
 			case '\n': case '\r': break;
-			default: bw.append(ch); 
+			default: bw.append(ch);
 			}
 		}
 	}
@@ -791,7 +792,7 @@ public class WebAozoraConverter
 				if (node instanceof TextNode) {
 					String text = ((TextNode) node).getWholeText();
 					if (text != null && text.length() > 0) {
-						text = text.replaceAll("[\n|\r]", "").trim();
+						text = text.replaceAll("[\n|\r]", "").replaceAll("\t", " ").trim();
 						if (text.length() > 0) return text;
 					}
 				}

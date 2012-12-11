@@ -211,6 +211,8 @@ public class AozoraEpub3Applet extends JApplet
 	JTextField jTextPageBreakChapterSize;
 	
 	JTextField jTextMaxChapterNameLength;
+	JCheckBox jCheckChapterUseNextLine;
+	JCheckBox jCheckChapterExclude;
 	JCheckBox jCheckCoverPageToc;
 	JCheckBox jCheckChapterSection;
 	JCheckBox jCheckChapterH;
@@ -218,13 +220,10 @@ public class AozoraEpub3Applet extends JApplet
 	JCheckBox jCheckChapterH2;
 	JCheckBox jCheckChapterH3;
 	JCheckBox jCheckChapterName;
-	JCheckBox jCheckChapterNameTitle;
 	JCheckBox jCheckChapterNumTitle;
 	JCheckBox jCheckChapterNumOnly;
 	JCheckBox jCheckChapterNumParen;
 	JCheckBox jCheckChapterNumParenTitle;
-	JCheckBox jCheckChapterUseNextLine;
-	JCheckBox jCheckChapterExclude;
 	JCheckBox jCheckChapterPattern;
 	JComboBox jComboChapterPattern;
 	
@@ -2377,13 +2376,18 @@ public class AozoraEpub3Applet extends JApplet
 			return;
 		}
 		
-		//確認ページ 変換ボタン押下時にbookInfo更新
+		//確認ダイアログ 変換ボタン押下時にbookInfo更新
 		if (this.jCheckConfirm.isSelected()) {
 			//表題と著者設定 ファイル名から設定
 			String title = "";
 			String creator = "";
 			if (bookInfo.title != null) title = bookInfo.title;
 			if (bookInfo.creator != null) creator = bookInfo.creator;
+			this.jConfirmDialog.setChapterCheck(jCheckChapterSection.isSelected(),
+					jCheckChapterH.isSelected(), jCheckChapterH1.isSelected(), jCheckChapterH2.isSelected(), jCheckChapterH3.isSelected(),
+					jCheckChapterName.isSelected(),
+					jCheckChapterNumOnly.isSelected()||jCheckChapterNumTitle.isSelected()||jCheckChapterNumParen.isSelected()||jCheckChapterNumParenTitle.isSelected(),
+					jCheckChapterPattern.isSelected());
 			this.jConfirmDialog.showDialog(
 				srcFile.getName(),
 				(dstPath!=null ? dstPath.getAbsolutePath() : srcFile.getParentFile().getAbsolutePath())+File.separator,
@@ -2736,7 +2740,7 @@ public class AozoraEpub3Applet extends JApplet
 		jFrame.setIconImage(applet.iconImage);
 		//最小サイズ
 		jFrame.setMinimumSize(new Dimension(500, 320));
-		jFrame.setPreferredSize(new Dimension(500, 320));
+		jFrame.setPreferredSize(new Dimension(500, 360));
 		
 		try {
 			int x = (int)Float.parseFloat(applet.props.getProperty("PosX"));
