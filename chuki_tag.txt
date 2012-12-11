@@ -184,8 +184,8 @@
 ［＃注記付き］	｜
 
 ####縦横中 (前後の外字画像がずれるので外にspan追加)
-縦中横	<span class="tcy"><span>		2
-縦中横終わり	</span></span>		3
+縦中横	<span class="tcy"><span>
+縦中横終わり	</span></span>
 
 ####割り注
 ## → 未対応

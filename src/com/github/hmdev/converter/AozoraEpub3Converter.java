@@ -1744,7 +1744,6 @@ public class AozoraEpub3Converter
 	 * ・ルビ （前｜漢字《かんじ》 → 前<ruby><rbase>漢字</rbase><rtop>かんじ</rtop></ruby>）
 	 * ・文字置換 （―）
 	 * ・半角2文字のみの数字と!?を縦横中変換
-	 * < と > は &lt; &gt; に置換
 	 * @param buf 出力先バッファ
 	 * @param ch ルビ変換前の行文字列
 	 * @param begin 変換範囲開始位置
@@ -1809,152 +1808,9 @@ public class AozoraEpub3Converter
 					}
 				}
 				break;
-			case '0': case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9':
-				//数字2文字を縦横中で出力
-				if (this.autoYoko && !(this.inYoko || this.inTcy || noTcy || inRuby)) {
-					if (this.autoYokoNum3 && i+2<ch.length && CharUtils.isHalfNum(ch[i+1]) && CharUtils.isHalfNum(ch[i+2])) {
-						//数字3文字
-						//前後が半角かチェック
-						if (i>0 && CharUtils.isHalf(ch[i-1])) break;
-						if (i+3<ch.length && CharUtils.isHalf(ch[i+3])) break;
-						//半角スペースの前後が半角文字
-						if (i>1 && ch[i-1]==' ' && CharUtils.isHalf(ch[i-2])) break;
-						if (i+4<ch.length && ch[i+3]==' ' && CharUtils.isHalf(ch[i+3])) break;
-						//前まで出力
-						if (rubyStart != -1) convertChars(buf, ch, rubyStart, i - rubyStart, false);
-						rubyStart = -1;
-						buf.append(chukiMap.get("縦中横")[0]);
-						buf.append(ch[i]);
-						buf.append(ch[i+1]);
-						buf.append(ch[i+2]);
-						buf.append(chukiMap.get("縦中横終わり")[0]);
-						i+=2;
-						continue;
-					} else if (i+1<ch.length && CharUtils.isHalfNum(ch[i+1])) {
-						//数字2文字
-						//前後が半角かチェック
-						if (i>0 && CharUtils.isHalf(ch[i-1])) break;
-						if (i+2<ch.length && CharUtils.isHalf(ch[i+2])) break;
-						//半角スペースの前後が半角文字
-						if (i>1 && ch[i-1]==' ' && CharUtils.isHalf(ch[i-2])) break;
-						if (i+3<ch.length && ch[i+2]==' ' && CharUtils.isHalf(ch[i+3])) break;
-						//前まで出力
-						if (rubyStart != -1) convertChars(buf, ch, rubyStart, i - rubyStart, false);
-						rubyStart = -1;
-						buf.append(chukiMap.get("縦中横")[0]);
-						buf.append(ch[i]);
-						buf.append(ch[i+1]);
-						buf.append(chukiMap.get("縦中横終わり")[0]);
-						i++;
-						continue;
-					} else if (this.autoYokoNum1 && (i==0 || !CharUtils.isHalfNum(ch[i-1])) && (i+1==ch.length || !CharUtils.isHalfNum(ch[i+1]))) {
-						//数字1文字
-						//前後が半角かチェック
-						if (i>0 && CharUtils.isHalf(ch[i-1])) break;
-						if (i+1<ch.length && CharUtils.isHalf(ch[i+1])) break;
-						//半角スペースの前後が半角文字
-						if (i>1 && ch[i-1]==' ' && CharUtils.isHalf(ch[i-2])) break;
-						if (i+2<ch.length && ch[i+1]==' ' && CharUtils.isHalf(ch[i+2])) break;
-						//前まで出力
-						if (rubyStart != -1) convertChars(buf, ch, rubyStart, i - rubyStart, false);
-						rubyStart = -1;
-						buf.append(chukiMap.get("縦中横")[0]);
-						buf.append(ch[i]);
-						buf.append(chukiMap.get("縦中横終わり")[0]);
-						continue;
-					}
-					//1月1日のような場合
-					if (i+3<end && ch[i+1]=='月' && '0'<=ch[i+2] && ch[i+2]<='9' && (
-						ch[i+3]=='日' || (i+4<ch.length && '0'<=ch[i+3] && ch[i+3]<='9' && ch[i+4]=='日'))) {
-						//1月2日 1月10日 の1を縦中横
-						//前まで出力
-						if (rubyStart != -1) convertChars(buf, ch, rubyStart, i - rubyStart, false);
-						rubyStart = -1;
-						buf.append(chukiMap.get("縦中横")[0]);
-						buf.append(ch[i]);
-						buf.append(chukiMap.get("縦中横終わり")[0]);
-						continue;
-					}
-					if (i>begin+1 && i+1<end && (ch[i-1]=='年' && ch[i+1]=='月' || ch[i-1]=='月' && ch[i+1]=='日' || ch[i-1]=='第' && (ch[i+1]=='刷' || ch[i+1]=='版' || ch[i+1]=='巻'))) {
-						//年3月 + 月4日 + 第5刷 + 第6版 + 第7巻 の数字１文字縦中横
-						//前まで出力
-						if (rubyStart != -1) convertChars(buf, ch, rubyStart, i - rubyStart, false);
-						rubyStart = -1;
-						buf.append(chukiMap.get("縦中横")[0]);
-						buf.append(ch[i]);
-						buf.append(chukiMap.get("縦中横終わり")[0]);
-						continue;
-					}
-					if (i>begin+2 && (ch[i-2]=='明'&&ch[i-1]=='治' || ch[i-2]=='大'&&ch[i-1]=='正' || ch[i-2]=='昭'&&ch[i-1]=='和' || ch[i-2]=='平'&&ch[i-1]=='成')) {
-						//月5日 の5を縦中横
-						//前まで出力
-						if (rubyStart != -1) convertChars(buf, ch, rubyStart, i - rubyStart, false);
-						rubyStart = -1;
-						buf.append(chukiMap.get("縦中横")[0]);
-						buf.append(ch[i]);
-						buf.append(chukiMap.get("縦中横終わり")[0]);
-						continue;
-					}
-				}
-				break;
-			case '!': case '?':
-				if (autoYoko  && !(inYoko || inTcy || noTcy || inRuby)) {
-					if (autoYokoEQ3 && i+2<ch.length && (ch[i+1]=='!' || ch[i+1]=='?') && (ch[i+2]=='!' || ch[i+2]=='?')) {
-						//!? 3文字を縦中横で出力
-						//前後が半角かチェック
-						if (i!=0 && CharUtils.isHalf(ch[i-1])) break;
-						if (i+3<ch.length && CharUtils.isHalf(ch[i+3])) break;
-						//半角スペースの前後が半角文字
-						if (i>1 && ch[i-1]==' ' && CharUtils.isHalf(ch[i-2])) break;
-						if (i+4<ch.length && ch[i+3]==' ' && CharUtils.isHalf(ch[i+4])) break;
-						//前まで出力
-						if (rubyStart != -1) convertChars(buf, ch, rubyStart, i - rubyStart, false);
-						rubyStart = -1;
-						buf.append(chukiMap.get("縦中横")[0]);
-						buf.append(ch[i]);
-						buf.append(ch[i+1]);
-						buf.append(ch[i+2]);
-						buf.append(chukiMap.get("縦中横終わり")[0]);
-						i+=2;
-						continue;
-					} else if (i+1<ch.length && (ch[i+1]=='!' || ch[i+1]=='?')) {
-						//!? 2文字を縦横中で出力
-						//前後が半角かチェック
-						if (i!=0 && CharUtils.isHalf(ch[i-1])) break;
-						if (i+2<ch.length && CharUtils.isHalf(ch[i+2])) break;
-						//半角スペースの前後が半角文字
-						if (i>1 && ch[i-1]==' ' && CharUtils.isHalf(ch[i-2])) break;
-						if (i+3<ch.length && ch[i+2]==' ' && CharUtils.isHalf(ch[i+3])) break;
-						//前まで出力
-						if (rubyStart != -1) convertChars(buf, ch, rubyStart, i - rubyStart, false);
-						rubyStart = -1;
-						buf.append(chukiMap.get("縦中横")[0]);
-						buf.append(ch[i]);
-						buf.append(ch[i+1]);
-						buf.append(chukiMap.get("縦中横終わり")[0]);
-						i++;
-						continue;
-					} else if (autoYokoEQ1 && (i==0 || !CharUtils.isHalfNum(ch[i-1])) && (i+1==ch.length || !CharUtils.isHalfNum(ch[i+1]))) {
-						//!? 1文字
-						//前後が半角かチェック
-						if (i>0 && CharUtils.isHalf(ch[i-1])) break;
-						if (i+1<ch.length && CharUtils.isHalf(ch[i+1])) break;
-						//半角スペースの前後が半角文字
-						if (i>1 && ch[i-1]==' ' && CharUtils.isHalf(ch[i-2])) break;
-						if (i+2<ch.length && ch[i+1]==' ' && CharUtils.isHalf(ch[i+2])) break;
-						//前まで出力
-						if (rubyStart != -1) convertChars(buf, ch, rubyStart, i - rubyStart, false);
-						rubyStart = -1;
-						buf.append(chukiMap.get("縦中横")[0]);
-						buf.append(ch[i]);
-						buf.append(chukiMap.get("縦中横終わり")[0]);
-						continue;
-					}
-				}
-				break;
 			case '｜':
 				//前まで出力
-				if (rubyStart != -1) convertChars(buf, ch, rubyStart, i - rubyStart, false);
+				if (rubyStart != -1) convertTcyText(buf, ch, rubyStart, i, noTcy);
 				rubyStart = i + 1;
 				inRuby = true;
 				break;
@@ -1970,7 +1826,7 @@ public class AozoraEpub3Converter
 				if (ch[i] == '》') {
 					if (rubyStart != -1 && rubyTopStart != -1) {
 						if (noRuby) 
-							convertChars(buf, ch, rubyStart, rubyTopStart - rubyStart, false); //本文
+							convertTcyText(buf, ch, rubyStart, rubyTopStart, noTcy); //本文
 						else {
 							//同じ長さで同じ文字なら一文字づつルビを振る
 							if (rubyTopStart-rubyStart == i-rubyTopStart-1 && CharUtils.isSameChars(ch, rubyTopStart+1, i)) {
@@ -1983,9 +1839,9 @@ public class AozoraEpub3Converter
 								}
 							} else {
 								buf.append(chukiMap.get("ルビ前")[0]);
-								convertChars(buf, ch, rubyStart, rubyTopStart-rubyStart, false); //本文
+								convertTcyText(buf, ch, rubyStart, rubyTopStart, noTcy); //本文
 								buf.append(chukiMap.get("ルビ")[0]);
-								convertChars(buf, ch, rubyTopStart+1, i-rubyTopStart-1, true);//ルビ
+								convertChars(buf, ch, rubyTopStart+1, i, true);//ルビ
 								buf.append(chukiMap.get("ルビ後")[0]);
 							}
 						}
@@ -2007,7 +1863,7 @@ public class AozoraEpub3Converter
 						//英字または空白なら英字ルビ
 						rubyStart = i; isAlphaRuby = true;
 					}
-					// ルビ中でなく漢字以外は出力
+					// ルビ中でなく漢字、半角以外は出力
 					else {
 						convertChar(buf, ch, i, false); isAlphaRuby = false;
 					}
@@ -2017,11 +1873,11 @@ public class AozoraEpub3Converter
 						if (!CharUtils.isHalf(ch[i])) {
 							if (CharUtils.isKanji(i==0?(char)-1:ch[i-1], ch[i], i+1>=ch.length?(char)-1:ch[i+1])) {
 								// rubyStartから前までと現在位置の前まで出力
-								convertChars(buf, ch, rubyStart, i - rubyStart, false);
+								convertTcyText(buf, ch, rubyStart, i, noTcy);
 								rubyStart = i; isAlphaRuby = false;
 							} else {
 								// rubyStartから前までと現在位置の文字を出力するので+1
-								convertChars(buf, ch, rubyStart, i - rubyStart+1, false);
+								convertTcyText(buf, ch, rubyStart, i+1, noTcy);
 								rubyStart = -1;
 							}
 						}
@@ -2029,12 +1885,12 @@ public class AozoraEpub3Converter
 						if (!CharUtils.isKanji(i==0?(char)-1:ch[i-1], ch[i], i+1>=ch.length?(char)-1:ch[i+1])) {
 							if (CharUtils.isHalf(ch[i]) || ch[i] == ' ') {
 								// rubyStartから前までと現在位置の前まで出力
-								convertChars(buf, ch, rubyStart, i - rubyStart, false);
+								convertTcyText(buf, ch, rubyStart, i, noTcy);
 								//英字または空白なら英字ルビ
 								rubyStart = i; isAlphaRuby = true;
 							} else {
 								// rubyStartから前までと現在位置の文字を出力するので+1
-								convertChars(buf, ch, rubyStart, i - rubyStart+1, false);
+								convertTcyText(buf, ch, rubyStart, i+1, noTcy);
 								rubyStart = -1;
 							}
 						}
@@ -2044,19 +1900,150 @@ public class AozoraEpub3Converter
 		}
 		if (rubyStart != -1) {
 			// ルビ開始チェック中で漢字以外ならキャンセルして出力
-			convertChars(buf, ch, rubyStart, end - rubyStart, false);
+			convertTcyText(buf, ch, rubyStart, end, noTcy);
+		}
+	}
+	
+	private void convertTcyText(StringBuilder buf, char[] ch, int begin, int end, boolean noTcy) throws IOException
+	{
+		
+		for (int i=begin; i<end; i++) {
+			switch (ch[i]) {
+			case '0': case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9':
+				//数字2文字を縦横中で出力
+				if (this.autoYoko && !(this.inYoko || this.inTcy || noTcy)) {
+					if (this.autoYokoNum3 && i+2<ch.length && CharUtils.isHalfNum(ch[i+1]) && CharUtils.isHalfNum(ch[i+2])) {
+						//数字3文字
+						//前後が半角かチェック
+						if (i>0 && CharUtils.isHalf(ch[i-1])) break;
+						if (i+3<ch.length && CharUtils.isHalf(ch[i+3])) break;
+						//半角スペースの前後が半角文字
+						if (i>1 && ch[i-1]==' ' && CharUtils.isHalf(ch[i-2])) break;
+						if (i+4<ch.length && ch[i+3]==' ' && CharUtils.isHalf(ch[i+3])) break;
+						buf.append(chukiMap.get("縦中横")[0]);
+						buf.append(ch[i]);
+						buf.append(ch[i+1]);
+						buf.append(ch[i+2]);
+						buf.append(chukiMap.get("縦中横終わり")[0]);
+						i+=2;
+						continue;
+					} else if (i+1<ch.length && CharUtils.isHalfNum(ch[i+1])) {
+						//数字2文字
+						//前後が半角かチェック
+						if (i>0 && CharUtils.isHalf(ch[i-1])) break;
+						if (i+2<ch.length && CharUtils.isHalf(ch[i+2])) break;
+						//半角スペースの前後が半角文字
+						if (i>1 && ch[i-1]==' ' && CharUtils.isHalf(ch[i-2])) break;
+						if (i+3<ch.length && ch[i+2]==' ' && CharUtils.isHalf(ch[i+3])) break;
+						buf.append(chukiMap.get("縦中横")[0]);
+						buf.append(ch[i]);
+						buf.append(ch[i+1]);
+						buf.append(chukiMap.get("縦中横終わり")[0]);
+						i++;
+						continue;
+					} else if (this.autoYokoNum1 && (i==0 || !CharUtils.isHalfNum(ch[i-1])) && (i+1==ch.length || !CharUtils.isHalfNum(ch[i+1]))) {
+						//数字1文字
+						//前後が半角かチェック
+						if (i>0 && CharUtils.isHalf(ch[i-1])) break;
+						if (i+1<ch.length && CharUtils.isHalf(ch[i+1])) break;
+						//半角スペースの前後が半角文字
+						if (i>1 && ch[i-1]==' ' && CharUtils.isHalf(ch[i-2])) break;
+						if (i+2<ch.length && ch[i+1]==' ' && CharUtils.isHalf(ch[i+2])) break;
+						buf.append(chukiMap.get("縦中横")[0]);
+						buf.append(ch[i]);
+						buf.append(chukiMap.get("縦中横終わり")[0]);
+						continue;
+					}
+					//begin～end外もチェックする
+					//1月1日のような場合
+					if (i+3<ch.length && ch[i+1]=='月' && '0'<=ch[i+2] && ch[i+2]<='9' && (
+						ch[i+3]=='日' || (i+4<ch.length && '0'<=ch[i+3] && ch[i+3]<='9' && ch[i+4]=='日'))) {
+						//1月2日 1月10日 の1を縦中横
+						buf.append(chukiMap.get("縦中横")[0]);
+						buf.append(ch[i]);
+						buf.append(chukiMap.get("縦中横終わり")[0]);
+						continue;
+					}
+					if (i>1 && i+1<ch.length && (ch[i-1]=='年' && ch[i+1]=='月' || ch[i-1]=='月' && ch[i+1]=='日' || ch[i-1]=='第' && (ch[i+1]=='刷' || ch[i+1]=='版' || ch[i+1]=='巻'))) {
+						//年3月 + 月4日 + 第5刷 + 第6版 + 第7巻 の数字１文字縦中横
+						buf.append(chukiMap.get("縦中横")[0]);
+						buf.append(ch[i]);
+						buf.append(chukiMap.get("縦中横終わり")[0]);
+						continue;
+					}
+					if (i>2 && (ch[i-2]=='明'&&ch[i-1]=='治' || ch[i-2]=='大'&&ch[i-1]=='正' || ch[i-2]=='昭'&&ch[i-1]=='和' || ch[i-2]=='平'&&ch[i-1]=='成')) {
+						//月5日 の5を縦中横
+						buf.append(chukiMap.get("縦中横")[0]);
+						buf.append(ch[i]);
+						buf.append(chukiMap.get("縦中横終わり")[0]);
+						continue;
+					}
+				}
+				break;
+			case '!': case '?':
+				if (autoYoko  && !(inYoko || inTcy || noTcy)) {
+					if (autoYokoEQ3 && i+2<ch.length && (ch[i+1]=='!' || ch[i+1]=='?') && (ch[i+2]=='!' || ch[i+2]=='?')) {
+						//!? 3文字を縦中横で出力
+						//前後が半角かチェック
+						if (i!=0 && CharUtils.isHalf(ch[i-1])) break;
+						if (i+3<ch.length && CharUtils.isHalf(ch[i+3])) break;
+						//半角スペースの前後が半角文字
+						if (i>1 && ch[i-1]==' ' && CharUtils.isHalf(ch[i-2])) break;
+						if (i+4<ch.length && ch[i+3]==' ' && CharUtils.isHalf(ch[i+4])) break;
+						buf.append(chukiMap.get("縦中横")[0]);
+						buf.append(ch[i]);
+						buf.append(ch[i+1]);
+						buf.append(ch[i+2]);
+						buf.append(chukiMap.get("縦中横終わり")[0]);
+						i+=2;
+						continue;
+					} else if (i+1<ch.length && (ch[i+1]=='!' || ch[i+1]=='?')) {
+						//!? 2文字を縦横中で出力
+						//前後が半角かチェック
+						if (i!=0 && CharUtils.isHalf(ch[i-1])) break;
+						if (i+2<ch.length && CharUtils.isHalf(ch[i+2])) break;
+						//半角スペースの前後が半角文字
+						if (i>1 && ch[i-1]==' ' && CharUtils.isHalf(ch[i-2])) break;
+						if (i+3<ch.length && ch[i+2]==' ' && CharUtils.isHalf(ch[i+3])) break;
+						buf.append(chukiMap.get("縦中横")[0]);
+						buf.append(ch[i]);
+						buf.append(ch[i+1]);
+						buf.append(chukiMap.get("縦中横終わり")[0]);
+						i++;
+						continue;
+					} else if (autoYokoEQ1 && (i==0 || !CharUtils.isHalfNum(ch[i-1])) && (i+1==ch.length || !CharUtils.isHalfNum(ch[i+1]))) {
+						//!? 1文字
+						//前後が半角かチェック
+						if (i>0 && CharUtils.isHalf(ch[i-1])) break;
+						if (i+1<ch.length && CharUtils.isHalf(ch[i+1])) break;
+						//半角スペースの前後が半角文字
+						if (i>1 && ch[i-1]==' ' && CharUtils.isHalf(ch[i-2])) break;
+						if (i+2<ch.length && ch[i+1]==' ' && CharUtils.isHalf(ch[i+2])) break;
+						buf.append(chukiMap.get("縦中横")[0]);
+						buf.append(ch[i]);
+						buf.append(chukiMap.get("縦中横終わり")[0]);
+						continue;
+					}
+				}
+				break;
+			}
+			
+			//自動縦中横で出力していたらcontinueしていてここは実行されない
+			convertChar(buf, ch, i, false);
 		}
 	}
 	
 	/** 出力バッファに複数文字出力 ラテン文字はグリフにして出力 */
-	private void convertChars(StringBuilder buf, char[] ch, int begin, int length, boolean inRuby) throws IOException
+	private void convertChars(StringBuilder buf, char[] ch, int begin, int end, boolean inRubyTop) throws IOException
 	{
-		for (int i=begin; i<begin+length; i++) {
-			convertChar(buf, ch, i, inRuby);
+		for (int i=begin; i<end; i++) {
+			convertChar(buf, ch, i, inRubyTop);
 		}
 	}
-	/** 出力バッファに文字出力 ラテン文字をグリフにして出力 */
-	private void convertChar(StringBuilder buf, char[] ch, int idx, boolean inRuby) throws IOException
+	
+	/** 出力バッファに文字出力 
+	 * < と > と & は &lt; &gt; &amp; に置換 */
+	private void convertChar(StringBuilder buf, char[] ch, int idx, boolean inRubyTop) throws IOException
 	{
 		//NULL文字なら何も出力しない
 		if (ch[idx] == '\0') return;
@@ -2085,7 +2072,7 @@ public class AozoraEpub3Converter
 			}
 		}
 		//文字の間の全角スペースを禁則調整
-		if (!(inYoko || inTcy || inRuby)) {
+		if (!(inYoko || inTcy || inRubyTop)) {
 			switch (this.spaceHyphenation) {
 			case 1:
 				if (ch[idx]=='　' && buf.length()>0 && buf.charAt(buf.length()-1)!='　' && (idx-1==ch.length || idx+1<ch.length && ch[idx+1]!='　')) {
@@ -2139,7 +2126,7 @@ public class AozoraEpub3Converter
 			case '✓': case '␣': case '⏎': case '♩': case '♮': case '♫': case '♬': case 'ℓ': case '№': case '℡':
 			case 'ℵ': case 'ℏ': case '℧':
 				//縦中横の中でなければタグで括る
-				if (!(inYoko || inTcy || inRuby)) {
+				if (!(inYoko || inTcy || inRubyTop)) {
 					buf.append(chukiMap.get("縦中横")[0]);
 					buf.append(ch[idx]);
 					buf.append(chukiMap.get("縦中横終わり")[0]);
