@@ -791,7 +791,8 @@ public class WebAozoraConverter
 				if (node instanceof TextNode) {
 					String text = ((TextNode) node).getWholeText();
 					if (text != null && text.length() > 0) {
-						return text.replaceAll("[\n|\r]", "").trim();
+						text = text.replaceAll("[\n|\r]", "").trim();
+						if (text.length() > 0) return text;
 					}
 				}
 			}
