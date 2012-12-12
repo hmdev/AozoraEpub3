@@ -454,7 +454,7 @@ public class WebAozoraConverter
 					for (Element update : updates) {
 						updateBw.append(hrefs.get(i++).attr("href"));
 						updateBw.append('\t');
-						updateBw.append(update.html());
+						updateBw.append(update.html().replaceAll("\n", " "));
 						updateBw.append('\n');
 					}
 				}
@@ -472,7 +472,8 @@ public class WebAozoraConverter
 			String hrefString = href.attr("href");
 			if (hrefString == null || hrefString.length() == 0) continue;
 			String updateString = updateStringMap.get(hrefString);
-			if (updateString != null && updateString.equals(updates.get(i).html())) {
+			String html  = updates.get(i).html().replaceAll("\n", " ");
+			if (updateString != null && updateString.equals(html)) {
 				String chapterHref = hrefString;
 				if (!hrefString.startsWith("http")) {
 					if (hrefString.charAt(0) == '/') chapterHref = baseUri+hrefString;
@@ -568,19 +569,32 @@ public class WebAozoraConverter
 		}
 	}
 	
+	Node startElement = null;
+	Node endElement = null;
 	/** ノードを出力 子ノード内のテキストも出力 */
+	private void printNode(BufferedWriter bw, Node parent, Node start, Node end) throws IOException
+	{
+		this.startElement = start;
+		this.endElement = end;
+		_printNode(bw, parent);
+	}
 	private void printNode(BufferedWriter bw, Node parent) throws IOException
 	{
 		printNode(bw, parent, null, null);
 	}
-	private void printNode(BufferedWriter bw, Node parent, Node start, Node end) throws IOException
+	
+	private void _printNode(BufferedWriter bw, Node parent) throws IOException
 	{
 		for (Node node : parent.childNodes()) {
-			if (start != null) {
-				if (node.equals(start)) start = null; 
+			if (startElement != null) {
+				if (node.equals(startElement)) {
+					startElement = null;
+					continue;
+				}
+				if (node instanceof Element) _printNode(bw, node);
 				continue;
 			}
-			if (end != null && node.equals(end)) {
+			if (endElement != null && node.equals(endElement)) {
 				return;
 			}
 			if (node instanceof TextNode) printText(bw, ((TextNode)node).getWholeText());
@@ -589,10 +603,10 @@ public class WebAozoraConverter
 				if ("br".equals(elem.tagName())) {
 					if (elem.nextSibling() != null) bw.append('\n');
 				} else if ("div".equals(elem.tagName())) {
-					printNode(bw, node); //子を出力
+					_printNode(bw, node); //子を出力
 					if (elem.nextSibling() != null) bw.append('\n');
 				} else if ("p".equals(elem.tagName())) {
-					printNode(bw, node); //子を出力
+					_printNode(bw, node); //子を出力
 					if (elem.nextSibling() != null) bw.append('\n');
 				} else if ("ruby".equals(elem.tagName())) {
 					//ルビ注記出力
@@ -604,25 +618,25 @@ public class WebAozoraConverter
 					bw.append("［＃区切り線］\n");
 				} else if ("b".equals(elem.tagName())) {
 					bw.append("［＃ここから太字］");
-					printNode(bw, node); //子を出力
+					_printNode(bw, node); //子を出力
 					bw.append("［＃ここで太字終わり］");
 				} else if ("sup".equals(elem.tagName())) {
 					bw.append("［＃上付き小文字］");
-					printNode(bw, node); //子を出力
+					_printNode(bw, node); //子を出力
 					bw.append("［＃上付き小文字終わり］");
 				} else if ("sub".equals(elem.tagName())) {
 					bw.append("［＃下付き小文字］");
-					printNode(bw, node); //子を出力
+					_printNode(bw, node); //子を出力
 					bw.append("［＃下付き小文字終わり］");
 				} else if ("strike".equals(elem.tagName()) || "s".equals(elem.tagName()) ) {
 					bw.append("［＃取消線］");
-					printNode(bw, node); //子を出力
+					_printNode(bw, node); //子を出力
 					bw.append("［＃取消線終わり］");
 				} else if ("tr".equals(elem.tagName())) {
-					printNode(bw, node); //子を出力
+					_printNode(bw, node); //子を出力
 					bw.append('\n');
 				} else {
-					printNode(bw, node); //子を出力
+					_printNode(bw, node); //子を出力
 				}
 			} else {
 				System.out.println(node.getClass().getName());
@@ -778,7 +792,9 @@ public class WebAozoraConverter
 		for (ExtractInfo extractInfo : extractInfos) {
 			Elements elements = doc.select(extractInfo.query);
 			if (elements == null || elements.size() == 0) return null;
-			return elements.get(extractInfo.idx[0]);
+			int pos = extractInfo.idx[0];
+			if (pos < 0) pos = elements.size()+pos;//負の値なら後ろから
+			if (pos >= 0 && elements.size() > pos) return elements.get(pos);
 		}
 		return null;
 	}
