@@ -27,6 +27,15 @@ public class CharUtils
 		return true;
 	}
 	
+	/** 半角数字かチェック */
+	static public boolean isHalfNum(char ch)
+	{
+		switch (ch) {
+			case '0': case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9': return true;
+		}
+		return false;
+	}
+	
 	/** 英字かどうかをチェック 拡張ラテン文字含む
 	 * 半角スペースは含まない */
 	static public boolean isHalf(char ch)
@@ -41,15 +50,6 @@ public class CharUtils
 			if (!isHalf(ch)) return false;
 		}
 		return true;
-	}
-	
-	/** 半角数字かチェック */
-	static public boolean isHalfNum(char ch)
-	{
-		switch (ch) {
-			case '0': case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9': return true;
-		}
-		return false;
 	}
 	
 	/** 英字かどうかをチェック 拡張ラテン文字含む
@@ -68,6 +68,21 @@ public class CharUtils
 		return true;
 	}
 	
+	static public boolean isFullAlpha(char ch)
+	{
+		return ('Ａ' <= ch && ch <= 'Ｚ') || ('ａ' <= ch && ch <= 'ｚ') || ('０' <= ch && ch <= '９') || '＠' == ch || '＿' == ch;
+	}
+	
+	static public boolean isHiragana(char ch)
+	{
+		return ('ぁ' <= ch && ch <= 'ゖ') || 'ー' == ch || 'ゝ' == ch || 'ゞ' == ch || 'ヽ' == ch || 'ヾ' == ch;
+	}
+	
+	static public boolean isKatakana(char ch)
+	{
+		return ('ァ' <= ch && ch <= 'ヺ') || 'ー' == ch || 'ゝ' == ch || 'ゞ' == ch || 'ヽ' == ch || 'ヾ' == ch;
+	}
+	
 	static public boolean isSpace(String line)
 	{
 		char c;
@@ -84,6 +99,10 @@ public class CharUtils
 		return ('A' <= ch  && ch <= 'z' || 0x80 <= ch && ch <= 0x02AF);
 	}
 	
+	static public boolean isKanji(char[] ch, int i)
+	{
+		return isKanji(i==0?(char)-1:ch[i-1], ch[i], i+1>=ch.length?(char)-1:ch[i+1]);
+	}
 	/** 漢字かどうかをチェック
 	 * 拡張領域はJavaではUTF-16の2文字になる
 	 * @param pre 1文字前 なければ -1

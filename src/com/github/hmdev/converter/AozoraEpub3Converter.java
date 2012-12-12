@@ -123,7 +123,7 @@ public class AozoraEpub3Converter
 			'壱','弐','参','肆','伍',
 			'Ⅰ','Ⅱ','Ⅲ','Ⅳ','Ⅴ','Ⅵ','Ⅶ','Ⅷ','Ⅸ','Ⅹ','Ⅺ','Ⅻ'};
 	/** 章番号の後の証明との間の文字 */
-	char[] chapterSeparator = {' ','　','-','－','「','―','『'};
+	char[] chapterSeparator = {' ','　','-','－','「','―','『','（'};
 	
 	/** 章名数字無し */
 	String[] chapterName = new String[]{"プロローグ","エピローグ","モノローグ","序","序章","序　章","終章","終　章","間章","間　章","転章","転　章","幕間","幕　間"};
@@ -1753,7 +1753,7 @@ public class AozoraEpub3Converter
 	{
 		//事前に《》の代替文字をエスケープ済※《 ※》 に変換
 		//全角ひらがな漢字スペースの存在もついでにチェック
-		for (int i = begin+1; i < end; i++) {
+		for (int i=begin+1; i<end; i++) {
 			switch (ch[i]) {
 			case '<':
 				if (ch[i-1] == '<' && (i == begin+1 || ch[i-2] != '<') && (end-1==i || ch[i+1] != '<')) {
@@ -1782,8 +1782,10 @@ public class AozoraEpub3Converter
 		int rubyStart = -1;// ルビ開始位置
 		int rubyTopStart = -1;// ぶりがな開始位置
 		boolean inRuby = false;
-		boolean isAlphaRuby = false; //英字へのルビ
-		for (int i = begin; i < end; i++) {
+		//boolean isAlphaRuby = false; //英字へのルビ
+		RubyCharType rubyCharType = RubyCharType.NULL;
+		
+		for (int i=begin; i<end; i++) {
 			switch (ch[i]) {
 			//case '〝': ch[i] = '“'; break;
 			//case '〟': ch[i] = '”'; break;
@@ -1854,46 +1856,45 @@ public class AozoraEpub3Converter
 					rubyTopStart = -1;
 				}
 			} else {
-				// 漢字チェック
+				//ルビ開始位置チェック
+				if (rubyStart != -1) {
+					// ルビ開始チェック中で漢字以外または英字以外ならキャンセルして出力
+					boolean charTypeChanged = false;
+					switch (rubyCharType) {
+					case ALPHA: if (!CharUtils.isHalfSpace(ch[i])) charTypeChanged = true; break;
+					case FULLALPHA: if (!CharUtils.isFullAlpha(ch[i])) charTypeChanged = true; break;
+					case KANJI: if (!CharUtils.isKanji(ch, i)) charTypeChanged = true; break;
+					case HIRAGANA: if (!CharUtils.isHiragana(ch[i])) charTypeChanged = true; break;
+					case KATAKANA: if (!CharUtils.isKatakana(ch[i])) charTypeChanged = true; break;
+					default:
+					}
+					if (charTypeChanged) {
+						// rubyStartから前までを出力
+						convertTcyText(buf, ch, rubyStart, i, noTcy);
+						rubyStart = -1; rubyCharType = RubyCharType.NULL;
+					}
+				}
+				//ルビが終了したか開始されていない
 				if (rubyStart == -1) {
-					// ルビ中でなく漢字ならルビ開始チェック
-					if (CharUtils.isKanji(i==0?(char)-1:ch[i-1], ch[i], i+1>=ch.length?(char)-1:ch[i+1])) {
-						rubyStart = i; isAlphaRuby = false;
-					} else if (CharUtils.isHalf(ch[i]) || ch[i] == ' ') {
-						//英字または空白なら英字ルビ
-						rubyStart = i; isAlphaRuby = true;
+					// ルビ中でなく漢字
+					if (CharUtils.isKanji(ch, i)) {
+						rubyStart = i; rubyCharType = RubyCharType.KANJI;
+					} else if (CharUtils.isHalfSpace(ch[i])) {
+						//英数字または空白
+						rubyStart = i; rubyCharType = RubyCharType.ALPHA;
+					} else if (CharUtils.isFullAlpha(ch[i])) {
+						//全角英数字
+						rubyStart = i; rubyCharType = RubyCharType.FULLALPHA;
+					} else if (CharUtils.isHiragana(ch[i])) {
+						//全角英数字
+						rubyStart = i; rubyCharType = RubyCharType.HIRAGANA;
+					} else if (CharUtils.isKatakana(ch[i])) {
+						//全角英数字
+						rubyStart = i; rubyCharType = RubyCharType.KATAKANA;
 					}
 					// ルビ中でなく漢字、半角以外は出力
 					else {
-						convertChar(buf, ch, i, false); isAlphaRuby = false;
-					}
-				} else {
-					// ルビ開始チェック中で漢字以外または英字以外ならキャンセルして出力
-					if (isAlphaRuby) {
-						if (!CharUtils.isHalf(ch[i])) {
-							if (CharUtils.isKanji(i==0?(char)-1:ch[i-1], ch[i], i+1>=ch.length?(char)-1:ch[i+1])) {
-								// rubyStartから前までと現在位置の前まで出力
-								convertTcyText(buf, ch, rubyStart, i, noTcy);
-								rubyStart = i; isAlphaRuby = false;
-							} else {
-								// rubyStartから前までと現在位置の文字を出力するので+1
-								convertTcyText(buf, ch, rubyStart, i+1, noTcy);
-								rubyStart = -1;
-							}
-						}
-					} else {
-						if (!CharUtils.isKanji(i==0?(char)-1:ch[i-1], ch[i], i+1>=ch.length?(char)-1:ch[i+1])) {
-							if (CharUtils.isHalf(ch[i]) || ch[i] == ' ') {
-								// rubyStartから前までと現在位置の前まで出力
-								convertTcyText(buf, ch, rubyStart, i, noTcy);
-								//英字または空白なら英字ルビ
-								rubyStart = i; isAlphaRuby = true;
-							} else {
-								// rubyStartから前までと現在位置の文字を出力するので+1
-								convertTcyText(buf, ch, rubyStart, i+1, noTcy);
-								rubyStart = -1;
-							}
-						}
+						convertChar(buf, ch, i, false); rubyCharType = RubyCharType.NULL;
 					}
 				}
 			}
