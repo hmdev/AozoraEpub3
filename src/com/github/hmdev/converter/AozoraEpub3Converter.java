@@ -1369,7 +1369,7 @@ public class AozoraEpub3Converter
 		//行頭インデント 先頭が「『―（以外 半角空白は除去
 		if (this.forceIndent && line.length() > begin+1) {
 			switch (line.charAt(begin)) {
-			case '　': case '「': case '『':  case '（': case '”': case '〈': case '【': case '〔':
+			case '　': case '「': case '『':  case '（': case '”': case '〈': case '【': case '〔': case '［': case '※':
 				break;
 			case ' ': case ' ':
 				char c1 = line.charAt(begin+1);
