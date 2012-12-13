@@ -1,10 +1,9 @@
 @charset "utf-8";
 
-/** 縦書きフォント変更 Reader用
- vertical_font.css と置き換えて利用
- READER/fonts/ の下にフォントファイルをおいてsrc:urlのフォントファイル名を変更する
+/** 縦書きフォント変更 Reader用 T1/G1/T2用
+ ファイル名を vertical_font.css に変更すると有効
+ READER/fonts/ の下にフォントファイルをコピーしてsrc:urlのフォントをコピーしたファイル名に変更
  フォントファイルが無い場合は標準フォントが利用される */
-
 @font-face {
 	font-family: "CustomFont";
 	src: url(res:///ebook/fonts/../../mnt/sdcard/fonts/Dfpaburi.ttc);

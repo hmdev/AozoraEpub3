@@ -59,6 +59,9 @@ public class Epub3Writer
 	/** xhtml格納パス */
 	final static String XHTML_PATH = "xhtml/";
 	
+	/** フォントファイル格納パス */
+	final static String FONTS_PATH = "fonts/";
+	
 	/** xhtmlヘッダVelocityテンプレート */
 	final static String XHTML_HEADER_VM = "xhtml_header.vm";
 	/** xhtmlフッタVelocityテンプレート */
@@ -339,7 +342,14 @@ public class Epub3Writer
 		//テンプレートのファイルを格納
 		for (String fileName : getTemplateFiles()) {
 			zos.putArchiveEntry(new ZipArchiveEntry(fileName));
-			fis = new FileInputStream(new File(templatePath+fileName));
+			//customファイル優先
+			File file = new File(templatePath+fileName);
+			int idx = fileName.lastIndexOf('/');
+			if (idx > 0) { 
+				File customFile = new File(templatePath+fileName.substring(0, idx)+"_custom/"+fileName.substring(idx+1));
+				if (customFile.exists()) file = customFile;
+			}
+			fis = new FileInputStream(file);
 			IOUtils.copy(fis, zos);
 			fis.close();
 			zos.closeArchiveEntry();
@@ -536,6 +546,21 @@ public class Epub3Writer
 		if (this.canceled) return;
 		//プログレスバーにテキスト進捗分を追加
 		if (this.jProgressBar != null && !bookInfo.imageOnly) this.jProgressBar.setValue(bookInfo.totalLineNum/10);
+		
+		//フォントファイル格納
+		if (!bookInfo.imageOnly) {
+			File fontsPath = new File(templatePath+OPS_PATH+FONTS_PATH);
+			if (fontsPath != null) {
+				for (File fontFile : fontsPath.listFiles()) {
+					String fileName = OPS_PATH+FONTS_PATH+fontFile.getName();
+					zos.putArchiveEntry(new ZipArchiveEntry(fileName));
+					fis = new FileInputStream(new File(templatePath+fileName));
+					IOUtils.copy(fis, zos);
+					fis.close();
+					zos.closeArchiveEntry();
+				}
+			}
+		}
 		
 		zos.setLevel(0);
 		////////////////////////////////////////////////////////////////////////////////////////////////
