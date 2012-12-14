@@ -2,3 +2,7 @@
 /bin
 /.settings
 /AozoraEpub3.jar
+/.cache
+/_kindlegen.exe
+/replace.txt
+/バージョン番号確認＋replace.txtは含めない.txt

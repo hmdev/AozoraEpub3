@@ -37,6 +37,7 @@ import javax.swing.table.DefaultTableModel;
 import com.github.hmdev.image.ImageInfoReader;
 import com.github.hmdev.info.BookInfo;
 import com.github.hmdev.info.ChapterLineInfo;
+import com.github.hmdev.swing.JTocTable.TocTableDataModel;
 
 /**
  * 変換前確認ダイアログ
@@ -84,7 +85,7 @@ public class JConfirmDialog extends JDialog
 	public JCheckBox jCheckReplaceCover;
 	
 	/** 目次リスト */
-	JTable jTableToc;
+	JTocTable jTableToc;
 	JScrollPane jScrollToc;
 	TocTableDataModel tocDataModel;
 	
@@ -339,7 +340,7 @@ public class JConfirmDialog extends JDialog
 		
 		////////////////////////////////////////////////////////////////
 		//目次プレビュー
-		jTableToc = new JTable();
+		jTableToc = new JTocTable();
 		jScrollToc = new JScrollPane(jTableToc);
 		//tocPane.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 0));
 		previewLeft.add(jScrollToc);
@@ -811,7 +812,7 @@ public class JConfirmDialog extends JDialog
 		} else {
 			
 			Vector<ChapterLineInfo> vecChapterLineInfo = bookInfo.getChapterLineInfoList();
-			this.tocDataModel = new TocTableDataModel(new String[]{"", "", "", "行", "目次名称"}, 0);
+			this.tocDataModel = this.jTableToc.getModel();
 			for (ChapterLineInfo chapterLineInfo : vecChapterLineInfo) {
 				if (chapterLineInfo.pageBreakChapter) jCheckChapterSection.setEnabled(true);
 				switch (chapterLineInfo.type) {
@@ -828,14 +829,6 @@ public class JConfirmDialog extends JDialog
 					true, chapterLineInfo.pageBreakChapter?"改":"", chapterLineInfo.getTypeId(), chapterLineInfo.lineNum+1, chapterLineInfo.getChapterName()
 				});
 			}
-			this.jTableToc.setModel(tocDataModel);
-			this.jTableToc.getColumnModel().getColumn(0).setMaxWidth(22);
-			this.jTableToc.getColumnModel().getColumn(1).setMaxWidth(30);
-			this.jTableToc.getColumnModel().getColumn(1).setPreferredWidth(20);
-			this.jTableToc.getColumnModel().getColumn(2).setMaxWidth(30);
-			this.jTableToc.getColumnModel().getColumn(2).setPreferredWidth(20);
-			this.jTableToc.getColumnModel().getColumn(3).setMaxWidth(60);
-			this.jTableToc.getColumnModel().getColumn(3).setPreferredWidth(35);
 			this.jTableToc.getTableHeader().setPreferredSize(new Dimension(100, 20));
 			this.jTableToc.setVisible(true);
 			this.jScrollToc.setVisible(true);
@@ -914,58 +907,5 @@ public class JConfirmDialog extends JDialog
 		this.jCoverImagePanel.setPaneSize(previewWidth+delta, previewHeight);
 		this.setResizable(false);
 		this.repaint();
-	}
-	
-	class TocTableDataModel extends DefaultTableModel
-	{
-		private static final long serialVersionUID = 1L;
-		TocTableDataModel(String[] columnNames, int rowNum){
-			super(columnNames, rowNum);
-		}
-		@SuppressWarnings({ "unchecked", "rawtypes" })
-		public Class getColumnClass(int col) {
-			switch (col) {
-			case 0: return Boolean.class;
-			case 3: return Integer.class;
-			}
-			return String.class;
-		}
-		@Override
-		public boolean isCellEditable(int row, int col)
-		{
-			switch (col) {
-			case 0:
-			case 4:
-				return true;
-			}
-			return false;
-		}
-		
-		public void setSelected(int row, boolean select)
-		{
-			this.setValueAt(select, row, 0);
-		}
-		public boolean isSelected(int row)
-		{
-			return (Boolean)this.getValueAt(row, 0);
-		}
-		public boolean isPageBreak(int row)
-		{
-			return "改".equals((String)this.getValueAt(row, 1));
-		}
-		public int getChapterType(int row)
-		{
-			String value = (String)this.getValueAt(row, 2);
-			if (value.length() == 0) return 0;
-			return ChapterLineInfo.getChapterType(value.charAt(0));
-		}
-		public int getLineNum(int row)
-		{
-			return (Integer)this.getValueAt(row, 3);
-		}
-		public String getTocName(int row)
-		{
-			return (String)this.getValueAt(row, 4);
-		}
 	}
 }

@@ -25,7 +25,7 @@ import com.github.hmdev.writer.Epub3Writer;
 /** コマンドライン実行用mainとePub3変換関数 */
 public class AozoraEpub3
 {
-	public static final String VERSION = "1.1.0b8";
+	public static final String VERSION = "1.1.0b9";
 	
 	/** コマンドライン実行用 */
 	public static void main(String args[])
@@ -164,17 +164,19 @@ public class AozoraEpub3
 			int autoMarginWhiteLevel = 80;
 			float autoMarginPadding = 0;
 			int autoMarginNombre = 0;
+			float nobreSize = 0.03f;
 			if ("1".equals(props.getProperty("AutoMargin"))) {
 				try { autoMarginLimitH = Integer.parseInt(props.getProperty("AutoMarginLimitH")); } catch (Exception e) {}
 				try { autoMarginLimitV = Integer.parseInt(props.getProperty("AutoMarginLimitV")); } catch (Exception e) {}
 				try { autoMarginWhiteLevel = Integer.parseInt(props.getProperty("AutoMarginWhiteLevel")); } catch (Exception e) {}
 				try { autoMarginPadding = Float.parseFloat(props.getProperty("AutoMarginPadding")); } catch (Exception e) {}
 				try { autoMarginNombre = Integer.parseInt(props.getProperty("AutoMarginNombre")); } catch (Exception e) {} 
+				try { autoMarginPadding = Float.parseFloat(props.getProperty("AutoMarginNombreSize")); } catch (Exception e) {}
 			 }
 			epub3Writer.setImageParam(dispW, dispH, coverW, coverH, resizeW, resizeH, singlePageSizeW, singlePageSizeH, singlePageWidth, fitImage, rotateImage,
-					imageFloatType, imageFloatW, imageFloatH, jpegQualty, autoMarginLimitH, autoMarginLimitV, autoMarginWhiteLevel, autoMarginPadding, autoMarginNombre);
+					imageFloatType, imageFloatW, imageFloatH, jpegQualty, autoMarginLimitH, autoMarginLimitV, autoMarginWhiteLevel, autoMarginPadding, autoMarginNombre, nobreSize);
 			epub3ImageWriter.setImageParam(dispW, dispH, coverW, coverH, resizeW, resizeH, singlePageSizeW, singlePageSizeH, singlePageWidth, fitImage, rotateImage,
-					imageFloatType, imageFloatW, imageFloatH, jpegQualty, autoMarginLimitH, autoMarginLimitV, autoMarginWhiteLevel, autoMarginPadding, autoMarginNombre);
+					imageFloatType, imageFloatW, imageFloatH, jpegQualty, autoMarginLimitH, autoMarginLimitV, autoMarginWhiteLevel, autoMarginPadding, autoMarginNombre, nobreSize);
 			
 			//自動改ページ
 			int forcePageBreakSize = 0;

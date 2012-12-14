@@ -40,9 +40,9 @@ public class ImageUtils
 	/** 8bitグレースケール時のRGB階調カラーモデル Singleton */
 	static ColorModel GRAY256_COLOR_MODEL;
 	
-	static final int NOMBRE_TOP = 1;
-	static final int NOMBRE_BOTTOM = 2;
-	static final int NOMBRE_TOPBOTTOM = 3;
+	public static final int NOMBRE_TOP = 1;
+	public static final int NOMBRE_BOTTOM = 2;
+	public static final int NOMBRE_TOPBOTTOM = 3;
 	
 	/** 4bitグレースケール時のRGB階調カラーモデル取得 */
 	static ColorModel getGray16ColorModel()
@@ -124,7 +124,7 @@ public class ImageUtils
 	 * @param autoMarginPadding 余白除去後に追加するマージン */
 	static public void writeImage(InputStream is, BufferedImage srcImage, ZipArchiveOutputStream zos, ImageInfo imageInfo,
 			float jpegQuality, int maxImagePixels, int maxImageW, int maxImageH, int dispW, int dispH,
-			int autoMarginLimitH, int autoMarginLimitV, int autoMarginWhiteLevel, float autoMarginPadding, int autoMarginNombre) throws IOException
+			int autoMarginLimitH, int autoMarginLimitV, int autoMarginWhiteLevel, float autoMarginPadding, int autoMarginNombre, float nombreSize) throws IOException
 	{
 		try {
 		String ext = imageInfo.getExt();
@@ -141,7 +141,7 @@ public class ImageUtils
 		
 		int[] margin = null;
 		if (autoMarginLimitH > 0 || autoMarginLimitV > 0) {
-			int startPixel = (int)(w*0.02); //2%
+			int startPixel = (int)(w*0.00); //1%
 			int ignoreEdge = (int)(w*0.02); //2%
 			int dustSize = (int)(w*0.01); //1%
 			
@@ -153,7 +153,7 @@ public class ImageUtils
 				ByteArrayInputStream bais = new ByteArrayInputStream(imgBuf);
 				try { srcImage = readImage(ext, bais); } finally { bais.close(); }
 			}
-			margin = getPlainMargin(srcImage, autoMarginLimitH/100f, autoMarginLimitV/100f, autoMarginWhiteLevel/100f, autoMarginPadding/100f, startPixel, ignoreEdge, dustSize, autoMarginNombre);
+			margin = getPlainMargin(srcImage, autoMarginLimitH/100f, autoMarginLimitV/100f, autoMarginWhiteLevel/100f, autoMarginPadding/100f, startPixel, ignoreEdge, dustSize, autoMarginNombre, nombreSize);
 			if (margin[0]==0 && margin[1]==0 && margin[2]==0 && margin[3]==0) margin = null;
 			if (margin != null) {
 				//元画像が幅か高さかチェック
@@ -385,7 +385,7 @@ public class ImageUtils
 	 * @param ignoreEdge 行列のチェック時に両端を無視するピクセル数
 	 * @param dustSize ゴミのピクセルサイズ
 	 * @return 余白画素数(left, top, right, bottom) */
-	static private int[] getPlainMargin(BufferedImage image, float limitH, float limitV, float whiteLevel, float padding, int startPixel, int ignoreEdge, int dustSize, int nombreType)
+	static private int[] getPlainMargin(BufferedImage image, float limitH, float limitV, float whiteLevel, float padding, int startPixel, int ignoreEdge, int dustSize, int nombreType, float nombreSize)
 	{
 		int[] margin = new int[4]; //left, top, right, bottom
 		int width = image.getWidth();
@@ -404,6 +404,7 @@ public class ImageUtils
 		//ノンブルがあった場合の最大マージン
 		int limitPxT = (int)(height*limitV)/2;
 		int limitPxB = (int)(height*limitV)/2;
+		
 		if (nombreType == NOMBRE_TOP || nombreType == NOMBRE_TOPBOTTOM) {
 			limitPxT += (int)(height*0.05); //5%加算
 		}
@@ -451,7 +452,7 @@ public class ImageUtils
 		boolean hasNombreB = false;
 		if (nombreType == NOMBRE_TOP || nombreType == NOMBRE_TOPBOTTOM) {
 			//これ以下ならノンブルとして除去
-			int nombreLimit = (int)(height * 0.03)+margin[1];
+			int nombreLimit = (int)(height * nombreSize)+margin[1];
 			int nombreDust = (int)(height * 0.005);
 			//ノンブル上
 			int nombreEnd = 0;
@@ -475,7 +476,7 @@ public class ImageUtils
 		}
 		if (nombreType == NOMBRE_BOTTOM || nombreType == NOMBRE_TOPBOTTOM) {
 			//これ以下ならノンブルとして除去
-			int nombreLimit = (int)(height * 0.03)+margin[3];
+			int nombreLimit = (int)(height * nombreSize)+margin[3];
 			int nombreDust = (int)(height * 0.005);
 			//ノンブル下
 			int nombreEnd = 0;

@@ -155,6 +155,8 @@ public class Epub3Writer
 	float autoMarginPadding = 0;
 	/** ノンブル除去種別 */
 	int autoMarginNombre = 0;
+	/** ノンブルの大きさ */
+	float autoMarginNombreSize = 0.03f;
 	
 	/** 表紙サイズ 横 */
 	int coverW = 600;
@@ -232,7 +234,7 @@ public class Epub3Writer
 			int singlePageSizeW, int singlePageSizeH, int singlePageWidth, boolean fitImage, int rotateAngle,
 			int imageFloatType, int imageFloatW, int imageFloatH,
 			float jpegQuality,
-			int autoMarginLimitH, int autoMarginLimitV, int autoMarginWhiteLevel, float autoMarginPadding, int autoMarginNombre)
+			int autoMarginLimitH, int autoMarginLimitV, int autoMarginWhiteLevel, float autoMarginPadding, int autoMarginNombre, float nombreSize)
 	{
 		this.dispW = dispW;
 		this.dispH = dispH;
@@ -261,6 +263,7 @@ public class Epub3Writer
 		this.autoMarginWhiteLevel = autoMarginWhiteLevel;
 		this.autoMarginPadding = autoMarginPadding;
 		this.autoMarginNombre = autoMarginNombre;
+		this.autoMarginNombreSize = nombreSize;
 	}
 	
 	/** 処理を中止 */
@@ -550,7 +553,7 @@ public class Epub3Writer
 		//フォントファイル格納
 		if (!bookInfo.imageOnly) {
 			File fontsPath = new File(templatePath+OPS_PATH+FONTS_PATH);
-			if (fontsPath != null) {
+			if (fontsPath.exists()) {
 				for (File fontFile : fontsPath.listFiles()) {
 					String fileName = OPS_PATH+FONTS_PATH+fontFile.getName();
 					zos.putArchiveEntry(new ZipArchiveEntry(fileName));
@@ -685,21 +688,21 @@ public class Epub3Writer
 		imageInfo.rotateAngle = 0; //回転させない
 		ImageUtils.writeImage(is, null, zos,imageInfo, this.jpegQuality,
 				0, this.coverW, this.coverH, this.dispW, this.dispH,
-				0, 0, 0, 0, 0);
+				0, 0, 0, 0, 0, 0);
 	}
 	/** 画像を出力 */
 	void writeImage(InputStream is,ZipArchiveOutputStream zos, ImageInfo imageInfo) throws IOException
 	{
 		ImageUtils.writeImage(is, null, zos, imageInfo, this.jpegQuality,
 				this.maxImagePixels, this.maxImageW, this.maxImageH, this.dispW, this.dispH,
-				this.autoMarginLimitH, this.autoMarginLimitV, this.autoMarginWhiteLevel, this.autoMarginPadding, this.autoMarginNombre);
+				this.autoMarginLimitH, this.autoMarginLimitV, this.autoMarginWhiteLevel, this.autoMarginPadding, this.autoMarginNombre, this.autoMarginNombreSize);
 	}
 	/** 画像を出力 */
 	void writeImage(BufferedImage srcImage, ZipArchiveOutputStream zos, ImageInfo imageInfo) throws IOException
 	{
 		ImageUtils.writeImage(null, srcImage, zos, imageInfo, this.jpegQuality,
 				this.maxImagePixels, this.maxImageW, this.maxImageH, this.dispW, this.dispH,
-				this.autoMarginLimitH,  this.autoMarginLimitV, this.autoMarginWhiteLevel, this.autoMarginPadding, this.autoMarginNombre);
+				this.autoMarginLimitH,  this.autoMarginLimitV, this.autoMarginWhiteLevel, this.autoMarginPadding, this.autoMarginNombre, this.autoMarginNombreSize);
 	}
 	
 	/** 本文を出力する */
