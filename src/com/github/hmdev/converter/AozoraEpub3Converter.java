@@ -471,6 +471,10 @@ public class AozoraEpub3Converter
 			} catch (Exception e) { LogAppender.println("[WARN] 目次抽出のその他パターンが正しくありません: "+chapterPattern); }
 	}
 	
+	public int getSpaceHyphenation()
+	{
+		return this.spaceHyphenation;
+	}
 	public void setSpaceHyphenation(int type)
 	{
 		this.spaceHyphenation = type;

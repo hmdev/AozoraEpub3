@@ -740,8 +740,12 @@ public class WebAozoraConverter
 			} else {
 				for (int i=0; i<extractInfo.idx.length; i++) {
 					if (elements.size() > extractInfo.idx[i]) {
-						String firstText = getFirstText(elements.get(extractInfo.idx[i]));
-						if (firstText != null) buf.append(" ").append(firstText);
+						int pos = extractInfo.idx[i];
+						if (pos < 0) pos = elements.size()+pos;//負の値なら後ろから
+						if (pos >= 0 && elements.size() > pos) {
+							String firstText = getFirstText(elements.get(pos));
+							if (firstText != null) buf.append(" ").append(firstText);
+						}
 					}
 				}
 				if (buf.length() > 0) text = buf.deleteCharAt(0).toString();

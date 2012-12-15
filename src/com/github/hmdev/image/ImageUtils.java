@@ -141,8 +141,8 @@ public class ImageUtils
 		
 		int[] margin = null;
 		if (autoMarginLimitH > 0 || autoMarginLimitV > 0) {
-			int startPixel = (int)(w*0.00); //1%
-			int ignoreEdge = (int)(w*0.02); //2%
+			int startPixel = (int)(w*0.01); //1%
+			int ignoreEdge = (int)(w*0.03); //3%
 			int dustSize = (int)(w*0.01); //1%
 			
 			//画像がなければ読み込み 変更なしの時にそのまま出力できるように一旦バッファに読み込む

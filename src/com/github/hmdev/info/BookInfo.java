@@ -663,7 +663,7 @@ public class BookInfo
 	{
 		//ファイル名からタイトル取得
 		String[] titleCreator = new String[2];
-		String noExtName = fileName.substring(0, fileName.lastIndexOf('.'));
+		String noExtName = fileName.replaceAll("\\.([A-Z]|[a-z]|[0-9])+$", "").replaceAll("\\.([A-Z]|[a-z]|[0-9])+$", "");
 		//後ろの括弧から校正情報等を除外
 		noExtName = noExtName.replaceAll("（","\\(").replaceAll("）","\\)");
 		noExtName = noExtName.replaceAll("\\(青空[^\\)]*\\)", "");

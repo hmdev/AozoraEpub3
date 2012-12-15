@@ -517,6 +517,8 @@ public class Epub3Writer
 		if (!bookInfo.imageOnly) {
 			boolean vertical = bookInfo.vertical;
 			bookInfo.vertical = bookInfo.tocVertical;
+			int spaceHyphenation = converter.getSpaceHyphenation();
+			converter.setSpaceHyphenation(0);
 			converter.bookInfo = bookInfo; //nullの場合があるので設定
 			StringBuilder buf = new StringBuilder();
 			for (ChapterInfo chapterInfo : chapterInfos) {
@@ -526,6 +528,7 @@ public class Epub3Writer
 				chapterInfo.setChapterName(buf.toString());
 			}
 			bookInfo.vertical = vertical;//戻す
+			converter.setSpaceHyphenation(spaceHyphenation);
 		}
 		
 		//navファイル

@@ -26,13 +26,9 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.border.Border;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.table.DefaultTableModel;
 
 import com.github.hmdev.image.ImageInfoReader;
 import com.github.hmdev.info.BookInfo;
@@ -354,42 +350,42 @@ public class JConfirmDialog extends JDialog
 		jCheckChapterSection = new JCheckBox("改");
 		jCheckChapterSection.setFocusPainted(false);
 		jCheckChapterSection.setBorder(padding2H);
-		jCheckChapterSection.addChangeListener(new ChangeListener() { public void stateChanged(ChangeEvent arg0){ selectChapterType(ChapterLineInfo.TYPE_PAGEBREAK); } });
+		jCheckChapterSection.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){ selectChapterType(ChapterLineInfo.TYPE_PAGEBREAK); } });
 		panel.add(jCheckChapterSection);
 		jCheckChapterH = new JCheckBox("見");
 		jCheckChapterH.setFocusPainted(false);
 		jCheckChapterH.setBorder(padding2H);
-		jCheckChapterH.addChangeListener(new ChangeListener() { public void stateChanged(ChangeEvent arg0){ selectChapterType(ChapterLineInfo.TYPE_CHUKI_H); } });
+		jCheckChapterH.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){ selectChapterType(ChapterLineInfo.TYPE_CHUKI_H); } });
 		panel.add(jCheckChapterH);
 		jCheckChapterH1 = new JCheckBox("大");
 		jCheckChapterH1.setFocusPainted(false);
 		jCheckChapterH1.setBorder(padding2H);
-		jCheckChapterH1.addChangeListener(new ChangeListener() { public void stateChanged(ChangeEvent arg0){ selectChapterType(ChapterLineInfo.TYPE_CHUKI_H1); } });
+		jCheckChapterH1.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){ selectChapterType(ChapterLineInfo.TYPE_CHUKI_H1); } });
 		panel.add(jCheckChapterH1);
 		jCheckChapterH2 = new JCheckBox("中");
 		jCheckChapterH2.setFocusPainted(false);
 		jCheckChapterH2.setBorder(padding2H);
-		jCheckChapterH2.addChangeListener(new ChangeListener() { public void stateChanged(ChangeEvent arg0){ selectChapterType(ChapterLineInfo.TYPE_CHUKI_H2); } });
+		jCheckChapterH2.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){ selectChapterType(ChapterLineInfo.TYPE_CHUKI_H2); } });
 		panel.add(jCheckChapterH2);
 		jCheckChapterH3 = new JCheckBox("小");
 		jCheckChapterH3.setFocusPainted(false);
 		jCheckChapterH3.setBorder(padding2H);
-		jCheckChapterH3.addChangeListener(new ChangeListener() { public void stateChanged(ChangeEvent arg0){ selectChapterType(ChapterLineInfo.TYPE_CHUKI_H3); } });
+		jCheckChapterH3.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){ selectChapterType(ChapterLineInfo.TYPE_CHUKI_H3); } });
 		panel.add(jCheckChapterH3);
 		jCheckChapterName = new JCheckBox("章");
 		jCheckChapterName.setFocusPainted(false);
 		jCheckChapterName.setBorder(padding2H);
-		jCheckChapterName.addChangeListener(new ChangeListener() { public void stateChanged(ChangeEvent arg0){ selectChapterType(ChapterLineInfo.TYPE_CHAPTER_NAME); } });
+		jCheckChapterName.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){ selectChapterType(ChapterLineInfo.TYPE_CHAPTER_NAME); } });
 		panel.add(jCheckChapterName);
 		jCheckChapterNum = new JCheckBox("数");
 		jCheckChapterNum.setFocusPainted(false);
 		jCheckChapterNum.setBorder(padding2H);
-		jCheckChapterNum.addChangeListener(new ChangeListener() { public void stateChanged(ChangeEvent arg0){ selectChapterType(ChapterLineInfo.TYPE_CHAPTER_NUM); } });
+		jCheckChapterNum.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){ selectChapterType(ChapterLineInfo.TYPE_CHAPTER_NUM); } });
 		panel.add(jCheckChapterNum);
 		jCheckChapterPattern = new JCheckBox("他");
 		jCheckChapterPattern.setFocusPainted(false);
 		jCheckChapterPattern.setBorder(padding2H);
-		jCheckChapterPattern.addChangeListener(new ChangeListener() { public void stateChanged(ChangeEvent arg0){ selectChapterType(ChapterLineInfo.TYPE_PATTERN); } });
+		jCheckChapterPattern.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){ selectChapterType(ChapterLineInfo.TYPE_PATTERN); } });
 		panel.add(jCheckChapterPattern);
 		previewLeft.add(panel);
 		
@@ -806,13 +802,13 @@ public class JConfirmDialog extends JDialog
 		//目次設定
 		if (bookInfo.isImageOnly()) {
 			this.tocDataModel = null;
-			this.jTableToc.setModel(new DefaultTableModel());
 			this.jTableToc.setVisible(false);
 			this.jScrollToc.setVisible(false);
 		} else {
 			
 			Vector<ChapterLineInfo> vecChapterLineInfo = bookInfo.getChapterLineInfoList();
 			this.tocDataModel = this.jTableToc.getModel();
+			this.tocDataModel.setRowCount(0);
 			for (ChapterLineInfo chapterLineInfo : vecChapterLineInfo) {
 				if (chapterLineInfo.pageBreakChapter) jCheckChapterSection.setEnabled(true);
 				switch (chapterLineInfo.type) {
