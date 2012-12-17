@@ -667,7 +667,7 @@ public class BookInfo
 		//後ろの括弧から校正情報等を除外
 		noExtName = noExtName.replaceAll("（","\\(").replaceAll("）","\\)");
 		noExtName = noExtName.replaceAll("\\(青空[^\\)]*\\)", "");
-		noExtName = noExtName.replaceAll("\\([^\\)]*(校正|軽量|表紙|挿絵|補正|修正|ルビ)[^\\)]*\\)", "");
+		noExtName = noExtName.replaceAll("\\([^\\)]*(校正|軽量|表紙|挿絵|補正|修正|ルビ|Rev|rev)[^\\)]*\\)", "");
 		
 		Matcher m = Pattern.compile("[\\[|［](.+?)[\\]|］][ |　]*(.*)[ |　]*$").matcher(noExtName);
 		if (m.find()) {

@@ -80,7 +80,7 @@ http://www.aozora.gr.jp/accent_separation.html
 ［＃改ページ］
 <Img Src="img/右画像.png" alt="右画像タイトル">
 ［＃改ページ］
-［＃左画像タイトル（img/左画像.jpg、横320×縦322）入る］
+［＃縦長画像（img/縦長.jpg）入る］
 ［＃改ページ］
 この前画像見開き
 

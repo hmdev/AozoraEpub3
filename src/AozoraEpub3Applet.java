@@ -325,7 +325,7 @@ public class AozoraEpub3Applet extends JApplet
 		Border padding4H2V = BorderFactory.createEmptyBorder(2, 4, 2, 4);
 		Border padding2 = BorderFactory.createEmptyBorder(2, 2, 2, 2);
 		Border padding3B = BorderFactory.createEmptyBorder(0, 0, 3, 0);
-		Border padding2V = BorderFactory.createEmptyBorder(2, 0, 2, 0);
+		Border padding2T4B = BorderFactory.createEmptyBorder(2, 0, 4, 0);
 		
 		Dimension panelSize = new Dimension(1920, 26);
 		JTextField text = new JTextField();
@@ -732,7 +732,7 @@ public class AozoraEpub3Applet extends JApplet
 		//画像単ページ
 		panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-		panel.setBorder(padding2V);
+		panel.setBorder(padding2T4B);
 		panelV.add(panel);
 		//横x縦
 		label = new JLabel("横");
@@ -806,14 +806,14 @@ public class AozoraEpub3Applet extends JApplet
 		////////////////////////////////
 		panelV = new JPanel();
 		panelV.setLayout(new BoxLayout(panelV, BoxLayout.Y_AXIS));
-		panelV.setBorder(new NarrowTitledBorder("画像回り込み (※単ページ化より優先)"));
+		panelV.setBorder(new NarrowTitledBorder("画像回り込み (単ページ化より優先)"));
 		tabPanel.add(panelV);
 		
 		////////////////////////////////
 		//画像回り込み
 		panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-		panel.setBorder(padding2V);
+		panel.setBorder(padding2T4B);
 		panelV.add(panel);
 		propValue = props.getProperty("ImageFloat");
 		jCheckImageFloat = new JCheckBox("有効 ", "1".equals(propValue));

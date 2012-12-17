@@ -869,10 +869,11 @@ public class AozoraEpub3Converter
 				.replaceAll("※", "") //エスケープ文字復元
 				.replaceFirst("^[\t| |　|―]+", "").replaceFirst("[\t| |　|―]+$","") //前後の不要な文字所除去
 				.replaceAll("〳〵", "く").replaceAll("〴〵", "ぐ").replaceAll("〻", "々")
-				.replaceFirst("^(=|＝|-|―|─)(=|＝|-|―|─)+", "").replaceFirst("(=|＝|-|―|─)(=|＝|-|―|─)+$", "");//連続する記号除去
+				.replaceFirst("^(=|＝|-|―|─)(=|＝|-|―|─)+", "").replaceFirst("(=|＝|-|―|─)(=|＝|-|―|─)+$", "")//連続する記号除去
+				.replaceAll("<[^>]+>", "");//<imgタグ等
 				//printLineBuffer内だと以下の変換が必要
 				/*.replaceAll("<span class=\"fullsp\"> </span>", "　").replaceAll(String.valueOf((char)(0x2000))+(char)(0x2000), "　")
-				.replaceAll("<rt>[^<]+</rt>", "").replaceAll("<[^>]+>", "");*/
+				.replaceAll("<rt>[^<]+</rt>", "")*/
 		return name.length()>maxChapterNameLength ? name.substring(0, maxChapterNameLength)+"..." : name;
 	}
 	
