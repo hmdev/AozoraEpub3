@@ -159,19 +159,21 @@ public class ImageUtils
 				//元画像が幅か高さかチェック
 				int mw = w-margin[0]-margin[2];
 				int mh = h-margin[1]-margin[3];
+				double dWH = dispW/(double)dispH;
+				double mWH = mw/(double)mh;
 				//縦横比で画面の横か縦に合わせる方向が変わらないようにマージンを調整する
-				if (w/h < dispW/dispH) { //元が縦
-					if (mw/mh > dispW/dispH && mw > dispW) { //余白除去で横にはみ出す
-						mh = mw*dispH/dispW;
+				if (w/(double)h < dWH) { //元が縦
+					if (mWH > dWH && mw > dispW) { //余白除去で横にはみ出す
+						mh = (int)(mw/dWH);
 						margin[3] = h-margin[1]-mh;//下マージンを伸ばす
 						if (margin[3] < 0) { margin[3] = 0; margin[1] = h-mh; }
 					}
 				} else { //元が横
-					if (mw/mh < dispW/dispH && mh > dispH) { //余白除去で縦にはみ出す
-						mw = mh*dispW/dispH;
-						double m02 = margin[0]+margin[2];
-						margin[0] = (int)((w-mw)*margin[0]/m02);
-						margin[2] = (int)((w-mw)*margin[2]/m02);
+					if (mWH < dWH && mh > dispH) { //余白除去で縦にはみ出す
+						mw = (int)(mh*dWH);
+						double mLR = margin[0]+margin[2];
+						margin[0] = (int)((w-mw)*margin[0]/mLR);
+						margin[2] = (int)((w-mw)*margin[2]/mLR);
 					}
 				}
 				w = mw;
