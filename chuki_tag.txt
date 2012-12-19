@@ -277,123 +277,123 @@
 
 ############# 字下げ #############
 ####字下げ (［＃ここで字下げ終わり］の省略判別はプログラム内で処理)
-ここから１字下げ	<div class="top1">		1
-ここから２字下げ	<div class="top2">		1
-ここから３字下げ	<div class="top3">		1
-ここから４字下げ	<div class="top4">		1
-ここから５字下げ	<div class="top5">		1
-ここから６字下げ	<div class="top6">		1
-ここから７字下げ	<div class="top7">		1
-ここから８字下げ	<div class="top8">		1
-ここから９字下げ	<div class="top9">		1
-ここから１０字下げ	<div class="top10">		1
-ここから１１字下げ	<div class="top11">		1
-ここから１２字下げ	<div class="top12">		1
-ここから１３字下げ	<div class="top13">		1
-ここから１４字下げ	<div class="top14">		1
-ここから１５字下げ	<div class="top15">		1
-ここから１６字下げ	<div class="top16">		1
-ここから１７字下げ	<div class="top17">		1
-ここから１８字下げ	<div class="top18">		1
-ここから１９字下げ	<div class="top19">		1
-ここから２０字下げ	<div class="top20">		1
-ここから２１字下げ	<div class="top21">		1
-ここから２２字下げ	<div class="top22">		1
-ここから２３字下げ	<div class="top23">		1
-ここから２４字下げ	<div class="top24">		1
-ここから２５字下げ	<div class="top25">		1
-ここから２６字下げ	<div class="top26">		1
-ここから２７字下げ	<div class="top27">		1
-ここから２８字下げ	<div class="top28">		1
-ここから２９字下げ	<div class="top29">		1
-ここから３０字下げ	<div class="top30">		1
+ここから１字下げ	<div class="pt1">		1
+ここから２字下げ	<div class="pt2">		1
+ここから３字下げ	<div class="pt3">		1
+ここから４字下げ	<div class="pt4">		1
+ここから５字下げ	<div class="pt5">		1
+ここから６字下げ	<div class="pt6">		1
+ここから７字下げ	<div class="pt7">		1
+ここから８字下げ	<div class="pt8">		1
+ここから９字下げ	<div class="pt9">		1
+ここから１０字下げ	<div class="pt10">		1
+ここから１１字下げ	<div class="pt11">		1
+ここから１２字下げ	<div class="pt12">		1
+ここから１３字下げ	<div class="pt13">		1
+ここから１４字下げ	<div class="pt14">		1
+ここから１５字下げ	<div class="pt15">		1
+ここから１６字下げ	<div class="pt16">		1
+ここから１７字下げ	<div class="pt17">		1
+ここから１８字下げ	<div class="pt18">		1
+ここから１９字下げ	<div class="pt19">		1
+ここから２０字下げ	<div class="pt20">		1
+ここから２１字下げ	<div class="pt21">		1
+ここから２２字下げ	<div class="pt22">		1
+ここから２３字下げ	<div class="pt23">		1
+ここから２４字下げ	<div class="pt24">		1
+ここから２５字下げ	<div class="pt25">		1
+ここから２６字下げ	<div class="pt26">		1
+ここから２７字下げ	<div class="pt27">		1
+ここから２８字下げ	<div class="pt28">		1
+ここから２９字下げ	<div class="pt29">		1
+ここから３０字下げ	<div class="pt30">		1
 
-ここから改行天付き、折り返して１字下げ	<div class="top1 idt-1">		1
-ここから改行天付き、折り返して２字下げ	<div class="top2 idt-2">		1
-ここから改行天付き、折り返して３字下げ	<div class="top3 idt-3">		1
-ここから改行天付き、折り返して４字下げ	<div class="top4 idt-4">		1
-ここから改行天付き、折り返して５字下げ	<div class="top5 idt-5">		1
-ここから改行天付き、折り返して６字下げ	<div class="top6 idt-6">		1
-ここから改行天付き、折り返して７字下げ	<div class="top7 idt-7">		1
-ここから改行天付き、折り返して８字下げ	<div class="top8 idt-8">		1
-ここから改行天付き、折り返して９字下げ	<div class="top9 idt-9">		1
-ここから改行天付き、折り返して１０字下げ	<div class="top10 idt-10">		1
-ここから改行天付き、折り返して１１字下げ	<div class="top11 idt-11">		1
-ここから改行天付き、折り返して１２字下げ	<div class="top12 idt-12">		1
-ここから改行天付き、折り返して１３字下げ	<div class="top13 idt-13">		1
-ここから改行天付き、折り返して１４字下げ	<div class="top14 idt-14">		1
-ここから改行天付き、折り返して１５字下げ	<div class="top15 idt-15">		1
-ここから改行天付き、折り返して１６字下げ	<div class="top16 idt-16">		1
-ここから改行天付き、折り返して１７字下げ	<div class="top17 idt-17">		1
-ここから改行天付き、折り返して１８字下げ	<div class="top18 idt-18">		1
-ここから改行天付き、折り返して１９字下げ	<div class="top19 idt-19">		1
-ここから改行天付き、折り返して２０字下げ	<div class="top20 idt-20">		1
-ここから改行天付き、折り返して２１字下げ	<div class="top21 idt-21">		1
-ここから改行天付き、折り返して２２字下げ	<div class="top22 idt-22">		1
-ここから改行天付き、折り返して２３字下げ	<div class="top23 idt-23">		1
-ここから改行天付き、折り返して２４字下げ	<div class="top24 idt-24">		1
-ここから改行天付き、折り返して２５字下げ	<div class="top25 idt-25">		1
+ここから改行天付き、折り返して１字下げ	<div class="pt1 idt-1">		1
+ここから改行天付き、折り返して２字下げ	<div class="pt2 idt-2">		1
+ここから改行天付き、折り返して３字下げ	<div class="pt3 idt-3">		1
+ここから改行天付き、折り返して４字下げ	<div class="pt4 idt-4">		1
+ここから改行天付き、折り返して５字下げ	<div class="pt5 idt-5">		1
+ここから改行天付き、折り返して６字下げ	<div class="pt6 idt-6">		1
+ここから改行天付き、折り返して７字下げ	<div class="pt7 idt-7">		1
+ここから改行天付き、折り返して８字下げ	<div class="pt8 idt-8">		1
+ここから改行天付き、折り返して９字下げ	<div class="pt9 idt-9">		1
+ここから改行天付き、折り返して１０字下げ	<div class="pt10 idt-10">		1
+ここから改行天付き、折り返して１１字下げ	<div class="pt11 idt-11">		1
+ここから改行天付き、折り返して１２字下げ	<div class="pt12 idt-12">		1
+ここから改行天付き、折り返して１３字下げ	<div class="pt13 idt-13">		1
+ここから改行天付き、折り返して１４字下げ	<div class="pt14 idt-14">		1
+ここから改行天付き、折り返して１５字下げ	<div class="pt15 idt-15">		1
+ここから改行天付き、折り返して１６字下げ	<div class="pt16 idt-16">		1
+ここから改行天付き、折り返して１７字下げ	<div class="pt17 idt-17">		1
+ここから改行天付き、折り返して１８字下げ	<div class="pt18 idt-18">		1
+ここから改行天付き、折り返して１９字下げ	<div class="pt19 idt-19">		1
+ここから改行天付き、折り返して２０字下げ	<div class="pt20 idt-20">		1
+ここから改行天付き、折り返して２１字下げ	<div class="pt21 idt-21">		1
+ここから改行天付き、折り返して２２字下げ	<div class="pt22 idt-22">		1
+ここから改行天付き、折り返して２３字下げ	<div class="pt23 idt-23">		1
+ここから改行天付き、折り返して２４字下げ	<div class="pt24 idt-24">		1
+ここから改行天付き、折り返して２５字下げ	<div class="pt25 idt-25">		1
 
-改行天付き、折り返して１字下げ	<div class="top1 idt-1">		1
-改行天付き、折り返して２字下げ	<div class="top2 idt-2">		1
-改行天付き、折り返して３字下げ	<div class="top3 idt-3">		1
-改行天付き、折り返して４字下げ	<div class="top4 idt-4">		1
-改行天付き、折り返して５字下げ	<div class="top5 idt-5">		1
-改行天付き、折り返して６字下げ	<div class="top6 idt-6">		1
-改行天付き、折り返して７字下げ	<div class="top7 idt-7">		1
-改行天付き、折り返して８字下げ	<div class="top8 idt-8">		1
-改行天付き、折り返して９字下げ	<div class="top9 idt-9">		1
-改行天付き、折り返して１０字下げ	<div class="top10 idt-10">		1
-改行天付き、折り返して１１字下げ	<div class="top11 idt-11">		1
-改行天付き、折り返して１２字下げ	<div class="top12 idt-12">		1
-改行天付き、折り返して１３字下げ	<div class="top13 idt-13">		1
-改行天付き、折り返して１４字下げ	<div class="top14 idt-14">		1
-改行天付き、折り返して１５字下げ	<div class="top15 idt-15">		1
-改行天付き、折り返して１６字下げ	<div class="top16 idt-16">		1
-改行天付き、折り返して１７字下げ	<div class="top17 idt-17">		1
-改行天付き、折り返して１８字下げ	<div class="top18 idt-18">		1
-改行天付き、折り返して１９字下げ	<div class="top19 idt-19">		1
-改行天付き、折り返して２０字下げ	<div class="top20 idt-20">		1
-改行天付き、折り返して２１字下げ	<div class="top21 idt-21">		1
-改行天付き、折り返して２２字下げ	<div class="top22 idt-22">		1
-改行天付き、折り返して２３字下げ	<div class="top23 idt-23">		1
-改行天付き、折り返して２４字下げ	<div class="top24 idt-24">		1
-改行天付き、折り返して２５字下げ	<div class="top25 idt-25">		1
+改行天付き、折り返して１字下げ	<div class="pt1 idt-1">		1
+改行天付き、折り返して２字下げ	<div class="pt2 idt-2">		1
+改行天付き、折り返して３字下げ	<div class="pt3 idt-3">		1
+改行天付き、折り返して４字下げ	<div class="pt4 idt-4">		1
+改行天付き、折り返して５字下げ	<div class="pt5 idt-5">		1
+改行天付き、折り返して６字下げ	<div class="pt6 idt-6">		1
+改行天付き、折り返して７字下げ	<div class="pt7 idt-7">		1
+改行天付き、折り返して８字下げ	<div class="pt8 idt-8">		1
+改行天付き、折り返して９字下げ	<div class="pt9 idt-9">		1
+改行天付き、折り返して１０字下げ	<div class="pt10 idt-10">		1
+改行天付き、折り返して１１字下げ	<div class="pt11 idt-11">		1
+改行天付き、折り返して１２字下げ	<div class="pt12 idt-12">		1
+改行天付き、折り返して１３字下げ	<div class="pt13 idt-13">		1
+改行天付き、折り返して１４字下げ	<div class="pt14 idt-14">		1
+改行天付き、折り返して１５字下げ	<div class="pt15 idt-15">		1
+改行天付き、折り返して１６字下げ	<div class="pt16 idt-16">		1
+改行天付き、折り返して１７字下げ	<div class="pt17 idt-17">		1
+改行天付き、折り返して１８字下げ	<div class="pt18 idt-18">		1
+改行天付き、折り返して１９字下げ	<div class="pt19 idt-19">		1
+改行天付き、折り返して２０字下げ	<div class="pt20 idt-20">		1
+改行天付き、折り返して２１字下げ	<div class="pt21 idt-21">		1
+改行天付き、折り返して２２字下げ	<div class="pt22 idt-22">		1
+改行天付き、折り返して２３字下げ	<div class="pt23 idt-23">		1
+改行天付き、折り返して２４字下げ	<div class="pt24 idt-24">		1
+改行天付き、折り返して２５字下げ	<div class="pt25 idt-25">		1
 
 ここで字下げ終わり	</div>		1
 ここで字下げ終り	</div>		1
 字下げ終わり	</div>		1
 字下げ終り	</div>		1
 
-####字上げ
-ここから地から１字上げ	<div class="btm1">		1
-ここから地から２字上げ	<div class="btm2">		1
-ここから地から３字上げ	<div class="btm3">		1
-ここから地から４字上げ	<div class="btm4">		1
-ここから地から５字上げ	<div class="btm5">		1
-ここから地から６字上げ	<div class="btm6">		1
-ここから地から７字上げ	<div class="btm7">		1
-ここから地から８字上げ	<div class="btm8">		1
-ここから地から９字上げ	<div class="btm9">		1
-ここから地から１０字上げ	<div class="btm10">		1
-ここから地から１１字上げ	<div class="btm11">		1
-ここから地から１２字上げ	<div class="btm12">		1
-ここから地から１３字上げ	<div class="btm13">		1
-ここから地から１４字上げ	<div class="btm14">		1
-ここから地から１５字上げ	<div class="btm15">		1
-ここから地から１６字上げ	<div class="btm16">		1
-ここから地から１７字上げ	<div class="btm17">		1
-ここから地から１８字上げ	<div class="btm18">		1
-ここから地から１９字上げ	<div class="btm19">		1
-ここから地から２０字上げ	<div class="btm20">		1
-ここから地から２１字上げ	<div class="btm21">		1
-ここから地から２２字上げ	<div class="btm22">		1
-ここから地から２３字上げ	<div class="btm23">		1
-ここから地から２４字上げ	<div class="btm24">		1
-ここから地から２５字上げ	<div class="btm25">		1
+####地付き字上げ
+ここから地付き	<div class="btm">		1
+ここから地から１字上げ	<div class="pb1 btm">		1
+ここから地から２字上げ	<div class="pb2 btm">		1
+ここから地から３字上げ	<div class="pb3 btm">		1
+ここから地から４字上げ	<div class="pb4 btm">		1
+ここから地から５字上げ	<div class="pb5 btm">		1
+ここから地から６字上げ	<div class="pb6 btm">		1
+ここから地から７字上げ	<div class="pb7 btm">		1
+ここから地から８字上げ	<div class="pb8 btm">		1
+ここから地から９字上げ	<div class="pb9 btm">		1
+ここから地から１０字上げ	<div class="pb10 btm">		1
+ここから地から１１字上げ	<div class="pb11 btm">		1
+ここから地から１２字上げ	<div class="pb12 btm">		1
+ここから地から１３字上げ	<div class="pb13 btm">		1
+ここから地から１４字上げ	<div class="pb14 btm">		1
+ここから地から１５字上げ	<div class="pb15 btm">		1
+ここから地から１６字上げ	<div class="pb16 btm">		1
+ここから地から１７字上げ	<div class="pb17 btm">		1
+ここから地から１８字上げ	<div class="pb18 btm">		1
+ここから地から１９字上げ	<div class="pb19 btm">		1
+ここから地から２０字上げ	<div class="pb20 btm">		1
+ここから地から２１字上げ	<div class="pb21 btm">		1
+ここから地から２２字上げ	<div class="pb22 btm">		1
+ここから地から２３字上げ	<div class="pb23 btm">		1
+ここから地から２４字上げ	<div class="pb24 btm">		1
+ここから地から２５字上げ	<div class="pb25 btm">		1
 ここで字上げ終わり	</div>		1
 
-ここから地付き	<div class="btm">		1
 ここで地付き終わり	</div>		1
 ここで地付き終り	</div>		1
 地付き終わり	</div>		1
@@ -402,100 +402,106 @@
 
 ####インライン注記
 
-１字下げ	<div class="top1">	</div>	1
-２字下げ	<div class="top2">	</div>	1
-３字下げ	<div class="top3">	</div>	1
-４字下げ	<div class="top4">	</div>	1
-５字下げ	<div class="top5">	</div>	1
-６字下げ	<div class="top6">	</div>	1
-７字下げ	<div class="top7">	</div>	1
-８字下げ	<div class="top8">	</div>	1
-９字下げ	<div class="top9">	</div>	1
-１０字下げ	<div class="top10">	</div>	1
-１１字下げ	<div class="top11">	</div>	1
-１２字下げ	<div class="top12">	</div>	1
-１３字下げ	<div class="top13">	</div>	1
-１４字下げ	<div class="top14">	</div>	1
-１５字下げ	<div class="top15">	</div>	1
-１６字下げ	<div class="top16">	</div>	1
-１７字下げ	<div class="top17">	</div>	1
-１８字下げ	<div class="top18">	</div>	1
-１９字下げ	<div class="top19">	</div>	1
-２０字下げ	<div class="top20">	</div>	1
-２１字下げ	<div class="top21">	</div>	1
-２２字下げ	<div class="top22">	</div>	1
-２３字下げ	<div class="top23">	</div>	1
-２４字下げ	<div class="top24">	</div>	1
-２５字下げ	<div class="top25">	</div>	1
-２６字下げ	<div class="top26">	</div>	1
-２７字下げ	<div class="top27">	</div>	1
-２８字下げ	<div class="top28">	</div>	1
-２９字下げ	<div class="top29">	</div>	1
-３０字下げ	<div class="top30">	</div>	1
+１字下げ	<div class="pt1">	</div>	1
+２字下げ	<div class="pt2">	</div>	1
+３字下げ	<div class="pt3">	</div>	1
+４字下げ	<div class="pt4">	</div>	1
+５字下げ	<div class="pt5">	</div>	1
+６字下げ	<div class="pt6">	</div>	1
+７字下げ	<div class="pt7">	</div>	1
+８字下げ	<div class="pt8">	</div>	1
+９字下げ	<div class="pt9">	</div>	1
+１０字下げ	<div class="pt10">	</div>	1
+１１字下げ	<div class="pt11">	</div>	1
+１２字下げ	<div class="pt12">	</div>	1
+１３字下げ	<div class="pt13">	</div>	1
+１４字下げ	<div class="pt14">	</div>	1
+１５字下げ	<div class="pt15">	</div>	1
+１６字下げ	<div class="pt16">	</div>	1
+１７字下げ	<div class="pt17">	</div>	1
+１８字下げ	<div class="pt18">	</div>	1
+１９字下げ	<div class="pt19">	</div>	1
+２０字下げ	<div class="pt20">	</div>	1
+２１字下げ	<div class="pt21">	</div>	1
+２２字下げ	<div class="pt22">	</div>	1
+２３字下げ	<div class="pt23">	</div>	1
+２４字下げ	<div class="pt24">	</div>	1
+２５字下げ	<div class="pt25">	</div>	1
+２６字下げ	<div class="pt26">	</div>	1
+２７字下げ	<div class="pt27">	</div>	1
+２８字下げ	<div class="pt28">	</div>	1
+２９字下げ	<div class="pt29">	</div>	1
+３０字下げ	<div class="pt30">	</div>	1
 ##はみ出すので30文字
-３１字下げ	<div class="top30">	</div>	1
-３２字下げ	<div class="top30">	</div>	1
-３３字下げ	<div class="top30">	</div>	1
-３４字下げ	<div class="top30">	</div>	1
-３５字下げ	<div class="top30">	</div>	1
+３１字下げ	<div class="pt30">	</div>	1
+３２字下げ	<div class="pt30">	</div>	1
+３３字下げ	<div class="pt30">	</div>	1
+３４字下げ	<div class="pt30">	</div>	1
+３５字下げ	<div class="pt30">	</div>	1
 
-天から１字下げ	<div class="top1">	</div>	1
-天から２字下げ	<div class="top2">	</div>	1
-天から３字下げ	<div class="top3">	</div>	1
-天から４字下げ	<div class="top4">	</div>	1
-天から５字下げ	<div class="top5">	</div>	1
-天から６字下げ	<div class="top6">	</div>	1
-天から７字下げ	<div class="top7">	</div>	1
-天から８字下げ	<div class="top8">	</div>	1
-天から９字下げ	<div class="top9">	</div>	1
-天から１０字下げ	<div class="top10">	</div>	1
-天から１１字下げ	<div class="top11">	</div>	1
-天から１２字下げ	<div class="top12">	</div>	1
-天から１３字下げ	<div class="top13">	</div>	1
-天から１４字下げ	<div class="top14">	</div>	1
-天から１５字下げ	<div class="top15">	</div>	1
-天から１６字下げ	<div class="top16">	</div>	1
-天から１７字下げ	<div class="top17">	</div>	1
-天から１８字下げ	<div class="top18">	</div>	1
-天から１９字下げ	<div class="top19">	</div>	1
-天から２０字下げ	<div class="top20">	</div>	1
-天から２１字下げ	<div class="top21">	</div>	1
-天から２２字下げ	<div class="top22">	</div>	1
-天から２３字下げ	<div class="top23">	</div>	1
-天から２４字下げ	<div class="top24">	</div>	1
-天から２５字下げ	<div class="top25">	</div>	1
-天から２６字下げ	<div class="top26">	</div>	1
-天から２７字下げ	<div class="top27">	</div>	1
-天から２８字下げ	<div class="top28">	</div>	1
-天から２９字下げ	<div class="top29">	</div>	1
-天から３０字下げ	<div class="top30">	</div>	1
+天から１字下げ	<div class="pt1">	</div>	1
+天から２字下げ	<div class="pt2">	</div>	1
+天から３字下げ	<div class="pt3">	</div>	1
+天から４字下げ	<div class="pt4">	</div>	1
+天から５字下げ	<div class="pt5">	</div>	1
+天から６字下げ	<div class="pt6">	</div>	1
+天から７字下げ	<div class="pt7">	</div>	1
+天から８字下げ	<div class="pt8">	</div>	1
+天から９字下げ	<div class="pt9">	</div>	1
+天から１０字下げ	<div class="pt10">	</div>	1
+天から１１字下げ	<div class="pt11">	</div>	1
+天から１２字下げ	<div class="pt12">	</div>	1
+天から１３字下げ	<div class="pt13">	</div>	1
+天から１４字下げ	<div class="pt14">	</div>	1
+天から１５字下げ	<div class="pt15">	</div>	1
+天から１６字下げ	<div class="pt16">	</div>	1
+天から１７字下げ	<div class="pt17">	</div>	1
+天から１８字下げ	<div class="pt18">	</div>	1
+天から１９字下げ	<div class="pt19">	</div>	1
+天から２０字下げ	<div class="pt20">	</div>	1
+天から２１字下げ	<div class="pt21">	</div>	1
+天から２２字下げ	<div class="pt22">	</div>	1
+天から２３字下げ	<div class="pt23">	</div>	1
+天から２４字下げ	<div class="pt24">	</div>	1
+天から２５字下げ	<div class="pt25">	</div>	1
+天から２６字下げ	<div class="pt26">	</div>	1
+天から２７字下げ	<div class="pt27">	</div>	1
+天から２８字下げ	<div class="pt28">	</div>	1
+天から２９字下げ	<div class="pt29">	</div>	1
+天から３０字下げ	<div class="pt30">	</div>	1
+##はみ出すので30文字
+天から３１字下げ	<div class="pt30">	</div>	1
+天から３２字下げ	<div class="pt30">	</div>	1
+天から３３字下げ	<div class="pt30">	</div>	1
+天から３４字下げ	<div class="pt30">	</div>	1
+天から３５字下げ	<div class="pt30">	</div>	1
 
 地付き	<div class="btm">	</div>	1
-地から１字上げ	<div class="btm1">	</div>	1
-地から２字上げ	<div class="btm2">	</div>	1
-地から３字上げ	<div class="btm3">	</div>	1
-地から４字上げ	<div class="btm4">	</div>	1
-地から５字上げ	<div class="btm5">	</div>	1
-地から６字上げ	<div class="btm6">	</div>	1
-地から７字上げ	<div class="btm7">	</div>	1
-地から８字上げ	<div class="btm8">	</div>	1
-地から９字上げ	<div class="btm9">	</div>	1
-地から１０字上げ	<div class="btm10">	</div>	1
-地から１１字上げ	<div class="btm11">	</div>	1
-地から１２字上げ	<div class="btm12">	</div>	1
-地から１３字上げ	<div class="btm13">	</div>	1
-地から１４字上げ	<div class="btm14">	</div>	1
-地から１５字上げ	<div class="btm15">	</div>	1
-地から１６字上げ	<div class="btm16">	</div>	1
-地から１７字上げ	<div class="btm17">	</div>	1
-地から１８字上げ	<div class="btm18">	</div>	1
-地から１９字上げ	<div class="btm19">	</div>	1
-地から２０字上げ	<div class="btm20">	</div>	1
-地から２１字上げ	<div class="btm21">	</div>	1
-地から２２字上げ	<div class="btm22">	</div>	1
-地から２３字上げ	<div class="btm23">	</div>	1
-地から２４字上げ	<div class="btm24">	</div>	1
-地から２５字上げ	<div class="btm25">	</div>	1
+地から１字上げ	<div class="pb1 btm">	</div>	1
+地から２字上げ	<div class="pb2 btm">	</div>	1
+地から３字上げ	<div class="pb3 btm">	</div>	1
+地から４字上げ	<div class="pb4 btm">	</div>	1
+地から５字上げ	<div class="pb5 btm">	</div>	1
+地から６字上げ	<div class="pb6 btm">	</div>	1
+地から７字上げ	<div class="pb7 btm">	</div>	1
+地から８字上げ	<div class="pb8 btm">	</div>	1
+地から９字上げ	<div class="pb9 btm">	</div>	1
+地から１０字上げ	<div class="pb10 btm">	</div>	1
+地から１１字上げ	<div class="pb11 btm">	</div>	1
+地から１２字上げ	<div class="pb12 btm">	</div>	1
+地から１３字上げ	<div class="pb13 btm">	</div>	1
+地から１４字上げ	<div class="pb14 btm">	</div>	1
+地から１５字上げ	<div class="pb15 btm">	</div>	1
+地から１６字上げ	<div class="pb16 btm">	</div>	1
+地から１７字上げ	<div class="pb17 btm">	</div>	1
+地から１８字上げ	<div class="pb18 btm">	</div>	1
+地から１９字上げ	<div class="pb19 btm">	</div>	1
+地から２０字上げ	<div class="pb20 btm">	</div>	1
+地から２１字上げ	<div class="pb21 btm">	</div>	1
+地から２２字上げ	<div class="pb22 btm">	</div>	1
+地から２３字上げ	<div class="pb23 btm">	</div>	1
+地から２４字上げ	<div class="pb24 btm">	</div>	1
+地から２５字上げ	<div class="pb25 btm">	</div>	1
 
 ####字詰め
 ここから１字詰め	<div class="jzm1 jzm">		1
@@ -538,6 +544,7 @@
 ここから３８字詰め	<div class="jzm38 jzm">		1
 ここから３９字詰め	<div class="jzm39 jzm">		1
 ここから４０字詰め	<div class="jzm40 jzm">		1
+#はみ出すので最大40
 ここから４１字詰め	<div class="jzm40 jzm">		1
 ここから４２字詰め	<div class="jzm40 jzm">		1
 ここから４３字詰め	<div class="jzm40 jzm">		1
@@ -559,20 +566,20 @@
 字下げ省略	</div>
 
 ####字下げ折り返し → TODO PatternとFormatにする (演算処理はフラグで切り替え？)
-##ここから([０-９]+)字下げ、折り返して([０-９]+)字下げ	<div class="top{$2} idt{$1-$2}">
-折り返し1	<div class="top
+##ここから([０-９]+)字下げ、折り返して([０-９]+)字下げ	<div class="pt{$2} idt{$1-$2}">
+折り返し1	<div class="pt
 折り返し2	 idt
 折り返し3	">
 
 ####字下げ字詰め → TODO PatternとFormatにする
-##ここから([０-９]+)字下げ、([０-９]+)字詰め	<div class="top{$1} jzm{$2}">
-字下げ字詰め1	<div class="top
+##ここから([０-９]+)字下げ、([０-９]+)字詰め	<div class="pt{$1} jzm{$2}">
+字下げ字詰め1	<div class="pt
 字下げ字詰め2	 jzm
 字下げ字詰め3	">
 
 ####字下げ その他の複合注記 → 字下げのみ有効 ※字下げ終わりも複合表記有り
-##ここから([０-９]+)字下げ、(.*)	<div class="top{$1}">
-字下げ複合1	<div class="top
+##ここから([０-９]+)字下げ、(.*)	<div class="pt{$1}">
+字下げ複合1	<div class="pt
 ##この間に複合注記のクラスが追加される
 字下げ複合2	">
 
@@ -594,6 +601,10 @@
 ここから４字上げ	<div class="pb4">		1
 ここから５字上げ	<div class="pb5">		1
 ここから６字上げ	<div class="pb6">		1
+ここから７字上げ	<div class="pb7">		1
+ここから８字上げ	<div class="pb8">		1
+ここから９字上げ	<div class="pb9">		1
+ここから１０字上げ	<div class="pb10">		1
 
 ################################################################
 ####その他
@@ -619,11 +630,11 @@
 表題後	</div>		1
 原題前	<div class="font4">		1
 原題後	</div>		1
-副題前	<div class="top2 font2">		1
+副題前	<div class="pt2 font2">		1
 副題後	</div>		1
-副原題前	<div class="top2 font2">		1
+副原題前	<div class="pt2 font2">		1
 副原題後	</div>		1
-著者前	<div class="btm2 font1">		1
+著者前	<div class="pb2 btm font1">		1
 著者後	</div>		1
-副著者前	<div class="btm2 font1">		1
+副著者前	<div class="pb2 btm font1">		1
 副著者後	</div>		1

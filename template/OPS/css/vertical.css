@@ -193,10 +193,8 @@ span.left_underline {
 .kogaki { font-size: 70%; }
 
 /* 縦中横 */
-/* 外字画像とは重なってしまう ただし字下げ折り返し内で画面外にずれる */ 
-/*span.tcy {
-	display: inline-block;
-}*/
+/* 外字画像と重ならない対策 ※有効にすると字下げ折り返し内で画面外にずれる */ 
+/*span.tcy { display: inline-block; }*/
 .tcy span {
 	width: 1em;
 	text-combine: horizontal;
@@ -204,7 +202,7 @@ span.left_underline {
 	-epub-text-combine: horizontal;
 }
 
-/** 横組み */
+/** 横組み (右に回転) */
 span.swr {
 	display: inline-block;
 }
@@ -239,39 +237,69 @@ div.yoko {
 div.center, div.center p { text-align: center; }
 
 /* 字下げ */
-div.top1 { margin-top: 1em; }
-div.top2 { margin-top: 2em; }
-div.top3 { margin-top: 3em; }
-div.top4 { margin-top: 4em; }
-div.top5 { margin-top: 5em; }
-div.top6 { margin-top: 6em; }
-div.top7 { margin-top: 7em; }
-div.top8 { margin-top: 8em; }
-div.top9 { margin-top: 9em; }
-div.top10 { margin-top: 10em; }
-div.top11 { margin-top: 11em; }
-div.top12 { margin-top: 12em; }
-div.top13 { margin-top: 13em; }
-div.top14 { margin-top: 14em; }
-div.top15 { margin-top: 15em; }
-div.top16 { margin-top: 16em; }
-div.top17 { margin-top: 17em; }
-div.top18 { margin-top: 18em; }
-div.top19 { margin-top: 19em; }
-div.top20 { margin-top: 20em; }
-div.top21 { margin-top: 21em; }
-div.top22 { margin-top: 22em; }
-div.top23 { margin-top: 23em; }
-div.top24 { margin-top: 24em; }
-div.top25 { margin-top: 25em; }
-div.top26 { margin-top: 26em; }
-div.top27 { margin-top: 27em; }
-div.top28 { margin-top: 28em; }
-div.top29 { margin-top: 29em; }
-div.top30 { margin-top: 30em; }
+div.pt1 { margin-top: 1em; }
+div.pt2 { margin-top: 2em; }
+div.pt3 { margin-top: 3em; }
+div.pt4 { margin-top: 4em; }
+div.pt5 { margin-top: 5em; }
+div.pt6 { margin-top: 6em; }
+div.pt7 { margin-top: 7em; }
+div.pt8 { margin-top: 8em; }
+div.pt9 { margin-top: 9em; }
+div.pt10 { margin-top: 10em; }
+div.pt11 { margin-top: 11em; }
+div.pt12 { margin-top: 12em; }
+div.pt13 { margin-top: 13em; }
+div.pt14 { margin-top: 14em; }
+div.pt15 { margin-top: 15em; }
+div.pt16 { margin-top: 16em; }
+div.pt17 { margin-top: 17em; }
+div.pt18 { margin-top: 18em; }
+div.pt19 { margin-top: 19em; }
+div.pt20 { margin-top: 20em; }
+div.pt21 { margin-top: 21em; }
+div.pt22 { margin-top: 22em; }
+div.pt23 { margin-top: 23em; }
+div.pt24 { margin-top: 24em; }
+div.pt25 { margin-top: 25em; }
+div.pt26 { margin-top: 26em; }
+div.pt27 { margin-top: 27em; }
+div.pt28 { margin-top: 28em; }
+div.pt29 { margin-top: 29em; }
+div.pt30 { margin-top: 30em; }
 
-/* 改行天付き、折り返して(.+?)字下げ → class="top{$1} idt-{$1}" */
-/* ここから(.+?)字下げ、折り返して(.+?)字下げ → class="top{$2} idt{$1-$2}" */
+/* 字上げ */
+div.pb1, div.pb1 p { margin-bottom: 1em; }
+div.pb2, div.pb2 p { margin-bottom: 2em; }
+div.pb3, div.pb3 p { margin-bottom: 3em; }
+div.pb4, div.pb4 p { margin-bottom: 4em; }
+div.pb5, div.pb5 p { margin-bottom: 5em; }
+div.pb6, div.pb6 p { margin-bottom: 6em; }
+div.pb7, div.pb7 p { margin-bottom: 7em; }
+div.pb8, div.pb8 p { margin-bottom: 8em; }
+div.pb9, div.pb9 p { margin-bottom: 9em; }
+div.pb10, div.pb10 p { margin-bottom: 10em; }
+div.pb11, div.pb11 p { margin-bottom: 11em; }
+div.pb12, div.pb12 p { margin-bottom: 12em; }
+div.pb13, div.pb13 p { margin-bottom: 13em; }
+div.pb14, div.pb14 p { margin-bottom: 14em; }
+div.pb15, div.pb15 p { margin-bottom: 15em; }
+div.pb16, div.pb16 p { margin-bottom: 16em; }
+div.pb17, div.pb17 p { margin-bottom: 17em; }
+div.pb18, div.pb18 p { margin-bottom: 18em; }
+div.pb19, div.pb19 p { margin-bottom: 19em; }
+div.pb20, div.pb20 p { margin-bottom: 20em; }
+div.pb21, div.pb21 p { margin-bottom: 21em; }
+div.pb22, div.pb22 p { margin-bottom: 22em; }
+div.pb23, div.pb23 p { margin-bottom: 23em; }
+div.pb24, div.pb24 p { margin-bottom: 24em; }
+div.pb25, div.pb25 p { margin-bottom: 25em; }
+
+/* 地付き */
+div.btm, div.btm p { text-align: right; }
+
+/* 改行天付き、折り返して(.+?)字下げ → class="pt{$1} idt-{$1}" */
+/* ここから(.+?)字下げ、折り返して(.+?)字下げ → class="pt{$2} idt{$1-$2}" */
 div.idt1 { text-indent: 1em; }
 div.idt2 { text-indent: 2em; }
 div.idt3 { text-indent: 3em; }
@@ -323,34 +351,7 @@ div.idt-23 { text-indent: -23em; }
 div.idt-24 { text-indent: -24em; }
 div.idt-25 { text-indent: -25em; }
 
-/* 地付き 地上げ */
-div.btm, div.btm p { text-align: right; margin-bottom: 0em; }
-div.btm1, div.btm1 p { text-align: right; margin-bottom: 1em; }
-div.btm2, div.btm2 p { text-align: right; margin-bottom: 2em; }
-div.btm3, div.btm3 p { text-align: right; margin-bottom: 3em; }
-div.btm4, div.btm4 p { text-align: right; margin-bottom: 4em; }
-div.btm5, div.btm5 p { text-align: right; margin-bottom: 5em; }
-div.btm6, div.btm6 p { text-align: right; margin-bottom: 6em; }
-div.btm7, div.btm7 p { text-align: right; margin-bottom: 7em; }
-div.btm8, div.btm8 p { text-align: right; margin-bottom: 8em; }
-div.btm9, div.btm9 p { text-align: right; margin-bottom: 9em; }
-div.btm10, div.btm10 p { text-align: right; margin-bottom: 10em; }
-div.btm11, div.btm11 p { text-align: right; margin-bottom: 11em; }
-div.btm12, div.btm12 p { text-align: right; margin-bottom: 12em; }
-div.btm13, div.btm13 p { text-align: right; margin-bottom: 13em; }
-div.btm14, div.btm14 p { text-align: right; margin-bottom: 14em; }
-div.btm15, div.btm15 p { text-align: right; margin-bottom: 15em; }
-div.btm16, div.btm16 p { text-align: right; margin-bottom: 16em; }
-div.btm17, div.btm17 p { text-align: right; margin-bottom: 17em; }
-div.btm18, div.btm18 p { text-align: right; margin-bottom: 18em; }
-div.btm19, div.btm19 p { text-align: right; margin-bottom: 19em; }
-div.btm20, div.btm20 p { text-align: right; margin-bottom: 20em; }
-div.btm21, div.btm21 p { text-align: right; margin-bottom: 21em; }
-div.btm22, div.btm22 p { text-align: right; margin-bottom: 22em; }
-div.btm23, div.btm23 p { text-align: right; margin-bottom: 23em; }
-div.btm24, div.btm24 p { text-align: right; margin-bottom: 24em; }
-div.btm25, div.btm25 p { text-align: right; margin-bottom: 25em; }
-
+/* 字詰め */
 div.jzm1 { max-height: 1em; }
 div.jzm2 { max-height: 2em; }
 div.jzm3 { max-height: 3em; }
@@ -391,13 +392,6 @@ div.jzm37 { max-height: 37em; }
 div.jzm38 { max-height: 38em; }
 div.jzm39 { max-height: 39em; }
 div.jzm40 { max-height: 40em; }
-
-div.pb1 { margin-bottom: 1em; }
-div.pb2 { margin-bottom: 2em; }
-div.pb3 { margin-bottom: 3em; }
-div.pb4 { margin-bottom: 4em; }
-div.pb5 { margin-bottom: 5em; }
-div.pb6 { margin-bottom: 6em; }
 
 /* 行内全角スペース調整用 */
 span.fullsp { padding-top:.5em; }
