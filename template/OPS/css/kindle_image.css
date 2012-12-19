@@ -3,28 +3,28 @@
 
 /* 画像用 画面中央にするには縦書きにする必要あり */
 @page {
-	margin: 0;
-	padding: 0;
+margin: 0;
+padding: 0;
 }
 
 html {
-	writing-mode: horizontal-tb;
-	-webkit-writing-mode: horizontal-tb;
-	-epub-writing-mode: horizontal-tb;
-	margin: 0;
-	padding: 0;
-	width: 100%;
-	height: 100%;
+writing-mode: horizontal-tb;
+-webkit-writing-mode: horizontal-tb;
+-epub-writing-mode: horizontal-tb;
+margin: 0;
+padding: 0;
+width: 100%;
+height: 100%;
 }
 
 body {
-	margin: 0;
-	padding: 0;
-	width: 100%;
-	height: 100%;
+margin: 0;
+padding: 0;
+width: 100%;
+height: 100%;
 }
 
 body .img {
-	width: 100%;
-	height: 100%;
+width: 100%;
+height: 100%;
 }

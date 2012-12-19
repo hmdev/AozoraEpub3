@@ -1,39 +1,41 @@
 @charset "utf-8";
+@namespace "http://www.w3.org/1999/xhtml";
 
 /** 縦書き用 ページ設定以外の基本部分 */
 p {
-	text-align: justify;
+text-align: justify;
+margin: 0;
 }
-span.img {
-	/*clear: both;*/
-	display: inline-block;
-	vertical-align: middle;
-	max-width: 100%;
-	max-height: 100%;
-}
-span.img.ft {
-	/*clear: both;*/
-	display: inline;
-	float: left;
-	padding-bottom: 0.5em;
-}
-span.img.fb {
-	/*clear: both;*/
-	display: inline;
-	float: right;
-	padding-top: 0.5em;
-}
-span.img.fw {
-	width: 100%;
-}
-span.img.fh {
-	height: 100%;
-}
-
 :link { color: #00C; background: transparent; }
 :visited { color: #609; background: transparent; }
 a:active { color: #C00; background: transparent; }
 a:link img, a:visited img { border-style: none; }
+
+span.img {
+/*clear: both;*/
+display: inline-block;
+vertical-align: middle;
+max-width: 100%;
+max-height: 100%;
+}
+span.img.ft {
+/*clear: both;*/
+display: inline;
+float: left;
+padding-bottom: 0.5em;
+}
+span.img.fb {
+/*clear: both;*/
+display: inline;
+float: right;
+padding-top: 0.5em;
+}
+span.img.fw {
+width: 100%;
+}
+span.img.fh {
+height: 100%;
+}
 
 h1 { font-size: 150%; margin-top: 1em; }
 h2, h3, h4, h5, h6 { margin-top: 1em; }
@@ -43,137 +45,131 @@ h4 { font: bold 100%; }
 h5 { font: italic 100%; }
 h6 { font: small-caps 100%; }
 
-p { margin: 0; }
-
 hr { margin: .5em 0 .5em 0; }
 
 .strike { text-decoration:line-through; }
 .dbl_strike { text-decoration:line-through; }
 
-.b, .gtc { font-weight: bold; }
-.gtc, .b { font-family: '@ＭＳ ゴシック','@MS Gothic',sans-serif; }
-.i { font-style: italic; }
-
 /* 外字文字画像 */
 .gaiji {
-	display: inline-block;
-	vertical-align: middle;
+display: inline-block;
+vertical-align: middle;
 }
 .gaiji img {
-	width: 1em;
+width: 1em;
 }
 /* 罫囲み */
 .border {
-	border: 1px solid #000;
-	margin: 0.25em;
-	padding: 0.25em;
-	display: inline-block;
+border: 1px solid #000;
+margin: 0.25em;
+padding: 0.25em;
+display: inline-block;
 }
 .jzm .border {
-	display: block;
+display: block;
 }
 .jzm .p .border {
-	display: inline-block;
+display: inline-block;
 }
 /* 破線罫囲み */
 .dashed_border {
-	border: 1px dashed #000;
-	margin: 0.25em;
-	padding: 0.25em;
-	display: inline-block;
+border: 1px dashed #000;
+margin: 0.25em;
+padding: 0.25em;
+display: inline-block;
 }
 .jzm .dashed_border {
-	display: block;
+display: block;
 }
 .jzm .p .dashed_border {
-	display: inline-block;
+display: inline-block;
 }
 
 /* 圏点 */
 span.sesame {
-	text-emphasis-style: sesame;
-	-webkit-text-emphasis-style: sesame;
-	-epub-text-emphasis-style: sesame;
+text-emphasis-style: sesame;
+-webkit-text-emphasis-style: sesame;
+-epub-text-emphasis-style: sesame;
 }
 span.open_sesame {
-	text-emphasis-style: open sesame;
-	-webkit-text-emphasis-style: open sesame;
-	-epub-text-emphasis-style: open sesame;
+text-emphasis-style: open sesame;
+-webkit-text-emphasis-style: open sesame;
+-epub-text-emphasis-style: open sesame;
 }
 span.dot {
-	text-emphasis-style: dot;
-	-webkit-text-emphasis-style: dot;
-	-epub-text-emphasis-style: dot;
+text-emphasis-style: dot;
+-webkit-text-emphasis-style: dot;
+-epub-text-emphasis-style: dot;
 }
 span.open_dot {
-	text-emphasis-style: open dot;
-	-webkit-text-emphasis-style: open dot;
-	-epub-text-emphasis-style: open dot;
+text-emphasis-style: open dot;
+-webkit-text-emphasis-style: open dot;
+-epub-text-emphasis-style: open dot;
 }
 span.circle {
-	text-emphasis-style: circle;
-	-webkit-text-emphasis-style: circle;
-	-epub-text-emphasis-style: circle;
+text-emphasis-style: circle;
+-webkit-text-emphasis-style: circle;
+-epub-text-emphasis-style: circle;
 }
 span.open_circle {
-	text-emphasis-style: open circle;
-	-webkit-text-emphasis-style: open circle;
-	-epub-text-emphasis-style: open circle;
+text-emphasis-style: open circle;
+-webkit-text-emphasis-style: open circle;
+-epub-text-emphasis-style: open circle;
 }
 span.double-circle {
-	text-emphasis-style: double-circle;
-	-webkit-text-emphasis-style: double-circle;
-	-epub-text-emphasis-style: double-circle;
+text-emphasis-style: double-circle;
+-webkit-text-emphasis-style: double-circle;
+-epub-text-emphasis-style: double-circle;
 }
 span.open_double-circle {
-	text-emphasis-style: open double-circle;
-	-webkit-text-emphasis-style: open double-circle;
-	-epub-text-emphasis-style: open double-circle;
+text-emphasis-style: open double-circle;
+-webkit-text-emphasis-style: open double-circle;
+-epub-text-emphasis-style: open double-circle;
 }
 span.triangle {
-	text-emphasis-style: triangle;
-	-webkit-text-emphasis-style: triangle;
-	-epub-text-emphasis-style: triangle;
+text-emphasis-style: triangle;
+-webkit-text-emphasis-style: triangle;
+-epub-text-emphasis-style: triangle;
 }
 span.open_triangle {
-	text-emphasis-style: open triangle;
-	-webkit-text-emphasis-style: open triangle;
-	-epub-text-emphasis-style: open triangle;
+text-emphasis-style: open triangle;
+-webkit-text-emphasis-style: open triangle;
+-epub-text-emphasis-style: open triangle;
 }
 span.left_sesame {
-	text-emphasis-style: sesame;
-	text-emphasis-position: under;
-	-webkit-text-emphasis-style: sesame;
-	-webkit-text-emphasis-position: under;
-	-epub-text-emphasis-style: sesame;
-	-epub-text-emphasis-position: under;
+text-emphasis-style: sesame;
+text-emphasis-position: under;
+-webkit-text-emphasis-style: sesame;
+-webkit-text-emphasis-position: under;
+-epub-text-emphasis-style: sesame;
+-epub-text-emphasis-position: under;
 }
 
 /* 傍線 */
 span.underline, span.double_underline, span.dotted_underline, span.dashed_underline, span.wave_underline {
-	border-right-width: 1px;
-	padding-right: 1px;
+border-right-width: 1px;
+padding-right: 1px;
 }
 span.underline {
-	border-right-style: solid;
+border-right-style: solid;
 }
 span.double_underline {
-	border-right-width: 3px;
-	border-right-style: double;
+border-right-width: 3px;
+border-right-style: double;
 }
 span.dotted_underline {
-	border-right-style: dotted;
+border-right-style: dotted;
 }
 span.dashed_underline {
-	border-right-style: dashed;
+border-right-style: dashed;
 }
 span.wave_underline {
-	border-right-style: solid;/*wave;*/
+border-right-style: solid;/*wave;*/
 }
 span.left_underline {
-	border-left-style: solid;
-	padding-left: 1px;
-	border-left-width: 1px;
+border-left-style: solid;
+padding-left: 1px;
+border-left-width: 1px;
 }
 
 /* 文字サイズ 大 */
@@ -196,41 +192,52 @@ span.left_underline {
 /* 外字画像と重ならない対策 ※有効にすると字下げ折り返し内で画面外にずれる */ 
 /*span.tcy { display: inline-block; }*/
 .tcy span {
-	width: 1em;
-	text-combine: horizontal;
-	-webkit-text-combine: horizontal;
-	-epub-text-combine: horizontal;
+width: 1em;
+text-combine: horizontal;
+-webkit-text-combine: horizontal;
+-epub-text-combine: horizontal;
+}
+
+/** 割り注 (要改行) */
+span.wrc {
+display: inline-block;
+font-size: .6em;
+line-height: 1em;
+vertical-align: middle;
+padding: .2em 0 .1em 0;
+position: relative;
+left: -.4em;
 }
 
 /** 横組み (右に回転) */
 span.swr {
-	display: inline-block;
+display: inline-block;
 }
 .swr {
-	text-orientation: sideways-right;
-	-webkit-text-orientation: sideways-right;
-	-epub-text-orientation: sideways-right;
+text-orientation: sideways-right;
+-webkit-text-orientation: sideways-right;
+-epub-text-orientation: sideways-right;
 }
 
 /* 横書き */
 div.yoko {
-	display: inline-block;
-	writing-mode: horizontal-tb;
-	-webkit-writing-mode: horizontal-tb;
-	-epub-writing-mode: horizontal-tb;
+display: inline-block;
+writing-mode: horizontal-tb;
+-webkit-writing-mode: horizontal-tb;
+-epub-writing-mode: horizontal-tb;
 }
 
 /* 行右小書き 上付き小文字 */
 .sup {
-	vertical-align: super;
-	font-size: 0.66em;
-	letter-spacing: -2px;
+vertical-align: super;
+font-size: 0.66em;
+letter-spacing: -2px;
 }
 /* 行左小書き 下付き小文字 */
 .sub {
-	vertical-align: sub;
-	font-size: 0.66em;
-	letter-spacing: -2px;
+vertical-align: sub;
+font-size: 0.66em;
+letter-spacing: -2px;
 }
 
 /* 中央揃え */

@@ -245,14 +245,14 @@ public class WebAozoraConverter
 			}
 			bw.append('\n');
 			//説明
-			String description = getExtractText(doc, this.queryMap.get(ExtractId.DESCRIPTION));
+			Element description = getExtractFirstElement(doc, this.queryMap.get(ExtractId.DESCRIPTION));
 			if (description != null) {
 				bw.append('\n');
 				bw.append("［＃区切り線］\n");
 				bw.append('\n');
 				bw.append("［＃ここから２字下げ］\n");
 				bw.append("［＃ここから２字上げ］\n");
-				printText(bw, description);
+				printNode(bw, description, true);
 				bw.append('\n');
 				bw.append("［＃ここで字上げ終わり］\n");
 				bw.append("［＃ここで字下げ終わり］\n");
@@ -535,11 +535,13 @@ public class WebAozoraConverter
 			//前書き
 			Elements preambleDivs = getExtractElements(doc, this.queryMap.get(ExtractId.CONTENT_PREAMBLE));
 			if (preambleDivs != null) {
+				Element startElement = getExtractFirstElement(doc, this.queryMap.get(ExtractId.CONTENT_PREAMBLE_START));
+				Element endElement = getExtractFirstElement(doc, this.queryMap.get(ExtractId.CONTENT_PREAMBLE_END));
 				bw.append("［＃区切り線］\n");
 				bw.append("［＃ここから２字下げ］\n［＃ここから２字上げ］\n");
 				bw.append("［＃ここから１段階小さな文字］\n");
 				bw.append("\n");
-				for (Element elem : preambleDivs) printNode(bw, elem);
+				for (Element elem : preambleDivs) printNode(bw, elem, startElement, endElement, true);
 				bw.append("\n\n");
 				bw.append("［＃ここで小さな文字終わり］\n");
 				bw.append("［＃ここで字上げ終わり］\n［＃ここで字下げ終わり］\n");
@@ -550,18 +552,20 @@ public class WebAozoraConverter
 			for (Element elem : contentDivs) {
 				Element startElement = getExtractFirstElement(doc, this.queryMap.get(ExtractId.CONTENT_ARTICLE_START));
 				Element endElement = getExtractFirstElement(doc, this.queryMap.get(ExtractId.CONTENT_ARTICLE_END));
-				printNode(bw, elem, startElement, endElement);
+				printNode(bw, elem, startElement, endElement, false);
 			}
 			
 			//後書き
 			Elements appendixDivs = getExtractElements(doc, this.queryMap.get(ExtractId.CONTENT_APPENDIX));
 			if (appendixDivs != null) {
+				Element startElement = getExtractFirstElement(doc, this.queryMap.get(ExtractId.CONTENT_APPENDIX_START));
+				Element endElement = getExtractFirstElement(doc, this.queryMap.get(ExtractId.CONTENT_APPENDIX_END));
 				bw.append("\n\n");
 				bw.append("［＃区切り線］\n");
 				bw.append("［＃ここから２字下げ］\n［＃ここから２字上げ］\n");
 				bw.append("［＃ここから１段階小さな文字］\n");
 				bw.append("\n");
-				for (Element elem : appendixDivs) printNode(bw, elem);
+				for (Element elem : appendixDivs) printNode(bw, elem, startElement, endElement, true);
 				bw.append("\n");
 				bw.append("［＃ここで小さな文字終わり］\n");
 				bw.append("［＃ここで字上げ終わり］\n［＃ここで字下げ終わり］\n");
@@ -571,18 +575,21 @@ public class WebAozoraConverter
 	
 	Node startElement = null;
 	Node endElement = null;
+	boolean noHr = false;
 	/** ノードを出力 子ノード内のテキストも出力 */
-	private void printNode(BufferedWriter bw, Node parent, Node start, Node end) throws IOException
+	private void printNode(BufferedWriter bw, Node parent, boolean noHr) throws IOException
+	{
+		printNode(bw, parent, null, null, noHr);
+	}
+	/** ノードを出力 子ノード内のテキストも出力 */
+	private void printNode(BufferedWriter bw, Node parent, Node start, Node end, boolean noHr) throws IOException
 	{
 		this.startElement = start;
 		this.endElement = end;
+		this.noHr = noHr;
 		_printNode(bw, parent);
 	}
-	private void printNode(BufferedWriter bw, Node parent) throws IOException
-	{
-		printNode(bw, parent, null, null);
-	}
-	
+	/** ノードを出力 再帰用 */
 	private void _printNode(BufferedWriter bw, Node parent) throws IOException
 	{
 		for (Node node : parent.childNodes()) {
@@ -614,7 +621,7 @@ public class WebAozoraConverter
 				} else if ("img".equals(elem.tagName())) {
 					//画像をキャッシュして注記出力
 					printImage(bw, elem);
-				} else if ("hr".equals(elem.tagName())) {
+				} else if ("hr".equals(elem.tagName()) && !this.noHr) {
 					bw.append("［＃区切り線］\n");
 				} else if ("b".equals(elem.tagName())) {
 					bw.append("［＃ここから太字］");

@@ -1387,6 +1387,10 @@ public class AozoraEpub3Converter
 		
 		//ルビなしタグ開始なら+1
 		int noRubyLevel = 0;
+		//割り注タグ内
+		boolean inWrc = false;
+		//割り注タグ内の改行有り
+		boolean hasWrcBR = false;
 		
 		StringBuilder bufSuf = new StringBuilder();
 		// 注記タグ変換
@@ -1409,13 +1413,23 @@ public class AozoraEpub3Converter
 				continue;
 			}
 			
-			//注記の前まで本文出力
-			if (begin < chukiStart) {
-				this.convertRubyText(buf, ch, begin, chukiStart, noRubyLevel>0, noRubyLevel>0);
-			}
-			
 			//注記→タグ変換
 			String chukiName = chukiTag.substring(2, chukiTag.length()-1);
+			
+			if (inWrc && !hasWrcBR &&  chukiName.endsWith("割り注終わり")) {
+				//半分の位置に改行注記を入れて本文出力
+				if (begin < chukiStart) {
+					int brPos = begin+(int)Math.ceil((chukiStart-begin)/2.0);
+					this.convertRubyText(buf, ch, begin, brPos, noRubyLevel>0, noRubyLevel>0);
+					buf.append("<br/>");
+					this.convertRubyText(buf, ch, brPos, chukiStart, noRubyLevel>0, noRubyLevel>0);
+				}
+			} else {
+				//注記の前まで本文出力
+				if (begin < chukiStart) {
+					this.convertRubyText(buf, ch, begin, chukiStart, noRubyLevel>0, noRubyLevel>0);
+				}
+			}
 			
 			//横組みチェック
 			if (chukiName.endsWith("横組み")) inYoko = true;
@@ -1505,7 +1519,15 @@ public class AozoraEpub3Converter
 				}
 				//ブロック注記チェック
 				if (chukiFlagNoBr.contains(chukiName)) noBr = true;
-			
+				
+				if (chukiName.endsWith("割り注")) {
+					inWrc = true;
+					hasWrcBR = false;
+				}
+				if (inWrc && "改行".equals(chukiName)) {
+					hasWrcBR = true;
+				}
+				
 			} else {
 				
 				//画像 (訓点 ［＃（ス）］ は . があるかで判断)

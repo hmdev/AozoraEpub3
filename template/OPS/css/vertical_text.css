@@ -3,27 +3,27 @@
 
 /** 縦書き用 */
 @page {
-	/* 上右下左 */
-	margin: .5em .5em 0 0;
+/* 上右下左 */
+margin: .5em .5em 0 0;
 }
 
 html {
-	writing-mode: vertical-rl;
-	-webkit-writing-mode: vertical-rl;
-	-epub-writing-mode: vertical-rl;
-	-epub-line-break: strict;
-	line-break: strict;	
-	-epub-word-break: normal;
-	word-break: normal;
-	margin: 0;
-	padding: 0;
+writing-mode: vertical-rl;
+-webkit-writing-mode: vertical-rl;
+-epub-writing-mode: vertical-rl;
+-epub-line-break: strict;
+line-break: strict;	
+-epub-word-break: normal;
+word-break: normal;
+margin: 0;
+padding: 0;
 }
 body {
-	margin: 0;
-	padding: 0;
-	display: block;
-	color: #000;
-	font-size: 1em;
-	line-height: 1.75;
-	vertical-align: baseline;
+margin: 0;
+padding: 0;
+display: block;
+color: #000;
+font-size: 1em;
+line-height: 1.75;
+vertical-align: baseline;
 }

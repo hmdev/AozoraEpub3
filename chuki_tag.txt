@@ -51,11 +51,11 @@
 同行中見出し終わり	</span>
 同行小見出し	<span class="font1">
 同行小見出し終わり	</span>
-#窓大見出し	<span class="font-1">
+#窓大見出し	<span class="font3">
 #窓大見出し終わり	</span>
-#窓中見出し	<span class="font-3">
+#窓中見出し	<span class="font2">
 #窓中見出し終わり	</span>
-#窓小見出し	<span class="font-5">
+#窓小見出し	<span class="font1">
 #窓小見出し終わり	</span>
 
 
@@ -190,8 +190,12 @@
 ####割り注
 ## → 未対応
 ## ブロック注記改行制御とログ表示抑止のため空欄で設定
-ここから割り注			1
-ここで割り注終わり			1
+ここから割り注	<span class="wrc">
+ここで割り注終わり	</span>
+割り注	<span class="wrc">
+割り注終わり	</span>
+##割り注内の改行注記＋内部の改行出力時にも利用
+改行	<br/>
 
 ####横組み (縦書きの向きで文字右回転) → Koboのみ
 ここから横組み	<div class="swr">		1
@@ -611,8 +615,6 @@
 ルビ前	<ruby>
 ルビ	<rt>
 ルビ後	</rt></ruby>
-
-改行	<br/>
 
 画像開始	<span class="img"><img src="
 画像終了	"/></span>

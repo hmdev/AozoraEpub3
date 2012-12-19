@@ -1,11 +1,19 @@
 @charset "utf-8";
+@namespace "http://www.w3.org/1999/xhtml";
 
 /** 縦書きフォント変更 埋め込み用
  ファイル名を vertical_font.css に変更すると有効 */
 @font-face {
-	font-family: "CustomFont";
-	src: url(../fonts/aokin-mincho.ttf);
+font-family: "CustomFont";
+src: url(../fonts/aokin-mincho.ttf);
 }
 body {
-	font-family: "CustomFont", "@ＭＳ 明朝", "@MS Mincho", "ヒラギノ明朝 ProN W3", "HiraMinProN-W3", serif, sans-serif;
+font-family: "CustomFont", "@ＭＳ 明朝", "@MS Mincho", "ヒラギノ明朝 ProN W3", "HiraMinProN-W3", serif, sans-serif;
 }
+
+.gtc, .b {
+font-family: '@ＭＳ ゴシック','@MS Gothic',sans-serif !important;
+}
+
+.b, .gtc { font-weight: bold; }
+.i { font-style: italic; }

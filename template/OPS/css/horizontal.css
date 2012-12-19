@@ -3,37 +3,38 @@
 
 /* 横書き基本部分 */
 p {
-	text-align: justify;
+text-align: justify;
+margin: 0;
 }
-span.img {
-	/*clear: both;*/
-	display: inline-block;
-	max-width: 100%;
-	max-height: 100%;
-}
-span.img.ft {
-	/*clear: both;*/
-	display: inline;
-	float: left;
-	padding-right: 0.5em;
-}
-span.img.fb {
-	/*clear: both;*/
-	display: inline;
-	float: right;
-	padding-left: 0.5em;
-}
-span.img.fw {
-	width: 100%;
-}
-span.img.fh {
-	height: 100%;
-}
-
 :link { color: #00C; background: transparent; }
 :visited { color: #609; background: transparent; }
 a:active { color: #C00; background: transparent; }
 a:link img, a:visited img { border-style: none; }
+
+span.img {
+/*clear: both;*/
+display: inline-block;
+max-width: 100%;
+max-height: 100%;
+}
+span.img.ft {
+/*clear: both;*/
+display: inline;
+float: left;
+padding-right: 0.5em;
+}
+span.img.fb {
+/*clear: both;*/
+display: inline;
+float: right;
+padding-left: 0.5em;
+}
+span.img.fw {
+width: 100%;
+}
+span.img.fh {
+height: 100%;
+}
 
 h1 { font-size: 150%;padding-left: 1em; }
 h2, h3, h4, h5, h6 {padding-left: 1em; }
@@ -43,132 +44,126 @@ h4 { font: bold 100%; }
 h5 { font: italic 100%; }
 h6 { font: small-caps 100%; }
 
-p { margin: 0; }
-
 .strike { text-decoration:line-through; }
 .dbl_strike { text-decoration:line-through; }
 
-.b, .gtc{ font-weight: bold; }
-.gtc, .b { font-family: 'ＭＳ ゴシック','MS Gothic',sans-serif; }
-.i { font-style: italic; }
-
 /* 外字文字画像 */
 .gaiji {
-	display: inline-block;
-	vertical-align: baseline;
+display: inline-block;
+vertical-align: baseline;
 }
 .gaiji img {
-	height: 1em;
+height: 1em;
 }
 /* 罫囲み */
 .border {
-	border: 1px solid #000;
-	padding: 0.5em;
+border: 1px solid #000;
+padding: 0.5em;
 }
 .jzm .border {
-	display: block;
+display: block;
 }
 .jzm .p .border {
-	display: inline-block;
+display: inline-block;
 }
 /* 破線罫囲み */
 .dashed_border {
-	border: 1px dashed #000;
-	padding: 0.5em;
-	display: inline-block;
+border: 1px dashed #000;
+padding: 0.5em;
+display: inline-block;
 }
 .jzm .dashed_border {
-	display: block;
+display: block;
 }
 .jzm .p .dashed_border {
-	display: inline-block;
+display: inline-block;
 }
 
 /* 圏点 */
 span.sesame {
-	text-emphasis-style: sesame;
-	-webkit-text-emphasis-style: sesame;
-	-epub-text-emphasis-style: sesame;
+text-emphasis-style: sesame;
+-webkit-text-emphasis-style: sesame;
+-epub-text-emphasis-style: sesame;
 }
 span.open_sesame {
-	text-emphasis-style: open sesame;
-	-webkit-text-emphasis-style: open sesame;
-	-epub-text-emphasis-style: open sesame;
+text-emphasis-style: open sesame;
+-webkit-text-emphasis-style: open sesame;
+-epub-text-emphasis-style: open sesame;
 }
 span.dot {
-	text-emphasis-style: dot;
-	-webkit-text-emphasis-style: dot;
-	-epub-text-emphasis-style: dot;
+text-emphasis-style: dot;
+-webkit-text-emphasis-style: dot;
+-epub-text-emphasis-style: dot;
 }
 span.open_dot {
-	text-emphasis-style: open dot;
-	-webkit-text-emphasis-style: open dot;
-	-epub-text-emphasis-style: open dot;
+text-emphasis-style: open dot;
+-webkit-text-emphasis-style: open dot;
+-epub-text-emphasis-style: open dot;
 }
 span.circle {
-	text-emphasis-style: circle;
-	-webkit-text-emphasis-style: circle;
-	-epub-text-emphasis-style: circle;
+text-emphasis-style: circle;
+-webkit-text-emphasis-style: circle;
+-epub-text-emphasis-style: circle;
 }
 span.open_circle {
-	text-emphasis-style: open circle;
-	-webkit-text-emphasis-style: open circle;
-	-epub-text-emphasis-style: open circle;
+text-emphasis-style: open circle;
+-webkit-text-emphasis-style: open circle;
+-epub-text-emphasis-style: open circle;
 }
 span.double-circle {
-	text-emphasis-style: double-circle;
-	-webkit-text-emphasis-style: double-circle;
-	-epub-text-emphasis-style: double-circle;
+text-emphasis-style: double-circle;
+-webkit-text-emphasis-style: double-circle;
+-epub-text-emphasis-style: double-circle;
 }
 span.open_double-circle {
-	text-emphasis-style: open double-circle;
-	-webkit-text-emphasis-style: open double-circle;
-	-epub-text-emphasis-style: open double-circle;
+text-emphasis-style: open double-circle;
+-webkit-text-emphasis-style: open double-circle;
+-epub-text-emphasis-style: open double-circle;
 }
 span.triangle {
-	text-emphasis-style: triangle;
-	-webkit-text-emphasis-style: triangle;
-	-epub-text-emphasis-style: triangle;
+text-emphasis-style: triangle;
+-webkit-text-emphasis-style: triangle;
+-epub-text-emphasis-style: triangle;
 }
 span.open_triangle {
-	text-emphasis-style: open triangle;
-	-webkit-text-emphasis-style: open triangle;
-	-epub-text-emphasis-style: open triangle;
+text-emphasis-style: open triangle;
+-webkit-text-emphasis-style: open triangle;
+-epub-text-emphasis-style: open triangle;
 }
 span.left_sesame {
-	text-emphasis-style: sesame;
-	text-emphasis-position: under;
-	-webkit-text-emphasis-style: sesame;
-	-webkit-text-emphasis-position: under;
-	-epub-text-emphasis-style: sesame;
-	-epub-text-emphasis-position: under;
+text-emphasis-style: sesame;
+text-emphasis-position: under;
+-webkit-text-emphasis-style: sesame;
+-webkit-text-emphasis-position: under;
+-epub-text-emphasis-style: sesame;
+-epub-text-emphasis-position: under;
 }
 
 /* 傍線 */
 span.underline, span.double_underline, span.dotted_underline, span.dashed_underline, span.wave_underline {
-	border-bottom-width: 1px;
-	padding-bottom: 1px;
+border-bottom-width: 1px;
+padding-bottom: 1px;
 }
 span.underline {
-	border-bottom-style: solid;
+border-bottom-style: solid;
 }
 span.double_underline {
-	border-bottom-width: 3px;
-	border-bottom-style: double;
+border-bottom-width: 3px;
+border-bottom-style: double;
 }
 span.dotted_underline {
-	border-bottom-style: dotted;
+border-bottom-style: dotted;
 }
 span.dashed_underline {
-	border-bottom-style: dashed;
+border-bottom-style: dashed;
 }
 span.wave_underline {
-	border-bottom-style: solid;/*wave;*/
+border-bottom-style: solid;/*wave;*/
 }
 span.left_underline {
-	border-top-style: solid;
-	padding-top: 1px;
-	border-top-width: 1px;
+border-top-style: solid;
+padding-top: 1px;
+border-top-width: 1px;
 }
 
 /* 文字サイズ 大 */
@@ -189,17 +184,28 @@ span.left_underline {
 
 /* 縦中横 */
 
+/** 割り注 (要改行) */
+span.wrc {
+display: inline-block;
+font-size: 0.6em;
+line-height: 1em;
+vertical-align: middle;
+padding: 0 .1em 0 .2em;
+position: relative;
+top: -.35em;
+}
+
 /* 行右小書き 上付き小文字 */
 .sup {
-	vertical-align: super;
-	font-size: 0.66em;
-	letter-spacing: -2px;
+vertical-align: super;
+font-size: 0.66em;
+letter-spacing: -2px;
 }
 /* 行左小書き 下付き小文字 */
 .sub {
-	vertical-align: sub;
-	font-size: 0.66em;
-	letter-spacing: -2px;
+vertical-align: sub;
+font-size: 0.66em;
+letter-spacing: -2px;
 }
 
 /* 中央揃え */

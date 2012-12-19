@@ -67,17 +67,23 @@ CONTENT_SUBTITLE	.novel_subtitle
 ##本文タグ外に画像がある場合本文の前に出力
 CONTENT_IMG	.novel_img img
 
-## 各話 本文 (再帰的に出力するので置換設定無効)
+## 本文 抽出開始 このタグの次から
+#CONTENT_ARTICLE_START	.novel_body hr:0
+## 本文 (再帰的に出力するので置換設定無効)
 CONTENT_ARTICLE	.novel_body
+## 本文 抽出終了 このタグの前まで
+#CONTENT_ARTICLE_END	.novel_body hr:-1
 
-## 本文抽出開始 このタグの次から
-##CONTENT_ARTICLE_START	.novel_body hr:0
-
-## 本文抽出終了 このタグの前まで
-##CONTENT_ARTICLE_END	.novel_body hr:-1
-
+## 前書き 抽出開始 このタグの次から
+#CONTENT_PREAMBLE_START	.novel_p .novel_view p:1
 ## 前書き (再帰的に出力するので置換設定無効)
 CONTENT_PREAMBLE	.novel_p .novel_view:0
+## 前書き 抽出終了 このタグの前まで
+#CONTENT_PREAMBLE_END	.novel_p .novel_view hr:-1
 
+## 補足 抽出開始 このタグの次から
+#CONTENT_APPENDIX_START	.novel_a .novel_view hr:1
 ## 補足 (再帰的に出力するので置換設定無効)
 CONTENT_APPENDIX	.novel_a .novel_view:0
+## 前書き 抽出終了 このタグの前まで
+#CONTENT_APPENDIX_END	.novel_a .novel_view p:-1

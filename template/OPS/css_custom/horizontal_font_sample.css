@@ -1,12 +1,20 @@
 @charset "utf-8";
+@namespace "http://www.w3.org/1999/xhtml";
 
 /** 横書きフォント変更 埋め込み用
  ファイル名を horizontal_font.css に変更すると有効 */
 
 @font-face {
-	font-family: "CustomFont";
-	src: url(res:///ebook/fonts/../../mnt/sdcard/fonts/Dfpaburi.ttc);
+font-family: "CustomFont";
+src: url(res:///ebook/fonts/../../mnt/sdcard/fonts/Dfpaburi.ttc);
 }
 body {
-	font-family: "CustomFont", "ＭＳ 明朝", "MS Mincho", "ヒラギノ明朝 ProN W3", "HiraMinProN-W3", serif, sans-serif;
+font-family: "CustomFont", "ＭＳ 明朝", "MS Mincho", "ヒラギノ明朝 ProN W3", "HiraMinProN-W3", serif, sans-serif;
 }
+
+.gtc, .b {
+font-family: 'ＭＳ ゴシック','MS Gothic',sans-serif;
+}
+
+.b, .gtc { font-weight: bold; }
+.i { font-style: italic; }

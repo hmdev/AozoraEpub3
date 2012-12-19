@@ -3,50 +3,50 @@
 
 /** 縦書き用 左右中央 */
 @page {
-	/* 上右下左 */
-	margin: 0.5em 0 0 0;
+/* 上右下左 */
+margin: 0.5em 0 0 0;
 }
 
 html {
-	writing-mode: vertical-rl;
-	-webkit-writing-mode: vertical-rl;
-	-epub-writing-mode: vertical-rl;
-	-epub-line-break: strict;
-	line-break: strict;	
-	-epub-word-break: normal;
-	word-break: normal;
-	margin: 0;
-	padding: 0;
-	width:100%;
-	height:100%;
+writing-mode: vertical-rl;
+-webkit-writing-mode: vertical-rl;
+-epub-writing-mode: vertical-rl;
+-epub-line-break: strict;
+line-break: strict;	
+-epub-word-break: normal;
+word-break: normal;
+margin: 0;
+padding: 0;
+width:100%;
+height:100%;
 }
 body {
-	margin: 0;
-	padding: 0;
-	display: block;
-	color: #000;
-	font-size: 1em;
-	line-height: 1.75;
-	vertical-align: middle;
-	width:100%;
-	height:100%;
+margin: 0;
+padding: 0;
+display: block;
+color: #000;
+font-size: 1em;
+line-height: 1.75;
+vertical-align: middle;
+width:100%;
+height:100%;
 }
 
 table {
-	width:100%;
-	height:100%;
+width:100%;
+height:100%;
 }
 table td {
-	width:100%;
-	height:100%;
-	display: table-cell;
+width:100%;
+height:100%;
+display: table-cell;
 }
 
 /* 左右中央 */
 table.middle td {
-	vertical-align: middle;
+vertical-align: middle;
 }
 /* ページ左 */
 table.bottom td {
-	vertical-align: bottom;
+vertical-align: bottom;
 }
