@@ -57,6 +57,8 @@ vertical-align: middle;
 }
 .gaiji img {
 width: 1em;
+position: relative;
+left: -.2em;
 }
 /* 罫囲み */
 .border {
@@ -192,10 +194,13 @@ border-left-width: 1px;
 /* 外字画像と重ならない対策 ※有効にすると字下げ折り返し内で画面外にずれる */ 
 /*span.tcy { display: inline-block; }*/
 .tcy span {
-width: 1em;
 text-combine: horizontal;
 -webkit-text-combine: horizontal;
 -epub-text-combine: horizontal;
+}
+
+ruby {
+	white-space: nowrap;
 }
 
 /** 割り注 (要改行) */
