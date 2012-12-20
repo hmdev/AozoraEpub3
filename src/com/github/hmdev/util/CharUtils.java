@@ -28,7 +28,7 @@ public class CharUtils
 	}
 	
 	/** 半角数字かチェック */
-	static public boolean isHalfNum(char ch)
+	static public boolean isNum(char ch)
 	{
 		switch (ch) {
 			case '0': case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9': return true;
@@ -72,6 +72,14 @@ public class CharUtils
 	{
 		return ('Ａ' <= ch && ch <= 'Ｚ') || ('ａ' <= ch && ch <= 'ｚ') || ('０' <= ch && ch <= '９') || '＠' == ch || '＿' == ch;
 	}
+	/** 半角数字かチェック */
+	static public boolean isFullNum(char ch)
+	{
+		switch (ch) {
+			case '０': case '１': case '２': case '３': case '４': case '５': case '６': case '７': case '８': case '９': return true;
+		}
+		return false;
+	}
 	
 	static public boolean isHiragana(char ch)
 	{
@@ -96,7 +104,7 @@ public class CharUtils
 	/** 英字かどうかをチェック 拡張ラテン文字含む */
 	static public boolean isAlpha(char ch)
 	{
-		return ('A' <= ch  && ch <= 'z' || 0x80 <= ch && ch <= 0x02AF);
+		return ('A' <= ch  && ch <= 'Z') || ('a' <= ch && ch <= 'z') || (0x80 <= ch && ch <= 0x02AF);
 	}
 	
 	static public boolean isKanji(char[] ch, int i)

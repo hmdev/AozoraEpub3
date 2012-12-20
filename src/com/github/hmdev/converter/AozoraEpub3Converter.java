@@ -856,17 +856,18 @@ public class AozoraEpub3Converter
 		}
 	}
 	
-	/** タグのみ削除 */
+	/** タグとルビを除外 */
 	private String removeTag(String line)
 	{
-		return line.replaceAll("［＃.+?］", "").replaceFirst("^[ |　|―]+", "").replaceAll("<[^>]+>", "").replaceAll("｜", "");
+		return line.replaceAll("［＃.+?］", "").replaceFirst("^[ |　|―]+", "").replaceAll("<[^>]+>", "")
+				.replaceAll("([^※])《.*?[^※]》", "$1").replaceFirst("^｜", "").replaceAll("([^※])｜", "$1");
 	}
 	
 	/** 目次やタイトル用の文字列を取得 ルビ関連の文字 ｜《》 は除外済で他の特殊文字は'※'エスケープ */
 	private String getChapterName(String line)
 	{
 		String name = line.replaceAll("［＃.+?］", "").replaceAll("<a [^>]+>", "").replaceAll("<img [^>]+>", "") //注記とaタグとimgタグ除去
-				.replaceAll("※", "") //エスケープ文字復元
+				.replaceAll("※(《|》|［|］|〔|〕|〔|〕|〔|〕|｜|※)", "$1") //エスケープ文字から※除外
 				.replaceFirst("^[\t| |　|―]+", "").replaceFirst("[\t| |　|―]+$","") //前後の不要な文字所除去
 				.replaceAll("〳〵", "く").replaceAll("〴〵", "ぐ").replaceAll("〻", "々")
 				.replaceFirst("^(=|＝|-|―|─)(=|＝|-|―|─)+", "").replaceFirst("(=|＝|-|―|─)(=|＝|-|―|─)+$", "")//連続する記号除去
@@ -1243,7 +1244,7 @@ public class AozoraEpub3Converter
 	
 	/** 前方参照注記をインライン注記に変換
 	 * 重複等の法則が変則すぎるのでバッファを利用
-	 * kentenの中にルビ、font、yokoが入る場合の入れ替えは後でやる */
+	 * 前にルビがあって｜で始まる場合は｜の前に追加 */
 	private String replaceChukiSufTag(String line)
 	{
 		Matcher m = chukiSufPattern.matcher(line);
@@ -1256,7 +1257,7 @@ public class AozoraEpub3Converter
 		do {
 			//System.out.println(m.group());
 			String target = m.group(1);
-			target = target.replaceAll("《[^》]+》", "");
+			//target = target.replaceAll("《[^》]+》", "");
 			String chuki = m.group(2);
 			String[] tags = sufChukiMap.get(chuki);
 			int targetLength = target.length();
@@ -1317,29 +1318,38 @@ public class AozoraEpub3Converter
 	{
 		//置換済みの文字列で注記追加位置を探す
 		int idx = chukiTagStart-1+chOffset;
+		boolean hasRuby = false;
+		int length = 0;
 		//間にあるタグをスタック
-		while (targetLength > 0 && idx >= 0) {
+		while (targetLength < length && idx >= 0) {
 			switch (buf.charAt(idx)) {
 			case '※':
 			case '｜':
 				break;
 			case '》':
-				 idx--;
-				while (idx >= 0 && buf.charAt(idx) != '《') {
+				idx--;
+				//エスケープ文字
+				if (buf.charAt(idx) == '※') break;
+				while (idx >= 0 && buf.charAt(idx) != '《' && (idx >0 && buf.charAt(idx-1) != '※')) {
 					idx--;
 				}
+				hasRuby = true;
 				break;
 			case '］':
-				 idx--;
-				while (idx >= 0 && buf.charAt(idx) != '［') {
+				idx--;
+				//エスケープ文字
+				if (buf.charAt(idx) == '※') break;
+				while (idx >= 0 && buf.charAt(idx) != '［' && (idx >0 && buf.charAt(idx-1) != '※')) {
 					idx--;
 				}
 				break;
 			default:
-				targetLength--;
+				length++;
 			}
 			idx--;
 		}
+		//ルビがあれば先頭の｜を含める
+		if (hasRuby && idx >= 0 && buf.charAt(idx) == '｜') return idx;
 		//一つ戻す
 		return idx + 1;
 	}
@@ -1385,8 +1395,6 @@ public class AozoraEpub3Converter
 			}
 		}
 		
-		//ルビなしタグ開始なら+1
-		int noRubyLevel = 0;
 		//割り注タグ内
 		boolean inWrc = false;
 		//割り注タグ内の改行有り
@@ -1420,14 +1428,14 @@ public class AozoraEpub3Converter
 				//半分の位置に改行注記を入れて本文出力
 				if (begin < chukiStart) {
 					int brPos = begin+(int)Math.ceil((chukiStart-begin)/2.0);
-					this.convertRubyText(buf, ch, begin, brPos, noRubyLevel>0, noRubyLevel>0);
+					this.convertEscapedText(buf, ch, begin, brPos);
 					buf.append("<br/>");
-					this.convertRubyText(buf, ch, brPos, chukiStart, noRubyLevel>0, noRubyLevel>0);
+					this.convertEscapedText(buf, ch, brPos, chukiStart);
 				}
 			} else {
 				//注記の前まで本文出力
 				if (begin < chukiStart) {
-					this.convertRubyText(buf, ch, begin, chukiStart, noRubyLevel>0, noRubyLevel>0);
+					this.convertEscapedText(buf, ch, begin, chukiStart);
 				}
 			}
 			
@@ -1439,10 +1447,6 @@ public class AozoraEpub3Converter
 				if (chukiName.endsWith("終わり")) inTcy = false;
 				else inTcy = true;
 			}
-			
-			//ルビ無効チェック
-			if (chukiFlagNoRubyStart.contains(chukiName)) noRubyLevel++;
-			else if (chukiFlagNoRubyEnd.contains(chukiName)) noRubyLevel--;
 			
 			String[] tags = chukiMap.get(chukiName);
 			if (tags != null) {
@@ -1745,7 +1749,7 @@ public class AozoraEpub3Converter
 		}
 		//注記の後ろの残りの文字
 		if (begin < ch.length) {
-			this.convertRubyText(buf, ch, begin, ch.length, false, false);
+			this.convertEscapedText(buf, ch, begin, ch.length);
 		}
 		//行末タグを追加
 		if (bufSuf.length() > 0) buf.append(bufSuf.toString());
@@ -1762,22 +1766,54 @@ public class AozoraEpub3Converter
 			}
 		}
 		
+		//ルビの変換後に自動縦中横 (注記を挟む場合があるので行全体で行う)
+		StringBuilder outBuf = new StringBuilder();
+		convertRubyText(outBuf, buf.toString().toCharArray());
+		
 		//バッファを出力
-		this.printLineBuffer(out, buf, lineNum, noBr);
+		this.printLineBuffer(out, outBuf, lineNum, noBr);
+	}
+	
+	/** 出力バッファに<>&をエスケープした状態で出力 */
+	private void convertEscapedText(StringBuilder buf, char[] ch, int begin, int end) throws IOException
+	{
+		for (int idx=begin; idx<end; idx++) {
+			if (this.bookInfo.vertical) {
+				switch (ch[idx]) {
+				case '&': buf.append("&amp;"); break;
+				case '<': buf.append("&lt;"); break;
+				case '>': buf.append("&gt;"); break;
+				case '≪': buf.append("《"); break;
+				case '≫': buf.append("》"); break;
+				case '“': buf.append("〝"); break;
+				case '”': buf.append("〟"); break;
+				//case '〝': ch[i] = '“'; break;
+				//case '〟': ch[i] = '”'; break;
+				case '―': buf.append("─"); break;
+				default: buf.append(ch[idx]);
+				}
+			} else {
+				switch (ch[idx]) {
+				case '&': buf.append("&amp;"); break;
+				case '<': buf.append("&lt;"); break;
+				case '>': buf.append("&gt;"); break;
+				default: buf.append(ch[idx]);
+				}
+			}
+		}
 	}
 	
 	/** ルビタグに変換して出力
 	 * 特殊文字は※が前についているので※の後ろの文字を利用しルビ内なら開始位置以降の文字をずらす
 	 * ・ルビ （前｜漢字《かんじ》 → 前<ruby><rbase>漢字</rbase><rtop>かんじ</rtop></ruby>）
-	 * ・文字置換 （―）
-	 * ・半角2文字のみの数字と!?を縦横中変換
 	 * @param buf 出力先バッファ
-	 * @param ch ルビ変換前の行文字列
-	 * @param begin 変換範囲開始位置
-	 * @param end 変換範囲終了位置
-	 * @param noRuby ルビタグ禁止 縦横中変換も禁止 */
-	public void convertRubyText(StringBuilder buf, char[] ch, int begin, int end, boolean noRuby, boolean noTcy) throws IOException
+	 * @param ch ルビ変換前の行文字列 */
+	private void convertRubyText(StringBuilder buf, char[] ch) throws IOException
 	{
+		int begin = 0;
+		int end = ch.length;
+		boolean noRuby = false;
+		
 		//事前に《》の代替文字をエスケープ済※《 ※》 に変換
 		//全角ひらがな漢字スペースの存在もついでにチェック
 		for (int i=begin+1; i<end; i++) {
@@ -1814,9 +1850,6 @@ public class AozoraEpub3Converter
 		
 		for (int i=begin; i<end; i++) {
 			switch (ch[i]) {
-			//case '〝': ch[i] = '“'; break;
-			//case '〟': ch[i] = '”'; break;
-			case '―': ch[i] = '─'; break;
 			case '※':
 				//外字変換処理でルビ文字と注記になる可能性のある＃が ※でエスケープされている (※《 ※》 ※｜ ※＃)
 				//ルビ自動判別中は次の文字が漢字でもアルファベットでもないのでルビ対象がとして出力される
@@ -1839,7 +1872,7 @@ public class AozoraEpub3Converter
 				break;
 			case '｜':
 				//前まで出力
-				if (rubyStart != -1) convertTcyText(buf, ch, rubyStart, i, noTcy);
+				if (rubyStart != -1) convertTcyText(buf, ch, rubyStart, i, false);
 				rubyStart = i + 1;
 				inRuby = true;
 				break;
@@ -1855,22 +1888,22 @@ public class AozoraEpub3Converter
 				if (ch[i] == '》') {
 					if (rubyStart != -1 && rubyTopStart != -1) {
 						if (noRuby) 
-							convertTcyText(buf, ch, rubyStart, rubyTopStart, noTcy); //本文
+							convertTcyText(buf, ch, rubyStart, rubyTopStart, false); //本文
 						else {
 							//同じ長さで同じ文字なら一文字づつルビを振る
 							if (rubyTopStart-rubyStart == i-rubyTopStart-1 && CharUtils.isSameChars(ch, rubyTopStart+1, i)) {
 								for (int j=0; j<rubyTopStart-rubyStart; j++) {
 									buf.append(chukiMap.get("ルビ前")[0]);
-									convertChar(buf, ch, rubyStart+j, false); //本文
+									convertTcyChar(buf, ch, rubyStart+j, false); //本文
 									buf.append(chukiMap.get("ルビ")[0]);
-									convertChar(buf, ch, rubyTopStart+1+j, true);//ルビ
+									convertTcyChar(buf, ch, rubyTopStart+1+j, true);//ルビ
 									buf.append(chukiMap.get("ルビ後")[0]);
 								}
 							} else {
 								buf.append(chukiMap.get("ルビ前")[0]);
-								convertTcyText(buf, ch, rubyStart, rubyTopStart, noTcy); //本文
+								convertTcyText(buf, ch, rubyStart, rubyTopStart, false); //本文
 								buf.append(chukiMap.get("ルビ")[0]);
-								convertChars(buf, ch, rubyTopStart+1, i, true);//ルビ
+								convertTcyText(buf, ch, rubyTopStart+1, i, true);//ルビ
 								buf.append(chukiMap.get("ルビ後")[0]);
 							}
 						}
@@ -1888,8 +1921,8 @@ public class AozoraEpub3Converter
 					// ルビ開始チェック中で漢字以外または英字以外ならキャンセルして出力
 					boolean charTypeChanged = false;
 					switch (rubyCharType) {
-					case ALPHA: if (!CharUtils.isHalfSpace(ch[i])) charTypeChanged = true; break;
-					case FULLALPHA: if (!CharUtils.isFullAlpha(ch[i])) charTypeChanged = true; break;
+					case ALPHA: if (!(CharUtils.isAlpha(ch[i]) || CharUtils.isNum(ch[i])) && ch[i] != ' ') charTypeChanged = true; break;
+					case FULLALPHA: if (!(CharUtils.isFullAlpha(ch[i]) || CharUtils.isFullNum(ch[i]))) charTypeChanged = true; break;
 					case KANJI: if (!CharUtils.isKanji(ch, i)) charTypeChanged = true; break;
 					case HIRAGANA: if (!CharUtils.isHiragana(ch[i])) charTypeChanged = true; break;
 					case KATAKANA: if (!CharUtils.isKatakana(ch[i])) charTypeChanged = true; break;
@@ -1897,7 +1930,7 @@ public class AozoraEpub3Converter
 					}
 					if (charTypeChanged) {
 						// rubyStartから前までを出力
-						convertTcyText(buf, ch, rubyStart, i, noTcy);
+						convertTcyText(buf, ch, rubyStart, i, false);
 						rubyStart = -1; rubyCharType = RubyCharType.NULL;
 					}
 				}
@@ -1906,10 +1939,10 @@ public class AozoraEpub3Converter
 					// ルビ中でなく漢字
 					if (CharUtils.isKanji(ch, i)) {
 						rubyStart = i; rubyCharType = RubyCharType.KANJI;
-					} else if (CharUtils.isHalfSpace(ch[i])) {
+					} else if (CharUtils.isAlpha(ch[i]) || CharUtils.isNum(ch[i])) {
 						//英数字または空白
 						rubyStart = i; rubyCharType = RubyCharType.ALPHA;
-					} else if (CharUtils.isFullAlpha(ch[i])) {
+					} else if (CharUtils.isFullAlpha(ch[i]) || CharUtils.isFullNum(ch[i])) {
 						//全角英数字
 						rubyStart = i; rubyCharType = RubyCharType.FULLALPHA;
 					} else if (CharUtils.isHiragana(ch[i])) {
@@ -1921,18 +1954,27 @@ public class AozoraEpub3Converter
 					}
 					// ルビ中でなく漢字、半角以外は出力
 					else {
-						convertChar(buf, ch, i, false); rubyCharType = RubyCharType.NULL;
+						convertTcyChar(buf, ch, i, false); rubyCharType = RubyCharType.NULL;
 					}
 				}
 			}
 		}
 		if (rubyStart != -1) {
 			// ルビ開始チェック中で漢字以外ならキャンセルして出力
-			convertTcyText(buf, ch, rubyStart, end, noTcy);
+			convertTcyText(buf, ch, rubyStart, end, false);
+		}
+	}
+	/** 出力バッファに複数文字出力 ラテン文字はグリフにして出力 */
+	private void convertRubyChars2(StringBuilder buf, char[] ch, int begin, int end, boolean inRubyTop) throws IOException
+	{
+		for (int i=begin; i<end; i++) {
+			buf.append(ch[i]);
 		}
 	}
 	
-	private void convertTcyText(StringBuilder buf, char[] ch, int begin, int end, boolean noTcy) throws IOException
+	
+	/** 縦中横変換してbufに出力 */
+	public void convertTcyText(StringBuilder buf, char[] ch, int begin, int end, boolean noTcy) throws IOException
 	{
 		
 		for (int i=begin; i<end; i++) {
@@ -1940,7 +1982,7 @@ public class AozoraEpub3Converter
 			case '0': case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9':
 				//数字2文字を縦横中で出力
 				if (this.autoYoko && !(this.inYoko || this.inTcy || noTcy)) {
-					if (this.autoYokoNum3 && i+2<ch.length && CharUtils.isHalfNum(ch[i+1]) && CharUtils.isHalfNum(ch[i+2])) {
+					if (this.autoYokoNum3 && i+2<ch.length && CharUtils.isNum(ch[i+1]) && CharUtils.isNum(ch[i+2])) {
 						//数字3文字
 						//前後が半角かチェック
 						if (i>0 && CharUtils.isHalf(ch[i-1])) break;
@@ -1955,7 +1997,7 @@ public class AozoraEpub3Converter
 						buf.append(chukiMap.get("縦中横終わり")[0]);
 						i+=2;
 						continue;
-					} else if (i+1<ch.length && CharUtils.isHalfNum(ch[i+1])) {
+					} else if (i+1<ch.length && CharUtils.isNum(ch[i+1])) {
 						//数字2文字
 						//前後が半角かチェック
 						if (i>0 && CharUtils.isHalf(ch[i-1])) break;
@@ -1969,7 +2011,7 @@ public class AozoraEpub3Converter
 						buf.append(chukiMap.get("縦中横終わり")[0]);
 						i++;
 						continue;
-					} else if (this.autoYokoNum1 && (i==0 || !CharUtils.isHalfNum(ch[i-1])) && (i+1==ch.length || !CharUtils.isHalfNum(ch[i+1]))) {
+					} else if (this.autoYokoNum1 && (i==0 || !CharUtils.isNum(ch[i-1])) && (i+1==ch.length || !CharUtils.isNum(ch[i+1]))) {
 						//数字1文字
 						//前後が半角かチェック
 						if (i>0 && CharUtils.isHalf(ch[i-1])) break;
@@ -2039,7 +2081,7 @@ public class AozoraEpub3Converter
 						buf.append(chukiMap.get("縦中横終わり")[0]);
 						i++;
 						continue;
-					} else if (autoYokoEQ1 && (i==0 || !CharUtils.isHalfNum(ch[i-1])) && (i+1==ch.length || !CharUtils.isHalfNum(ch[i+1]))) {
+					} else if (autoYokoEQ1 && (i==0 || !CharUtils.isNum(ch[i-1])) && (i+1==ch.length || !CharUtils.isNum(ch[i+1]))) {
 						//!? 1文字
 						//前後が半角かチェック
 						if (i>0 && CharUtils.isHalf(ch[i-1])) break;
@@ -2057,21 +2099,13 @@ public class AozoraEpub3Converter
 			}
 			
 			//自動縦中横で出力していたらcontinueしていてここは実行されない
-			convertChar(buf, ch, i, false);
-		}
-	}
-	
-	/** 出力バッファに複数文字出力 ラテン文字はグリフにして出力 */
-	private void convertChars(StringBuilder buf, char[] ch, int begin, int end, boolean inRubyTop) throws IOException
-	{
-		for (int i=begin; i<end; i++) {
-			convertChar(buf, ch, i, inRubyTop);
+			convertTcyChar(buf, ch, i, false);
 		}
 	}
 	
 	/** 出力バッファに文字出力 
 	 * < と > と & は &lt; &gt; &amp; に置換 */
-	private void convertChar(StringBuilder buf, char[] ch, int idx, boolean inRubyTop) throws IOException
+	private void convertTcyChar(StringBuilder buf, char[] ch, int idx, boolean inRubyTop) throws IOException
 	{
 		//NULL文字なら何も出力しない
 		if (ch[idx] == '\0') return;
@@ -2126,13 +2160,6 @@ public class AozoraEpub3Converter
 		
 		if (this.bookInfo.vertical) {
 			switch (ch[idx]) {
-			case '&': buf.append("&amp;"); break;
-			case '<': buf.append("&lt;"); break;
-			case '>': buf.append("&gt;"); break;
-			case '≪': buf.append("《"); break;
-			case '≫': buf.append("》"); break;
-			case '“': buf.append("〝"); break;
-			case '”': buf.append("〟"); break;
 			//ローマ数字等 Readerで正立にする
 			//その他右回転する記号: ¶⇔⇒≡√∇∂∃∠⊥⌒∽∝∫∬∮∑∟⊿≠≦≧∈∋⊆⊇⊂⊃∧∨↑↓→←
 			case 'Ⅰ': case 'Ⅱ': case 'Ⅲ': case 'Ⅳ': case 'Ⅴ': case 'Ⅵ': case 'Ⅶ': case 'Ⅷ': case 'Ⅸ': case 'Ⅹ': case 'Ⅺ': case 'Ⅻ':
@@ -2165,12 +2192,7 @@ public class AozoraEpub3Converter
 			default: buf.append(ch[idx]);
 			}
 		} else {
-			switch (ch[idx]) {
-			case '&': buf.append("&amp;"); break;
-			case '<': buf.append("&lt;"); break;
-			case '>': buf.append("&gt;"); break;
-			default: buf.append(ch[idx]);
-			}
+			buf.append(ch[idx]);
 		}
 	}
 	
