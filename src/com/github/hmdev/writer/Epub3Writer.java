@@ -524,7 +524,12 @@ public class Epub3Writer
 			for (ChapterInfo chapterInfo : chapterInfos) {
 				buf.setLength(0);
 				char[] ch = chapterInfo.getChapterName().toCharArray();
-				converter.convertTcyText(buf, ch, 0, ch.length, false);
+				converter.convertEscapedText(buf, ch, 0, ch.length);
+				if (bookInfo.vertical) {
+					ch = buf.toString().toCharArray();
+					buf.setLength(0);
+					converter.convertTcyText(buf, ch, 0, ch.length, false);
+				}
 				chapterInfo.setChapterName(buf.toString());
 			}
 			bookInfo.vertical = vertical;//戻す

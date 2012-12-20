@@ -866,12 +866,12 @@ public class AozoraEpub3Converter
 	/** 目次やタイトル用の文字列を取得 ルビ関連の文字 ｜《》 は除外済で他の特殊文字は'※'エスケープ */
 	private String getChapterName(String line)
 	{
-		String name = line.replaceAll("［＃.+?］", "").replaceAll("<a [^>]+>", "").replaceAll("<img [^>]+>", "") //注記とaタグとimgタグ除去
+		String name = line.replaceAll("［＃.+?］", "").replaceAll("<[^>]+>", "")//注記とタグ除去
 				.replaceAll("※(《|》|［|］|〔|〕|〔|〕|〔|〕|｜|※)", "$1") //エスケープ文字から※除外
 				.replaceFirst("^[\t| |　|―]+", "").replaceFirst("[\t| |　|―]+$","") //前後の不要な文字所除去
 				.replaceAll("〳〵", "く").replaceAll("〴〵", "ぐ").replaceAll("〻", "々")
 				.replaceFirst("^(=|＝|-|―|─)(=|＝|-|―|─)+", "").replaceFirst("(=|＝|-|―|─)(=|＝|-|―|─)+$", "")//連続する記号除去
-				.replaceAll("<[^>]+>", "");//<imgタグ等
+				;
 				//printLineBuffer内だと以下の変換が必要
 				/*.replaceAll("<span class=\"fullsp\"> </span>", "　").replaceAll(String.valueOf((char)(0x2000))+(char)(0x2000), "　")
 				.replaceAll("<rt>[^<]+</rt>", "")*/
@@ -1191,7 +1191,7 @@ public class AozoraEpub3Converter
 				else if (gaiji.length() == 1 && escape) {
 					//特殊文字は 前に※をつけて文字出力時に例外処理
 					switch (gaiji.charAt(0)) {
-					//case '※': buf.append('※'); break;
+					case '※': buf.append('※'); break;
 					case '》': buf.append('※'); break;
 					case '《': buf.append('※'); break;
 					case '｜': buf.append('※'); break;
@@ -1321,7 +1321,7 @@ public class AozoraEpub3Converter
 		boolean hasRuby = false;
 		int length = 0;
 		//間にあるタグをスタック
-		while (targetLength < length && idx >= 0) {
+		while (targetLength > length && idx >= 0) {
 			switch (buf.charAt(idx)) {
 			case '※':
 			case '｜':
@@ -1775,45 +1775,8 @@ public class AozoraEpub3Converter
 	}
 	
 	/** 出力バッファに<>&をエスケープした状態で出力 */
-	private void convertEscapedText(StringBuilder buf, char[] ch, int begin, int end) throws IOException
+	public void convertEscapedText(StringBuilder buf, char[] ch, int begin, int end) throws IOException
 	{
-		for (int idx=begin; idx<end; idx++) {
-			if (this.bookInfo.vertical) {
-				switch (ch[idx]) {
-				case '&': buf.append("&amp;"); break;
-				case '<': buf.append("&lt;"); break;
-				case '>': buf.append("&gt;"); break;
-				case '≪': buf.append("《"); break;
-				case '≫': buf.append("》"); break;
-				case '“': buf.append("〝"); break;
-				case '”': buf.append("〟"); break;
-				//case '〝': ch[i] = '“'; break;
-				//case '〟': ch[i] = '”'; break;
-				case '―': buf.append("─"); break;
-				default: buf.append(ch[idx]);
-				}
-			} else {
-				switch (ch[idx]) {
-				case '&': buf.append("&amp;"); break;
-				case '<': buf.append("&lt;"); break;
-				case '>': buf.append("&gt;"); break;
-				default: buf.append(ch[idx]);
-				}
-			}
-		}
-	}
-	
-	/** ルビタグに変換して出力
-	 * 特殊文字は※が前についているので※の後ろの文字を利用しルビ内なら開始位置以降の文字をずらす
-	 * ・ルビ （前｜漢字《かんじ》 → 前<ruby><rbase>漢字</rbase><rtop>かんじ</rtop></ruby>）
-	 * @param buf 出力先バッファ
-	 * @param ch ルビ変換前の行文字列 */
-	private void convertRubyText(StringBuilder buf, char[] ch) throws IOException
-	{
-		int begin = 0;
-		int end = ch.length;
-		boolean noRuby = false;
-		
 		//事前に《》の代替文字をエスケープ済※《 ※》 に変換
 		//全角ひらがな漢字スペースの存在もついでにチェック
 		for (int i=begin+1; i<end; i++) {
@@ -1840,6 +1803,27 @@ public class AozoraEpub3Converter
 				break;
 			}
 		}
+		
+		for (int idx=begin; idx<end; idx++) {
+			switch (ch[idx]) {
+			case '&': buf.append("&amp;"); break;
+			case '<': buf.append("&lt;"); break;
+			case '>': buf.append("&gt;"); break;
+			default: buf.append(ch[idx]);
+			}
+		}
+	}
+	
+	/** ルビタグに変換して出力
+	 * 特殊文字は※が前についているので※の後ろの文字を利用しルビ内なら開始位置以降の文字をずらす
+	 * ・ルビ （前｜漢字《かんじ》 → 前<ruby><rbase>漢字</rbase><rtop>かんじ</rtop></ruby>）
+	 * @param buf 出力先バッファ
+	 * @param ch ルビ変換前の行文字列 */
+	private void convertRubyText(StringBuilder buf, char[] ch) throws IOException
+	{
+		int begin = 0;
+		int end = ch.length;
+		boolean noRuby = false;
 		
 		// ルビと文字変換
 		int rubyStart = -1;// ルビ開始位置
@@ -1921,7 +1905,7 @@ public class AozoraEpub3Converter
 					// ルビ開始チェック中で漢字以外または英字以外ならキャンセルして出力
 					boolean charTypeChanged = false;
 					switch (rubyCharType) {
-					case ALPHA: if (!(CharUtils.isAlpha(ch[i]) || CharUtils.isNum(ch[i])) && ch[i] != ' ') charTypeChanged = true; break;
+					case ALPHA: if (!(CharUtils.isAlpha(ch[i]) || CharUtils.isNum(ch[i]) || ch[i] == '!' || ch[i] == '?') && ch[i] != ' ') charTypeChanged = true; break;
 					case FULLALPHA: if (!(CharUtils.isFullAlpha(ch[i]) || CharUtils.isFullNum(ch[i]))) charTypeChanged = true; break;
 					case KANJI: if (!CharUtils.isKanji(ch, i)) charTypeChanged = true; break;
 					case HIRAGANA: if (!CharUtils.isHiragana(ch[i])) charTypeChanged = true; break;
@@ -1939,7 +1923,7 @@ public class AozoraEpub3Converter
 					// ルビ中でなく漢字
 					if (CharUtils.isKanji(ch, i)) {
 						rubyStart = i; rubyCharType = RubyCharType.KANJI;
-					} else if (CharUtils.isAlpha(ch[i]) || CharUtils.isNum(ch[i])) {
+					} else if (CharUtils.isAlpha(ch[i]) || CharUtils.isNum(ch[i]) || ch[i] == '!' || ch[i] == '?') {
 						//英数字または空白
 						rubyStart = i; rubyCharType = RubyCharType.ALPHA;
 					} else if (CharUtils.isFullAlpha(ch[i]) || CharUtils.isFullNum(ch[i])) {
@@ -1952,7 +1936,7 @@ public class AozoraEpub3Converter
 						//全角英数字
 						rubyStart = i; rubyCharType = RubyCharType.KATAKANA;
 					}
-					// ルビ中でなく漢字、半角以外は出力
+					// ルビ中でなく漢字、半角以外は出力 数字と!?は英字扱いになっている
 					else {
 						convertTcyChar(buf, ch, i, false); rubyCharType = RubyCharType.NULL;
 					}
@@ -1964,14 +1948,6 @@ public class AozoraEpub3Converter
 			convertTcyText(buf, ch, rubyStart, end, false);
 		}
 	}
-	/** 出力バッファに複数文字出力 ラテン文字はグリフにして出力 */
-	private void convertRubyChars2(StringBuilder buf, char[] ch, int begin, int end, boolean inRubyTop) throws IOException
-	{
-		for (int i=begin; i<end; i++) {
-			buf.append(ch[i]);
-		}
-	}
-	
 	
 	/** 縦中横変換してbufに出力 */
 	public void convertTcyText(StringBuilder buf, char[] ch, int begin, int end, boolean noTcy) throws IOException
@@ -2099,7 +2075,7 @@ public class AozoraEpub3Converter
 			}
 			
 			//自動縦中横で出力していたらcontinueしていてここは実行されない
-			convertTcyChar(buf, ch, i, false);
+			convertTcyChar(buf, ch, i, noTcy);
 		}
 	}
 	
@@ -2160,6 +2136,13 @@ public class AozoraEpub3Converter
 		
 		if (this.bookInfo.vertical) {
 			switch (ch[idx]) {
+			case '≪': buf.append("《"); break;
+			case '≫': buf.append("》"); break;
+			case '“': buf.append("〝"); break;
+			case '”': buf.append("〟"); break;
+			//case '〝': ch[i] = '“'; break;
+			//case '〟': ch[i] = '”'; break;
+			case '―': buf.append("─"); break;
 			//ローマ数字等 Readerで正立にする
 			//その他右回転する記号: ¶⇔⇒≡√∇∂∃∠⊥⌒∽∝∫∬∮∑∟⊿≠≦≧∈∋⊆⊇⊂⊃∧∨↑↓→←
 			case 'Ⅰ': case 'Ⅱ': case 'Ⅲ': case 'Ⅳ': case 'Ⅴ': case 'Ⅵ': case 'Ⅶ': case 'Ⅷ': case 'Ⅸ': case 'Ⅹ': case 'Ⅺ': case 'Ⅻ':
@@ -2192,7 +2175,12 @@ public class AozoraEpub3Converter
 			default: buf.append(ch[idx]);
 			}
 		} else {
-			buf.append(ch[idx]);
+			switch (ch[idx]) {
+			case '≪': buf.append("《"); break;
+			case '≫': buf.append("》"); break;
+			case '―': buf.append("─"); break;
+			default: buf.append(ch[idx]);
+			}
 		}
 	}
 	
