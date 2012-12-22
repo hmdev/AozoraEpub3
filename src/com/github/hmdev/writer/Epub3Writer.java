@@ -899,8 +899,10 @@ public class Epub3Writer
 				imageInfo.getWidth() >=64 &&  imageInfo.getHeight() >= 64 &&
 				imageInfo.getWidth() <= this.imageFloatW && imageInfo.getHeight() <= this.imageFloatH) {
 				if (this.imageFloatType==1) {
+					if (imageInfo.getWidth() > dispW) return PageBreakTrigger.IMAGE_INLINE_TOP_W;
 					return PageBreakTrigger.IMAGE_INLINE_TOP;
 				} else {
+					if (imageInfo.getWidth() > dispW) return PageBreakTrigger.IMAGE_INLINE_BOTTOM_W;
 					return PageBreakTrigger.IMAGE_INLINE_BOTTOM;
 				}
 			}

@@ -11,11 +11,19 @@ public class PageBreakTrigger
 	final static public int IMAGE_PAGE_NOFIT = 5;
 	final static public int IMAGE_PAGE_AUTO = 10;
 	
+	/** 幅合わせ */
 	final static public int IMAGE_INLINE_W = 11;
+	/** 高さ合わせ */
 	final static public int IMAGE_INLINE_H = 12;
 	
+	/** 回り込み上 */
 	final static public int IMAGE_INLINE_TOP = 20;
+	/** 回り込み下 */
 	final static public int IMAGE_INLINE_BOTTOM = 21;
+	/** 回り込み上 幅合わせ */
+	final static public int IMAGE_INLINE_TOP_W = 25;
+	/** 回り込み下 幅合わせ */
+	final static public int IMAGE_INLINE_BOTTOM_W = 26;
 	
 	final static public int PAGE_NORMAL = 0;
 	final static public int PAGE_MIDDLE = 1;

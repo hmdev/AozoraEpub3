@@ -624,6 +624,9 @@
 ##回り込み
 画像開始上	<span class="img ft"><img src="
 画像開始下	<span class="img fb"><img src="
+##回り込み横合わせ
+画像開始上横	<span class="img ft fw"><img src="
+画像開始下横	<span class="img fb fw"><img src="
 ##外字注記の画像
 外字画像開始	<span class="gaiji"><img src="
 外字画像終了	"/></span>

@@ -780,7 +780,7 @@ public class AozoraEpub3Applet extends JApplet
 		label.setBorder(padding2H);
 		panel.add(label);
 		panel = new JPanel();
-		panel.setLayout(new FlowLayout(FlowLayout.LEFT, 1, 0));
+		panel.setLayout(new FlowLayout(FlowLayout.CENTER, 1, 0));
 		panelV.add(panel);
 		//拡大しない
 		propValue = props.getProperty("FitImage");
@@ -856,9 +856,9 @@ public class AozoraEpub3Applet extends JApplet
 		panel.add(label);
 		
 		panel = new JPanel();
-		panel.setLayout(new FlowLayout(FlowLayout.LEFT, 1, 0));
+		panel.setLayout(new FlowLayout(FlowLayout.CENTER, 1, 0));
 		panelV.add(panel);
-		label = new JLabel("    画像位置");
+		label = new JLabel("画像位置");
 		panel.add(label);
 		propValue = props.getProperty("ImageFloatType");
 		jComboImageFloatType = new JComboBox(new String[]{"上/左","下/右"});
@@ -2115,7 +2115,7 @@ public class AozoraEpub3Applet extends JApplet
 		int imageFloatW = 0;
 		int imageFloatH = 0;
 		if (jCheckImageFloat.isSelected()) {
-			imageFloatType =this.jComboImageFloatType.getSelectedIndex();
+			imageFloatType =this.jComboImageFloatType.getSelectedIndex()+1;
 			try { imageFloatW =Integer.parseInt(jTextImageFloatW.getText()); } catch (Exception e) {}
 			try { imageFloatH =Integer.parseInt(jTextImageFloatH.getText()); } catch (Exception e) {}
 		}

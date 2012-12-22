@@ -6,6 +6,7 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -702,10 +703,12 @@ public class JConfirmDialog extends JDialog
 				for (int row=0; row<cnt; row++) {
 					int lineNum = this.tocDataModel.getLineNum(row)-1;
 					ChapterLineInfo chapterLineInfo = bookInfo.getChapterLineInfo(lineNum);
-					if (!this.tocDataModel.isSelected(row)) {
-						this.bookInfo.removeChapterLineInfo(chapterLineInfo.lineNum);
-					} else {
-						chapterLineInfo.setChapterName(this.tocDataModel.getTocName(row));
+					if (chapterLineInfo != null) {
+						if (!this.tocDataModel.isSelected(row)) {
+							this.bookInfo.removeChapterLineInfo(chapterLineInfo.lineNum);
+						} else {
+							chapterLineInfo.setChapterName(this.tocDataModel.getTocName(row));
+						}
 					}
 				}
 			}
@@ -828,6 +831,7 @@ public class JConfirmDialog extends JDialog
 			this.jTableToc.getTableHeader().setPreferredSize(new Dimension(100, 20));
 			this.jTableToc.setVisible(true);
 			this.jScrollToc.setVisible(true);
+			this.jScrollToc.getVerticalScrollBar().setValue(0);
 		}
 		
 		//サイズ調整

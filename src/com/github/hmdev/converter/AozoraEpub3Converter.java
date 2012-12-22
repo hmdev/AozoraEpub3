@@ -798,6 +798,8 @@ public class AozoraEpub3Converter
 						firstLines[0] = replaced;
 					}
 				} else {
+					//改ページで終了
+					if (isPageBreakLine(line)) firstCommentStarted = true;
 					if (this.lineNum-firstLineStart > firstLines.length-1) {
 						firstCommentStarted = true;
 					} else {
@@ -1589,37 +1591,8 @@ public class AozoraEpub3Converter
 											buf.append(fileName);
 											buf.append(chukiMap.get("画像終了")[0]);
 										} else {
-											//画像ページ種別取得
-											int imagePageType = this.writer.getImagePageType(srcFilePath, this.tagLevel);
-											if (imagePageType == PageBreakTrigger.IMAGE_INLINE_W) {
-												buf.append(chukiMap.get("画像開始横")[0]);
-												buf.append(fileName);
-												buf.append(chukiMap.get("画像終了")[0]);
-											} else if (imagePageType == PageBreakTrigger.IMAGE_INLINE_H) {
-												buf.append(chukiMap.get("画像開始縦")[0]);
-												buf.append(fileName);
-												buf.append(chukiMap.get("画像終了")[0]);
-											} else if (imagePageType == PageBreakTrigger.IMAGE_INLINE_TOP) {
-												buf.append(chukiMap.get("画像開始上")[0]);
-												buf.append(fileName);
-												buf.append(chukiMap.get("画像終了")[0]);
-											} else if (imagePageType == PageBreakTrigger.IMAGE_INLINE_BOTTOM) {
-												buf.append(chukiMap.get("画像開始下")[0]);
-												buf.append(fileName);
-												buf.append(chukiMap.get("画像終了")[0]);
-											} else if (imagePageType != PageBreakTrigger.IMAGE_PAGE_NONE) {
-												//改ページの前に文字があれば出力
-												if (buf.length() > 0) this.printLineBuffer(out, buf, lineNum, true);
-												//単一ページ出力
-												buf.append(chukiMap.get("画像開始")[0]);
-												buf.append(fileName);
-												buf.append(chukiMap.get("画像終了")[0]);
-												this.printImagePage(out, buf, lineNum, fileName, imagePageType);
-											} else {
-												buf.append(chukiMap.get("画像開始")[0]);
-												buf.append(fileName);
-												buf.append(chukiMap.get("画像終了")[0]);
-											}
+											//画像注記またはページ出力
+											printImageChuki(out, buf, fileName, this.writer.getImagePageType(srcFilePath, this.tagLevel));
 										}
 									}
 								}
@@ -1646,37 +1619,8 @@ public class AozoraEpub3Converter
 									buf.append(fileName);
 									buf.append(chukiMap.get("画像終了")[0]);
 								} else {
-									//画像ページ種別取得
-									int imagePageType = this.writer.getImagePageType(srcFilePath, this.tagLevel);
-									if (imagePageType == PageBreakTrigger.IMAGE_INLINE_W) {
-										buf.append(chukiMap.get("画像開始横")[0]);
-										buf.append(fileName);
-										buf.append(chukiMap.get("画像終了")[0]);
-									} else if (imagePageType == PageBreakTrigger.IMAGE_INLINE_H) {
-										buf.append(chukiMap.get("画像開始縦")[0]);
-										buf.append(fileName);
-										buf.append(chukiMap.get("画像終了")[0]);
-									} else if (imagePageType == PageBreakTrigger.IMAGE_INLINE_TOP) {
-										buf.append(chukiMap.get("画像開始上")[0]);
-										buf.append(fileName);
-										buf.append(chukiMap.get("画像終了")[0]);
-									} else if (imagePageType == PageBreakTrigger.IMAGE_INLINE_BOTTOM) {
-										buf.append(chukiMap.get("画像開始下")[0]);
-										buf.append(fileName);
-										buf.append(chukiMap.get("画像終了")[0]);
-									} else if (imagePageType != PageBreakTrigger.IMAGE_PAGE_NONE) {
-										//改ページの前に文字があれば出力
-										if (buf.length() > 0) this.printLineBuffer(out, buf, lineNum, true);
-										//単一ページ出力
-										buf.append(chukiMap.get("画像開始")[0]);
-										buf.append(fileName);
-										buf.append(chukiMap.get("画像終了")[0]);
-										this.printImagePage(out, buf, lineNum, fileName, imagePageType);
-									} else {
-										buf.append(chukiMap.get("画像開始")[0]);
-										buf.append(fileName);
-										buf.append(chukiMap.get("画像終了")[0]);
-									}
+									//画像注記またはページ出力
+									printImageChuki(out, buf, fileName, this.writer.getImagePageType(srcFilePath, this.tagLevel));
 								}
 							}
 						}
@@ -1788,6 +1732,47 @@ public class AozoraEpub3Converter
 		
 		//バッファを出力
 		this.printLineBuffer(out, outBuf, lineNum, noBr);
+	}
+	
+	private void printImageChuki(BufferedWriter out, StringBuilder buf, String fileName, int imagePageType) throws IOException
+	{
+		if (imagePageType == PageBreakTrigger.IMAGE_INLINE_W) {
+			buf.append(chukiMap.get("画像開始横")[0]);
+			buf.append(fileName);
+			buf.append(chukiMap.get("画像終了")[0]);
+		} else if (imagePageType == PageBreakTrigger.IMAGE_INLINE_H) {
+			buf.append(chukiMap.get("画像開始縦")[0]);
+			buf.append(fileName);
+			buf.append(chukiMap.get("画像終了")[0]);
+		} else if (imagePageType == PageBreakTrigger.IMAGE_INLINE_TOP) {
+			buf.append(chukiMap.get("画像開始上")[0]);
+			buf.append(fileName);
+			buf.append(chukiMap.get("画像終了")[0]);
+		} else if (imagePageType == PageBreakTrigger.IMAGE_INLINE_BOTTOM) {
+			buf.append(chukiMap.get("画像開始下")[0]);
+			buf.append(fileName);
+			buf.append(chukiMap.get("画像終了")[0]);
+		} else if (imagePageType == PageBreakTrigger.IMAGE_INLINE_TOP_W) {
+			buf.append(chukiMap.get("画像開始上横")[0]);
+			buf.append(fileName);
+			buf.append(chukiMap.get("画像終了")[0]);
+		} else if (imagePageType == PageBreakTrigger.IMAGE_INLINE_BOTTOM_W) {
+			buf.append(chukiMap.get("画像開始下横")[0]);
+			buf.append(fileName);
+			buf.append(chukiMap.get("画像終了")[0]);
+		} else if (imagePageType != PageBreakTrigger.IMAGE_PAGE_NONE) {
+			//改ページの前に文字があれば出力
+			if (buf.length() > 0) this.printLineBuffer(out, buf, lineNum, true);
+			//単一ページ出力
+			buf.append(chukiMap.get("画像開始")[0]);
+			buf.append(fileName);
+			buf.append(chukiMap.get("画像終了")[0]);
+			this.printImagePage(out, buf, lineNum, fileName, imagePageType);
+		} else {
+			buf.append(chukiMap.get("画像開始")[0]);
+			buf.append(fileName);
+			buf.append(chukiMap.get("画像終了")[0]);
+		}
 	}
 	
 	/** 出力バッファに<>&をエスケープした状態で出力 */
