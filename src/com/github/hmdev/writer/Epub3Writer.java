@@ -1,6 +1,8 @@
 package com.github.hmdev.writer;
 
 import java.awt.image.BufferedImage;
+import java.awt.image.ByteLookupTable;
+import java.awt.image.LookupOp;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -166,6 +168,9 @@ public class Epub3Writer
 	/** jpeg圧縮率 */
 	float jpegQuality = 0.8f;
 	
+	/** ガンマフィルタ */
+	LookupOp gammaOp;
+	
 	boolean isKindle = false;
 	
 	////////////////////////////////
@@ -233,7 +238,7 @@ public class Epub3Writer
 			int resizeW, int resizeH,
 			int singlePageSizeW, int singlePageSizeH, int singlePageWidth, boolean fitImage, int rotateAngle,
 			int imageFloatType, int imageFloatW, int imageFloatH,
-			float jpegQuality,
+			float jpegQuality, float gamma,
 			int autoMarginLimitH, int autoMarginLimitV, int autoMarginWhiteLevel, float autoMarginPadding, int autoMarginNombre, float nombreSize)
 	{
 		this.dispW = dispW;
@@ -257,6 +262,17 @@ public class Epub3Writer
 		this.coverH = coverH;
 		
 		this.jpegQuality = jpegQuality;
+		
+		/*
+		if (gamma < 1 && gamma > 0) gammaOp = new RescaleOp(1/gamma, -256*1/gamma+256, null);
+		else if (gamma > 1) gammaOp = new RescaleOp(gamma, 0, null);*/
+		if (gamma != 1) {
+			byte[] table = new byte[256];
+			for (int i=0; i<256; i++) {
+				table[i] = (byte)Math.min(255, Math.round(255*Math.pow((i/255.0), 1/gamma)));
+			}
+			gammaOp = new LookupOp(new ByteLookupTable(0, table), null);
+		} else gammaOp = null;
 		
 		this.autoMarginLimitH = autoMarginLimitH;
 		this.autoMarginLimitV = autoMarginLimitV;
@@ -694,21 +710,21 @@ public class Epub3Writer
 	void writeCoverImage(InputStream is, ZipArchiveOutputStream zos, ImageInfo imageInfo) throws IOException
 	{
 		imageInfo.rotateAngle = 0; //回転させない
-		ImageUtils.writeImage(is, null, zos,imageInfo, this.jpegQuality,
+		ImageUtils.writeImage(is, null, zos,imageInfo, this.jpegQuality, this.gammaOp,
 				0, this.coverW, this.coverH, this.dispW, this.dispH,
 				0, 0, 0, 0, 0, 0);
 	}
 	/** 画像を出力 */
 	void writeImage(InputStream is,ZipArchiveOutputStream zos, ImageInfo imageInfo) throws IOException
 	{
-		ImageUtils.writeImage(is, null, zos, imageInfo, this.jpegQuality,
+		ImageUtils.writeImage(is, null, zos, imageInfo, this.jpegQuality, this.gammaOp,
 				this.maxImagePixels, this.maxImageW, this.maxImageH, this.dispW, this.dispH,
 				this.autoMarginLimitH, this.autoMarginLimitV, this.autoMarginWhiteLevel, this.autoMarginPadding, this.autoMarginNombre, this.autoMarginNombreSize);
 	}
 	/** 画像を出力 */
 	void writeImage(BufferedImage srcImage, ZipArchiveOutputStream zos, ImageInfo imageInfo) throws IOException
 	{
-		ImageUtils.writeImage(null, srcImage, zos, imageInfo, this.jpegQuality,
+		ImageUtils.writeImage(null, srcImage, zos, imageInfo, this.jpegQuality, this.gammaOp,
 				this.maxImagePixels, this.maxImageW, this.maxImageH, this.dispW, this.dispH,
 				this.autoMarginLimitH,  this.autoMarginLimitV, this.autoMarginWhiteLevel, this.autoMarginPadding, this.autoMarginNombre, this.autoMarginNombreSize);
 	}

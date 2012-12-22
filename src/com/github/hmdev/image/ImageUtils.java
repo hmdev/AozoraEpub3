@@ -8,6 +8,7 @@ import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.IndexColorModel;
+import java.awt.image.LookupOp;
 import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
 import java.io.BufferedInputStream;
@@ -123,7 +124,7 @@ public class ImageUtils
 	 * @param autoMarginWhiteLevel 白画素として判別する白さ 100が白
 	 * @param autoMarginPadding 余白除去後に追加するマージン */
 	static public void writeImage(InputStream is, BufferedImage srcImage, ZipArchiveOutputStream zos, ImageInfo imageInfo,
-			float jpegQuality, int maxImagePixels, int maxImageW, int maxImageH, int dispW, int dispH,
+			float jpegQuality, LookupOp gammaOp, int maxImagePixels, int maxImageW, int maxImageH, int dispW, int dispH,
 			int autoMarginLimitH, int autoMarginLimitV, int autoMarginWhiteLevel, float autoMarginPadding, int autoMarginNombre, float nombreSize) throws IOException
 	{
 		try {
@@ -136,8 +137,8 @@ public class ImageUtils
 		//余白チェック時に読み込んだ画像のバッファ
 		byte[] imgBuf = null;
 		
-		//回転なら読み込んでおく
-		if (imageInfo.rotateAngle != 0 && srcImage == null) srcImage = readImage(ext, is);
+		//回転とコントラスト調整なら読み込んでおく
+		if (srcImage == null && (imageInfo.rotateAngle != 0 || gammaOp != null)) srcImage = readImage(ext, is);
 		
 		int[] margin = null;
 		if (autoMarginLimitH > 0 || autoMarginLimitV > 0) {
@@ -186,7 +187,7 @@ public class ImageUtils
 		if (maxImageW > 0) scale = Math.min(scale, (double)maxImageW/w); //最大幅指定
 		if (maxImageH > 0) scale = Math.min(scale, (double)maxImageH/h); //最大高さ指定
 		
-		if (scale >= 1) {
+		if (scale >= 1 && (gammaOp == null || srcImage.getType() == BufferedImage.TYPE_INT_RGB)) {
 			if (srcImage == null) {
 				//変更なしならそのままファイル出力
 				IOUtils.copy(is, zos);
@@ -229,6 +230,11 @@ public class ImageUtils
 						}
 						srcImage = outImage;//入れ替え
 					} else if (margin != null) srcImage = srcImage.getSubimage(margin[0], margin[1], srcImage.getWidth()-margin[2]-margin[0], srcImage.getHeight()-margin[3]-margin[1]);
+					if (gammaOp != null) {
+						BufferedImage filterdImage = new BufferedImage(srcImage.getWidth(), srcImage.getHeight(), BufferedImage.TYPE_INT_RGB);
+						srcImage = gammaOp.filter(srcImage, filterdImage);
+						srcImage = filterdImage;
+					}
 					_writeImage(zos, srcImage, ext, jpegQuality);
 					if (imageInfo.rotateAngle != 0) LogAppender.println("画像回転"+": "+imageInfo.getOutFileName()+" ("+h+","+w+")");
 				}
@@ -245,22 +251,19 @@ public class ImageUtils
 			if (srcImage == null) srcImage = readImage(ext, is);
 			int imageType = srcImage.getType();
 			BufferedImage outImage;
-			boolean hasAlpha = false;
 			ColorModel colorModel;
 			WritableRaster raster;
-			switch (imageType) {
+			switch (gammaOp==null?imageType:BufferedImage.TYPE_INT_RGB) {
 			case BufferedImage.TYPE_BYTE_BINARY:
 				colorModel = srcImage.getColorModel();
 				colorModel = getGray16ColorModel();
 				raster = colorModel.createCompatibleWritableRaster(scaledW, scaledH);
 				outImage = new BufferedImage(colorModel, raster, true, null);
-				hasAlpha = true;
 				break;
 			case BufferedImage.TYPE_BYTE_INDEXED:
 				colorModel = srcImage.getColorModel();
 				raster = colorModel.createCompatibleWritableRaster(scaledW, scaledH);
 				outImage = new BufferedImage(colorModel, raster, true, null);
-				hasAlpha = true;
 				break;
 			/*case BufferedImage.TYPE_BYTE_GRAY:
 				//PngEncoderのGRAYが薄くなるのでindexにする
@@ -276,14 +279,12 @@ public class ImageUtils
 			case BufferedImage.TYPE_USHORT_GRAY:
 				outImage = new BufferedImage(scaledW, scaledH, BufferedImage.TYPE_USHORT_GRAY);
 				break;
-			case BufferedImage.TYPE_INT_ARGB:
-				hasAlpha = true;
 			default:
 				outImage = new BufferedImage(scaledW, scaledH, BufferedImage.TYPE_INT_RGB);
 			}
 			Graphics2D g = outImage.createGraphics();
 			try {
-				if (hasAlpha) {
+				if (imageType == BufferedImage.TYPE_BYTE_BINARY && imageType == BufferedImage.TYPE_BYTE_INDEXED && imageType == BufferedImage.TYPE_INT_ARGB) {
 					g.setColor(Color.WHITE);
 					g.fillRect(0, 0, scaledW, scaledH);
 				}
@@ -318,10 +319,48 @@ public class ImageUtils
 				g.dispose();
 			}
 			//ImageIO.write(outImage, imageInfo.getExt(), zos);
+			//コントラスト調整
+			if (gammaOp != null) {
+				BufferedImage filterdImage = new BufferedImage(outImage.getWidth(), outImage.getHeight(), BufferedImage.TYPE_INT_RGB);
+				outImage = gammaOp.filter(outImage, filterdImage);
+				outImage = filterdImage;
+				filterdImage = null;
+				//インデックス化
+				switch (imageType) {
+				case BufferedImage.TYPE_BYTE_BINARY:
+					colorModel = srcImage.getColorModel();
+					colorModel = getGray16ColorModel();
+					raster = colorModel.createCompatibleWritableRaster(scaledW, scaledH);
+					filterdImage = new BufferedImage(colorModel, raster, true, null);
+					break;
+				case BufferedImage.TYPE_BYTE_INDEXED:
+					colorModel = srcImage.getColorModel();
+					raster = colorModel.createCompatibleWritableRaster(scaledW, scaledH);
+					filterdImage = new BufferedImage(colorModel, raster, true, null);
+					break;
+				case BufferedImage.TYPE_BYTE_GRAY:
+					filterdImage = new BufferedImage(scaledW, scaledH, BufferedImage.TYPE_BYTE_GRAY);
+					break;
+				case BufferedImage.TYPE_USHORT_GRAY:
+					filterdImage = new BufferedImage(scaledW, scaledH, BufferedImage.TYPE_USHORT_GRAY);
+					break;
+				}
+				if (filterdImage != null) {
+					g = filterdImage.createGraphics();
+					try {
+						g.drawImage(outImage, 0, 0, null);
+					} finally {
+						g.dispose();
+					}
+					outImage = filterdImage;
+				}
+			}
 			_writeImage(zos, outImage, ext, jpegQuality);
-			LogAppender.append("画像縮小");
-			if (imageInfo.rotateAngle!=0) LogAppender.append("回転");
-			LogAppender.println(": "+imageInfo.getOutFileName()+" ("+w+","+h+")→("+scaledW+","+scaledH+")");
+			if (scale < 1) {
+				LogAppender.append("画像縮小");
+				if (imageInfo.rotateAngle!=0) LogAppender.append("回転");
+				LogAppender.println(": "+imageInfo.getOutFileName()+" ("+w+","+h+")→("+scaledW+","+scaledH+")");
+			}
 			zos.flush();
 		}
 		} catch (Exception e) {

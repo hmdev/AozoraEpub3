@@ -69,7 +69,7 @@ public class AozoraEpub3
 			//options.addOption("g4", false, "4バイト文字変換");
 			//options.addOption("tm", false, "表題を左右中央");
 			//options.addOption("cp", false, "表紙画像ページ追加");
-			//options.addOption("hor", false, "横書き (指定がなければ縦書き)");
+			options.addOption("hor", false, "横書き (指定がなければ縦書き)");
 			
 			CommandLine commandLine;
 			try {
@@ -116,23 +116,15 @@ public class AozoraEpub3
 			try { props.load(new FileInputStream(propFileName)); } catch (Exception e) { }
 			
 			int titleIndex = 0; //try { titleIndex = Integer.parseInt(props.getProperty("TitleType")); } catch (Exception e) {}//表題
-			boolean useFileName = true; //"1".equals(props.getProperty("UseFileName"));//表題に入力ファイル名利用
-			String coverFileName = null;
-			
-			String encType = "MS932"; //if ("1".equals(props.getProperty("EncType"))) encType = "UTF-8";
-			String outExt = ".epub"; //String propValue = props.getProperty("Ext"); if (propValue!=null&&propValue.length()>0) outExt = propValue;
-			boolean autoFileName = true; //"1".equals(props.getProperty("AutoFileName"));; //ファイル名を表題に利用
-			
-			boolean autoYoko = false; //"1".equals(props.getProperty("AutoYoko"));
 			
 			//コマンドラインオプション以外
-			boolean coverPage = false; "1".equals(props.getProperty("CoverPage"));//表紙追加
-			boolean middleTitle = false; "1".equals(props.getProperty("MiddleTitle"));
-			boolean withMarkId = false; "1".equals(props.getProperty("MarkId"));
-			boolean gaiji32 = false; "1".equals(props.getProperty("Gaiji32"));
-			boolean vertical = !props.containsKey("Vertical")||"1".equals(props.getProperty("Vertical"));
+			boolean coverPage = "1".equals(props.getProperty("CoverPage"));//表紙追加
+			boolean middleTitle = "1".equals(props.getProperty("MiddleTitle"));
+			boolean withMarkId = "1".equals(props.getProperty("MarkId"));
+			boolean gaiji32 = "1".equals(props.getProperty("Gaiji32"));
 			boolean commentPrint = "1".equals(props.getProperty("CommentPrint"));
 			boolean commentConvert = "1".equals(props.getProperty("CommentConvert"));
+			boolean autoYoko = "1".equals(props.getProperty("AutoYoko"));
 			boolean autoYokoNum1 = "1".equals(props.getProperty("AutoYokoNum1"));
 			boolean autoYokoNum3 = "1".equals(props.getProperty("AutoYokoNum3"));
 			boolean autoYokoEQ1 = "1".equals(props.getProperty("AutoYokoEQ1"));
@@ -158,7 +150,8 @@ public class AozoraEpub3
 			int imageFloatH = 0; try { imageFloatH = Integer.parseInt(props.getProperty("ImageFloatH")); } catch (Exception e) {}
 			boolean fitImage = "1".equals(props.getProperty("FitImage"));
 			int rotateImage = 0; if ("1".equals(props.getProperty("RorateImage"))) rotateImage = 90; else if ("2".equals(props.getProperty("RorateImage"))) rotateImage = -90;
-			float jpegQualty = 80; try { jpegQualty = Integer.parseInt(props.getProperty("JpegQuality"))/100f; } catch (Exception e) {}
+			float jpegQualty = 0.8f; try { jpegQualty = Integer.parseInt(props.getProperty("JpegQuality"))/100f; } catch (Exception e) {}
+			float gamma = 1.0f; if ( "1".equals(props.getProperty("Gamma"))) try { gamma = Float.parseFloat(props.getProperty("GammaValue")); } catch (Exception e) {}
 			int autoMarginLimitH = 0;
 			int autoMarginLimitV = 0;
 			int autoMarginWhiteLevel = 80;
@@ -174,9 +167,9 @@ public class AozoraEpub3
 				try { autoMarginPadding = Float.parseFloat(props.getProperty("AutoMarginNombreSize")); } catch (Exception e) {}
 			 }
 			epub3Writer.setImageParam(dispW, dispH, coverW, coverH, resizeW, resizeH, singlePageSizeW, singlePageSizeH, singlePageWidth, fitImage, rotateImage,
-					imageFloatType, imageFloatW, imageFloatH, jpegQualty, autoMarginLimitH, autoMarginLimitV, autoMarginWhiteLevel, autoMarginPadding, autoMarginNombre, nobreSize);
+					imageFloatType, imageFloatW, imageFloatH, jpegQualty, gamma, autoMarginLimitH, autoMarginLimitV, autoMarginWhiteLevel, autoMarginPadding, autoMarginNombre, nobreSize);
 			epub3ImageWriter.setImageParam(dispW, dispH, coverW, coverH, resizeW, resizeH, singlePageSizeW, singlePageSizeH, singlePageWidth, fitImage, rotateImage,
-					imageFloatType, imageFloatW, imageFloatH, jpegQualty, autoMarginLimitH, autoMarginLimitV, autoMarginWhiteLevel, autoMarginPadding, autoMarginNombre, nobreSize);
+					imageFloatType, imageFloatW, imageFloatH, jpegQualty, gamma, autoMarginLimitH, autoMarginLimitV, autoMarginWhiteLevel, autoMarginPadding, autoMarginNombre, nobreSize);
 			
 			//自動改ページ
 			int forcePageBreakSize = 0;
@@ -212,6 +205,12 @@ public class AozoraEpub3
 			String chapterPattern = ""; if ("1".equals(props.getProperty("ChapterPattern"))) chapterPattern = props.getProperty("ChapterPatternText");
 			
 			//オプション指定を反映
+			boolean useFileName = false;//表題に入力ファイル名利用
+			String coverFileName = null;
+			String encType = "MS932";
+			String outExt = ".epub";
+			boolean autoFileName = true; //ファイル名を表題に利用
+			boolean vertical = true;
 			if(commandLine.hasOption("t")) try { titleIndex = Integer.parseInt(commandLine.getOptionValue("t")); } catch (Exception e) {}//表題
 			if(commandLine.hasOption("tf")) useFileName = true;
 			if(commandLine.hasOption("c")) coverFileName = commandLine.getOptionValue("c");
@@ -225,7 +224,7 @@ public class AozoraEpub3
 			//if(commandLine.hasOption("cb")) commentPrint = true;
 			//if(commandLine.hasOption("cc")) commentConvert = true;
 			//if(commandLine.hasOption("cp")) coverPage = true;
-			//if(commandLine.hasOption("hor")) vertical = false;
+			if(commandLine.hasOption("hor")) vertical = false;
 			
 			//変換クラス生成とパラメータ設定
 			AozoraEpub3Converter  aozoraConverter = new AozoraEpub3Converter(epub3Writer, jarPath);

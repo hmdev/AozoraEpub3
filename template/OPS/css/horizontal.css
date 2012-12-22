@@ -29,10 +29,10 @@ display: inline;
 float: right;
 padding-left: 0.5em;
 }
-span.img.fw {
+span.img.fw img {
 width: 100%;
 }
-span.img.fh {
+span.img.fh img {
 height: 100%;
 }
 

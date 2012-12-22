@@ -176,6 +176,9 @@ public class AozoraEpub3Applet extends JApplet
 	//JTextField jTextPixelH;
 	//Jpeg圧縮率
 	JTextField jTextJpegQuality;
+	//ガンマ補正
+	JCheckBox jCheckGamma;
+	JTextField jTextGammaValue;
 	//余白除去
 	JCheckBox jCheckAutoMargin;
 	JTextField jTextAutoMarginLimitH;
@@ -728,7 +731,6 @@ public class AozoraEpub3Applet extends JApplet
 		panelV.setBorder(new NarrowTitledBorder("画像単ページ化"));
 		tabPanel.add(panelV);
 		
-		////////////////////////////////
 		//画像単ページ
 		panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
@@ -780,9 +782,10 @@ public class AozoraEpub3Applet extends JApplet
 		label.setBorder(padding2H);
 		panel.add(label);
 		panel = new JPanel();
-		panel.setLayout(new FlowLayout(FlowLayout.CENTER, 1, 0));
+		panel.setLayout(new FlowLayout(FlowLayout.LEFT, 1, 0));
 		panelV.add(panel);
 		//拡大しない
+		panel.add(new JLabel("    "));
 		propValue = props.getProperty("FitImage");
 		jCheckFitImage = new JCheckBox("拡大表示 ", propValue==null||"1".equals(propValue));
 		jCheckFitImage.setToolTipText("画面サイズより小さい画像を幅・高さに合わせて100%表示します");
@@ -809,7 +812,6 @@ public class AozoraEpub3Applet extends JApplet
 		panelV.setBorder(new NarrowTitledBorder("画像回り込み (単ページ化より優先)"));
 		tabPanel.add(panelV);
 		
-		////////////////////////////////
 		//画像回り込み
 		panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
@@ -817,7 +819,7 @@ public class AozoraEpub3Applet extends JApplet
 		panelV.add(panel);
 		propValue = props.getProperty("ImageFloat");
 		jCheckImageFloat = new JCheckBox("有効 ", "1".equals(propValue));
-		jCheckImageFloat.setToolTipText("画像の実サイズが指定サイズ以下の画像を回り込み設定します 画面サイズより大きい画像ははみ出します");
+		jCheckImageFloat.setToolTipText("画像の実サイズが指定サイズ以下の画像を回り込み設定します");
 		jCheckImageFloat.setFocusPainted(false);
 		jCheckImageFloat.setBorder(padding0);
 		jCheckImageFloat.addChangeListener(new ChangeListener() {
@@ -856,9 +858,9 @@ public class AozoraEpub3Applet extends JApplet
 		panel.add(label);
 		
 		panel = new JPanel();
-		panel.setLayout(new FlowLayout(FlowLayout.CENTER, 1, 0));
+		panel.setLayout(new FlowLayout(FlowLayout.LEFT, 1, 0));
 		panelV.add(panel);
-		label = new JLabel("画像位置");
+		label = new JLabel("    画像位置");
 		panel.add(label);
 		propValue = props.getProperty("ImageFloatType");
 		jComboImageFloatType = new JComboBox(new String[]{"上/左","下/右"});
@@ -971,6 +973,36 @@ public class AozoraEpub3Applet extends JApplet
 		panel.add(label);
 		
 		////////////////////////////////
+		//ガンマ補正
+		////////////////////////////////
+		panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		panel.setBorder(new NarrowTitledBorder("ガンマ補正"));
+		tabPanel.add(panel);
+		propValue = props.getProperty("Gamma");
+		jCheckGamma = new JCheckBox("有効","1".equals(propValue));
+		jCheckGamma.setToolTipText("画像の濃さを変更します (濃:0.5～1.5:淡)");
+		jCheckGamma.setFocusPainted(false);
+		jCheckGamma.setBorder(padding2H);
+		jCheckGamma.addChangeListener(new ChangeListener() {public void stateChanged(ChangeEvent e){
+			jTextGammaValue.setEditable(jCheckGamma.isSelected());
+		}});
+		panel.add(jCheckGamma);
+		propValue = props.getProperty("GammaValue");
+		jTextGammaValue = new JTextField(propValue==null?"1.0":propValue);
+		jTextGammaValue.setToolTipText(jCheckGamma.getToolTipText());
+		jTextGammaValue.setHorizontalAlignment(JTextField.RIGHT);
+		jTextGammaValue.setInputVerifier(new FloatInputVerifier(1.0f, 0.2f, 1.8f));
+		jTextGammaValue.setMaximumSize(text3);
+		jTextGammaValue.setPreferredSize(text3);
+		jTextGammaValue.setEditable(jCheckGamma.isSelected());
+		jTextGammaValue.addFocusListener(new TextSelectFocusListener(jTextGammaValue));
+		panel.add(jTextGammaValue);
+		label = new JLabel("%");
+		label.setBorder(padding2H);
+		panel.add(label);
+		
+		////////////////////////////////
 		//余白除去
 		////////////////////////////////
 		panel = new JPanel();
@@ -1060,12 +1092,13 @@ public class AozoraEpub3Applet extends JApplet
 		propValue = props.getProperty("AutoMarginNombre");
 		jComboAutoMarginNombre = new JComboBox(new String[]{"なし","上","下","上下"});
 		try { jComboAutoMarginNombre.setSelectedIndex(Integer.parseInt(propValue)); } catch (Exception e) {}
+		jComboAutoMarginNombre.setToolTipText("ノンブルを除去します。除去した場合は除去制限が5%追加されます");
 		jComboAutoMarginNombre.setFocusable(false);
 		jComboAutoMarginNombre.setPreferredSize(new Dimension(text3.width+24, 19));
 		panel.add(jComboAutoMarginNombre);
 		propValue = props.getProperty("AutoMarginNombreSize");
 		jTextAutoMarginNombreSize = new JTextField(propValue==null?"3.0":propValue);
-		jTextAutoMarginNombreSize.setToolTipText(label.getToolTipText());
+		jTextAutoMarginNombreSize.setToolTipText("ノンブルの文字部分の高さを指定します。これより大きい場合はノンブル除去されません");
 		jTextAutoMarginNombreSize.setHorizontalAlignment(JTextField.RIGHT);
 		jTextAutoMarginNombreSize.setInputVerifier(new FloatInputVerifier(0, 0, 10));
 		jTextAutoMarginNombreSize.setMaximumSize(text3);
@@ -2120,6 +2153,7 @@ public class AozoraEpub3Applet extends JApplet
 			try { imageFloatH =Integer.parseInt(jTextImageFloatH.getText()); } catch (Exception e) {}
 		}
 		float jpegQualty = 0.8f; try { jpegQualty = Integer.parseInt(jTextJpegQuality.getText())/100f; } catch (Exception e) {}
+		float gamma = 1.0f; if (jCheckGamma.isSelected()) try { gamma = Float.parseFloat(jTextGammaValue.getText()); } catch (Exception e) {}
 		int autoMarginLimitH = 0;
 		int autoMarginLimitV = 0;
 		int autoMarginWhiteLevel = 0;
@@ -2137,9 +2171,9 @@ public class AozoraEpub3Applet extends JApplet
 		int rorateAngle = 0; if (jComboRotateImage.getSelectedIndex() == 1) rorateAngle = 90; else if (jComboRotateImage.getSelectedIndex() == 2) rorateAngle = -90;
 		
 		this.epub3Writer.setImageParam(dispW, dispH, coverW, coverH, resizeW, resizeH, singlePageSizeW, singlePageSizeH, singlePageWidth, jCheckFitImage.isSelected(), rorateAngle,
-				imageFloatType, imageFloatW, imageFloatH, jpegQualty, autoMarginLimitH, autoMarginLimitV, autoMarginWhiteLevel, autoMarginPadding, autoMarginNombre, autoMarginNombreSize);
+				imageFloatType, imageFloatW, imageFloatH, jpegQualty, gamma, autoMarginLimitH, autoMarginLimitV, autoMarginWhiteLevel, autoMarginPadding, autoMarginNombre, autoMarginNombreSize);
 		this.epub3ImageWriter.setImageParam(dispW, dispH, coverW, coverH, resizeW, resizeH, singlePageSizeW, singlePageSizeH, singlePageWidth, jCheckFitImage.isSelected(), rorateAngle,
-				imageFloatType, imageFloatW, imageFloatH, jpegQualty, autoMarginLimitH, autoMarginLimitV, autoMarginWhiteLevel, autoMarginPadding, autoMarginNombre, autoMarginNombreSize);
+				imageFloatType, imageFloatW, imageFloatH, jpegQualty, gamma, autoMarginLimitH, autoMarginLimitV, autoMarginWhiteLevel, autoMarginPadding, autoMarginNombre, autoMarginNombreSize);
 		
 		try {
 			this.aozoraConverter.setNoIllust(jCheckNoIllust.isSelected()); 
@@ -2903,6 +2937,9 @@ public class AozoraEpub3Applet extends JApplet
 		this.props.setProperty("CoverH", this.jTextCoverH.getText());
 		//JPEG画質
 		this.props.setProperty("JpegQuality", this.jTextJpegQuality.getText());
+		//ガンマ補正
+		this.props.setProperty("Gamma", this.jCheckGamma.isSelected()?"1":"");
+		this.props.setProperty("GammaValue", this.jTextGammaValue.getText());
 		//余白除去
 		this.props.setProperty("AutoMargin", this.jCheckAutoMargin.isSelected()?"1":"");
 		this.props.setProperty("AutoMarginLimitH", this.jTextAutoMarginLimitH.getText());
