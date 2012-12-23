@@ -61,6 +61,11 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 	private int prevX = 0;
 	private int mouseType = 0;
 	
+	final static int EVT_CHANGED = 1;
+	final static int EVT_DBLCLICK = 10;
+	final static int EVT_PAGE_UP = 100;
+	final static int EVT_PAGE_DOWN = 101;
+	
 	public JCoverImagePanel()
 	{
 		this.addMouseListener(this);
@@ -371,7 +376,7 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 	{
 		if (e.getClickCount() == 2) {
 			//2倍表示をコールバック
-			if (this.linstener != null) this.linstener.actionPerformed(new ActionEvent(this, 1, "dbkclick"));
+			if (this.linstener != null) this.linstener.actionPerformed(new ActionEvent(this, EVT_DBLCLICK, null));
 		}
 	}
 	@Override
@@ -397,12 +402,14 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 		//中ボタンは縦合わせ
 		if (this.mouseType == MouseEvent.BUTTON2) {
 			setFitType(FIT_H, false);
+			if (this.linstener != null) this.linstener.actionPerformed(new ActionEvent(this, EVT_CHANGED, null));
 		}
 	}
 	@Override
 	public void mouseReleased(MouseEvent e)
 	{
 		this.startX = Integer.MIN_VALUE;
+		if (this.linstener != null) this.linstener.actionPerformed(new ActionEvent(this, EVT_CHANGED, null));
 	}
 	/** マウスドラッグイベント */
 	@Override
@@ -437,11 +444,21 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 		} else {
 			this.setZoom(rate);
 		}
+		if (this.linstener != null) this.linstener.actionPerformed(new ActionEvent(this, EVT_CHANGED, null));
 	}
 	
 	@Override
 	public void keyPressed(KeyEvent e)
 	{
+		switch (e.getKeyCode()) {
+		case KeyEvent.VK_PAGE_DOWN:
+			if (this.linstener != null) this.linstener.actionPerformed(new ActionEvent(this, EVT_PAGE_DOWN, null));
+			return;
+		case KeyEvent.VK_PAGE_UP:
+			if (this.linstener != null) this.linstener.actionPerformed(new ActionEvent(this, EVT_PAGE_UP, null));
+			return;
+		}
+		
 		if (previewImage == null) return;
 		int delta = 1;
 		if (e.isControlDown()) {

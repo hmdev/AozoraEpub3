@@ -521,7 +521,7 @@ public class WebAozoraConverter
 			if (coutentUpdate != null && coutentUpdate.length() > 0) postDate = coutentUpdate;
 			if (postDate != null) {
 				bw.append("［＃ここから地から１字上げ］\n［＃ここから１段階小さな文字］\n");
-				bw.append(postDate);
+				printText(bw, postDate);
 				bw.append('\n');
 				bw.append("［＃ここで小さな文字終わり］\n［＃ここで字上げ終わり］\n");
 			}
@@ -658,12 +658,12 @@ public class WebAozoraConverter
 		if (rb.size() > 0) {
 			if (rt.size() > 0) {
 				bw.append('｜');
-				bw.append(rb.get(0).text());
+				printText(bw, rb.get(0).text());
 				bw.append('《');
-				bw.append(rt.get(0).text());
+				printText(bw, rt.get(0).text());
 				bw.append('》');
 			} else {
-				bw.append(rb.get(0).text());
+				printText(bw, rb.get(0).text());
 			}
 		}
 	}

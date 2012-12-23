@@ -1609,6 +1609,7 @@ public class AozoraEpub3Applet extends JApplet
 		jConfirmDialog = new JConfirmDialog(
 			iconImage, AozoraEpub3Applet.class.getResource("images/icon.png").toString().replaceFirst("/icon\\.png", "/")
 		);
+		if ("1".equals(props.getProperty("ReplaceCover"))) jConfirmDialog.jCheckReplaceCover.setSelected(true);
 		
 		////////////////////////////////////////////////////////////////
 		//ログ出力先を設定
@@ -2988,6 +2989,9 @@ public class AozoraEpub3Applet extends JApplet
 		this.props.setProperty("ChapterNumParenTitle", this.jCheckChapterNumParenTitle.isSelected()?"1":"");
 		this.props.setProperty("ChapterPattern", this.jCheckChapterPattern.isSelected()?"1":"");
 		this.props.setProperty("ChapterPatternText", this.jComboChapterPattern.getEditor().getItem().toString().trim());
+		
+		//確認ダイアログの元画像を残す
+		this.props.setProperty("ReplaceCover", this.jConfirmDialog.jCheckReplaceCover.isSelected()?"1":"");
 		
 		this.props.setProperty("EncType", ""+this.jComboEncType.getSelectedIndex());
 		this.props.setProperty("OverWrite", this.jCheckOverWrite.isSelected()?"1":"");
