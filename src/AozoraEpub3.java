@@ -25,7 +25,7 @@ import com.github.hmdev.writer.Epub3Writer;
 /** コマンドライン実行用mainとePub3変換関数 */
 public class AozoraEpub3
 {
-	public static final String VERSION = "1.1.0b12";
+	public static final String VERSION = "1.1.0b13";
 	
 	/** コマンドライン実行用 */
 	public static void main(String args[])
@@ -294,8 +294,7 @@ public class AozoraEpub3
 					
 					BookInfo bookInfo = null;
 					if (!imageOnly) {
-						InputStream is = AozoraEpub3.getInputStream(srcFile, ext, imageInfoReader, null, txtIdx);
-						bookInfo = AozoraEpub3.getBookInfo(is, imageInfoReader, aozoraConverter, encType, BookInfo.TitleType.indexOf(titleIndex));
+						bookInfo = AozoraEpub3.getBookInfo(srcFile, ext, txtIdx, imageInfoReader, aozoraConverter, encType, BookInfo.TitleType.indexOf(titleIndex));
 						bookInfo.vertical = vertical;
 						bookInfo.insertTocPage = tocPage;
 						bookInfo.setTocVertical(tocVertical);
@@ -307,7 +306,7 @@ public class AozoraEpub3
 						if (imageOnly) {
 							LogAppender.println("画像のみのePubファイルを生成します");
 							//画像出力用のBookInfo生成
-							bookInfo = new BookInfo();
+							bookInfo = new BookInfo(srcFile);
 							bookInfo.imageOnly = true;
 							//Writerを画像出力用派生クラスに入れ替え
 							writer = epub3ImageWriter;
@@ -380,16 +379,19 @@ public class AozoraEpub3
 	}
 	
 	/** 前処理で一度読み込んでタイトル等の情報を取得 */
-	static public BookInfo getBookInfo(InputStream is, ImageInfoReader imageInfoReader, AozoraEpub3Converter aozoraConverter,
+	static public BookInfo getBookInfo(File srcFile, String ext, int txtIdx, ImageInfoReader imageInfoReader, AozoraEpub3Converter aozoraConverter,
 			String encType, BookInfo.TitleType titleType)
 	{
 		try {
+			String[] textEntryName = new String[1];
+			InputStream is = AozoraEpub3.getInputStream(srcFile, ext, imageInfoReader, textEntryName, txtIdx);
 			if (is == null) return null;
 			
 			//タイトル、画像注記、左右中央注記、目次取得
 			BufferedReader src = new BufferedReader(new InputStreamReader(is, (String)encType));
-			BookInfo bookInfo = aozoraConverter.getBookInfo(src, imageInfoReader, titleType);
+			BookInfo bookInfo = aozoraConverter.getBookInfo(srcFile, src, imageInfoReader, titleType);
 			is.close();
+			bookInfo.textEntryName = textEntryName[0];
 			return bookInfo;
 			
 		} catch (Exception e) {

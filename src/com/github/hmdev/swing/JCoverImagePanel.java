@@ -31,6 +31,7 @@ import java.util.List;
 import javax.swing.JPanel;
 
 import com.github.hmdev.info.BookInfo;
+import com.github.hmdev.info.CoverEditInfo;
 
 /**
  * 表紙画像プレビューとトリミング用パネル
@@ -154,14 +155,34 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 	public void setBookInfo(BookInfo bookInfo)
 	{
 		this.bookInfo = bookInfo;
-		this.previewImage = null;
-		this.offsetX = 0;
-		this.offsetY = 0;
-		this.visibleWidth = 0;
-		if (this.fitType == FIT_ZOOM) this.fitType = FIT_ALL;
+		//表紙の情報がbookInfoにあれば再現
+		if (this.bookInfo.coverEditInfo != null) {
+			//縦の比率で再計算
+			CoverEditInfo coverEditInfo  = this.bookInfo.coverEditInfo;
+			double rate = this.getHeight() / (double)coverEditInfo.panelHeight;
+			this.offsetX = coverEditInfo.offsetX * rate;
+			this.offsetY = coverEditInfo.offsetY * rate;
+			this.visibleWidth = coverEditInfo.visibleWidth * rate;
+			this.scale = coverEditInfo.scale * rate;
+			//this.fitType = coverEditInfo.fitType;
+			this.fitType = FIT_ZOOM;
+		} else {
+			this.offsetX = 0;
+			this.offsetY = 0;
+			this.visibleWidth = 0;
+			if (this.fitType == FIT_ZOOM) this.fitType = FIT_ALL;
+		}
+		
 		this.setScale();
+		this.previewImage = null;
 		this.repaint();
 	}
+	/** 表紙編集情報を取得 */
+	public CoverEditInfo getCoverEditInfo()
+	{
+		return new CoverEditInfo(this.getWidth(), this.getHeight(), this.fitType, this.scale, this.offsetX, this.offsetY, this.visibleWidth);
+	}
+	
 	/** 幅高さに合わせる */
 	public void setFitType(int fitType, boolean force)
 	{
@@ -280,6 +301,8 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 			//if ()
 			return null;
 		}
+		
+		if (this.previewImage == null) this.createPreviewImage(this.scale);
 		
 		//縮尺に合せてリサイズ 大きければ縮小
 		double coverScale = 1;

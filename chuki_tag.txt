@@ -639,7 +639,7 @@
 副題後	</div>		1
 副原題前	<div class="pt2 font2">		1
 副原題後	</div>		1
-著者前	<div class="pb2 btm font1">		1
-著者後	</div>		1
-副著者前	<div class="pb2 btm font1">		1
-副著者後	</div>		1
+著者前	<div class="btm font1">		1
+著者後	　　</div>		1
+副著者前	<div class="btm font1">		1
+副著者後	　　</div>		1

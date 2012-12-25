@@ -310,8 +310,7 @@ public class JConfirmDialog extends JDialog
 		try { jButton.setIcon(new ImageIcon(new URL(imageURLPath+"skip.png"))); } catch (MalformedURLException e1) {}
 		jButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				skipped = true;
-				setVisible(false);
+				skip();
 			}
 		});
 		
@@ -326,8 +325,7 @@ public class JConfirmDialog extends JDialog
 		try { jButton.setIcon(new ImageIcon(new URL(imageURLPath+"cancel.png"))); } catch (MalformedURLException e1) {}
 		jButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				canceled = true;
-				setVisible(false);
+				cancel();
 			}
 		});
 		panel.add(jButton);
@@ -659,6 +657,7 @@ public class JConfirmDialog extends JDialog
 	void movePreviewImage(int offset)
 	{
 		this.bookInfo.coverImageIndex += offset;
+		bookInfo.coverEditInfo = null;
 		try {
 			bookInfo.coverImage = imageInfoReader.getImage(bookInfo.coverImageIndex);
 			jCoverImagePanel.setBookInfo(bookInfo);
@@ -709,8 +708,8 @@ public class JConfirmDialog extends JDialog
 		if (jTextTitle.getText().replaceFirst("^[ |　]+", "").replaceFirst("[ |　]+$", "").length() == 0) {
 			JOptionPane.showMessageDialog(this, "タイトルを設定してください。");
 		} else {
-			canceled = false;
-			setVisible(false);
+			this.canceled = false;
+			this.setVisible(false);
 			
 			//目次設定
 			if (!this.bookInfo.isImageOnly() && this.tocDataModel != null) {
@@ -728,9 +727,25 @@ public class JConfirmDialog extends JDialog
 					}
 				}
 			}
+			
+			//表紙情報保存
+			bookInfo.coverEditInfo = this.jCoverImagePanel.getCoverEditInfo();
 		}
 	}
 	
+	void skip()
+	{
+		this.skipped = true;
+		this.setVisible(false);
+		//表紙情報保存
+		bookInfo.coverEditInfo = this.jCoverImagePanel.getCoverEditInfo();
+	}
+	
+	void cancel()
+	{
+		this.canceled = true;
+		this.setVisible(false);
+	}
 	void selectChapterType(int chapterType)
 	{
 		if (this.tocDataModel == null) return;
@@ -797,6 +812,16 @@ public class JConfirmDialog extends JDialog
 		this.jComboTitle.setEnabled(!bookInfo.isImageOnly());
 		this.jButtonTitle.setEnabled(!bookInfo.isImageOnly());
 		
+		//プレビュー読み込み
+		try {
+			if (bookInfo.coverImageIndex >= 0 && bookInfo.coverImageIndex < imageInfoReader.countImageFileNames()) {
+				bookInfo.coverImage = imageInfoReader.getImage(bookInfo.coverImageIndex);
+			} else if (bookInfo.coverImage == null && bookInfo.coverFileName != null) {
+				bookInfo.loadCoverImage(bookInfo.coverFileName);
+			}
+		} catch (Exception e) { e.printStackTrace(); }
+		this.jCoverImagePanel.setBookInfo(bookInfo);
+		
 		//フラグ初期化
 		this.canceled = false;
 		this.skipped = false;
@@ -806,8 +831,6 @@ public class JConfirmDialog extends JDialog
 		
 		this.bookInfo = bookInfo;
 		this.imageInfoReader = imageInfoReader;
-		
-		this.jCoverImagePanel.setBookInfo(bookInfo);
 		
 		//目次に無いものはdisabled
 		jCheckChapterH.setEnabled(false);
@@ -856,15 +879,8 @@ public class JConfirmDialog extends JDialog
 		
 		this.jButtonScale.setSelected(false);
 		
-		//プレビュー表示
-		try {
-			if (imageInfoReader.countImageFileNames() > 0 && bookInfo.coverImageIndex >= 0) {
-				bookInfo.coverImage = imageInfoReader.getImage(0);
-			} else if (bookInfo.coverImage == null && bookInfo.coverFileName != null) {
-				bookInfo.loadCoverImage(bookInfo.coverFileName);
-			}
-		} catch (Exception e) { e.printStackTrace(); }
-		this.jCoverImagePanel.setFitType(JCoverImagePanel.FIT_ALL, true);
+		if (bookInfo.coverEditInfo == null)
+			this.jCoverImagePanel.setFitType(JCoverImagePanel.FIT_ALL, true);
 		this.checkPreviewControlEnabled();
 		
 		this.jCheckReplaceCover.setVisible(bookInfo.insertCoverPage);

@@ -505,10 +505,10 @@ public class AozoraEpub3Converter
 	 * @param imageInfos テキスト内の画像ファイル名を格納して返却
 	 * @param titleType 表題種別
 	 * @param coverFileName 表紙ファイル名 nullなら表紙無し ""は先頭ファイル "*"は同じファイル名 */
-	public BookInfo getBookInfo(BufferedReader src, ImageInfoReader imageInfoReader, TitleType titleType) throws Exception
+	public BookInfo getBookInfo(File srcFile, BufferedReader src, ImageInfoReader imageInfoReader, TitleType titleType) throws Exception
 	{
 		try {
-		BookInfo bookInfo = new BookInfo();
+		BookInfo bookInfo = new BookInfo(srcFile);
 		
 		String line;
 		this.lineNum = -1;
@@ -1062,20 +1062,33 @@ public class AozoraEpub3Converter
 			//出力しない行を飛ばす
 			if (bookInfo.isIgnoreLine(lineNum)) continue;
 			
-			if (lineNum == bookInfo.titleLine)
-				convertTextLineToEpub3(out, "［＃表題前］"+line+"［＃表題後］", lineNum, true);
-			else if (lineNum == bookInfo.orgTitleLine)
-				convertTextLineToEpub3(out, "［＃原題前］"+line+"［＃原題後］", lineNum, true);
-			else if (lineNum == bookInfo.subTitleLine)
-				convertTextLineToEpub3(out, "［＃副題前］"+line+"［＃副題後］", lineNum, true);
-			else if (lineNum == bookInfo.subOrgTitleLine)
-				convertTextLineToEpub3(out, "［＃副原題前］"+line+"［＃副原題後］", lineNum, true);
-			else if (lineNum == bookInfo.creatorLine)
-				convertTextLineToEpub3(out, "［＃著者前］"+line+"［＃著者後］", lineNum, true);
-			else if (lineNum == bookInfo.subCreatorLine)
-				convertTextLineToEpub3(out, "［＃副著者前］"+line+"［＃副著者後］", lineNum, true);
-			else
+			if (lineNum == bookInfo.titleLine) {
+				out.append(chukiMap.get("表題前")[0]);
+				convertTextLineToEpub3(out, line, lineNum, true);
+				out.append(chukiMap.get("表題後")[0]);
+			} else if (lineNum == bookInfo.orgTitleLine) {
+				out.append(chukiMap.get("原題前")[0]);
+				convertTextLineToEpub3(out, line, lineNum, true);
+				out.append(chukiMap.get("原題後")[0]);
+			} else if (lineNum == bookInfo.subTitleLine) {
+				out.append(chukiMap.get("副題前")[0]);
+				convertTextLineToEpub3(out, line, lineNum, true);
+				out.append(chukiMap.get("副題後")[0]);
+			} else if (lineNum == bookInfo.subOrgTitleLine) {
+				out.append(chukiMap.get("副原題前")[0]);
+				convertTextLineToEpub3(out, line, lineNum, true);
+				out.append(chukiMap.get("副原題後")[0]);
+			} else if (lineNum == bookInfo.creatorLine) {
+				out.append(chukiMap.get("著者前")[0]);
+				convertTextLineToEpub3(out, line, lineNum, true);
+				out.append(chukiMap.get("著者後")[0]);
+			} else if (lineNum == bookInfo.subCreatorLine) {
+				out.append(chukiMap.get("副著者前")[0]);
+				convertTextLineToEpub3(out, line, lineNum, true);
+				out.append(chukiMap.get("副著者後")[0]);
+			} else {
 				convertTextLineToEpub3(out, line);
+			}
 			if (this.canceled) return;
 			if (this.writer.jProgressBar != null && lineNum % 10 == 0){
 				this.writer.jProgressBar.setValue(lineNum/10);

@@ -1,5 +1,6 @@
 package com.github.hmdev.info;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -93,6 +94,13 @@ public class BookInfo
 	/** 右から左ならtrue */
 	public boolean rtl = false;
 	
+	/** 入力ファイル */
+	public File srcFile;
+	/** 圧縮ファイル内のテキストファイルエントリー名 */
+	public String textEntryName = null;
+	
+	/** 表紙編集情報 */
+	public CoverEditInfo coverEditInfo;
 	/** 表紙ファイル名 フルパスかURL ""なら先頭の挿絵 nullなら表紙無し */
 	public String coverFileName;
 	/** 表紙イメージがトリミングされた場合に設定される coverFileNameより優先される */
@@ -120,9 +128,6 @@ public class BookInfo
 	/** タイトルページの改ページ行 前に改ページがなければ0 表題がなければ-1 */
 	public int preTitlePageBreak = -1;
 	
-	/** 圧縮ファイル内のテキストファイルエントリー名 */
-	public String textEntryName = null;
-	
 	/** 改ページ単位で区切られたセクションの情報を格納 */
 	//Vector<SectionInfo> vecSectionInfo;
 	
@@ -138,8 +143,9 @@ public class BookInfo
 	HashMap<Integer, ChapterLineInfo> mapChapterLine;
 	
 	////////////////////////////////////////////////////////////////
-	public BookInfo()
+	public BookInfo(File srcFile)
 	{
+		this.srcFile = srcFile;
 		this.modified = new Date();
 	}
 	
