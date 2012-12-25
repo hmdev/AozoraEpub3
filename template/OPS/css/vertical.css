@@ -11,6 +11,9 @@ margin: 0;
 a:active { color: #C00; background: transparent; }
 a:link img, a:visited img { border-style: none; }
 
+div.ib {
+	display: inline-block;
+}
 span.img {
 /*clear: both;*/
 display: inline-block;

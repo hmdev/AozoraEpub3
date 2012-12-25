@@ -1063,17 +1063,17 @@ public class AozoraEpub3Converter
 			if (bookInfo.isIgnoreLine(lineNum)) continue;
 			
 			if (lineNum == bookInfo.titleLine)
-				convertTextLineToEpub3(out, "［＃表題前］"+line+"［＃表題後］");
+				convertTextLineToEpub3(out, "［＃表題前］"+line+"［＃表題後］", lineNum, true);
 			else if (lineNum == bookInfo.orgTitleLine)
-				convertTextLineToEpub3(out, "［＃原題前］"+line+"［＃原題後］");
+				convertTextLineToEpub3(out, "［＃原題前］"+line+"［＃原題後］", lineNum, true);
 			else if (lineNum == bookInfo.subTitleLine)
-				convertTextLineToEpub3(out, "［＃副題前］"+line+"［＃副題後］");
+				convertTextLineToEpub3(out, "［＃副題前］"+line+"［＃副題後］", lineNum, true);
 			else if (lineNum == bookInfo.subOrgTitleLine)
-				convertTextLineToEpub3(out, "［＃副原題前］"+line+"［＃副原題後］");
+				convertTextLineToEpub3(out, "［＃副原題前］"+line+"［＃副原題後］", lineNum, true);
 			else if (lineNum == bookInfo.creatorLine)
-				convertTextLineToEpub3(out, "［＃著者前］"+line+"［＃著者後］");
+				convertTextLineToEpub3(out, "［＃著者前］"+line+"［＃著者後］", lineNum, true);
 			else if (lineNum == bookInfo.subCreatorLine)
-				convertTextLineToEpub3(out, "［＃副著者前］"+line+"［＃副著者後］");
+				convertTextLineToEpub3(out, "［＃副著者前］"+line+"［＃副著者後］", lineNum, true);
 			else
 				convertTextLineToEpub3(out, line);
 			if (this.canceled) return;
@@ -1841,7 +1841,7 @@ public class AozoraEpub3Converter
 			
 			switch (ch[i]) {
 			case '※':
-				//外字変換処理でルビ文字と注記になる可能性のある＃が ※でエスケープされている (※《 ※》 ※｜ ※＃)
+				//外字変換処理でルビ文字と注記になる可能性のある文字が※でエスケープされている (※《 ※》 ※｜ ※＃)
 				//ルビ自動判別中は次の文字が漢字でもアルファベットでもないのでルビ対象がとして出力される
 				//ルビ内で変換した場合はルビ開始位置の文字を１文字ずらす
 				if (i+1 != end) {
@@ -1855,8 +1855,12 @@ public class AozoraEpub3Converter
 								ch[j+1] = ch[j];
 							}
 							rubyStart++;
+							if (rubyTopStart > -1) rubyTopStart++;
+							i++;
+							continue;
+						} else {
+							i++;
 						}
-						i++;
 					}
 				}
 				break;
@@ -2367,7 +2371,7 @@ public class AozoraEpub3Converter
 			//見出し用のID設定
 			if (chapterLineInfo != null) {
 				chapterId = "kobo."+this.lineIdNum+"."+(idIdx++);
-				out.write("<span id=\""+chapterId+"\">");
+				out.write("<div class=\"ib\" id=\""+chapterId+"\">");
 				this.pageByteSize += (chapterId.length() + 19);
 			}
 		} else {
@@ -2388,7 +2392,7 @@ public class AozoraEpub3Converter
 		
 		//改行のpまたは見出しspanを閉じる
 		if (noBr) {
-			if (chapterLineInfo != null) out.write("</span>");
+			if (chapterLineInfo != null) out.write("</div>");
 		} else {
 			out.write("</p>");
 			out.write("\n");
