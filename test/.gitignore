@@ -1,3 +1,5 @@
 /chukiichiran_kinyurei.txt
-/tamamono_mae.txt
+/tamamono_mae.*
 /*.epub
+/*.kepub
+/テスト*

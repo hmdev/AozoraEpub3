@@ -864,7 +864,7 @@ public class AozoraEpub3Converter
 	/** タグとルビを除外 */
 	private String removeTag(String text)
 	{
-		return removeRuby(text.replaceAll("［＃.+?］", "").replaceFirst("^[ |　|―]+", "").replaceAll("<[^>]+>", ""));
+		return removeRuby(text.replaceAll("［＃.+?］", "").replaceFirst("^[ |　|―|─]+", "").replaceAll("<[^>]+>", ""));
 	}
 	/** ルビを除去 特殊文字はエスケープされている */
 	private String removeRuby(String text)
@@ -877,9 +877,9 @@ public class AozoraEpub3Converter
 	{
 		String name = line.replaceAll("［＃.+?］", "").replaceAll("<[^>]+>", "")//注記とタグ除去
 				.replaceAll("※(《|》|［|］|〔|〕|〔|〕|〔|〕|｜)", "$1") //エスケープ文字から※除外
-				.replaceFirst("^[\t| |　|―]+", "").replaceFirst("[\t| |　|―]+$","") //前後の不要な文字所除去
+				.replaceFirst("^[\t| |　]+", "").replaceFirst("[\t| |　]+$","") //前後の不要な文字所除去
 				.replaceAll("〳〵", "く").replaceAll("〴〵", "ぐ").replaceAll("〻", "々")
-				.replaceFirst("^(=|＝|-|―|─)(=|＝|-|―|─)+", "").replaceFirst("(=|＝|-|―|─)(=|＝|-|―|─)+$", "")//連続する記号除去
+				//.replaceFirst("^(=|＝|-|―|─)(=|＝|-|―|─)+", "").replaceFirst("(=|＝|-|―|─)(=|＝|-|―|─)+$", "")//連続する記号除去
 				;
 				//printLineBuffer内だと以下の変換が必要
 				/*.replaceAll("<span class=\"fullsp\"> </span>", "　").replaceAll(String.valueOf((char)(0x2000))+(char)(0x2000), "　")
