@@ -97,6 +97,8 @@ public class JConfirmDialog extends JDialog
 	
 	////////////////////////////////
 	//Preview Controls
+	/** 先頭画像 */
+	JButton jButtonFirst;
 	/** 前の画像 */
 	JButton jButtonPrev;
 	/** 次の画像 */
@@ -440,6 +442,17 @@ public class JConfirmDialog extends JDialog
 		panel.setPreferredSize(new Dimension(190, 72));
 		previewRight.add(panel);
 		//プレビュー操作ボタン
+		jButtonFirst = new JButton();
+		jButtonFirst.setBorder(padding0);
+		jButtonFirst.setPreferredSize(new Dimension(22, 22));
+		jButtonFirst.setToolTipText("先頭の画像");
+		jButtonFirst.setFocusable(false);
+		try { jButtonFirst.setIcon(new ImageIcon(new URL(imageURLPath+"first.png"))); } catch (MalformedURLException e1) {}
+		jButtonFirst.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) { movePreviewImage(-100000); }
+		});
+		panel.add(jButtonFirst);
 		jButtonPrev = new JButton();
 		jButtonPrev.setBorder(padding0);
 		jButtonPrev.setPreferredSize(new Dimension(22, 22));
@@ -541,7 +554,7 @@ public class JConfirmDialog extends JDialog
 		panel.add(jButtonZoomOut);
 		
 		label = new JLabel();
-		label.setPreferredSize(new Dimension(27, 22));
+		label.setPreferredSize(new Dimension(4, 22));
 		panel.add(label);
 		
 		jButtonScale = new JToggleButton("x2");
@@ -646,6 +659,7 @@ public class JConfirmDialog extends JDialog
 	void checkPreviewControlEnabled()
 	{
 		int count = this.imageInfoReader.countImageFileNames();
+		this.jButtonFirst.setEnabled(count > 0 && this.bookInfo.coverImageIndex > 0);
 		this.jButtonPrev.setEnabled(count > 0 && this.bookInfo.coverImageIndex > 0);
 		this.jButtonNext.setEnabled(count > 0 && this.bookInfo.coverImageIndex < count-1);
 		//this.jButtonMove.setEnabled(this.bookInfo.coverImage != null || this.bookInfo.coverImageIndex > 0);
@@ -657,6 +671,7 @@ public class JConfirmDialog extends JDialog
 	void movePreviewImage(int offset)
 	{
 		this.bookInfo.coverImageIndex += offset;
+		this.bookInfo.coverImageIndex = Math.max(0, this.bookInfo.coverImageIndex);
 		bookInfo.coverEditInfo = null;
 		try {
 			bookInfo.coverImage = imageInfoReader.getImage(bookInfo.coverImageIndex);
