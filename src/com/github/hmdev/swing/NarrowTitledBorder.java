@@ -17,6 +17,6 @@ public class NarrowTitledBorder extends TitledBorder
 	@Override
 	public Insets getBorderInsets(Component c)
 	{
-		return new Insets(15, 8, 7, 8);
+		return new Insets(15, 6, 7, 6);
 	}
 }

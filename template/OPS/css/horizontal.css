@@ -40,14 +40,10 @@ span.img.fh img {
 height: 100%;
 }
 
-h1 { font-size: 150%;padding-left: 1em; }
-h2, h3, h4, h5, h6 {padding-left: 1em; }
-h2 { font-size: 130%;}
-h3 { font-size: 115%;}
-h4 { font: bold 100%; }
-h5 { font: italic 100%; }
-h6 { font: small-caps 100%; }
+/* 区切り線 */
+hr { margin: .5em 0 .5em 0; }
 
+/* 取り消し線 */
 .strike { text-decoration:line-through; }
 .dbl_strike { text-decoration:line-through; }
 
@@ -187,6 +183,17 @@ border-top-width: 1px;
 .kogaki { font-size: 70%; }
 
 /* 縦中横 */
+
+/* 窓見出し 行頭2行のみ対応 */
+span.mado {
+float: left;
+display: inline-block;
+line-height:1em;
+}
+/* 窓見出し 左右paddingは (lineheight-文字サイズ/2)/文字サイズ */
+span.mado.L { font-size:1.5em; padding:0.625em 0; padding-right:0.33em; line-height:1em;}
+span.mado.M { font-size:1.3em; padding:0.846em 0; padding-right:0.38em; line-height:1em;}
+span.mado.S { font-size:1.1em; padding:1.091em 0; padding-right:0.45em; line-height:1em;}
 
 /** 割り注 (要改行) */
 span.wrc {

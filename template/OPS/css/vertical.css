@@ -40,16 +40,15 @@ span.img.fh img {
 height: 100%;
 }
 
-h1 { font-size: 150%; margin-top: 1em; }
-h2, h3, h4, h5, h6 { margin-top: 1em; }
-h2 { font-size: 130%;}
-h3 { font-size: 115%;}
-h4 { font: bold 100%; }
-h5 { font: italic 100%; }
-h6 { font: small-caps 100%; }
+/* floatクリア用 */
+p.clear { clear:both; width:0; line-height:0;}
+p.clear_r { clear:right; width:0; line-height:0;}
+p.clear_l { clear:left; width:0; line-height:0;}
 
+/* 区切り線 */
 hr { margin: .5em 0 .5em 0; }
 
+/* 取り消し線 */
 .strike { text-decoration:line-through; }
 .dbl_strike { text-decoration:line-through; }
 
@@ -202,9 +201,21 @@ text-combine: horizontal;
 -epub-text-combine: horizontal;
 }
 
+/* ルビ内改行無し (Kindleで縦中横でずれるため) */
 ruby {
-	white-space: nowrap;
+white-space: nowrap;
 }
+
+/* 窓見出し 行頭2行のみ対応 */
+span.mado {
+float: left;
+display: inline-block;
+line-height: 1em;
+}
+/* 窓見出し 左右paddingは (lineheight-文字サイズ/2)/文字サイズ */
+span.mado.L { font-size:1.5em; padding:0 0.625em; padding-bottom:0.33em; line-height:1em;}
+span.mado.M { font-size:1.3em; padding:0 0.846em; padding-bottom:0.38em; line-height:1em;}
+span.mado.S { font-size:1.1em; padding:0 1.091em; padding-bottom:0.45em; line-height:1em;}
 
 /** 割り注 (要改行) */
 span.wrc {
@@ -312,6 +323,12 @@ div.pb25, div.pb25 p { margin-bottom: 25em; }
 
 /* 地付き */
 div.btm, div.btm p { text-align: right; }
+
+/* 行内地付き */
+span.btm.fr {
+float: right;
+display: inline-block;
+}
 
 /* 改行天付き、折り返して(.+?)字下げ → class="pt{$1} idt-{$1}" */
 /* ここから(.+?)字下げ、折り返して(.+?)字下げ → class="pt{$2} idt{$1-$2}" */

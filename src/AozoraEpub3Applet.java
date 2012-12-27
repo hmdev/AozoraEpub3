@@ -80,6 +80,7 @@ import org.apache.commons.compress.utils.IOUtils;
 import com.github.hmdev.converter.AozoraEpub3Converter;
 import com.github.hmdev.image.ImageInfoReader;
 import com.github.hmdev.info.BookInfo;
+import com.github.hmdev.info.PropInfo;
 import com.github.hmdev.swing.JConfirmDialog;
 import com.github.hmdev.swing.NarrowTitledBorder;
 import com.github.hmdev.util.LogAppender;
@@ -108,6 +109,9 @@ public class AozoraEpub3Applet extends JApplet
 	
 	/** 変換前確認ダイアログ */
 	JConfirmDialog jConfirmDialog;
+	
+	JComboBox jComboPreset;
+	JButton jButtonPreset;
 	
 	JComboBox jComboTitle;
 	JCheckBox jCheckUserFileName;
@@ -196,6 +200,10 @@ public class AozoraEpub3Applet extends JApplet
 	JRadioButton jRadioSpaceHyp0;
 	JRadioButton jRadioSpaceHyp1;
 	JRadioButton jRadioSpaceHyp2;
+	
+	JRadioButton jRadioChukiRuby0;
+	JRadioButton jRadioChukiRuby1;
+	JRadioButton jRadioChukiRuby2;
 	
 	JCheckBox jCheckAutoYoko;
 	JCheckBox jCheckAutoYokoNum1;
@@ -330,6 +338,7 @@ public class AozoraEpub3Applet extends JApplet
 		Border padding4H2V = BorderFactory.createEmptyBorder(2, 4, 2, 4);
 		Border padding3B = BorderFactory.createEmptyBorder(0, 0, 3, 0);
 		Border padding2T4B = BorderFactory.createEmptyBorder(2, 0, 4, 0);
+		Border iconPadding = BorderFactory.createEmptyBorder(0, 14, 0, 0);
 		
 		Dimension panelSize = new Dimension(1920, 26);
 		JTextField text = new JTextField();
@@ -370,6 +379,43 @@ public class AozoraEpub3Applet extends JApplet
 		tabPanel.setLayout(new BoxLayout(tabPanel, BoxLayout.Y_AXIS));
 		jTabbedPane.setPreferredSize(new Dimension(1920, 220));
 		jTabbedPane.addTab("変換 ", epubIcon, tabPanel);
+		
+		////////////////////////////////
+		//プリセットとプロファイル
+		////////////////////////////////
+		panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		panel.setMinimumSize(panelSize);
+		panel.setMaximumSize(panelSize);
+		panel.setPreferredSize(panelSize);
+		panel.setBorder(padding4H2V);
+		tabPanel.add(panel);
+		label = new JLabel("端末: ");
+		panel.add(label);
+		jComboPreset = new JComboBox();
+		jComboPreset.setFocusable(false);
+		jComboPreset.setEditable(false);
+		jComboPreset.setMaximumSize(new Dimension(140, 22));
+		jComboPreset.setPreferredSize(new Dimension(140, 22));
+		//presetsファイルを取得
+		for (File presetFile : new File(jarPath+"presets").listFiles()) {
+			Properties presetProps = new Properties(); 
+			try { presetProps.load(new FileInputStream(presetFile)); } catch (Exception e) { }
+			String name = presetProps.getProperty("PresetName");
+			if (name != null && name.length() > 0) {
+				jComboPreset.addItem(new PropInfo(presetFile.getName(), name, presetProps));
+			}
+		}
+		
+		panel.add(jComboPreset);
+		jButtonPreset = new JButton("設定");
+		jButtonPreset.setBorder(padding3);
+		jButtonPreset.setFocusable(false);
+		jButtonPreset.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent arg0) {
+			PropInfo propInfo = (PropInfo)jComboPreset.getSelectedItem();
+			loadProperties(propInfo.getProps());
+		}});
+		panel.add(jButtonPreset);
 		
 		////////////////////////////////
 		//表題
@@ -536,53 +582,6 @@ public class AozoraEpub3Applet extends JApplet
 		panel.add(jButtonDstPath);
 		
 		////////////////////////////////
-		//変換オプション
-		////////////////////////////////
-		panel = new JPanel();
-		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-		panel.setMinimumSize(panelSize);
-		panel.setMaximumSize(panelSize);
-		panel.setPreferredSize(panelSize);
-		panel.setBorder(padding4H2V);
-		tabPanel.add(panel);
-		//栞用ID出力
-		jCheckMarkId = new JCheckBox("栞用ID出力");
-		jCheckMarkId.setToolTipText("Kobo向けの栞を記憶するためのIDを各行に設定します");
-		jCheckMarkId.setFocusPainted(false);
-		panel.add(jCheckMarkId);
-		//4バイト文字を変換する
-		jCheckGaiji32 = new JCheckBox("4バイト文字変換");
-		jCheckGaiji32.setToolTipText("Kobo等で4バイト文字より後ろが表示できない場合はチェックを外します");
-		jCheckGaiji32.setFocusPainted(false);
-		panel.add(jCheckGaiji32);
-		//縦書き横書き
-		buttonGroup = new ButtonGroup();
-		jRadioVertical = new JRadioButton();
-		jRadioVertical.setFocusPainted(false);
-		jRadioVertical.setBorder(BorderFactory.createEmptyBorder(0, 100, 0, 0));
-		jRadioVertical.setIconTextGap(0);
-		panel.add(jRadioVertical);
-		JCheckBox checkBox = new JCheckBox("縦書き  ", new ImageIcon(AozoraEpub3Applet.class.getResource("images/page_vertical.png")), true);
-		checkBox.setFocusPainted(false);
-		checkBox.setBorder(padding0);
-		checkBox.setIconTextGap(1);
-		checkBox.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent e){jRadioVertical.setSelected(true); }});
-		panel.add(checkBox);
-		buttonGroup.add(jRadioVertical);
-		jRadioHorizontal = new JRadioButton();
-		jRadioHorizontal.setFocusPainted(false);
-		jRadioHorizontal.setBorder(padding0);
-		jRadioHorizontal.setIconTextGap(0);
-		panel.add(jRadioHorizontal);
-		checkBox = new JCheckBox("横書き ", new ImageIcon(AozoraEpub3Applet.class.getResource("images/page_horizontal.png")));
-		checkBox.setFocusPainted(false);
-		checkBox.setBorder(padding0);
-		checkBox.setIconTextGap(1);
-		checkBox.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent e){jRadioHorizontal.setSelected(true); }});
-		panel.add(checkBox);
-		buttonGroup.add(jRadioHorizontal);
-		
-		////////////////////////////////
 		/*group = new ButtonGroup();
 		jRadioRtL = new JRadioButton("右→左");
 		jRadioRtL.setFocusPainted(false);
@@ -598,13 +597,13 @@ public class AozoraEpub3Applet extends JApplet
 		////////////////////////////////
 		panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-		panel.setMaximumSize(new Dimension(1920, 40));
-		panel.setPreferredSize(new Dimension(1920, 40));
+		panel.setMaximumSize(new Dimension(1920, 32));
+		panel.setPreferredSize(new Dimension(1920, 32));
 		panel.setBorder(padding4H);
 		tabPanel.add(panel);
 		//左パネル
 		JPanel panel1 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		panel1.setPreferredSize(panelSize);
+		//panel1.setPreferredSize(panelSize);
 		panel1.setBorder(padding0);
 		//入力文字コード
 		label = new JLabel("入力文字コード");
@@ -616,11 +615,33 @@ public class AozoraEpub3Applet extends JApplet
 		jComboEncType.setPreferredSize(new Dimension(100, 22));
 		panel1.add(jComboEncType);
 		panel.add(panel1);
+		
 		//右パネル
 		JPanel panel2 = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		panel2.setPreferredSize(panelSize);
+		//panel2.setPreferredSize(panelSize);
 		panel.setBorder(padding0);
-		//開く
+		//縦書き横書き
+		buttonGroup = new ButtonGroup();
+		jRadioVertical = new JRadioButton();
+		jRadioVertical.setFocusPainted(false);
+		//jRadioVertical.setBorder(BorderFactory.createEmptyBorder(0, 100, 0, 0));
+		jRadioVertical.setBorder(padding0);
+		jRadioVertical.setIconTextGap(0);
+		label = new JLabel("縦書き", new ImageIcon(AozoraEpub3Applet.class.getResource("images/page_vertical.png")), JLabel.LEFT);
+		label.setBorder(iconPadding);
+		jRadioVertical.add(label);
+		panel2.add(jRadioVertical);
+		buttonGroup.add(jRadioVertical);
+		jRadioHorizontal = new JRadioButton();
+		jRadioHorizontal.setFocusPainted(false);
+		jRadioHorizontal.setBorder(padding0);
+		jRadioHorizontal.setIconTextGap(0);
+		label = new JLabel("横書き", new ImageIcon(AozoraEpub3Applet.class.getResource("images/page_horizontal.png")), JLabel.LEFT);
+		label.setBorder(iconPadding);
+		jRadioHorizontal.add(label);
+		panel2.add(jRadioHorizontal);
+		buttonGroup.add(jRadioHorizontal);
+		//ファイル選択
 		jButtonFile = new JButton("ファイル選択");
 		jButtonFile.setToolTipText("ファイル選択後に変換処理を開始します");
 		jButtonFile.setBorder(padding5H3V);
@@ -629,12 +650,6 @@ public class AozoraEpub3Applet extends JApplet
 		jButtonFile.setFocusable(false);
 		jButtonFile.addActionListener(new FileChooserListener(this));
 		panel2.add(jButtonFile);
-		//変換前に確認する
-		jCheckConfirm = new JCheckBox("変換前確認", true);
-		jCheckConfirm.setToolTipText("変換前にタイトルと表紙の設定が可能な確認画面を表示します");
-		jCheckConfirm.setFocusPainted(false);
-		jCheckConfirm.setBorder(padding0);
-		panel2.add(jCheckConfirm);
 		panel.add(panel2);
 		
 		////////////////////////////////////////////////////////////////
@@ -1055,7 +1070,7 @@ public class AozoraEpub3Applet extends JApplet
 		panel.setBorder(new NarrowTitledBorder("文中全角スペースの処理"));
 		tabPanel.add(panel);
 		//ピクセル
-		label = new JLabel("行末で非表示:(");
+		label = new JLabel("行末で非表示(");
 		label.setBorder(padding2);
 		panel.add(label);
 		buttonGroup = new ButtonGroup();
@@ -1073,13 +1088,67 @@ public class AozoraEpub3Applet extends JApplet
 		jRadioSpaceHyp2.setBorder(padding2);
 		panel.add(jRadioSpaceHyp2);
 		buttonGroup.add(jRadioSpaceHyp2);
-		jRadioSpaceHyp0 = new JRadioButton("そのまま  ", true);
+		jRadioSpaceHyp0 = new JRadioButton("そのまま", true);
 		jRadioSpaceHyp0.setToolTipText("行の折り返し部分にある全角スペースが行頭に表示されます");
 		jRadioSpaceHyp0.setFocusPainted(false);
 		jRadioSpaceHyp0.setIconTextGap(1);
 		jRadioSpaceHyp0.setBorder(padding2);
 		panel.add(jRadioSpaceHyp0);
 		buttonGroup.add(jRadioSpaceHyp0);
+		
+		////////////////////////////////
+		//「Ａ」に「Ｂ」の注記
+		////////////////////////////////
+		panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		panel.setBorder(new NarrowTitledBorder("「Ａ」に「Ｂ」の注記"));
+		tabPanel.add(panel);
+		buttonGroup = new ButtonGroup();
+		jRadioChukiRuby0 = new JRadioButton("非表示", true);
+		jRadioChukiRuby0.setFocusPainted(false);
+		jRadioChukiRuby0.setIconTextGap(1);
+		jRadioChukiRuby0.setBorder(padding2);
+		panel.add(jRadioChukiRuby0);
+		buttonGroup.add(jRadioChukiRuby0);
+		jRadioChukiRuby1 = new JRadioButton("ルビ");
+		jRadioChukiRuby1.setToolTipText("ＡのルビとしてＢを表示します");
+		jRadioChukiRuby1.setFocusPainted(false);
+		jRadioChukiRuby1.setIconTextGap(1);
+		jRadioChukiRuby1.setBorder(padding2);
+		panel.add(jRadioChukiRuby1);
+		buttonGroup.add(jRadioChukiRuby1);
+		jRadioChukiRuby2 = new JRadioButton("小書き");
+		jRadioChukiRuby2.setToolTipText("Ａの後ろにＢを小書きで表示します");
+		jRadioChukiRuby2.setFocusPainted(false);
+		jRadioChukiRuby2.setIconTextGap(1);
+		jRadioChukiRuby2.setBorder(padding2);
+		panel.add(jRadioChukiRuby2);
+		buttonGroup.add(jRadioChukiRuby2);
+		
+		////////////////////////////////
+		//栞用ID出力
+		////////////////////////////////
+		panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		panel.setBorder(new NarrowTitledBorder("栞用ID"));
+		tabPanel.add(panel);
+		jCheckMarkId = new JCheckBox("各行に出力");
+		jCheckMarkId.setToolTipText("Kobo向けの栞を記憶するためのIDを各行に設定します");
+		jCheckMarkId.setFocusPainted(false);
+		panel.add(jCheckMarkId);
+		
+		////////////////////////////////
+		//4バイト文字変換
+		////////////////////////////////
+		panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		panel.setBorder(new NarrowTitledBorder("4バイト文字"));
+		tabPanel.add(panel);
+		//4バイト文字を変換する
+		jCheckGaiji32 = new JCheckBox("変換する");
+		jCheckGaiji32.setToolTipText("Kobo等で4バイト文字より後ろが表示できない場合はチェックを外します");
+		jCheckGaiji32.setFocusPainted(false);
+		panel.add(jCheckGaiji32);
 		
 		////////////////////////////////
 		//自動縦中横
@@ -1113,7 +1182,7 @@ public class AozoraEpub3Applet extends JApplet
 		label.setBorder(padding0);
 		panel.add(label);
 		//!? 1文字
-		jCheckAutoEQ1 = new JCheckBox("!? 1文字 ");
+		jCheckAutoEQ1 = new JCheckBox("!? 1文字");
 		jCheckAutoEQ1.setFocusPainted(false);
 		jCheckAutoEQ1.setIconTextGap(3);
 		jCheckAutoEQ1.setBorder(padding2);
@@ -1429,7 +1498,6 @@ public class AozoraEpub3Applet extends JApplet
 		lowerPane.add(statusPane);
 		////////////////////////////////
 		//プログレスバー
-		////////////////////////////////
 		panel = new JPanel();
 		panel.setLayout(new FlowLayout(FlowLayout.LEFT, 1, 0));
 		panel.setBorder(BorderFactory.createEmptyBorder(1, 2, 0, 2));
@@ -1458,14 +1526,23 @@ public class AozoraEpub3Applet extends JApplet
 			}
 		});
 		panel.add(jButtonCancel);
+		
 		////////////////////////////////
-		//ログ関連
-		////////////////////////////////
+		//右パネル
 		panel = new JPanel();
 		panel.setLayout(new FlowLayout(FlowLayout.RIGHT, 1, 0));
 		panel.setBorder(BorderFactory.createEmptyBorder(1, 2, 0, 2));
 		statusPane.add(panel);
-		label = new JLabel("ログ:");
+		
+		//変換前に確認
+		jCheckConfirm = new JCheckBox("変換前確認", true);
+		jCheckConfirm.setToolTipText("変換前にタイトルと表紙の設定が可能な確認画面を表示します");
+		jCheckConfirm.setFocusPainted(false);
+		jCheckConfirm.setBorder(padding0);
+		panel.add(jCheckConfirm);
+		
+		//ログ関連
+		label = new JLabel("  ログ:");
 		label.setBorder(padding2H);
 		panel.add(label);
 		JButton jButtonLogClear = new JButton();
@@ -1493,6 +1570,7 @@ public class AozoraEpub3Applet extends JApplet
 		
 		////////////////////////////////////////////////////////////////
 		//確認ダイアログ
+		////////////////////////////////////////////////////////////////
 		jConfirmDialog = new JConfirmDialog(
 			iconImage, AozoraEpub3Applet.class.getResource("images/icon.png").toString().replaceFirst("/icon\\.png", "/")
 		);
@@ -1500,6 +1578,7 @@ public class AozoraEpub3Applet extends JApplet
 		
 		////////////////////////////////////////////////////////////////
 		//iniファイルの中身を設定
+		////////////////////////////////////////////////////////////////
 		loadProperties(this.props);
 		
 		//変換前確認の設定
@@ -1507,6 +1586,7 @@ public class AozoraEpub3Applet extends JApplet
 		
 		////////////////////////////////////////////////////////////////
 		//ログ出力先を設定
+		////////////////////////////////////////////////////////////////
 		LogAppender.setTextArea(jTextArea);
 		
 		//初期化
@@ -2082,6 +2162,8 @@ public class AozoraEpub3Applet extends JApplet
 			this.aozoraConverter.setMiddleTitle(this.jCheckMiddleTitle.isSelected());
 			//全角スペースの禁則
 			this.aozoraConverter.setSpaceHyphenation(this.jRadioSpaceHyp0.isSelected()?0:(this.jRadioSpaceHyp1.isSelected()?1:2));
+			//注記のルビ表示
+			this.aozoraConverter.setChukiRuby(this.jRadioChukiRuby1.isSelected(), this.jRadioChukiRuby2.isSelected());
 			//コメント
 			this.aozoraConverter.setCommentPrint(this.jCheckCommentPrint.isSelected(), this.jCheckCommentConvert.isSelected());
 			
@@ -2685,6 +2767,306 @@ public class AozoraEpub3Applet extends JApplet
 	}
 	
 	////////////////////////////////////////////////////////////////
+	//Properties
+	////////////////////////////////////////////////////////////////
+	/** "1"が設定されている場合のみチェックをON nullなら変更しない */
+	private boolean setPropsSelected(JToggleButton button, Properties props, String name)
+	{
+		if (props.containsKey(name)) {
+			boolean selected = "1".equals(props.getProperty(name));
+			button.setSelected(selected);
+			return selected;
+		}
+		return button.isSelected();
+	}
+	/** int値を設定 null なら設定しない */
+	private void setIntText(JTextField jText, Properties props, String name)
+	{
+		try {
+			if (!props.containsKey(name)) return;
+			jText.setText(Integer.toString(Integer.parseInt(props.getProperty(name))));
+		} catch (Exception e) {}
+	}
+	/** float値を設定 null なら設定しない */
+	private void setFloatText(JTextField jText, Properties props, String name)
+	{
+		try {
+			if (!props.containsKey(name)) return;
+			jText.setText(Float.toString(Float.parseFloat(props.getProperty(name))));
+		} catch (Exception e) {}
+	}
+	
+	/** propsの値をアプレットに設定 */
+	private void loadProperties(Properties props)
+	{
+		boolean selected;
+		//プリセット
+		String presetFileName = props.getProperty("Preset");
+		for (int i=0; i<jComboPreset.getItemCount(); i++) {
+			PropInfo presetPropInfo = (PropInfo)(jComboPreset.getItemAt(i));
+			if (presetPropInfo.getFileName().equals(presetFileName)) jComboPreset.setSelectedIndex(i);
+		}
+		
+		//表題
+		try { jComboTitle.setSelectedIndex(Integer.parseInt(props.getProperty("TitleType"))); } catch (Exception e) {}
+		setPropsSelected(jCheckUserFileName, props, "UseFileName");
+		//表紙
+		if (props.getProperty("Cover")==null||props.getProperty("Cover").length()==0) jComboCover.setSelectedIndex(0);
+		else jComboCover.setSelectedItem(props.getProperty("Cover"));
+		
+		//表紙履歴
+		setPropsSelected(jCheckCoverHistory, props, "CoverHistory");
+		
+		setPropsSelected(jCheckCoverPage, props, "CoverPage");
+		//左右中央
+		setPropsSelected(jCheckMiddleTitle, props, "MiddleTitle");
+		setPropsSelected(jCheckTocPage, props, "TocPage");
+		selected = setPropsSelected(jRadioTocV, props, "TocVertical");
+		jRadioTocH.setSelected(!selected);
+		//出力ファイル設定
+		//拡張子
+		if (props.getProperty("Ext") != null && props.getProperty("Ext").length() > 0)
+			jComboExt.setSelectedItem(props.getProperty("Ext"));
+		//出力ファイル名設定
+		setPropsSelected(jCheckAutoFileName, props, "AutoFileName");
+		//ファイルの上書き許可
+		setPropsSelected(jCheckOverWrite, props, "OverWrite");
+		//栞用ID出力
+		setPropsSelected(jCheckMarkId, props, "MarkId");
+		//4バイト文字を変換する
+		setPropsSelected(jCheckGaiji32, props, "Gaiji32");
+		//縦書き横書き
+		selected= setPropsSelected(jRadioVertical, props, "Vertical");
+		jRadioHorizontal.setSelected(!selected);
+		//入力文字コード
+		try { jComboEncType.setSelectedIndex(Integer.parseInt(props.getProperty("EncType"))); } catch (Exception e) {}
+		
+		////////////////////////////////////////////////////////////////
+		//画像設定
+		setPropsSelected(jCheckNoIllust, props, "NoIllust");
+		//画面サイズ
+		setIntText(jTextDispW, props, "DispW");
+		setIntText(jTextDispH, props, "DispH");
+		//表紙サイズ
+		setIntText(jTextCoverW, props, "CoverW");
+		setIntText(jTextCoverH, props, "CoverH");
+		//画像単ページ化
+		setIntText(jTextSinglePageSizeW, props, "SinglePageSizeW");
+		setIntText(jTextSinglePageSizeH, props, "SinglePageSizeH");
+		//横のみ
+		setIntText(jTextSinglePageWidth, props, "SinglePageWidth");
+		//拡大しない
+		setPropsSelected(jCheckFitImage, props, "FitImage");
+		try { jComboRotateImage.setSelectedIndex(Integer.parseInt(props.getProperty("RotateImage"))); } catch (Exception e) {}
+		//画像回り込み
+		setPropsSelected(jCheckImageFloat, props, "ImageFloat");
+		setIntText(jTextImageFloatW, props, "ImageFloatW");
+		setIntText(jTextImageFloatH, props, "ImageFloatH");
+		try { jComboImageFloatType.setSelectedIndex(Integer.parseInt(props.getProperty("ImageFloatType"))); } catch (Exception e) {}
+		//画像縮小指定
+		setPropsSelected(jCheckResizeW, props, "ResizeW");
+		setIntText(jTextResizeNumW, props, "ResizeNumW");
+		setPropsSelected(jCheckResizeH, props, "ResizeH");
+		setIntText(jTextResizeNumH, props, "ResizeNumH");
+		//Jpeg圧縮率
+		setIntText(jTextJpegQuality, props, "JpegQuality");
+		//ガンマ補正
+		setPropsSelected(jCheckGamma, props, "Gamma");
+		setFloatText(jTextGammaValue, props, "GammaValue");
+		//余白除去
+		setPropsSelected(jCheckAutoMargin, props, "AutoMargin");
+		setIntText(jTextAutoMarginLimitH, props, "AutoMarginLimitH");
+		setIntText(jTextAutoMarginLimitV, props, "AutoMarginLimitV");
+		setIntText(jTextAutoMarginWhiteLevel, props, "AutoMarginWhiteLevel");
+		setFloatText(jTextAutoMarginPadding, props, "AutoMarginPadding");
+		try { jComboAutoMarginNombre.setSelectedIndex(Integer.parseInt(props.getProperty("AutoMarginNombre"))); } catch (Exception e) {}
+		setFloatText(jTextAutoMarginNombreSize, props, "AutoMarginNombreSize");
+		
+		////////////////////////////////////////////////////////////////
+		//詳細設定
+		String propValue = props.getProperty("SpaceHyphenation");
+		jRadioSpaceHyp1.setSelected(propValue==null||"1".equals(propValue));
+		jRadioSpaceHyp2.setSelected("2".equals(propValue));
+		jRadioSpaceHyp0.setSelected("0".equals(propValue));
+		//注記のルビ表示
+		propValue = props.getProperty("ChukiRuby");
+		jRadioChukiRuby0.setSelected(propValue==null||"0".equals(propValue));
+		jRadioChukiRuby1.setSelected("1".equals(propValue));
+		jRadioChukiRuby2.setSelected("2".equals(propValue));
+		//自動縦中横
+		//半角2文字縦書き
+		setPropsSelected(jCheckAutoYoko, props, "AutoYoko");
+		//半角数字1文字縦書き
+		setPropsSelected(jCheckAutoYokoNum1, props, "AutoYokoNum1");
+		//半角数字3文字縦書き
+		setPropsSelected(jCheckAutoYokoNum3, props, "AutoYokoNum3");
+		//!? 1文字
+		setPropsSelected(jCheckAutoEQ1, props, "AutoYokoEQ1");
+		//コメント出力
+		setPropsSelected(jCheckCommentPrint, props, "CommentPrint");
+		setPropsSelected(jCheckCommentConvert, props, "CommentConvert");
+		//空行除去
+		try { jComboxRemoveEmptyLine.setSelectedItem(Integer.parseInt(props.getProperty("RemoveEmptyLine"))); }catch (Exception e) {}
+		propValue = props.getProperty("MaxEmptyLine");
+		jComboxMaxEmptyLine.setSelectedItem(propValue==null?"0":propValue);
+		//行頭字下げ追加
+		setPropsSelected(jCheckForceIndent, props, "ForceIndent");
+		//強制改ページ
+		setPropsSelected(jCheckPageBreak, props, "PageBreak");
+		try { jTextPageBreakSize.setText(Integer.toString(Integer.parseInt(props.getProperty("PageBreakSize")))); } catch (Exception e) {}
+		setPropsSelected(jCheckPageBreakEmpty, props, "PageBreakEmpty");
+		propValue = props.getProperty("PageBreakEmptyLine");
+		jComboxPageBreakEmptyLine.setSelectedItem(propValue==null?"2":propValue);
+		setIntText(jTextPageBreakEmptySize, props, "PageBreakEmptySize");
+		setPropsSelected(jCheckPageBreakChapter, props, "PageBreakChapter");
+		setIntText(jTextPageBreakChapterSize, props, "PageBreakChapterSize");
+		
+		////////////////////////////////////////////////////////////////
+		//目次設定
+		//最大文字数
+		setIntText(jTextMaxChapterNameLength, props, "MaxChapterNameLength");
+		//表紙
+		setPropsSelected(jCheckCoverPageToc, props, "CoverPageToc");
+		setPropsSelected(jCheckChapterUseNextLine, props, "ChapterUseNextLine");
+		setPropsSelected(jCheckChapterExclude, props, "ChapterExclude");
+		//改ページ後を目次に追加
+		setPropsSelected(jCheckChapterSection, props, "ChapterSection");
+		//見出し注記
+		setPropsSelected(jCheckChapterH, props, "ChapterH");
+		setPropsSelected(jCheckChapterH1, props, "ChapterH1");
+		setPropsSelected(jCheckChapterH2, props, "ChapterH2");
+		setPropsSelected(jCheckChapterH3, props, "ChapterH3");
+		//章番号、数字、パターン
+		setPropsSelected(jCheckChapterName, props, "ChapterName");
+		setPropsSelected(jCheckChapterNumOnly, props, "ChapterNumOnly");
+		setPropsSelected(jCheckChapterNumTitle, props, "ChapterNumTitle");
+		setPropsSelected(jCheckChapterNumParen, props, "ChapterNumParen");
+		setPropsSelected(jCheckChapterNumParenTitle, props, "ChapterNumParenTitle");
+		setPropsSelected(jCheckChapterPattern, props, "ChapterPattern");
+		if (props.containsKey("ChapterPatternText")) jComboChapterPattern.setSelectedItem(props.getProperty("ChapterPatternText"));
+	}
+	
+	/** アプレットの設定状態をpropsに保存 */
+	private void setProperties(Properties props)
+	{
+		//
+		PropInfo presetPropInfo = (PropInfo)(this.jComboPreset.getSelectedItem());
+		props.setProperty("Preset", presetPropInfo.getFileName());
+		
+		//アップレット設定の保存
+		props.setProperty("TitleType", ""+this.jComboTitle.getSelectedIndex());
+		props.setProperty("UseFileName", this.jCheckUserFileName.isSelected()?"1":"");
+		props.setProperty("AutoFileName", this.jCheckAutoFileName.isSelected()?"1":"");
+		//変換設定
+		props.setProperty("MarkId", this.jCheckMarkId.isSelected()?"1":"");
+		props.setProperty("Gaiji32", this.jCheckGaiji32.isSelected()?"1":"");
+		props.setProperty("Vertical", this.jRadioVertical.isSelected()?"1":"");
+		//props.setProperty("RtL", this.jRadioRtL.isSelected()?"1":"");
+		props.setProperty("Ext", ""+this.jComboExt.getEditor().getItem().toString().trim());
+		props.setProperty("ChkConfirm", this.jCheckConfirm.isSelected()?"1":"");
+		
+		//先頭の挿絵と表紙無しのみ記憶
+		if (this.jComboCover.getSelectedIndex() == 0) props.setProperty("Cover","");
+		else if (this.jComboCover.getSelectedIndex() == 1) props.setProperty("Cover", ""+this.jComboCover.getEditor().getItem().toString().trim());
+		props.setProperty("CoverHistory", this.jCheckCoverHistory.isSelected()?"1":"");
+		//ページ出力
+		props.setProperty("CoverPage", this.jCheckCoverPage.isSelected()?"1":"");
+		props.setProperty("MiddleTitle", this.jCheckMiddleTitle.isSelected()?"1":"");
+		props.setProperty("TocPage", this.jCheckTocPage.isSelected()?"1":"");
+		props.setProperty("TocVertical", this.jRadioTocV.isSelected()?"1":"");
+		//挿絵非表示
+		props.setProperty("NoIllust", this.jCheckNoIllust.isSelected()?"1":"");
+		//画面サイズ
+		props.setProperty("DispW", this.jTextDispW.getText());
+		props.setProperty("DispH", this.jTextDispH.getText());
+		//画像単ページ
+		props.setProperty("SinglePageSizeW", this.jTextSinglePageSizeW.getText());
+		props.setProperty("SinglePageSizeH", this.jTextSinglePageSizeH.getText());
+		props.setProperty("SinglePageWidth", this.jTextSinglePageWidth.getText());
+		props.setProperty("FitImage", this.jCheckFitImage.isSelected()?"1":"");
+		props.setProperty("RotateImage", ""+this.jComboRotateImage.getSelectedIndex());
+		//画像回り込み
+		props.setProperty("ImageFloat", this.jCheckImageFloat.isSelected()?"1":"");
+		props.setProperty("ImageFloatType", ""+this.jComboImageFloatType.getSelectedIndex());
+		props.setProperty("ImageFloatW", this.jTextImageFloatW.getText());
+		props.setProperty("ImageFloatH", this.jTextImageFloatH.getText());
+		//画像サイズ
+		props.setProperty("ResizeW", this.jCheckResizeW.isSelected()?"1":"");
+		props.setProperty("ResizeH", this.jCheckResizeH.isSelected()?"1":"");
+		props.setProperty("ResizeNumW", this.jTextResizeNumW.getText());
+		props.setProperty("ResizeNumH", this.jTextResizeNumH.getText());
+		//props.setProperty("Pixel", this.jCheckPixel.isSelected()?"1":"");
+		//props.setProperty("PixelW", this.jTextPixelW.getText());
+		//props.setProperty("PixelH", this.jTextPixelH.getText());
+		//表紙
+		props.setProperty("CoverW", this.jTextCoverW.getText());
+		props.setProperty("CoverH", this.jTextCoverH.getText());
+		//JPEG画質
+		props.setProperty("JpegQuality", this.jTextJpegQuality.getText());
+		//ガンマ補正
+		props.setProperty("Gamma", this.jCheckGamma.isSelected()?"1":"");
+		props.setProperty("GammaValue", this.jTextGammaValue.getText());
+		//余白除去
+		props.setProperty("AutoMargin", this.jCheckAutoMargin.isSelected()?"1":"");
+		props.setProperty("AutoMarginLimitH", this.jTextAutoMarginLimitH.getText());
+		props.setProperty("AutoMarginLimitV", this.jTextAutoMarginLimitV.getText());
+		props.setProperty("AutoMarginWhiteLevel", this.jTextAutoMarginWhiteLevel.getText());
+		props.setProperty("AutoMarginPadding", this.jTextAutoMarginPadding.getText());
+		props.setProperty("AutoMarginNombre", ""+this.jComboAutoMarginNombre.getSelectedIndex());
+		props.setProperty("AutoMarginNombreSize", this.jTextAutoMarginNombreSize.getText());
+		//空白の禁則処理
+		props.setProperty("SpaceHyphenation", this.jRadioSpaceHyp0.isSelected()?"0":(this.jRadioSpaceHyp1.isSelected()?"1":"2"));
+		//注記のルビ表示
+		props.setProperty("ChukiRuby", this.jRadioChukiRuby0.isSelected()?"0":(this.jRadioChukiRuby1.isSelected()?"1":"2"));
+		//自動縦中横
+		props.setProperty("AutoYoko", this.jCheckAutoYoko.isSelected()?"1":"");
+		props.setProperty("AutoYokoNum1", this.jCheckAutoYokoNum1.isSelected()?"1":"");
+		props.setProperty("AutoYokoNum3", this.jCheckAutoYokoNum3.isSelected()?"1":"");
+		props.setProperty("AutoYokoEQ1", this.jCheckAutoEQ1.isSelected()?"1":"");
+		//コメント出力
+		props.setProperty("CommentPrint", this.jCheckCommentPrint.isSelected()?"1":"");
+		props.setProperty("CommentConvert", this.jCheckCommentConvert.isSelected()?"1":"");
+		//空行除去
+		props.setProperty("RemoveEmptyLine", ""+this.jComboxRemoveEmptyLine.getSelectedIndex());
+		props.setProperty("MaxEmptyLine", ""+this.jComboxMaxEmptyLine.getSelectedIndex());
+		//行頭字下げ
+		props.setProperty("ForceIndent", this.jCheckForceIndent.isSelected()?"1":"");
+		//強制改ページ
+		props.setProperty("PageBreak", this.jCheckPageBreak.isSelected()?"1":"");
+		props.setProperty("PageBreakSize", ""+this.jTextPageBreakSize.getText().trim());
+		props.setProperty("PageBreakEmpty", this.jCheckPageBreakEmpty.isSelected()?"1":"");
+		props.setProperty("PageBreakEmptyLine", ""+this.jComboxPageBreakEmptyLine.getSelectedItem().toString().trim());
+		props.setProperty("PageBreakEmptySize", ""+this.jTextPageBreakEmptySize.getText().trim());
+		props.setProperty("PageBreakChapter", this.jCheckPageBreakChapter.isSelected()?"1":"");
+		props.setProperty("PageBreakChapterSize", ""+this.jTextPageBreakChapterSize.getText().trim());
+		//目次出力
+		props.setProperty("MaxChapterNameLength", this.jTextMaxChapterNameLength.getText());
+		props.setProperty("CoverPageToc", this.jCheckCoverPageToc.isSelected()?"1":"");
+		props.setProperty("ChapterUseNextLine", this.jCheckChapterUseNextLine.isSelected()?"1":"");
+		props.setProperty("ChapterExclude", this.jCheckChapterExclude.isSelected()?"1":"");
+		props.setProperty("ChapterSection", this.jCheckChapterSection.isSelected()?"1":"");
+		props.setProperty("ChapterH", this.jCheckChapterH.isSelected()?"1":"");
+		props.setProperty("ChapterH1", this.jCheckChapterH1.isSelected()?"1":"");
+		props.setProperty("ChapterH2", this.jCheckChapterH2.isSelected()?"1":"");
+		props.setProperty("ChapterH3", this.jCheckChapterH3.isSelected()?"1":"");
+		props.setProperty("ChapterName", this.jCheckChapterName.isSelected()?"1":"");
+		props.setProperty("ChapterNumOnly", this.jCheckChapterNumOnly.isSelected()?"1":"");
+		props.setProperty("ChapterNumTitle", this.jCheckChapterNumTitle.isSelected()?"1":"");
+		props.setProperty("ChapterNumParen", this.jCheckChapterNumParen.isSelected()?"1":"");
+		props.setProperty("ChapterNumParenTitle", this.jCheckChapterNumParenTitle.isSelected()?"1":"");
+		props.setProperty("ChapterPattern", this.jCheckChapterPattern.isSelected()?"1":"");
+		props.setProperty("ChapterPatternText", this.jComboChapterPattern.getEditor().getItem().toString().trim());
+		
+		//確認ダイアログの元画像を残す
+		props.setProperty("ReplaceCover", this.jConfirmDialog.jCheckReplaceCover.isSelected()?"1":"");
+		
+		props.setProperty("EncType", ""+this.jComboEncType.getSelectedIndex());
+		props.setProperty("OverWrite", this.jCheckOverWrite.isSelected()?"1":"");
+	}
+	
+	////////////////////////////////////////////////////////////////
+	// JFrame
+	////////////////////////////////////////////////////////////////
 	/** Jar実行用 */
 	public static void main(String args[])
 	{
@@ -2769,281 +3151,6 @@ public class AozoraEpub3Applet extends JApplet
 		}
 	}
 	
-	/** "1"が設定されている場合のみチェックをON nullなら変更しない */
-	private boolean setPropsSelected(JToggleButton button, Properties props, String name)
-	{
-		if (props.containsKey(name)) {
-			boolean selected = "1".equals(props.getProperty(name));
-			button.setSelected(selected);
-			return selected;
-		}
-		return button.isSelected();
-	}
-	/** int値を設定 null なら設定しない */
-	private void setIntText(JTextField jText, Properties props, String name)
-	{
-		try {
-			if (!props.containsKey(name)) return;
-			jText.setText(Integer.toString(Integer.parseInt(props.getProperty(name))));
-		} catch (Exception e) {}
-	}
-	/** float値を設定 null なら設定しない */
-	private void setFloatText(JTextField jText, Properties props, String name)
-	{
-		try {
-			if (!props.containsKey(name)) return;
-			jText.setText(Float.toString(Float.parseFloat(props.getProperty(name))));
-		} catch (Exception e) {}
-	}
-	
-	/** propsの値をアプレットに設定 */
-	private void loadProperties(Properties props)
-	{
-		boolean selected;
-		//表題
-		try { jComboTitle.setSelectedIndex(Integer.parseInt(props.getProperty("TitleType"))); } catch (Exception e) {}
-		setPropsSelected(jCheckUserFileName, props, "UseFileName");
-		//表紙
-		if (props.getProperty("Cover")==null||props.getProperty("Cover").length()==0) jComboCover.setSelectedIndex(0);
-		else jComboCover.setSelectedItem(props.getProperty("Cover"));
-		jCheckCoverHistory.setSelected("1".equals(props.getProperty("CoverHistory")));
-		
-		setPropsSelected(jCheckCoverPage, props, "CoverPage");
-		//左右中央
-		setPropsSelected(jCheckMiddleTitle, props, "MiddleTitle");
-		setPropsSelected(jCheckTocPage, props, "TocPage");
-		selected = setPropsSelected(jRadioTocV, props, "TocVertical");
-		jRadioTocH.setSelected(!selected);
-		//出力ファイル設定
-		//拡張子
-		if (props.getProperty("Ext") != null && props.getProperty("Ext").length() > 0)
-			jComboExt.setSelectedItem(props.getProperty("Ext"));
-		//出力ファイル名設定
-		setPropsSelected(jCheckAutoFileName, props, "AutoFileName");
-		//ファイルの上書き許可
-		setPropsSelected(jCheckOverWrite, props, "OverWrite");
-		//栞用ID出力
-		setPropsSelected(jCheckMarkId, props, "MarkId");
-		//4バイト文字を変換する
-		setPropsSelected(jCheckGaiji32, props, "Gaiji32");
-		//縦書き横書き
-		selected= setPropsSelected(jRadioVertical, props, "Vertical");
-		jRadioHorizontal.setSelected(!selected);
-		//入力文字コード
-		try { jComboEncType.setSelectedIndex(Integer.parseInt(props.getProperty("EncType"))); } catch (Exception e) {}
-		
-		////////////////////////////////////////////////////////////////
-		//画像設定
-		setPropsSelected(jCheckNoIllust, props, "NoIllust");
-		//画面サイズ
-		setIntText(jTextDispW, props, "DispW");
-		setIntText(jTextDispH, props, "DispH");
-		//表紙サイズ
-		setIntText(jTextCoverW, props, "CoverW");
-		setIntText(jTextCoverH, props, "CoverH");
-		//画像単ページ化
-		setIntText(jTextSinglePageSizeW, props, "SinglePageSizeW");
-		setIntText(jTextSinglePageSizeH, props, "SinglePageSizeH");
-		//横のみ
-		setIntText(jTextSinglePageWidth, props, "SinglePageWidth");
-		//拡大しない
-		setPropsSelected(jCheckFitImage, props, "FitImage");
-		try { jComboRotateImage.setSelectedIndex(Integer.parseInt(props.getProperty("RotateImage"))); } catch (Exception e) {}
-		//画像回り込み
-		setPropsSelected(jCheckImageFloat, props, "ImageFloat");
-		setIntText(jTextImageFloatW, props, "ImageFloatW");
-		setIntText(jTextImageFloatH, props, "ImageFloatH");
-		try { jComboImageFloatType.setSelectedIndex(Integer.parseInt(props.getProperty("ImageFloatType"))); } catch (Exception e) {}
-		//画像縮小指定
-		setPropsSelected(jCheckResizeW, props, "ResizeW");
-		setIntText(jTextResizeNumW, props, "ResizeNumW");
-		setPropsSelected(jCheckResizeH, props, "ResizeH");
-		setIntText(jTextResizeNumH, props, "ResizeNumH");
-		//Jpeg圧縮率
-		setIntText(jTextJpegQuality, props, "JpegQuality");
-		//ガンマ補正
-		setPropsSelected(jCheckGamma, props, "Gamma");
-		setFloatText(jTextGammaValue, props, "GammaValue");
-		//余白除去
-		setPropsSelected(jCheckAutoMargin, props, "AutoMargin");
-		setIntText(jTextAutoMarginLimitH, props, "AutoMarginLimitH");
-		setIntText(jTextAutoMarginLimitV, props, "AutoMarginLimitV");
-		setIntText(jTextAutoMarginWhiteLevel, props, "AutoMarginWhiteLevel");
-		setFloatText(jTextAutoMarginPadding, props, "AutoMarginPadding");
-		try { jComboAutoMarginNombre.setSelectedIndex(Integer.parseInt(props.getProperty("AutoMarginNombre"))); } catch (Exception e) {}
-		setFloatText(jTextAutoMarginNombreSize, props, "AutoMarginNombreSize");
-		
-		////////////////////////////////////////////////////////////////
-		//詳細設定
-		String propValue = props.getProperty("SpaceHyphenation");
-		jRadioSpaceHyp1.setSelected(propValue==null||"1".equals(propValue));
-		jRadioSpaceHyp2.setSelected("2".equals(propValue));
-		jRadioSpaceHyp0.setSelected("0".equals(propValue));
-		//自動縦中横
-		//半角2文字縦書き
-		setPropsSelected(jCheckAutoYoko, props, "AutoYoko");
-		//半角数字1文字縦書き
-		setPropsSelected(jCheckAutoYokoNum1, props, "AutoYokoNum1");
-		//半角数字3文字縦書き
-		setPropsSelected(jCheckAutoYokoNum3, props, "AutoYokoNum3");
-		//!? 1文字
-		setPropsSelected(jCheckAutoEQ1, props, "AutoYokoEQ1");
-		//コメント出力
-		setPropsSelected(jCheckCommentPrint, props, "CommentPrint");
-		setPropsSelected(jCheckCommentConvert, props, "CommentConvert");
-		//空行除去
-		try { jComboxRemoveEmptyLine.setSelectedItem(Integer.parseInt(props.getProperty("RemoveEmptyLine"))); }catch (Exception e) {}
-		propValue = props.getProperty("MaxEmptyLine");
-		jComboxMaxEmptyLine.setSelectedItem(propValue==null?"0":propValue);
-		//行頭字下げ追加
-		setPropsSelected(jCheckForceIndent, props, "ForceIndent");
-		//強制改ページ
-		setPropsSelected(jCheckPageBreak, props, "PageBreak");
-		try { jTextPageBreakSize.setText(Integer.toString(Integer.parseInt(props.getProperty("PageBreakSize")))); } catch (Exception e) {}
-		setPropsSelected(jCheckPageBreakEmpty, props, "PageBreakEmpty");
-		propValue = props.getProperty("PageBreakEmptyLine");
-		jComboxPageBreakEmptyLine.setSelectedItem(propValue==null?"2":propValue);
-		setIntText(jTextPageBreakEmptySize, props, "PageBreakEmptySize");
-		setPropsSelected(jCheckPageBreakChapter, props, "PageBreakChapter");
-		setIntText(jTextPageBreakChapterSize, props, "PageBreakChapterSize");
-		
-		////////////////////////////////////////////////////////////////
-		//目次設定
-		//最大文字数
-		setIntText(jTextMaxChapterNameLength, props, "MaxChapterNameLength");
-		//表紙
-		setPropsSelected(jCheckCoverPageToc, props, "CoverPageToc");
-		setPropsSelected(jCheckChapterUseNextLine, props, "ChapterUseNextLine");
-		setPropsSelected(jCheckChapterExclude, props, "ChapterExclude");
-		//改ページ後を目次に追加
-		setPropsSelected(jCheckChapterSection, props, "ChapterSection");
-		//見出し注記
-		setPropsSelected(jCheckChapterH, props, "ChapterH");
-		setPropsSelected(jCheckChapterH1, props, "ChapterH1");
-		setPropsSelected(jCheckChapterH2, props, "ChapterH2");
-		setPropsSelected(jCheckChapterH3, props, "ChapterH3");
-		//章番号、数字、パターン
-		setPropsSelected(jCheckChapterName, props, "ChapterName");
-		setPropsSelected(jCheckChapterNumOnly, props, "ChapterNumOnly");
-		setPropsSelected(jCheckChapterNumTitle, props, "ChapterNumTitle");
-		setPropsSelected(jCheckChapterNumParen, props, "ChapterNumParen");
-		setPropsSelected(jCheckChapterNumParenTitle, props, "ChapterNumParenTitle");
-		setPropsSelected(jCheckChapterPattern, props, "ChapterPattern");
-		if (props.containsKey("ChapterPatternText")) jComboChapterPattern.setSelectedItem(props.getProperty("ChapterPatternText"));
-	}
-	
-	/** アプレットの設定状態をpropsに保存 */
-	private void setProperties(Properties props)
-	{
-		//アップレット設定の保存
-		props.setProperty("TitleType", ""+this.jComboTitle.getSelectedIndex());
-		props.setProperty("UseFileName", this.jCheckUserFileName.isSelected()?"1":"");
-		props.setProperty("AutoFileName", this.jCheckAutoFileName.isSelected()?"1":"");
-		//変換設定
-		props.setProperty("MarkId", this.jCheckMarkId.isSelected()?"1":"");
-		props.setProperty("Gaiji32", this.jCheckGaiji32.isSelected()?"1":"");
-		props.setProperty("Vertical", this.jRadioVertical.isSelected()?"1":"");
-		//props.setProperty("RtL", this.jRadioRtL.isSelected()?"1":"");
-		props.setProperty("Ext", ""+this.jComboExt.getEditor().getItem().toString().trim());
-		props.setProperty("ChkConfirm", this.jCheckConfirm.isSelected()?"1":"");
-		
-		//先頭の挿絵と表紙無しのみ記憶
-		if (this.jComboCover.getSelectedIndex() == 0) props.setProperty("Cover","");
-		else if (this.jComboCover.getSelectedIndex() == 1) props.setProperty("Cover", ""+this.jComboCover.getEditor().getItem().toString().trim());
-		props.setProperty("CoverHistory", this.jCheckCoverHistory.isSelected()?"1":"");
-		//ページ出力
-		props.setProperty("CoverPage", this.jCheckCoverPage.isSelected()?"1":"");
-		props.setProperty("MiddleTitle", this.jCheckMiddleTitle.isSelected()?"1":"");
-		props.setProperty("TocPage", this.jCheckTocPage.isSelected()?"1":"");
-		props.setProperty("TocVertical", this.jRadioTocV.isSelected()?"1":"");
-		//挿絵非表示
-		props.setProperty("NoIllust", this.jCheckNoIllust.isSelected()?"1":"");
-		//画面サイズ
-		props.setProperty("DispW", this.jTextDispW.getText());
-		props.setProperty("DispH", this.jTextDispH.getText());
-		//画像単ページ
-		props.setProperty("SinglePageSizeW", this.jTextSinglePageSizeW.getText());
-		props.setProperty("SinglePageSizeH", this.jTextSinglePageSizeH.getText());
-		props.setProperty("SinglePageWidth", this.jTextSinglePageWidth.getText());
-		props.setProperty("FitImage", this.jCheckFitImage.isSelected()?"1":"");
-		props.setProperty("RotateImage", ""+this.jComboRotateImage.getSelectedIndex());
-		//画像回り込み
-		props.setProperty("ImageFloat", this.jCheckImageFloat.isSelected()?"1":"");
-		props.setProperty("ImageFloatType", ""+this.jComboImageFloatType.getSelectedIndex());
-		props.setProperty("ImageFloatW", this.jTextImageFloatW.getText());
-		props.setProperty("ImageFloatH", this.jTextImageFloatH.getText());
-		//画像サイズ
-		props.setProperty("ResizeW", this.jCheckResizeW.isSelected()?"1":"");
-		props.setProperty("ResizeH", this.jCheckResizeH.isSelected()?"1":"");
-		props.setProperty("ResizeNumW", this.jTextResizeNumW.getText());
-		props.setProperty("ResizeNumH", this.jTextResizeNumH.getText());
-		//props.setProperty("Pixel", this.jCheckPixel.isSelected()?"1":"");
-		//props.setProperty("PixelW", this.jTextPixelW.getText());
-		//props.setProperty("PixelH", this.jTextPixelH.getText());
-		//表紙
-		props.setProperty("CoverW", this.jTextCoverW.getText());
-		props.setProperty("CoverH", this.jTextCoverH.getText());
-		//JPEG画質
-		props.setProperty("JpegQuality", this.jTextJpegQuality.getText());
-		//ガンマ補正
-		props.setProperty("Gamma", this.jCheckGamma.isSelected()?"1":"");
-		props.setProperty("GammaValue", this.jTextGammaValue.getText());
-		//余白除去
-		props.setProperty("AutoMargin", this.jCheckAutoMargin.isSelected()?"1":"");
-		props.setProperty("AutoMarginLimitH", this.jTextAutoMarginLimitH.getText());
-		props.setProperty("AutoMarginLimitV", this.jTextAutoMarginLimitV.getText());
-		props.setProperty("AutoMarginWhiteLevel", this.jTextAutoMarginWhiteLevel.getText());
-		props.setProperty("AutoMarginPadding", this.jTextAutoMarginPadding.getText());
-		props.setProperty("AutoMarginNombre", ""+this.jComboAutoMarginNombre.getSelectedIndex());
-		props.setProperty("AutoMarginNombreSize", this.jTextAutoMarginNombreSize.getText());
-		//空白の禁則処理
-		props.setProperty("SpaceHyphenation", this.jRadioSpaceHyp0.isSelected()?"0":(this.jRadioSpaceHyp1.isSelected()?"1":"2"));
-		//自動縦中横
-		props.setProperty("AutoYoko", this.jCheckAutoYoko.isSelected()?"1":"");
-		props.setProperty("AutoYokoNum1", this.jCheckAutoYokoNum1.isSelected()?"1":"");
-		props.setProperty("AutoYokoNum3", this.jCheckAutoYokoNum3.isSelected()?"1":"");
-		props.setProperty("AutoYokoEQ1", this.jCheckAutoEQ1.isSelected()?"1":"");
-		//コメント出力
-		props.setProperty("CommentPrint", this.jCheckCommentPrint.isSelected()?"1":"");
-		props.setProperty("CommentConvert", this.jCheckCommentConvert.isSelected()?"1":"");
-		//空行除去
-		props.setProperty("RemoveEmptyLine", ""+this.jComboxRemoveEmptyLine.getSelectedIndex());
-		props.setProperty("MaxEmptyLine", ""+this.jComboxMaxEmptyLine.getSelectedIndex());
-		//行頭字下げ
-		props.setProperty("ForceIndent", this.jCheckForceIndent.isSelected()?"1":"");
-		//強制改ページ
-		props.setProperty("PageBreak", this.jCheckPageBreak.isSelected()?"1":"");
-		props.setProperty("PageBreakSize", ""+this.jTextPageBreakSize.getText().trim());
-		props.setProperty("PageBreakEmpty", this.jCheckPageBreakEmpty.isSelected()?"1":"");
-		props.setProperty("PageBreakEmptyLine", ""+this.jComboxPageBreakEmptyLine.getSelectedItem().toString().trim());
-		props.setProperty("PageBreakEmptySize", ""+this.jTextPageBreakEmptySize.getText().trim());
-		props.setProperty("PageBreakChapter", this.jCheckPageBreakChapter.isSelected()?"1":"");
-		props.setProperty("PageBreakChapterSize", ""+this.jTextPageBreakChapterSize.getText().trim());
-		//目次出力
-		props.setProperty("MaxChapterNameLength", this.jTextMaxChapterNameLength.getText());
-		props.setProperty("CoverPageToc", this.jCheckCoverPageToc.isSelected()?"1":"");
-		props.setProperty("ChapterUseNextLine", this.jCheckChapterUseNextLine.isSelected()?"1":"");
-		props.setProperty("ChapterExclude", this.jCheckChapterExclude.isSelected()?"1":"");
-		props.setProperty("ChapterSection", this.jCheckChapterSection.isSelected()?"1":"");
-		props.setProperty("ChapterH", this.jCheckChapterH.isSelected()?"1":"");
-		props.setProperty("ChapterH1", this.jCheckChapterH1.isSelected()?"1":"");
-		props.setProperty("ChapterH2", this.jCheckChapterH2.isSelected()?"1":"");
-		props.setProperty("ChapterH3", this.jCheckChapterH3.isSelected()?"1":"");
-		props.setProperty("ChapterName", this.jCheckChapterName.isSelected()?"1":"");
-		props.setProperty("ChapterNumOnly", this.jCheckChapterNumOnly.isSelected()?"1":"");
-		props.setProperty("ChapterNumTitle", this.jCheckChapterNumTitle.isSelected()?"1":"");
-		props.setProperty("ChapterNumParen", this.jCheckChapterNumParen.isSelected()?"1":"");
-		props.setProperty("ChapterNumParenTitle", this.jCheckChapterNumParenTitle.isSelected()?"1":"");
-		props.setProperty("ChapterPattern", this.jCheckChapterPattern.isSelected()?"1":"");
-		props.setProperty("ChapterPatternText", this.jComboChapterPattern.getEditor().getItem().toString().trim());
-		
-		//確認ダイアログの元画像を残す
-		props.setProperty("ReplaceCover", this.jConfirmDialog.jCheckReplaceCover.isSelected()?"1":"");
-		
-		props.setProperty("EncType", ""+this.jComboEncType.getSelectedIndex());
-		props.setProperty("OverWrite", this.jCheckOverWrite.isSelected()?"1":"");
-	}
-	
 	/** アプレット終了時の処理
 	 * 設定ファイルを保存 */
 	@Override
@@ -3093,7 +3200,9 @@ public class AozoraEpub3Applet extends JApplet
 		super.finalize();
 	}
 	
-	//TODO 後でクラスを分ける
+	////////////////////////////////////////////////////////////////
+	//変換履歴  TODO 後でクラスを分ける
+	////////////////////////////////////////////////////////////////
 	HashMap<String, BookInfo> mapBookInfo = new HashMap<String, BookInfo>();
 	//以前の変換情報取得
 	BookInfo getBookInfoHistory(BookInfo bookInfo)
