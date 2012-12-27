@@ -565,10 +565,10 @@ public class AozoraEpub3Converter
 		while ((line = src.readLine()) != null) {
 			this.lineNum++;
 			
-			//注記と画像のチェックなのでルビだけ先に除去 他の特殊文字は"※"でエスケープ
-			line = line.replaceAll("《[^》]+?》", "").replaceAll("｜", "");
 			//見出し等の取得のため前方参照注記は変換 外字文字は置換
 			line = this.replaceChukiSufTag(this.convertGaijiChuki(line, true, false));
+			//注記と画像のチェックなのでルビ除去 エスケープ文字は残す
+			line = removeRuby(line);
 			
 			//コメント除外 50文字以上をコメントにする
 			if (line.startsWith("--------------------------------")) {

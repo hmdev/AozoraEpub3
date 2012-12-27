@@ -202,7 +202,7 @@ text-combine: horizontal;
 }
 
 /* ルビ内改行無し (Kindleで縦中横でずれるため) */
-ruby {
+ruby .tcy {
 white-space: nowrap;
 }
 

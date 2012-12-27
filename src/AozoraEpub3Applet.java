@@ -30,6 +30,7 @@ import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -37,6 +38,8 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
@@ -55,8 +58,10 @@ import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
@@ -80,7 +85,7 @@ import org.apache.commons.compress.utils.IOUtils;
 import com.github.hmdev.converter.AozoraEpub3Converter;
 import com.github.hmdev.image.ImageInfoReader;
 import com.github.hmdev.info.BookInfo;
-import com.github.hmdev.info.PropInfo;
+import com.github.hmdev.info.ProfileInfo;
 import com.github.hmdev.swing.JConfirmDialog;
 import com.github.hmdev.swing.NarrowTitledBorder;
 import com.github.hmdev.util.LogAppender;
@@ -110,9 +115,16 @@ public class AozoraEpub3Applet extends JApplet
 	/** 変換前確認ダイアログ */
 	JConfirmDialog jConfirmDialog;
 	
-	JComboBox jComboPreset;
-	JButton jButtonPreset;
+	/** プロファイル選択 */
+	JComboBox jComboProfile;
+	JButton jButtonProfileCreate;
+	JButton jButtonProfileDelete;
 	
+	/** 端末プリセット読み込み */
+	JButton jButtonPreset;
+	JPopupMenu jPopupPreset;
+	
+	/** 表題 */
 	JComboBox jComboTitle;
 	JCheckBox jCheckUserFileName;
 	JCheckBox jCheckAutoFileName;
@@ -254,7 +266,6 @@ public class AozoraEpub3Applet extends JApplet
 	/** 出力先選択ダイアログ表示イベントactionPerformed(null)で明示的に呼び出す。 */
 	DstPathChooserListener dstPathChooser;
 	
-	
 	/** 青空→ePub3変換クラス */
 	AozoraEpub3Converter aozoraConverter;
 	
@@ -291,6 +302,11 @@ public class AozoraEpub3Applet extends JApplet
 	/** Web小説取得情報格納パス */
 	File webConfigPath = null;
 	
+	/** 選択されているプロファイル */
+	ProfileInfo selectedProfile;
+	/** プロファイル格納パス */
+	File profilePath;
+	
 	//UIパラメータ
 	int coverW;
 	int coverH;
@@ -317,11 +333,15 @@ public class AozoraEpub3Applet extends JApplet
 		
 		this.cachePath = new File(this.jarPath+".cache");
 		this.webConfigPath = new File(this.jarPath+"web");
+		this.profilePath = new File(this.jarPath+"profiles");
+		this.profilePath.mkdir();
 		
 		//設定ファイル読み込み
 		props = new Properties(); 
 		try {
-			props.load(new FileInputStream(this.jarPath+propFileName));
+			FileInputStream fos = new FileInputStream(this.jarPath+this.propFileName);
+			props.load(fos);
+			fos.close();
 		} catch (Exception e) { }
 		String path = props.getProperty("LastDir");
 		if (path != null && path.length() >0) this.currentPath = new File(path);
@@ -337,17 +357,17 @@ public class AozoraEpub3Applet extends JApplet
 		Border padding4H = BorderFactory.createEmptyBorder(0, 4, 0, 4);
 		Border padding4H2V = BorderFactory.createEmptyBorder(2, 4, 2, 4);
 		Border padding3B = BorderFactory.createEmptyBorder(0, 0, 3, 0);
-		Border padding2T4B = BorderFactory.createEmptyBorder(2, 0, 4, 0);
+		Border padding2T3B = BorderFactory.createEmptyBorder(2, 0, 3, 0);
 		Border iconPadding = BorderFactory.createEmptyBorder(0, 14, 0, 0);
 		
 		Dimension panelSize = new Dimension(1920, 26);
 		JTextField text = new JTextField();
 		Insets is = text.getInsets();
 		FontMetrics fm = this.getFontMetrics(text.getFont());
-		Dimension text3 = new Dimension(fm.stringWidth("000")+is.left+is.right+2, 19);
-		Dimension text4 = new Dimension(fm.stringWidth("0000")+is.left+is.right+2, 19);
-		Dimension text5 = new Dimension(fm.stringWidth("00000")+is.left+is.right+2, 19);
-		Dimension text300 = new Dimension(300, 19);
+		Dimension text3 = new Dimension(fm.stringWidth("000")+is.left+is.right+2, 20);
+		Dimension text4 = new Dimension(fm.stringWidth("0000")+is.left+is.right+2, 20);
+		Dimension text5 = new Dimension(fm.stringWidth("00000")+is.left+is.right+2, 20);
+		Dimension text300 = new Dimension(300, 20);
 		
 		//アップレットのレイアウト設定
 		this.setLayout(new BoxLayout(this.getContentPane(), BoxLayout.Y_AXIS));
@@ -390,30 +410,63 @@ public class AozoraEpub3Applet extends JApplet
 		panel.setPreferredSize(panelSize);
 		panel.setBorder(padding4H2V);
 		tabPanel.add(panel);
-		label = new JLabel("端末: ");
+		//プロファイル
+		label = new JLabel("プロファイル: ");
 		panel.add(label);
-		jComboPreset = new JComboBox();
-		jComboPreset.setFocusable(false);
-		jComboPreset.setEditable(false);
-		jComboPreset.setMaximumSize(new Dimension(140, 22));
-		jComboPreset.setPreferredSize(new Dimension(140, 22));
+		jComboProfile = new JComboBox();
+		jComboProfile.setEditable(false);
+		jComboProfile.setFocusable(false);
+		jComboProfile.setPreferredSize(new Dimension(320, 24));
+		jComboProfile.setBorder(padding0);
+		panel.add(jComboProfile);
+		jButtonProfileCreate = new JButton(new ImageIcon(AozoraEpub3Applet.class.getResource("images/add.png")));
+		jButtonProfileCreate.setToolTipText("現在の設定でプロファイルを新規作成します");
+		jButtonProfileCreate.setBorder(padding3);
+		jButtonProfileCreate.setFocusable(false);
+		jButtonProfileCreate.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent arg0) {
+			String name = JOptionPane.showInputDialog(jComboProfile, "プロファイル名称", jComboProfile.getSelectedItem().toString()+"のコピー");
+			if (name != null) try { addProfile(name); } catch (Exception e) { e.printStackTrace(); }
+		}});
+		panel.add(jButtonProfileCreate);
+		jButtonProfileDelete = new JButton(new ImageIcon(AozoraEpub3Applet.class.getResource("images/delete.png")));
+		jButtonProfileDelete.setToolTipText("選択中のプロファイルを削除します");
+		jButtonProfileDelete.setBorder(padding3);
+		jButtonProfileDelete.setFocusable(false);
+		jButtonProfileDelete.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent arg0) {
+			int ret = JOptionPane.showConfirmDialog(jComboProfile, jComboProfile.getSelectedItem().toString()+" を削除しますか？", "プロファイル削除", JOptionPane.YES_NO_OPTION);
+			if (ret == JOptionPane.YES_OPTION) deleteProfile();
+		}});
+		panel.add(jButtonProfileDelete);
+		
+		//端末プリセット
+		label = new JLabel("    ");
+		panel.add(label);
+		jPopupPreset = new JPopupMenu();
 		//presetsファイルを取得
 		for (File presetFile : new File(jarPath+"presets").listFiles()) {
-			Properties presetProps = new Properties(); 
-			try { presetProps.load(new FileInputStream(presetFile)); } catch (Exception e) { }
+			Properties presetProps = new Properties();
+			try {
+				FileInputStream fos = new FileInputStream(presetFile);
+				presetProps.load(fos);
+				fos.close();
+			} catch (Exception e) {}
 			String name = presetProps.getProperty("PresetName");
 			if (name != null && name.length() > 0) {
-				jComboPreset.addItem(new PropInfo(presetFile.getName(), name, presetProps));
+				JMenuItem menu = new JMenuItem(name);
+				String iconName = presetProps.getProperty("PresetIcon");
+				if (iconName != null) {
+					try { menu.setIcon(new ImageIcon(AozoraEpub3Applet.class.getResource("images/"+iconName))); } catch (Exception r) {}
+				}
+				menu.addActionListener(new LoadPresetActionListener(presetProps));
+				jPopupPreset.add(menu);
 			}
 		}
-		
-		panel.add(jComboPreset);
-		jButtonPreset = new JButton("設定");
+		jButtonPreset = new JButton("端末設定反映", new ImageIcon(AozoraEpub3Applet.class.getResource("images/viewer.png")));
+		jButtonPreset.setToolTipText("端末に合わせた画面サイズと設定を反映します");
 		jButtonPreset.setBorder(padding3);
 		jButtonPreset.setFocusable(false);
 		jButtonPreset.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent arg0) {
-			PropInfo propInfo = (PropInfo)jComboPreset.getSelectedItem();
-			loadProperties(propInfo.getProps());
+			jPopupPreset.show(jButtonPreset, 8, 20);
 		}});
 		panel.add(jButtonPreset);
 		
@@ -636,7 +689,7 @@ public class AozoraEpub3Applet extends JApplet
 		jRadioHorizontal.setFocusPainted(false);
 		jRadioHorizontal.setBorder(padding0);
 		jRadioHorizontal.setIconTextGap(0);
-		label = new JLabel("横書き", new ImageIcon(AozoraEpub3Applet.class.getResource("images/page_horizontal.png")), JLabel.LEFT);
+		label = new JLabel("横書き ", new ImageIcon(AozoraEpub3Applet.class.getResource("images/page_horizontal.png")), JLabel.LEFT);
 		label.setBorder(iconPadding);
 		jRadioHorizontal.add(label);
 		panel2.add(jRadioHorizontal);
@@ -678,10 +731,10 @@ public class AozoraEpub3Applet extends JApplet
 		////////////////////////////////
 		panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-		panel.setBorder(new NarrowTitledBorder("画面サイズ (縦横比と拡大表示に利用)"));
+		panel.setBorder(new NarrowTitledBorder("画面・表紙サイズ"));
 		tabPanel.add(panel);
 		//画面サイズ
-		label = new JLabel("横");
+		label = new JLabel(" 画面: 横");
 		panel.add(label);
 		jTextDispW = new JTextField("600");
 		jTextDispW.setHorizontalAlignment(JTextField.RIGHT);
@@ -708,7 +761,7 @@ public class AozoraEpub3Applet extends JApplet
 		////////////////////////////////
 		//表紙サイズ
 		//横x縦
-		label = new JLabel("  表紙サイズ 横");
+		label = new JLabel("  表紙: 横");
 		panel.add(label);
 		jTextCoverW = new JTextField("600");
 		jTextCoverW.setHorizontalAlignment(JTextField.RIGHT);
@@ -744,7 +797,7 @@ public class AozoraEpub3Applet extends JApplet
 		//画像単ページ
 		panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-		panel.setBorder(padding2T4B);
+		panel.setBorder(padding2T3B);
 		panelV.add(panel);
 		//横x縦
 		label = new JLabel("横");
@@ -802,7 +855,7 @@ public class AozoraEpub3Applet extends JApplet
 		jComboRotateImage = new JComboBox(new String[]{"なし","右","左"});
 		jComboRotateImage.setToolTipText("単ページ時画面の縦横比に合わせて画像を回転します");
 		jComboRotateImage.setFocusable(false);
-		jComboRotateImage.setPreferredSize(new Dimension(text4.width+12, 19));
+		jComboRotateImage.setPreferredSize(new Dimension(text4.width+12, 20));
 		panel.add(jComboRotateImage);
 		
 		////////////////////////////////
@@ -816,7 +869,7 @@ public class AozoraEpub3Applet extends JApplet
 		//画像回り込み
 		panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-		panel.setBorder(padding2T4B);
+		panel.setBorder(padding2T3B);
 		panelV.add(panel);
 		jCheckImageFloat = new JCheckBox("有効 ");
 		jCheckImageFloat.setToolTipText("画像の実サイズが指定サイズ以下の画像を回り込み設定します");
@@ -860,7 +913,7 @@ public class AozoraEpub3Applet extends JApplet
 		panel.add(label);
 		jComboImageFloatType = new JComboBox(new String[]{"上/左","下/右"});
 		jComboImageFloatType.setFocusable(false);
-		jComboImageFloatType.setPreferredSize(new Dimension(text4.width+24, 19));
+		jComboImageFloatType.setPreferredSize(new Dimension(text4.width+24, 20));
 		panel.add(jComboImageFloatType);
 		
 		////////////////////////////////
@@ -1039,7 +1092,7 @@ public class AozoraEpub3Applet extends JApplet
 		jComboAutoMarginNombre = new JComboBox(new String[]{"なし","上","下","上下"});
 		jComboAutoMarginNombre.setToolTipText("ノンブルを除去します。除去した場合は除去制限が5%追加されます");
 		jComboAutoMarginNombre.setFocusable(false);
-		jComboAutoMarginNombre.setPreferredSize(new Dimension(text3.width+24, 19));
+		jComboAutoMarginNombre.setPreferredSize(new Dimension(text3.width+24, 20));
 		panel.add(jComboAutoMarginNombre);
 		jTextAutoMarginNombreSize = new JTextField("3.0");
 		jTextAutoMarginNombreSize.setToolTipText("ノンブルの文字部分の高さを指定します。これより大きい場合はノンブル除去されません");
@@ -1097,11 +1150,11 @@ public class AozoraEpub3Applet extends JApplet
 		buttonGroup.add(jRadioSpaceHyp0);
 		
 		////////////////////////////////
-		//「Ａ」に「Ｂ」の注記
+		//「○○」に「××」の注記
 		////////////////////////////////
 		panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-		panel.setBorder(new NarrowTitledBorder("「Ａ」に「Ｂ」の注記"));
+		panel.setBorder(new NarrowTitledBorder("「○○」に「××」の注記"));
 		tabPanel.add(panel);
 		buttonGroup = new ButtonGroup();
 		jRadioChukiRuby0 = new JRadioButton("非表示", true);
@@ -1111,14 +1164,14 @@ public class AozoraEpub3Applet extends JApplet
 		panel.add(jRadioChukiRuby0);
 		buttonGroup.add(jRadioChukiRuby0);
 		jRadioChukiRuby1 = new JRadioButton("ルビ");
-		jRadioChukiRuby1.setToolTipText("ＡのルビとしてＢを表示します");
+		jRadioChukiRuby1.setToolTipText("○○のルビとして××を表示します");
 		jRadioChukiRuby1.setFocusPainted(false);
 		jRadioChukiRuby1.setIconTextGap(1);
 		jRadioChukiRuby1.setBorder(padding2);
 		panel.add(jRadioChukiRuby1);
 		buttonGroup.add(jRadioChukiRuby1);
 		jRadioChukiRuby2 = new JRadioButton("小書き");
-		jRadioChukiRuby2.setToolTipText("Ａの後ろにＢを小書きで表示します");
+		jRadioChukiRuby2.setToolTipText("○○の後ろに××を小書きで表示します");
 		jRadioChukiRuby2.setFocusPainted(false);
 		jRadioChukiRuby2.setIconTextGap(1);
 		jRadioChukiRuby2.setBorder(padding2);
@@ -1290,6 +1343,7 @@ public class AozoraEpub3Applet extends JApplet
 		jCheckPageBreakEmpty.setBorder(padding2);
 		panel.add(jCheckPageBreakEmpty);
 		jComboxPageBreakEmptyLine = new JComboBox(new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9"});
+		jComboxPageBreakEmptyLine.setSelectedIndex(1);
 		jComboxPageBreakEmptyLine.setFocusable(false);
 		jComboxPageBreakEmptyLine.setBorder(padding0);
 		jComboxPageBreakEmptyLine.setMaximumSize(text5);
@@ -1542,7 +1596,7 @@ public class AozoraEpub3Applet extends JApplet
 		panel.add(jCheckConfirm);
 		
 		//ログ関連
-		label = new JLabel("  ログ:");
+		label = new JLabel("    ログ:");
 		label.setBorder(padding2H);
 		panel.add(label);
 		JButton jButtonLogClear = new JButton();
@@ -1606,6 +1660,57 @@ public class AozoraEpub3Applet extends JApplet
 			jTextArea.append(e.getMessage());
 		}
 		
+		////////////////////////////////////////////////////////////////
+		//すべて初期化にプロファイル読み込み
+		////////////////////////////////////////////////////////////////
+		//前回選択されていたプロファイル
+		String selectedProfileFileName = this.props.getProperty("ProfileFileName");
+		
+		//保存済プロファイルを読み込み
+		for (File profile : profilePath.listFiles()) {
+			Properties profileProps = new Properties(); 
+			try {
+				FileInputStream fos = new FileInputStream(profile);
+				profileProps.load(fos);
+				fos.close();
+			} catch (Exception e) { }
+			String name = profileProps.getProperty("ProfileName");
+			if (name != null && name.length() > 0) {
+				jComboProfile.addItem(new ProfileInfo(profile.getName(), name, profileProps));
+				//選択
+				if (profile.getName().equals(selectedProfileFileName)) {
+					jComboProfile.setSelectedIndex(jComboProfile.getItemCount()-1);
+				}
+			} else {
+				//名前がなければ起動時に削除
+				profile.delete();
+			}
+		}
+		//何もなければデフォルト設定を追加
+		if (jComboProfile.getItemCount() == 0) {
+			try { addProfile("デフォルト"); } catch (Exception e) { e.printStackTrace(); }
+		}
+		//選択済プロファイル保存
+		selectedProfile = (ProfileInfo)jComboProfile.getSelectedItem();
+		
+		//追加後にイベント有効
+		jComboProfile.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent arg0) {
+			try {
+				if (jComboProfile.getSelectedItem() instanceof ProfileInfo) {
+					//選択済のプロファイルを更新
+					if (selectedProfile != null) {
+						setProperties(selectedProfile.getProperties());
+						selectedProfile.update(profilePath);
+					}
+					ProfileInfo propInfo = (ProfileInfo)jComboProfile.getSelectedItem();
+					loadProperties(propInfo.getProperties());
+					//選択済入れ替え
+					selectedProfile = propInfo;
+				}
+			} catch (Exception e) { e.printStackTrace(); }
+		}});
+		//削除ボタン有効化
+		jButtonProfileDelete.setEnabled(jComboProfile.getItemCount() > 1);
 	}
 	
 	////////////////////////////////////////////////////////////////
@@ -1705,6 +1810,21 @@ public class AozoraEpub3Applet extends JApplet
 		}
 	}
 	
+	/** Preset選択イベント */
+	class LoadPresetActionListener implements ActionListener
+	{
+		Properties props;
+		
+		LoadPresetActionListener(Properties props)
+		{
+			this.props = props;
+		}
+		@Override
+		public void actionPerformed(ActionEvent e)
+		{
+			loadProperties(this.props);
+		}
+	}
 	
 	/** 表紙選択ボタンイベント */
 	class CoverChooserListener implements ActionListener
@@ -2436,6 +2556,27 @@ public class AozoraEpub3Applet extends JApplet
 			}
 		}
 		
+		String outExt = this.jComboExt.getEditor().getItem().toString().trim();
+		////////////////////////////////
+		//Kindleチェック
+		File kindlegen = null;
+		if (outExt.endsWith(".mobi")) {
+			kindlegen = new File(this.jarPath+"kindlegen.exe");
+			if (!kindlegen.isFile()) {
+				kindlegen = new File(this.jarPath+"kindlegen");
+				if (!kindlegen.isFile()) {
+					kindlegen = null;
+				}
+			}
+			if (kindlegen == null) {
+				JOptionPane.showMessageDialog(this, "kindlegenがありません\nkindlegen.exeをjarファイルの場所にコピーしてください", "kindlegenエラー", JOptionPane.WARNING_MESSAGE);
+				LogAppender.println("変換処理をキャンセルしました");
+				return;
+			}
+			outExt = outExt.replaceFirst("\\.mobi$", ".epub");
+			writer.setIsKindle(true);
+		}
+		
 		//確認ダイアログ 変換ボタン押下時にbookInfo更新
 		if (this.jCheckConfirm.isSelected()) {
 			//表題と著者設定 ファイル名から設定
@@ -2494,7 +2635,6 @@ public class AozoraEpub3Applet extends JApplet
 		
 		boolean autoFileName = this.jCheckAutoFileName.isSelected();
 		boolean overWrite = this.jCheckOverWrite.isSelected();
-		String outExt = this.jComboExt.getEditor().getItem().toString().trim();
 		
 		//出力ファイル
 		File outFile = AozoraEpub3.getOutFile(srcFile, dstPath, bookInfo, autoFileName, outExt);
@@ -2518,17 +2658,6 @@ public class AozoraEpub3Applet extends JApplet
 				return;
 			}
 		}*/
-		
-		////////////////////////////////
-		//Kindleチェック
-		File kindlegen = new File(this.jarPath+"kindlegen.exe");
-		if (!kindlegen.isFile()) {
-			kindlegen = new File(this.jarPath+"kindlegen");
-			if (!kindlegen.isFile()) {
-				kindlegen = null;
-			}
-		}
-		writer.setIsKindle(kindlegen != null);
 		
 		////////////////////////////////
 		//変換実行
@@ -2796,16 +2925,55 @@ public class AozoraEpub3Applet extends JApplet
 		} catch (Exception e) {}
 	}
 	
+	/** プロファイルを新規保存 
+	 * @throws IOException 
+	 * @throws FileNotFoundException */
+	private void addProfile(String name) throws FileNotFoundException, IOException
+	{
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd-hhmmss");
+		File profile = new File(profilePath.getPath()+"/"+dateFormat.format(new Date())+".ini");
+		int i = 1;
+		while (profile.exists()) {
+			profile = new File(profilePath.getPath()+"/"+dateFormat.format(new Date())+i+".ini");
+			i++;
+		}
+		
+		Properties profileProps = new Properties();
+		//名前設定
+		profileProps.setProperty("ProfileName", name);
+		//画面の設定をPropertiesに設定
+		this.setProperties(profileProps);
+		//プロファイル保存
+		FileOutputStream fos = new FileOutputStream(profile);
+		profileProps.store(fos, "AozoraEpub3 Profile");
+		fos.close();
+		//コンボボックスに追加
+		jComboProfile.addItem(new ProfileInfo(profile.getName(), name, profileProps));
+		jComboProfile.setSelectedIndex(jComboProfile.getItemCount()-1);
+		jButtonProfileDelete.setEnabled(jComboProfile.getItemCount() > 1);
+	}
+	/** プロファイルを削除 */
+	private void deleteProfile()
+	{
+		if (jComboProfile.getItemCount() == 1) return;
+		ProfileInfo propInfo = (ProfileInfo)jComboProfile.getSelectedItem();
+		if (propInfo.getFileName() != null) {
+			File profile = new File(profilePath.getPath()+"/"+propInfo.getFileName());
+			if (profile.exists()) {
+				//名前を削除して正常に終了しなかった場合も追加されないようにする
+				propInfo.getProperties().remove("ProfileName");
+				profile.deleteOnExit();
+				profile.delete();
+			}
+			jComboProfile.removeItemAt(jComboProfile.getSelectedIndex());
+			jButtonProfileDelete.setEnabled(jComboProfile.getItemCount() > 1);
+		}
+	}
+	
 	/** propsの値をアプレットに設定 */
 	private void loadProperties(Properties props)
 	{
 		boolean selected;
-		//プリセット
-		String presetFileName = props.getProperty("Preset");
-		for (int i=0; i<jComboPreset.getItemCount(); i++) {
-			PropInfo presetPropInfo = (PropInfo)(jComboPreset.getItemAt(i));
-			if (presetPropInfo.getFileName().equals(presetFileName)) jComboPreset.setSelectedIndex(i);
-		}
 		
 		//表題
 		try { jComboTitle.setSelectedIndex(Integer.parseInt(props.getProperty("TitleType"))); } catch (Exception e) {}
@@ -2885,14 +3053,18 @@ public class AozoraEpub3Applet extends JApplet
 		////////////////////////////////////////////////////////////////
 		//詳細設定
 		String propValue = props.getProperty("SpaceHyphenation");
-		jRadioSpaceHyp1.setSelected(propValue==null||"1".equals(propValue));
-		jRadioSpaceHyp2.setSelected("2".equals(propValue));
-		jRadioSpaceHyp0.setSelected("0".equals(propValue));
+		if (propValue != null) {
+			jRadioSpaceHyp1.setSelected("1".equals(propValue));
+			jRadioSpaceHyp2.setSelected("2".equals(propValue));
+			jRadioSpaceHyp0.setSelected("0".equals(propValue));
+		}
 		//注記のルビ表示
 		propValue = props.getProperty("ChukiRuby");
-		jRadioChukiRuby0.setSelected(propValue==null||"0".equals(propValue));
-		jRadioChukiRuby1.setSelected("1".equals(propValue));
-		jRadioChukiRuby2.setSelected("2".equals(propValue));
+		if (propValue != null) {
+			jRadioChukiRuby0.setSelected("0".equals(propValue));
+			jRadioChukiRuby1.setSelected("1".equals(propValue));
+			jRadioChukiRuby2.setSelected("2".equals(propValue));
+		}
 		//自動縦中横
 		//半角2文字縦書き
 		setPropsSelected(jCheckAutoYoko, props, "AutoYoko");
@@ -2916,7 +3088,7 @@ public class AozoraEpub3Applet extends JApplet
 		try { jTextPageBreakSize.setText(Integer.toString(Integer.parseInt(props.getProperty("PageBreakSize")))); } catch (Exception e) {}
 		setPropsSelected(jCheckPageBreakEmpty, props, "PageBreakEmpty");
 		propValue = props.getProperty("PageBreakEmptyLine");
-		jComboxPageBreakEmptyLine.setSelectedItem(propValue==null?"2":propValue);
+		if (propValue != null) jComboxPageBreakEmptyLine.setSelectedItem(propValue);
 		setIntText(jTextPageBreakEmptySize, props, "PageBreakEmptySize");
 		setPropsSelected(jCheckPageBreakChapter, props, "PageBreakChapter");
 		setIntText(jTextPageBreakChapterSize, props, "PageBreakChapterSize");
@@ -2949,10 +3121,6 @@ public class AozoraEpub3Applet extends JApplet
 	/** アプレットの設定状態をpropsに保存 */
 	private void setProperties(Properties props)
 	{
-		//
-		PropInfo presetPropInfo = (PropInfo)(this.jComboPreset.getSelectedItem());
-		props.setProperty("Preset", presetPropInfo.getFileName());
-		
 		//アップレット設定の保存
 		props.setProperty("TitleType", ""+this.jComboTitle.getSelectedIndex());
 		props.setProperty("UseFileName", this.jCheckUserFileName.isSelected()?"1":"");
@@ -3170,6 +3338,10 @@ public class AozoraEpub3Applet extends JApplet
 		//Spliterの位置
 		this.props.setProperty("DividerLocation", ""+this.jSplitPane.getDividerLocation());
 		
+		//選択中のプロファイル
+		ProfileInfo propInfo = (ProfileInfo)jComboProfile.getSelectedItem();
+		this.props.setProperty("ProfileFileName", propInfo.getFileName());
+		
 		//出力先と履歴保存
 		if (this.jComboDstPath.getSelectedIndex() == 0) this.props.setProperty("DstPath","");
 		else {
@@ -3195,7 +3367,9 @@ public class AozoraEpub3Applet extends JApplet
 		this.setProperties(this.props);
 		
 		//設定ファイル更新
-		this.props.store(new FileOutputStream(this.jarPath+this.propFileName), "AozoraEpub3 Parameters");
+		FileOutputStream fos = new FileOutputStream(this.jarPath+this.propFileName);
+		this.props.store(fos, "AozoraEpub3 Parameters");
+		fos.close();
 		
 		super.finalize();
 	}
