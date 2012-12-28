@@ -191,9 +191,9 @@ display: inline-block;
 line-height:1em;
 }
 /* 窓見出し 左右paddingは (lineheight-文字サイズ/2)/文字サイズ */
-span.mado.L { font-size:1.5em; padding:0.625em 0; padding-right:0.33em; line-height:1em;}
-span.mado.M { font-size:1.3em; padding:0.846em 0; padding-right:0.38em; line-height:1em;}
-span.mado.S { font-size:1.1em; padding:1.091em 0; padding-right:0.45em; line-height:1em;}
+span.mado.L { font-size:1.5em; padding:0.625em 0.33em 0 0; line-height:1em;}
+span.mado.M { font-size:1.3em; padding:0.846em 0.38em 0 0; line-height:1em;}
+span.mado.S { font-size:1.1em; padding:1.091em 0.45em 0 0; line-height:1em;}
 
 /** 割り注 (要改行) */
 span.wrc {

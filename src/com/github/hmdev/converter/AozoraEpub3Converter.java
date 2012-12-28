@@ -1305,7 +1305,8 @@ public class AozoraEpub3Converter
 					buf.insert(chukiTagStart+chOffset, "《"+target+"》");
 					chOffset += targetLength+2 - (chukiTagEnd-chukiTagStart);
 				} else if (chuki.endsWith("のルビ") || (chukiRuby && chuki.endsWith("の注記"))) {
-					if (target.indexOf("」に「") > -1) {
+					//ルビに変換 ママは除外
+					if (target.indexOf("」に「") > -1 && target.indexOf("」に「ママ") == -1) {
 						targetLength = target.indexOf('」');
 						//［＃「青空文庫」に「あおぞらぶんこ」のルビ］
 						int targetStart = this.getTargetStart(buf, chukiTagStart, chOffset, targetLength);
@@ -1321,8 +1322,8 @@ public class AozoraEpub3Converter
 						//左ルビ未対応 TODO 行左小書き？
 					}
 				} else if (chukiKogaki && chuki.endsWith("の注記")) {
-					//後ろに小書き表示
-					if (target.indexOf("」に「") > -1) {
+					//後ろに小書き表示 ママは除外
+					if (target.indexOf("」に「") > -1 && target.indexOf("」に「ママ") == -1) {
 						targetLength = target.indexOf('」');
 						//［＃「青空文庫」に「あおぞらぶんこ」の注記］
 						buf.delete(chukiTagStart+chOffset, chukiTagEnd+chOffset);
@@ -1448,10 +1449,10 @@ public class AozoraEpub3Converter
 		//窓見出し内 行頭のみ
 		boolean inMado = false;
 		//行内地付き
-		boolean inlineBtm = false;
+		//boolean inlineBtm = false;
 		//行の後でfloatのクリア
-		boolean clearRight = false;
-		boolean clearLeft = false;
+		//boolean clearRight = false;
+		//boolean clearLeft = false;
 		
 		StringBuilder bufSuf = new StringBuilder();
 		// 注記タグ変換
@@ -1583,12 +1584,12 @@ public class AozoraEpub3Converter
 					} else {
 						if (inMado && chukiName.endsWith("終わり")) {
 							inMado = false;
-							clearLeft = true;
+							//clearLeft = true;
 						} else inMado = true;
 					}
 				}
-				//行内地付き
-				else if (buf.length() > 0 && chukiName.startsWith("地付き")) {
+				//行内地付き Kobo調整中
+				/*else if (buf.length() > 0 && chukiName.startsWith("地付き")) {
 					if (inlineBtm && (chukiName.endsWith("終わり") || chukiName.endsWith("終り"))) {
 						inlineBtm = false;
 						chukiName = "行内"+chukiName;
@@ -1599,7 +1600,7 @@ public class AozoraEpub3Converter
 						chukiName = "行内"+chukiName;
 						tags = chukiMap.get(chukiName);
 					}
-				}
+				}*/
 				//割り注
 				else if (chukiName.endsWith("割り注")) {
 					inWrc = true;
@@ -1813,10 +1814,10 @@ public class AozoraEpub3Converter
 		//バッファを出力
 		this.printLineBuffer(out, outBuf, lineNum, noBr);
 		
-		//クリア
-		if (clearRight && clearLeft) out.append(chukiMap.get("クリア")[0]);
+		//クリア Kobo 調整中
+		/*if (clearRight && clearLeft) out.append(chukiMap.get("クリア")[0]);
 		else if (clearRight) out.append(chukiMap.get("右クリア")[0]);
-		else if (clearLeft) out.append(chukiMap.get("左クリア")[0]);
+		else if (clearLeft) out.append(chukiMap.get("左クリア")[0]);*/
 	}
 	
 	private void printImageChuki(BufferedWriter out, StringBuilder buf, String fileName, int imagePageType) throws IOException
