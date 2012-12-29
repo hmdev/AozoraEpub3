@@ -433,6 +433,7 @@ public class JConfirmDialog extends JDialog
 					checkPreviewControlEnabled();
 					break;
 				}
+				repaint();
 			}
 		});
 		

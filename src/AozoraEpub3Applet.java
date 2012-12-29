@@ -1175,33 +1175,6 @@ public class AozoraEpub3Applet extends JApplet
 		buttonGroup.add(jRadioChukiRuby2);
 		
 		////////////////////////////////
-		//栞用ID出力
-		////////////////////////////////
-		panel = new JPanel();
-		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-		panel.setBorder(new NarrowTitledBorder("栞用ID"));
-		tabPanel.add(panel);
-		jCheckMarkId = new JCheckBox("各行に出力");
-		jCheckMarkId.setToolTipText("Kobo向けの栞を記憶するためのIDを各行に設定します");
-		jCheckMarkId.setFocusPainted(false);
-		jCheckMarkId.setBorder(padding2);
-		panel.add(jCheckMarkId);
-		
-		////////////////////////////////
-		//4バイト文字変換
-		////////////////////////////////
-		panel = new JPanel();
-		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-		panel.setBorder(new NarrowTitledBorder("4バイト文字"));
-		tabPanel.add(panel);
-		//4バイト文字を変換する
-		jCheckGaiji32 = new JCheckBox("変換する");
-		jCheckGaiji32.setToolTipText("Kobo等で4バイト文字より後ろが表示できない場合はチェックを外します");
-		jCheckGaiji32.setFocusPainted(false);
-		jCheckGaiji32.setBorder(padding2);
-		panel.add(jCheckGaiji32);
-		
-		////////////////////////////////
 		//自動縦中横
 		////////////////////////////////
 		panel = new JPanel();
@@ -1258,6 +1231,33 @@ public class AozoraEpub3Applet extends JApplet
 		jCheckCommentConvert.setFocusPainted(false);
 		jCheckCommentConvert.setBorder(padding2);
 		panel.add(jCheckCommentConvert);
+		
+		////////////////////////////////
+		//栞用ID出力
+		////////////////////////////////
+		panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		panel.setBorder(new NarrowTitledBorder("栞用ID"));
+		tabPanel.add(panel);
+		jCheckMarkId = new JCheckBox("各行に出力");
+		jCheckMarkId.setToolTipText("Kobo向けの栞を記憶するためのIDを各行に設定します");
+		jCheckMarkId.setFocusPainted(false);
+		jCheckMarkId.setBorder(padding2);
+		panel.add(jCheckMarkId);
+		
+		////////////////////////////////
+		//4バイト文字変換
+		////////////////////////////////
+		panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		panel.setBorder(new NarrowTitledBorder("4バイト文字"));
+		tabPanel.add(panel);
+		//4バイト文字を変換する
+		jCheckGaiji32 = new JCheckBox("変換する");
+		jCheckGaiji32.setToolTipText("Kobo等で4バイト文字より後ろが表示できない場合はチェックを外します");
+		jCheckGaiji32.setFocusPainted(false);
+		jCheckGaiji32.setBorder(padding2);
+		panel.add(jCheckGaiji32);
 		
 		////////////////////////////////
 		//空行除去

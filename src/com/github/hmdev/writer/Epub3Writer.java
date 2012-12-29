@@ -381,6 +381,9 @@ public class Epub3Writer
 		this.writeSections(converter, src, bw);
 		if (this.canceled) return;
 		
+		int zipPathLength = 0;
+		if (this.bookInfo.textEntryName != null) zipPathLength = this.bookInfo.textEntryName.indexOf('/')+1;
+		
 		//表紙データと表示の画像情報
 		byte[] coverImageBytes = null;
 		ImageInfo coverImageInfo = null;
@@ -438,9 +441,11 @@ public class Epub3Writer
 			coverImageInfo.setIsCover(true);
 			this.imageInfos.add(0, coverImageInfo);
 		}else {
-			//表紙は出力対象に追加
-			if (bookInfo.coverImageIndex > -1 && imageInfoReader.countImageFileNames() > bookInfo.coverImageIndex)
-				outImageFileNames.add(imageInfoReader.getImageFileName(bookInfo.coverImageIndex));
+			//表紙は出力対象に追加 (テキストからの相対パス)
+			if (bookInfo.coverImageIndex > -1 && imageInfoReader.countImageFileNames() > bookInfo.coverImageIndex) {
+				String imageFileName = imageInfoReader.getImageFileName(bookInfo.coverImageIndex);
+				if (imageFileName != null) outImageFileNames.add(imageFileName.substring(zipPathLength));
+			}
 		}
 		
 		//表紙ページ出力 先頭画像表示時は画像出力時にカバー指定するので出力しない
@@ -595,7 +600,7 @@ public class Epub3Writer
 		//表紙指定があればそれを入力に設定 先頭画像のisCoverはfalseになっている
 		//プレビューで編集された場合はここで追加する
 		////////////////////////////////
-		//表紙出力
+		//表紙編集時のイメージ出力
 		if (coverImageInfo != null) {
 			try {
 				ImageInfo imageInfo = imageInfos.get(0);
@@ -614,7 +619,7 @@ public class Epub3Writer
 				if (bookInfo.coverImage != null) {
 					//プレビューで編集されている場合
 					zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+IMAGES_PATH+imageInfo.getOutFileName()));
-					this.writeImage(bookInfo.coverImage, zos, coverImageInfo);
+					this.writeCoverImage(bookInfo.coverImage, zos, coverImageInfo);
 					zos.closeArchiveEntry();
 					bookInfo.coverImage = null; //同じ画像が使われている場合は以後はファイルから読み込ませる
 				} else {
@@ -661,8 +666,6 @@ public class Epub3Writer
 		} else {
 			////////////////////////////////
 			//zipの場合
-			int zipPathLength = 0;
-			if (this.bookInfo.textEntryName != null) zipPathLength = this.bookInfo.textEntryName.indexOf('/')+1;
 			ZipArchiveInputStream zis = new ZipArchiveInputStream(new BufferedInputStream(new FileInputStream(srcFile), 65536), "MS932", false);
 			try {
 			ArchiveEntry entry;
@@ -706,6 +709,14 @@ public class Epub3Writer
 		}
 	}
 	
+	/** 表紙画像を出力 編集済の画像なのでリサイズしない */
+	void writeCoverImage(BufferedImage srcImage, ZipArchiveOutputStream zos, ImageInfo imageInfo) throws IOException
+	{
+		imageInfo.rotateAngle = 0; //回転させない
+		ImageUtils.writeImage(null, srcImage, zos,imageInfo, this.jpegQuality, this.gammaOp,
+				0, 0, 0, this.dispW, this.dispH,
+				0, 0, 0, 0, 0, 0);
+	}
 	/** 表紙画像を出力 */
 	void writeCoverImage(InputStream is, ZipArchiveOutputStream zos, ImageInfo imageInfo) throws IOException
 	{
