@@ -87,6 +87,7 @@ import com.github.hmdev.image.ImageInfoReader;
 import com.github.hmdev.info.BookInfo;
 import com.github.hmdev.info.ProfileInfo;
 import com.github.hmdev.swing.JConfirmDialog;
+import com.github.hmdev.swing.JProfileDialog;
 import com.github.hmdev.swing.NarrowTitledBorder;
 import com.github.hmdev.util.LogAppender;
 import com.github.hmdev.web.WebAozoraConverter;
@@ -115,10 +116,13 @@ public class AozoraEpub3Applet extends JApplet
 	/** 変換前確認ダイアログ */
 	JConfirmDialog jConfirmDialog;
 	
+	/** プロファイル選択ダイアログ */
+	JProfileDialog jProfileDialog;
+	
 	/** プロファイル選択 */
 	JComboBox jComboProfile;
 	JButton jButtonProfileCreate;
-	JButton jButtonProfileDelete;
+	JButton jButtonProfileEdit;
 	
 	/** 端末プリセット読み込み */
 	JButton jButtonPreset;
@@ -393,8 +397,33 @@ public class AozoraEpub3Applet extends JApplet
 		topPane.setLayout(new BoxLayout(topPane, BoxLayout.Y_AXIS));
 		jSplitPane.add(topPane);
 		
-		////////////////////////////////
+		////////////////////////////////////////////////////////////////
 		//プリセットとプロファイル
+		////////////////////////////////////////////////////////////////
+		//プロファイルダイアログ
+		jProfileDialog = new JProfileDialog(
+			iconImage, AozoraEpub3Applet.class.getResource("images/icon.png").toString().replaceFirst("/icon\\.png", "/") );
+		jProfileDialog.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent evt)
+			{
+				try {
+				switch (evt.getID()) {
+				case 1:
+					addProfile(evt.getSource().toString());
+					break;
+				case 2:
+					editProfile(evt.getSource().toString());
+					break;
+				case 3:
+					deleteProfile();
+					break;
+				}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
 		////////////////////////////////
 		panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
@@ -417,19 +446,17 @@ public class AozoraEpub3Applet extends JApplet
 		jButtonProfileCreate.setBorder(padding3);
 		jButtonProfileCreate.setFocusable(false);
 		jButtonProfileCreate.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent arg0) {
-			String name = JOptionPane.showInputDialog(jComboProfile, "プロファイル名称", jComboProfile.getSelectedItem().toString()+"のコピー");
-			if (name != null) try { addProfile(name); } catch (Exception e) { e.printStackTrace(); }
+			jProfileDialog.showCreate(jFrameParent.getLocation(), jComboProfile.getSelectedItem().toString()+"のコピー");
 		}});
 		panel.add(jButtonProfileCreate);
-		jButtonProfileDelete = new JButton(new ImageIcon(AozoraEpub3Applet.class.getResource("images/delete.png")));
-		jButtonProfileDelete.setToolTipText("選択中のプロファイルを削除します");
-		jButtonProfileDelete.setBorder(padding3);
-		jButtonProfileDelete.setFocusable(false);
-		jButtonProfileDelete.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent arg0) {
-			int ret = JOptionPane.showConfirmDialog(jComboProfile, jComboProfile.getSelectedItem().toString()+" を削除しますか？", "プロファイル削除", JOptionPane.YES_NO_OPTION);
-			if (ret == JOptionPane.YES_OPTION) deleteProfile();
+		jButtonProfileEdit = new JButton(new ImageIcon(AozoraEpub3Applet.class.getResource("images/edit.png")));
+		jButtonProfileEdit.setToolTipText("選択中のプロファイルを編集・削除します");
+		jButtonProfileEdit.setBorder(padding3);
+		jButtonProfileEdit.setFocusable(false);
+		jButtonProfileEdit.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent arg0) {
+			jProfileDialog.showEdit(jFrameParent.getLocation(), jComboProfile.getSelectedItem().toString());
 		}});
-		panel.add(jButtonProfileDelete);
+		panel.add(jButtonProfileEdit);
 		
 		//端末プリセット
 		label = new JLabel("    ");
@@ -1628,8 +1655,7 @@ public class AozoraEpub3Applet extends JApplet
 		//確認ダイアログ
 		////////////////////////////////////////////////////////////////
 		jConfirmDialog = new JConfirmDialog(
-			iconImage, AozoraEpub3Applet.class.getResource("images/icon.png").toString().replaceFirst("/icon\\.png", "/")
-		);
+			iconImage, AozoraEpub3Applet.class.getResource("images/icon.png").toString().replaceFirst("/icon\\.png", "/") );
 		if ("1".equals(props.getProperty("ReplaceCover"))) jConfirmDialog.jCheckReplaceCover.setSelected(true);
 		
 		////////////////////////////////////////////////////////////////
@@ -1712,7 +1738,7 @@ public class AozoraEpub3Applet extends JApplet
 			} catch (Exception e) { e.printStackTrace(); }
 		}});
 		//削除ボタン有効化
-		jButtonProfileDelete.setEnabled(jComboProfile.getItemCount() > 1);
+		jButtonProfileEdit.setEnabled(jComboProfile.getItemCount() > 1);
 	}
 	
 	////////////////////////////////////////////////////////////////
@@ -2952,7 +2978,7 @@ public class AozoraEpub3Applet extends JApplet
 		//コンボボックスに追加
 		jComboProfile.addItem(new ProfileInfo(profile.getName(), name, profileProps));
 		jComboProfile.setSelectedIndex(jComboProfile.getItemCount()-1);
-		jButtonProfileDelete.setEnabled(jComboProfile.getItemCount() > 1);
+		jButtonProfileEdit.setEnabled(jComboProfile.getItemCount() > 1);
 	}
 	/** プロファイルを削除 */
 	private void deleteProfile()
@@ -2968,10 +2994,27 @@ public class AozoraEpub3Applet extends JApplet
 				profile.delete();
 			}
 			jComboProfile.removeItemAt(jComboProfile.getSelectedIndex());
-			jButtonProfileDelete.setEnabled(jComboProfile.getItemCount() > 1);
+			jButtonProfileEdit.setEnabled(jComboProfile.getItemCount() > 1);
 		}
 	}
-	
+	private void editProfile(String name) throws IOException
+	{
+		if (name == null) return;
+		name = name.trim();
+		if (name.length() == 0) return;
+		ProfileInfo propInfo = (ProfileInfo)jComboProfile.getSelectedItem();
+		Properties profileProps = propInfo.getProperties();
+		//名前設定
+		propInfo.setName(name);
+		profileProps.setProperty("ProfileName", name);
+		//画面の設定をPropertiesに設定
+		this.setProperties(profileProps);
+		//プロファイル更新
+		FileOutputStream fos = new FileOutputStream(profilePath.getPath()+"/"+propInfo.getFileName());
+		profileProps.store(fos, "AozoraEpub3 Profile");
+		fos.close();
+		jComboProfile.repaint();
+	}
 	/** propsの値をアプレットに設定 */
 	private void loadProperties(Properties props)
 	{

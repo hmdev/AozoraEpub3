@@ -840,6 +840,10 @@ public class AozoraEpub3Converter
 			ChapterLineInfo chapterLineInfo = bookInfo.getChapterLineInfo(bookInfo.titleLine);
 			if (chapterLineInfo == null) bookInfo.addChapterLineInfo(new ChapterLineInfo(bookInfo.titleLine, ChapterLineInfo.TYPE_TITLE, true, 0, false, name));
 			else { chapterLineInfo.type = ChapterLineInfo.TYPE_TITLE; chapterLineInfo.level = 0; }
+			//1行目がタイトルでなければ除外
+			if (bookInfo.titleLine > 0) {
+				for (int i=bookInfo.titleLine-1; i>=0; i--) bookInfo.removeChapterLineInfo(i);
+			}
 		}
 		
 		//見出しに追加されたタイトル行は削除
