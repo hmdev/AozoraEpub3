@@ -40,24 +40,27 @@ public class JProfileDialog extends JDialog
 	public JProfileDialog(Image iconImage, String imageURLPath)
 	{
 		this.setIconImage(iconImage);
-		this.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
-		this.setSize(new Dimension(380, 120));
+		this.setModalityType(Dialog.ModalityType.TOOLKIT_MODAL);
+		this.setSize(new Dimension(360, 128));
 		this.setResizable(false);
 		this.setTitle("プロファイル設定");
 		this.setLayout(new GridLayout());
 		
 		JPanel panel;
-		Border paddingButton = BorderFactory.createEmptyBorder(3, 6, 3, 6);
+		Border paddingButton = BorderFactory.createEmptyBorder(4, 8, 4, 8);
 		Border padding4H = BorderFactory.createEmptyBorder(0, 4, 0, 4);
 		
 		JPanel outer = new JPanel();
 		outer.setLayout(new BoxLayout(outer, BoxLayout.Y_AXIS));
+		outer.setBorder(BorderFactory.createEmptyBorder(6, 6, 0, 6));
 		this.add(outer);
 		
 		panel = new JPanel();
-		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		panel.setLayout(new FlowLayout(FlowLayout.LEFT));
+		outer.add(panel);
 		panel.add(new JLabel("プロファイル名: "));
-		panel.setBorder(BorderFactory.createEmptyBorder(16, 6, 6, 6));
+		panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 		outer.add(panel);
 		jTextProfileName = new JTextField();
 		jTextProfileName.setMinimumSize(new Dimension(100, 22));
@@ -71,7 +74,7 @@ public class JProfileDialog extends JDialog
 		
 		jButtonCreate = new JButton("新規作成");
 		jButtonCreate.setBorder(paddingButton);
-		jButtonCreate.setPreferredSize(new Dimension(80, 26));
+		//jButtonCreate.setPreferredSize(new Dimension(80, 26));
 		try { jButtonCreate.setIcon(new ImageIcon(new URL(imageURLPath+"add.png"))); } catch (MalformedURLException e1) {}
 		jButtonCreate.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -86,7 +89,7 @@ public class JProfileDialog extends JDialog
 		
 		jButtonEdit = new JButton("名称変更");
 		jButtonEdit.setBorder(paddingButton);
-		jButtonEdit.setPreferredSize(new Dimension(80, 26));
+		//jButtonEdit.setPreferredSize(new Dimension(80, 26));
 		try { jButtonEdit.setIcon(new ImageIcon(new URL(imageURLPath+"edit.png"))); } catch (MalformedURLException e1) {}
 		jButtonEdit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -101,7 +104,7 @@ public class JProfileDialog extends JDialog
 		
 		jButtonDelete = new JButton("削除");
 		jButtonDelete.setBorder(paddingButton);
-		jButtonDelete.setPreferredSize(new Dimension(80, 26));
+		//jButtonDelete.setPreferredSize(new Dimension(80, 26));
 		try { jButtonDelete.setIcon(new ImageIcon(new URL(imageURLPath+"delete.png"))); } catch (MalformedURLException e1) {}
 		jButtonDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -121,7 +124,7 @@ public class JProfileDialog extends JDialog
 		
 		jButtonCancel = new JButton("キャンセル");
 		jButtonCancel.setBorder(paddingButton);
-		jButtonCancel.setPreferredSize(new Dimension(80, 26));
+		//jButtonCancel.setPreferredSize(new Dimension(80, 26));
 		try { jButtonCancel.setIcon(new ImageIcon(new URL(imageURLPath+"cross.png"))); } catch (MalformedURLException e1) {}
 		jButtonCancel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -146,11 +149,12 @@ public class JProfileDialog extends JDialog
 		this.setVisible(true);
 	}
 	
-	public void showEdit(Point location, String name)
+	public void showEdit(Point location, String name, boolean deletable)
 	{
 		this.jButtonCreate.setVisible(false);
 		this.jButtonEdit.setVisible(true);
 		this.jButtonDelete.setVisible(true);
+		this.jButtonDelete.setEnabled(deletable);
 		
 		this.orgName = name;
 		this.jTextProfileName.setText(name);

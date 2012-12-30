@@ -160,7 +160,7 @@ public class JConfirmDialog extends JDialog
 		
 		final Dimension dialogSize = new Dimension(DIALOG_WIDTH, DIALOG_HEIGHT);
 		this.setIconImage(iconImage);
-		this.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
+		this.setModalityType(Dialog.ModalityType.TOOLKIT_MODAL);
 		this.setSize(dialogSize);
 		this.setResizable(false);
 		this.setTitle("変換前確認");
