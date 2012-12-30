@@ -460,8 +460,7 @@ public class AozoraEpub3Applet extends JApplet
 				jComboProfile.removeItemAt(idx-1);
 				jComboProfile.insertItemAt(item, idx);
 				//移動ボタン有効化
-				jButtonProfileUp.setEnabled(jComboProfile.getSelectedIndex() > 0); 
-				jButtonProfileDown.setEnabled(jComboProfile.getSelectedIndex() < jComboProfile.getItemCount()-1);
+				setProfileMoveEnable();
 			}
 		}});
 		panelV.add(jButtonProfileUp);
@@ -477,8 +476,7 @@ public class AozoraEpub3Applet extends JApplet
 				jComboProfile.removeItemAt(idx+1);
 				jComboProfile.insertItemAt(item, idx);
 				//移動ボタン有効化
-				jButtonProfileUp.setEnabled(jComboProfile.getSelectedIndex() > 0); 
-				jButtonProfileDown.setEnabled(jComboProfile.getSelectedIndex() < jComboProfile.getItemCount()-1);
+				setProfileMoveEnable();
 			}
 		}});
 		panelV.add(jButtonProfileDown);
@@ -1800,14 +1798,12 @@ public class AozoraEpub3Applet extends JApplet
 					selectedProfile = propInfo;
 				}
 				//移動ボタン有効化
-				jButtonProfileUp.setEnabled(jComboProfile.getSelectedIndex() > 0); 
-				jButtonProfileDown.setEnabled(jComboProfile.getSelectedIndex() < jComboProfile.getItemCount()-1);
+				setProfileMoveEnable();
 			} catch (Exception e) { e.printStackTrace(); }
 		}});
 		
 		//移動ボタン有効化
-		jButtonProfileUp.setEnabled(jComboProfile.getSelectedIndex() > 0); 
-		jButtonProfileDown.setEnabled(jComboProfile.getSelectedIndex() < jComboProfile.getItemCount()-1);
+		setProfileMoveEnable();
 	}
 	
 	////////////////////////////////////////////////////////////////
@@ -3048,6 +3044,8 @@ public class AozoraEpub3Applet extends JApplet
 		jComboProfile.addItem(new ProfileInfo(profile.getName(), name, profileProps));
 		jComboProfile.setSelectedIndex(jComboProfile.getItemCount()-1);
 		jButtonProfileEdit.setEnabled(jComboProfile.getItemCount() > 1);
+		//移動ボタン有効化
+		setProfileMoveEnable();
 	}
 	/** プロファイルを削除 */
 	private void deleteProfile()
@@ -3064,6 +3062,8 @@ public class AozoraEpub3Applet extends JApplet
 			}
 			jComboProfile.removeItemAt(jComboProfile.getSelectedIndex());
 			jButtonProfileEdit.setEnabled(jComboProfile.getItemCount() > 1);
+			//移動ボタン有効化
+			setProfileMoveEnable();
 		}
 	}
 	private void editProfile(String name) throws IOException
@@ -3084,6 +3084,14 @@ public class AozoraEpub3Applet extends JApplet
 		fos.close();
 		jComboProfile.repaint();
 	}
+	
+	/** 移動ボタン有効化 */
+	private void setProfileMoveEnable()
+	{
+		jButtonProfileUp.setEnabled(jComboProfile.getSelectedIndex() > 0); 
+		jButtonProfileDown.setEnabled(jComboProfile.getSelectedIndex() < jComboProfile.getItemCount()-1);
+	}
+	
 	/** propsの値をアプレットに設定 */
 	private void loadProperties(Properties props)
 	{
