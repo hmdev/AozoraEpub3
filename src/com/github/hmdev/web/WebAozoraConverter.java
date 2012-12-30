@@ -379,7 +379,7 @@ public class WebAozoraConverter
 						if (chapterTitle != null && !preChapterTitle.equals(chapterTitle)) {
 							newChapter = true;
 							preChapterTitle = chapterTitle;
-							bw.append("［＃改ページ］\n");
+							bw.append("\n［＃改ページ］\n");
 							bw.append("［＃ここから大見出し］\n");
 							printText(bw, preChapterTitle);
 							bw.append('\n');
@@ -508,7 +508,7 @@ public class WebAozoraConverter
 	{
 		Elements contentDivs = getExtractElements(doc, this.queryMap.get(ExtractId.CONTENT_ARTICLE));
 		if (contentDivs != null && contentDivs.size() > 0) {
-			if (!newChapter) bw.append("［＃改ページ］\n");
+			if (!newChapter) bw.append("\n［＃改ページ］\n");
 			String subTitle = getExtractText(doc, this.queryMap.get(ExtractId.CONTENT_SUBTITLE));
 			if (subTitle != null) {
 				bw.append("［＃ここから中見出し］\n");

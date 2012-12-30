@@ -1532,7 +1532,13 @@ public class AozoraEpub3Converter
 					}
 					
 					//改ページの前に文字があれば出力
-					if (buf.length() > 0) this.printLineBuffer(out, buf, lineNum, true);
+					if (buf.length() > 0) {
+						StringBuilder outBuf = new StringBuilder();
+						convertRubyText(outBuf, buf.toString().toCharArray());
+						//bufはクリア
+						buf.setLength(0);
+						printLineBuffer(out, outBuf, lineNum, true);
+					}
 					
 					noBr = true;
 					//改ページの後ろに文字があれば</br>は出力
