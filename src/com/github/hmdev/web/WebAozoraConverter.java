@@ -59,6 +59,7 @@ public class WebAozoraConverter
 	/** fqdnに対応したインスタンスを生成してキャッシュして変換実行 */
 	public static WebAozoraConverter createWebAozoraConverter(String urlString, File configPath) throws IOException
 	{
+		urlString = urlString.trim();
 		String baseUri = urlString.substring(0, urlString.indexOf('/', urlString.indexOf("//")+2));
 		String fqdn = baseUri.substring(baseUri.indexOf("//")+2);
 		WebAozoraConverter converter = converters.get(fqdn);
@@ -158,6 +159,7 @@ public class WebAozoraConverter
 	{
 		this.canceled = false;
 		//リダイレクトされていたら置き換え
+		urlString = urlString.trim();
 		if (!urlString.endsWith("/") && !urlString.endsWith(".html") && urlString.indexOf("?") == -1 ) {
 			HttpURLConnection connection = (HttpURLConnection) new URL(urlString).openConnection();
 			connection.getResponseCode();
