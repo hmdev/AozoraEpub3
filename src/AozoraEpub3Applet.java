@@ -1271,7 +1271,7 @@ public class AozoraEpub3Applet extends JApplet
 		jCheckAutoYokoNum3.setIconTextGap(1);
 		jCheckAutoYokoNum3.setBorder(padding2);
 		panel.add(jCheckAutoYokoNum3);
-		label = new JLabel(")");
+		label = new JLabel(") ");
 		label.setBorder(padding0);
 		panel.add(label);
 		//!? 1文字
@@ -1368,7 +1368,7 @@ public class AozoraEpub3Applet extends JApplet
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 		panel.setBorder(new NarrowTitledBorder("行頭字下げ"));
 		tabPanel.add(panel);
-		jCheckForceIndent = new JCheckBox("有効    ");
+		jCheckForceIndent = new JCheckBox("有効     ");
 		jCheckForceIndent.setToolTipText("行頭が「『―”（〈〔【と全角空白以外なら行頭に全角空白を追加します 半角空白のみは全角に置き換えます");
 		jCheckForceIndent.setFocusPainted(false);
 		jCheckForceIndent.setBorder(padding2);

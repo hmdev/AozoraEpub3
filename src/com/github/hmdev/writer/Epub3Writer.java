@@ -195,7 +195,7 @@ public class Epub3Writer
 	/** 画像情報リスト Velocity埋め込み */
 	Vector<ImageInfo> imageInfos;
 	
-	/** 出力済みのファイル名 (画像なしチェック用) */
+	/** 出力対象のファイル名 (青空テキストの挿絵注記で追加され 重複出力のチェックに利用) */
 	HashSet<String> outImageFileNames; 
 	
 	/** Velocity変数格納コンテキスト */
@@ -440,11 +440,20 @@ public class Epub3Writer
 			coverImageInfo.setOutFileName("0000."+ext);
 			coverImageInfo.setIsCover(true);
 			this.imageInfos.add(0, coverImageInfo);
-		}else {
-			//表紙は出力対象に追加 (テキストからの相対パス)
+		} else {
+			//本文にないzip内の表紙を出力対象に追加 (テキストからの相対パス)
 			if (bookInfo.coverImageIndex > -1 && imageInfoReader.countImageFileNames() > bookInfo.coverImageIndex) {
-				String imageFileName = imageInfoReader.getImageFileName(bookInfo.coverImageIndex);
-				if (imageFileName != null) outImageFileNames.add(imageFileName.substring(zipPathLength));
+				if (!"txt".equals(srcExt)) {
+					String imageFileName = imageInfoReader.getImageFileName(bookInfo.coverImageIndex);
+					if (imageFileName != null) {
+						imageFileName = imageFileName.substring(zipPathLength);
+						outImageFileNames.add(imageFileName);
+						//表紙フラグも設定
+						ImageInfo imageInfo = imageInfoReader.getImageInfo(imageFileName);
+						imageInfo.setIsCover(true);
+						this.imageInfos.add(imageInfo);
+					}
+				}
 			}
 		}
 		
@@ -603,7 +612,6 @@ public class Epub3Writer
 		//表紙編集時のイメージ出力
 		if (coverImageInfo != null) {
 			try {
-				ImageInfo imageInfo = imageInfos.get(0);
 				//kindleの場合は常にjpegに変換
 				if (isKindle) {
 					String imgExt = coverImageInfo.getExt();
@@ -618,13 +626,13 @@ public class Epub3Writer
 				}
 				if (bookInfo.coverImage != null) {
 					//プレビューで編集されている場合
-					zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+IMAGES_PATH+imageInfo.getOutFileName()));
+					zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+IMAGES_PATH+coverImageInfo.getOutFileName()));
 					this.writeCoverImage(bookInfo.coverImage, zos, coverImageInfo);
 					zos.closeArchiveEntry();
 					bookInfo.coverImage = null; //同じ画像が使われている場合は以後はファイルから読み込ませる
 				} else {
 					ByteArrayInputStream bais = new ByteArrayInputStream(coverImageBytes);
-					zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+IMAGES_PATH+imageInfo.getOutFileName()));
+					zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+IMAGES_PATH+coverImageInfo.getOutFileName()));
 					this.writeCoverImage(bais, zos, coverImageInfo);
 					zos.closeArchiveEntry();
 					bais.close();
