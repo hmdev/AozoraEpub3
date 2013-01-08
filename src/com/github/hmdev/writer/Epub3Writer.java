@@ -446,12 +446,14 @@ public class Epub3Writer
 				if (!"txt".equals(srcExt)) {
 					String imageFileName = imageInfoReader.getImageFileName(bookInfo.coverImageIndex);
 					if (imageFileName != null) {
-						imageFileName = imageFileName.substring(zipPathLength);
-						outImageFileNames.add(imageFileName);
-						//表紙フラグも設定
 						ImageInfo imageInfo = imageInfoReader.getImageInfo(imageFileName);
-						imageInfo.setIsCover(true);
-						this.imageInfos.add(imageInfo);
+						if (imageInfo != null) {
+							imageFileName = imageFileName.substring(zipPathLength);
+							outImageFileNames.add(imageFileName);
+							//表紙フラグも設定
+							imageInfo.setIsCover(true);
+							this.imageInfos.add(imageInfo);
+						}
 					}
 				}
 			}
