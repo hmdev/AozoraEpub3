@@ -158,7 +158,7 @@ public class JProfileDialog extends JDialog
 		
 		this.orgName = name;
 		this.jTextProfileName.setText(name);
-		this.setLocation(location.x, location.y);
+		this.setLocation(location.x+32, location.y+16);
 		this.setVisible(true);
 	}
 	

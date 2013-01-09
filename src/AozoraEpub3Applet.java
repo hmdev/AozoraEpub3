@@ -3043,7 +3043,6 @@ public class AozoraEpub3Applet extends JApplet
 		//コンボボックスに追加
 		jComboProfile.addItem(new ProfileInfo(profile.getName(), name, profileProps));
 		jComboProfile.setSelectedIndex(jComboProfile.getItemCount()-1);
-		jButtonProfileEdit.setEnabled(jComboProfile.getItemCount() > 1);
 		//移動ボタン有効化
 		setProfileMoveEnable();
 	}
@@ -3061,7 +3060,6 @@ public class AozoraEpub3Applet extends JApplet
 				profile.delete();
 			}
 			jComboProfile.removeItemAt(jComboProfile.getSelectedIndex());
-			jButtonProfileEdit.setEnabled(jComboProfile.getItemCount() > 1);
 			//移動ボタン有効化
 			setProfileMoveEnable();
 		}

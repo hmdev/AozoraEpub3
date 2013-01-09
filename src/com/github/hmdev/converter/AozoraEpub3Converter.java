@@ -1079,27 +1079,27 @@ public class AozoraEpub3Converter
 			
 			if (lineNum == bookInfo.titleLine) {
 				out.append(chukiMap.get("表題前")[0]);
-				convertTextLineToEpub3(out, line, lineNum, true);
+				convertTextLineToEpub3(out, line, lineNum, false);
 				out.append(chukiMap.get("表題後")[0]);
 			} else if (lineNum == bookInfo.orgTitleLine) {
 				out.append(chukiMap.get("原題前")[0]);
-				convertTextLineToEpub3(out, line, lineNum, true);
+				convertTextLineToEpub3(out, line, lineNum, false);
 				out.append(chukiMap.get("原題後")[0]);
 			} else if (lineNum == bookInfo.subTitleLine) {
 				out.append(chukiMap.get("副題前")[0]);
-				convertTextLineToEpub3(out, line, lineNum, true);
+				convertTextLineToEpub3(out, line, lineNum, false);
 				out.append(chukiMap.get("副題後")[0]);
 			} else if (lineNum == bookInfo.subOrgTitleLine) {
 				out.append(chukiMap.get("副原題前")[0]);
-				convertTextLineToEpub3(out, line, lineNum, true);
+				convertTextLineToEpub3(out, line, lineNum, false);
 				out.append(chukiMap.get("副原題後")[0]);
 			} else if (lineNum == bookInfo.creatorLine) {
 				out.append(chukiMap.get("著者前")[0]);
-				convertTextLineToEpub3(out, line, lineNum, true);
+				convertTextLineToEpub3(out, line, lineNum, false);
 				out.append(chukiMap.get("著者後")[0]);
 			} else if (lineNum == bookInfo.subCreatorLine) {
 				out.append(chukiMap.get("副著者前")[0]);
-				convertTextLineToEpub3(out, line, lineNum, true);
+				convertTextLineToEpub3(out, line, lineNum, false);
 				out.append(chukiMap.get("副著者後")[0]);
 			} else {
 				convertTextLineToEpub3(out, line);
@@ -2467,7 +2467,8 @@ public class AozoraEpub3Converter
 			//見出し用のID設定
 			if (chapterLineInfo != null) {
 				chapterId = "kobo."+this.lineIdNum+"."+(idIdx++);
-				out.write("<p id=\""+chapterId+"\">");
+				//IDのみ出力
+				out.write("<span id=\""+chapterId+"\"></span>");
 				this.pageByteSize += (chapterId.length() + 19);
 			}
 		} else {
@@ -2486,10 +2487,8 @@ public class AozoraEpub3Converter
 		//ページバイト数加算
 		if (this.forcePageBreak) this.pageByteSize += line.getBytes("UTF-8").length;
 		
-		//改行のpまたは見出しspanを閉じる
-		if (noBr) {
-			if (chapterLineInfo != null) out.write("</p>");
-		} else {
+		//改行のpを閉じる
+		if (!noBr) {
 			out.write("</p>\n");
 		}
 		
