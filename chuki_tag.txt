@@ -643,6 +643,7 @@
 外字画像開始	<span class="gaiji"><img src="
 外字画像終了	"/></span>
 
+##間にpタグが入るのでブロック注記同様divにする
 表題前	<div class="font5">		1
 表題後	</div>		1
 原題前	<div class="font4">		1

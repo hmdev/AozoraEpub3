@@ -2467,7 +2467,7 @@ public class AozoraEpub3Converter
 			//見出し用のID設定
 			if (chapterLineInfo != null) {
 				chapterId = "kobo."+this.lineIdNum+"."+(idIdx++);
-				out.write("<div class=\"ib\" id=\""+chapterId+"\">");
+				out.write("<p id=\""+chapterId+"\">");
 				this.pageByteSize += (chapterId.length() + 19);
 			}
 		} else {
@@ -2488,10 +2488,9 @@ public class AozoraEpub3Converter
 		
 		//改行のpまたは見出しspanを閉じる
 		if (noBr) {
-			if (chapterLineInfo != null) out.write("</div>");
+			if (chapterLineInfo != null) out.write("</p>");
 		} else {
-			out.write("</p>");
-			out.write("\n");
+			out.write("</p>\n");
 		}
 		
 		//タグの階層を変更
