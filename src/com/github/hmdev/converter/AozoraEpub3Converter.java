@@ -1078,29 +1078,29 @@ public class AozoraEpub3Converter
 			if (bookInfo.isIgnoreLine(lineNum)) continue;
 			
 			if (lineNum == bookInfo.titleLine) {
-				out.append(chukiMap.get("表題前")[0]);
+				printLineBuffer(out, new StringBuilder(chukiMap.get("表題前")[0]), -1, true);
 				convertTextLineToEpub3(out, line, lineNum, false);
-				out.append(chukiMap.get("表題後")[0]);
+				printLineBuffer(out, new StringBuilder(chukiMap.get("表題後")[0]), -1, true);
 			} else if (lineNum == bookInfo.orgTitleLine) {
-				out.append(chukiMap.get("原題前")[0]);
+				printLineBuffer(out, new StringBuilder(chukiMap.get("原題前")[0]), -1, true);
 				convertTextLineToEpub3(out, line, lineNum, false);
-				out.append(chukiMap.get("原題後")[0]);
+				printLineBuffer(out, new StringBuilder(chukiMap.get("原題後")[0]), -1, true);
 			} else if (lineNum == bookInfo.subTitleLine) {
-				out.append(chukiMap.get("副題前")[0]);
+				printLineBuffer(out, new StringBuilder(chukiMap.get("副題前")[0]), -1, true);
 				convertTextLineToEpub3(out, line, lineNum, false);
-				out.append(chukiMap.get("副題後")[0]);
+				printLineBuffer(out, new StringBuilder(chukiMap.get("副題後")[0]), -1, true);
 			} else if (lineNum == bookInfo.subOrgTitleLine) {
-				out.append(chukiMap.get("副原題前")[0]);
+				printLineBuffer(out, new StringBuilder(chukiMap.get("副原題前")[0]), -1, true);
 				convertTextLineToEpub3(out, line, lineNum, false);
-				out.append(chukiMap.get("副原題後")[0]);
+				printLineBuffer(out, new StringBuilder(chukiMap.get("副原題後")[0]), -1, true);
 			} else if (lineNum == bookInfo.creatorLine) {
-				out.append(chukiMap.get("著者前")[0]);
+				printLineBuffer(out, new StringBuilder(chukiMap.get("著者前")[0]), -1, true);
 				convertTextLineToEpub3(out, line, lineNum, false);
-				out.append(chukiMap.get("著者後")[0]);
+				printLineBuffer(out, new StringBuilder(chukiMap.get("著者後")[0]), -1, true);
 			} else if (lineNum == bookInfo.subCreatorLine) {
-				out.append(chukiMap.get("副著者前")[0]);
+				printLineBuffer(out, new StringBuilder(chukiMap.get("副著者前")[0]), -1, true);
 				convertTextLineToEpub3(out, line, lineNum, false);
-				out.append(chukiMap.get("副著者後")[0]);
+				printLineBuffer(out, new StringBuilder(chukiMap.get("副著者後")[0]), -1, true);
 			} else {
 				convertTextLineToEpub3(out, line);
 			}
