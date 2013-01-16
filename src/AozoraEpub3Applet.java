@@ -135,7 +135,9 @@ public class AozoraEpub3Applet extends JApplet
 	JComboBox jComboTitle;
 	JCheckBox jCheckUserFileName;
 	JCheckBox jCheckAutoFileName;
-	JCheckBox jCheckMiddleTitle;
+	JCheckBox jCheckTitlePage;
+	JRadioButton jRadioTitleMiddle;
+	JRadioButton jRadioTitleHorizontal;
 	
 	JCheckBox jCheckConfirm;
 	
@@ -249,6 +251,7 @@ public class AozoraEpub3Applet extends JApplet
 	JCheckBox jCheckChapterUseNextLine;
 	JCheckBox jCheckChapterExclude;
 	JCheckBox jCheckCoverPageToc;
+	JCheckBox jCheckTitleToc;
 	JCheckBox jCheckChapterSection;
 	JCheckBox jCheckChapterH;
 	JCheckBox jCheckChapterH1;
@@ -523,8 +526,8 @@ public class AozoraEpub3Applet extends JApplet
 				jPopupPreset.add(menu);
 			}
 		}
-		jButtonPreset = new JButton("端末設定反映", new ImageIcon(AozoraEpub3Applet.class.getResource("images/viewer.png")));
-		jButtonPreset.setToolTipText("端末に合わせた画面サイズと設定を反映します");
+		jButtonPreset = new JButton("端末設定", new ImageIcon(AozoraEpub3Applet.class.getResource("images/viewer.png")));
+		jButtonPreset.setToolTipText("端末に合わせた画面サイズと最低限必要な設定を反映します");
 		jButtonPreset.setBorder(padding3);
 		jButtonPreset.setFocusPainted(false);
 		jButtonPreset.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent arg0) {
@@ -617,10 +620,26 @@ public class AozoraEpub3Applet extends JApplet
 		label = new JLabel("  ");
 		panel.add(label);
 		//左右中央
-		jCheckMiddleTitle = new JCheckBox("表題左右中央", true);
-		jCheckMiddleTitle.setFocusPainted(false);
-		panel.add(jCheckMiddleTitle);
-		label = new JLabel("  ");
+		jCheckTitlePage = new JCheckBox("表題", true);
+		jCheckTitlePage.setFocusPainted(false);
+		jCheckTitlePage.setBorder(padding0);
+		panel.add(jCheckTitlePage);
+		label = new JLabel("(");
+		panel.add(label);
+		buttonGroup = new ButtonGroup();
+		jRadioTitleMiddle = new JRadioButton("縦中央", true);
+		jRadioTitleMiddle.setToolTipText("縦書き左右中央で本文の順番で出力します");
+		jRadioTitleMiddle.setBorder(padding0);
+		jRadioTitleMiddle.setIconTextGap(1);
+		panel.add(jRadioTitleMiddle);
+		buttonGroup.add(jRadioTitleMiddle);
+		jRadioTitleHorizontal = new JRadioButton("横書き");
+		jRadioTitleHorizontal.setToolTipText("横書きテンプレートの表示を出力します");
+		jRadioTitleHorizontal.setBorder(padding0);
+		jRadioTitleHorizontal.setIconTextGap(1);
+		panel.add(jRadioTitleHorizontal);
+		buttonGroup.add(jRadioTitleHorizontal);
+		label = new JLabel(")  ");
 		panel.add(label);
 		jCheckTocPage = new JCheckBox("目次");
 		jCheckTocPage.setFocusPainted(false);
@@ -1480,13 +1499,20 @@ public class AozoraEpub3Applet extends JApplet
 		panel.add(label);
 		
 		//表紙
-		jCheckCoverPageToc = new JCheckBox("表紙  ");
-		jCheckCoverPageToc.setToolTipText("表紙画像のページを目次を追加します");
+		jCheckCoverPageToc = new JCheckBox("表紙 ");
+		jCheckCoverPageToc.setToolTipText("表紙画像のページを目次に追加します");
 		jCheckCoverPageToc.setFocusPainted(false);
 		jCheckCoverPageToc.setBorder(padding2);
 		panel.add(jCheckCoverPageToc);
 		
-		jCheckChapterUseNextLine = new JCheckBox("次の行を繋げる  ");
+		//表紙
+		jCheckTitleToc = new JCheckBox("表題 ", true);
+		jCheckTitleToc.setToolTipText("表題の行を目次に追加します");
+		jCheckTitleToc.setFocusPainted(false);
+		jCheckTitleToc.setBorder(padding2);
+		panel.add(jCheckTitleToc);
+		
+		jCheckChapterUseNextLine = new JCheckBox("次の行を繋げる ");
 		jCheckChapterUseNextLine.setToolTipText("次の行が空行でなければ見出しの後ろに繋げます");
 		jCheckChapterUseNextLine.setFocusPainted(false);
 		jCheckChapterUseNextLine.setBorder(padding2);
@@ -2371,8 +2397,6 @@ public class AozoraEpub3Applet extends JApplet
 			this.aozoraConverter.setAutoYoko(this.jCheckAutoYoko.isSelected(), this.jCheckAutoYokoNum1.isSelected(), this.jCheckAutoYokoNum3.isSelected(), this.jCheckAutoEQ1.isSelected());
 			//4バイト文字出力
 			this.aozoraConverter.setGaiji32(this.jCheckGaiji32.isSelected());
-			//表題左右中央
-			this.aozoraConverter.setMiddleTitle(this.jCheckMiddleTitle.isSelected());
 			//全角スペースの禁則
 			this.aozoraConverter.setSpaceHyphenation(this.jRadioSpaceHyp0.isSelected()?0:(this.jRadioSpaceHyp1.isSelected()?1:2));
 			//注記のルビ表示
@@ -2414,7 +2438,8 @@ public class AozoraEpub3Applet extends JApplet
 			//目次設定
 			int maxLength = 64;
 			try { maxLength = Integer.parseInt((jTextMaxChapterNameLength.getText())); } catch (Exception e) {}
-			this.aozoraConverter.setChapterLevel(maxLength, jCheckChapterExclude.isSelected(), jCheckChapterUseNextLine.isSelected(), jCheckChapterSection.isSelected(),
+			
+			this.aozoraConverter.setChapterLevel(maxLength, jCheckTitleToc.isSelected(), jCheckChapterExclude.isSelected(), jCheckChapterUseNextLine.isSelected(), jCheckChapterSection.isSelected(),
 					jCheckChapterH.isSelected(), jCheckChapterH1.isSelected(), jCheckChapterH2.isSelected(), jCheckChapterH3.isSelected(),
 					jCheckChapterName.isSelected(),
 					jCheckChapterNumOnly.isSelected(), jCheckChapterNumTitle.isSelected(), jCheckChapterNumParen.isSelected(), jCheckChapterNumParenTitle.isSelected(),
@@ -2602,6 +2627,17 @@ public class AozoraEpub3Applet extends JApplet
 		bookInfo.setTocVertical(this.jRadioTocV.isSelected());
 		//縦書き横書き設定追加
 		bookInfo.vertical = this.jRadioVertical.isSelected();
+		this.aozoraConverter.vertical = bookInfo.vertical;
+		
+		//表紙設定
+		//表題左右中央
+		if (!this.jCheckTitlePage.isSelected()) {
+			bookInfo.titlePageType = BookInfo.TITLE_NORMAL;
+		} else if (this.jRadioTitleMiddle.isSelected()) {
+			bookInfo.titlePageType = BookInfo.TITLE_MIDDLE;
+		} else if (this.jRadioTitleHorizontal.isSelected()) {
+			bookInfo.titlePageType = BookInfo.TITLE_HORIZONTAL;
+		}
 		
 		//表紙ページの情報をbookInfoに設定
 		bookInfo.coverFileName = coverFileName;
@@ -3106,8 +3142,14 @@ public class AozoraEpub3Applet extends JApplet
 		setPropsSelected(jCheckCoverHistory, props, "CoverHistory");
 		
 		setPropsSelected(jCheckCoverPage, props, "CoverPage");
-		//左右中央
-		setPropsSelected(jCheckMiddleTitle, props, "MiddleTitle");
+		//表題ページ
+		String propValue = props.getProperty("TitlePage");
+		if (propValue != null) {
+			jCheckTitlePage.setSelected(!"0".equals(propValue));
+			jRadioTitleMiddle.setSelected(Integer.toString(BookInfo.TITLE_MIDDLE).equals(propValue));
+			jRadioTitleHorizontal.setSelected(Integer.toString(BookInfo.TITLE_HORIZONTAL).equals(propValue));
+		}
+		
 		setPropsSelected(jCheckTocPage, props, "TocPage");
 		selected = setPropsSelected(jRadioTocV, props, "TocVertical");
 		jRadioTocH.setSelected(!selected);
@@ -3172,7 +3214,7 @@ public class AozoraEpub3Applet extends JApplet
 		
 		////////////////////////////////////////////////////////////////
 		//詳細設定
-		String propValue = props.getProperty("SpaceHyphenation");
+		propValue = props.getProperty("SpaceHyphenation");
 		if (propValue != null) {
 			jRadioSpaceHyp1.setSelected("1".equals(propValue));
 			jRadioSpaceHyp2.setSelected("2".equals(propValue));
@@ -3219,6 +3261,7 @@ public class AozoraEpub3Applet extends JApplet
 		setIntText(jTextMaxChapterNameLength, props, "MaxChapterNameLength");
 		//表紙
 		setPropsSelected(jCheckCoverPageToc, props, "CoverPageToc");
+		setPropsSelected(jCheckTitleToc, props, "TitleToc");
 		setPropsSelected(jCheckChapterUseNextLine, props, "ChapterUseNextLine");
 		setPropsSelected(jCheckChapterExclude, props, "ChapterExclude");
 		//改ページ後を目次に追加
@@ -3259,7 +3302,7 @@ public class AozoraEpub3Applet extends JApplet
 		props.setProperty("CoverHistory", this.jCheckCoverHistory.isSelected()?"1":"");
 		//ページ出力
 		props.setProperty("CoverPage", this.jCheckCoverPage.isSelected()?"1":"");
-		props.setProperty("MiddleTitle", this.jCheckMiddleTitle.isSelected()?"1":"");
+		props.setProperty("TitlePage", this.jCheckTitlePage.isSelected()?(this.jRadioTitleMiddle.isSelected()?""+BookInfo.TITLE_MIDDLE:""+BookInfo.TITLE_HORIZONTAL):"");
 		props.setProperty("TocPage", this.jCheckTocPage.isSelected()?"1":"");
 		props.setProperty("TocVertical", this.jRadioTocV.isSelected()?"1":"");
 		//挿絵非表示
@@ -3330,6 +3373,7 @@ public class AozoraEpub3Applet extends JApplet
 		//目次出力
 		props.setProperty("MaxChapterNameLength", this.jTextMaxChapterNameLength.getText());
 		props.setProperty("CoverPageToc", this.jCheckCoverPageToc.isSelected()?"1":"");
+		props.setProperty("TitleToc", this.jCheckTitleToc.isSelected()?"1":"");
 		props.setProperty("ChapterUseNextLine", this.jCheckChapterUseNextLine.isSelected()?"1":"");
 		props.setProperty("ChapterExclude", this.jCheckChapterExclude.isSelected()?"1":"");
 		props.setProperty("ChapterSection", this.jCheckChapterSection.isSelected()?"1":"");

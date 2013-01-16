@@ -39,6 +39,10 @@ public class AozoraEpub3Converter
 	boolean autoYokoEQ1 = true;
 	/** !か?の3文字連続を自動縦中横 */
 	boolean autoYokoEQ3 = true;
+	/** 英字2文字縦中横 */
+	boolean autoAlpha2 = false;
+	/** 英数字2文字縦中横 */
+	boolean autoAlphaNum2 = false;
 	
 	/** ～の注記をルビで表示 */
 	boolean chukiRuby = false;
@@ -61,10 +65,6 @@ public class AozoraEpub3Converter
 	
 	/** 4バイト文字を表示 */
 	boolean gaiji32 = false;
-	
-	/** 先頭ページを左右中央 コメント行前の8行まで
-	 * コメント行がない場合と9行以上の場合は無効になる */
-	boolean middleTitle = false;
 	
 	/** 奥付を別ページ */
 	boolean separateColophon = true;
@@ -99,6 +99,9 @@ public class AozoraEpub3Converter
 	
 	/** 強制改行対象の空行後のパターン */
 	//Pattern forcePageBreakPattern = null;
+	
+	/** 表題を目次から除外しない */
+	boolean insertTitleToc = true;
 	
 	//---------------- Chapter Properties ----------------//
 	boolean autoChapterName = false;
@@ -219,7 +222,10 @@ public class AozoraEpub3Converter
 	////////////////////////////////
 	// 変換前に初期化すること
 	/** BookInfo */
-	public BookInfo bookInfo;
+	BookInfo bookInfo;
+	/** 縦書き用変換 bookInfo.verticalと同じ */
+	public boolean vertical;
+	
 	/** 現在処理中の行番号 */
 	public int lineNum;
 	
@@ -405,12 +411,6 @@ public class AozoraEpub3Converter
 	{
 		this.gaiji32 = gaiji32;
 	}
-	/** 先頭ページを左右中央 コメント行前の8行まで
-	 * コメント行がない場合と9行以上の場合は無効になる */
-	public void setMiddleTitle(boolean middleFirst)
-	{
-		this.middleTitle = middleFirst;
-	}
 	
 	/** コメント行内出力設定 */
 	public void setCommentPrint(boolean commentPrint, boolean commentConvert)
@@ -436,11 +436,13 @@ public class AozoraEpub3Converter
 	}
 	
 	/** 目次抽出 */
-	public void setChapterLevel(int maxLength, boolean excludeSeqencialChapter, boolean useNextLineChapterName, boolean section, boolean h, boolean h1, boolean h2, boolean h3,
+	public void setChapterLevel(int maxLength, boolean insertTitleToc, boolean excludeSeqencialChapter, boolean useNextLineChapterName, boolean section, boolean h, boolean h1, boolean h2, boolean h3,
 			boolean chapterName, boolean autoChapterNumOnly, boolean autoChapterNumTitle, boolean autoChapterNumParen, boolean autoChapterNumParenTitle,
 			String chapterPattern)
 	{
 		this.maxChapterNameLength = maxLength;
+		
+		this.insertTitleToc = insertTitleToc;
 		
 		this.chapterSection = section;
 		//見出し
@@ -459,8 +461,8 @@ public class AozoraEpub3Converter
 			chapterChukiMap.put("中見出し", ChapterLineInfo.TYPE_CHUKI_H2);
 		}
 		if (h3) {
-			chapterChukiMap.put("ここから小見出し", ChapterLineInfo.TYPE_CHUKI_H2);
-			chapterChukiMap.put("小見出し", ChapterLineInfo.TYPE_CHUKI_H2);
+			chapterChukiMap.put("ここから小見出し", ChapterLineInfo.TYPE_CHUKI_H3);
+			chapterChukiMap.put("小見出し", ChapterLineInfo.TYPE_CHUKI_H3);
 		}
 		
 		this.useNextLineChapterName = useNextLineChapterName;
@@ -568,7 +570,7 @@ public class AozoraEpub3Converter
 			//見出し等の取得のため前方参照注記は変換 外字文字は置換
 			line = this.replaceChukiSufTag(this.convertGaijiChuki(line, true, false));
 			//注記と画像のチェックなのでルビ除去 エスケープ文字は残す
-			line = removeRuby(line);
+			line = CharUtils.removeRuby(line);
 			
 			//コメント除外 50文字以上をコメントにする
 			if (line.startsWith("--------------------------------")) {
@@ -676,7 +678,7 @@ public class AozoraEpub3Converter
 			//TODO パターンと目次レベルは設定可能にする 空行指定の場合はpreLines利用
 			if (autoChapter && bookInfo.getChapterLevel(lineNum) == 0) {
 				//文字列から注記と前の空白を除去
-				String noChukiLine = this.removeTag(line);
+				String noChukiLine = CharUtils.removeSpace(CharUtils.removeTag(CharUtils.removeRuby(line)));
 				
 				//その他パターン
 				if (this.chapterPattern != null) {
@@ -797,7 +799,7 @@ public class AozoraEpub3Converter
 			
 			//コメント行の後はタイトル取得はしない
 			if (!firstCommentStarted) {
-				String replaced = this.getChapterName(line);
+				String replaced = this.getChapterName(line, 0);
 				if (firstLineStart == -1) {
 					//改ページチェック
 					//タイトル前の改ページ位置を保存
@@ -847,22 +849,12 @@ public class AozoraEpub3Converter
 		}
 		
 		//見出しに追加されたタイトル行は削除
-		//if (bookInfo.titleLine > 0) {
-		//	bookInfo.removeChapterLineInfo(bookInfo.titleLine);
-		//}
+		if (!this.insertTitleToc && bookInfo.titleLine >= 0) {
+			bookInfo.removeChapterLineInfo(bookInfo.titleLine);
+		}
 		if (bookInfo.orgTitleLine > 0) bookInfo.removeChapterLineInfo(bookInfo.orgTitleLine);
 		if (bookInfo.subTitleLine > 0) bookInfo.removeChapterLineInfo(bookInfo.subTitleLine);
 		if (bookInfo.subOrgTitleLine > 0) bookInfo.removeChapterLineInfo(bookInfo.subOrgTitleLine);
-		
-		//左右中央指定で先頭がタイトルなら左右中央に設定
-		if (this.middleTitle) {
-			if (bookInfo.preTitlePageBreak > -1 && firstLineStart > -1) {
-				//表題の後に改ページを設定
-				bookInfo.addPageBreakLine(bookInfo.titleEndLine+1);
-				//左右中央のタイトルページを目次より前に出す 出力前にsectionInfosからは削除しておく
-				bookInfo.insertTitlePage = true;
-			}
-		}
 		
 		//目次ページの見出しを除外
 		//前後2行前と2行後に3つ以上に抽出した見出しがある場合連続する見出しを除去
@@ -876,19 +868,14 @@ public class AozoraEpub3Converter
 		}
 	}
 	
-	/** タグとルビを除外 */
-	private String removeTag(String text)
-	{
-		return removeRuby(text.replaceAll("［＃.+?］", "").replaceFirst("^[ |　|―|─]+", "").replaceAll("<[^>]+>", ""));
-	}
-	/** ルビを除去 特殊文字はエスケープされている */
-	private String removeRuby(String text)
-	{
-		return text.replaceAll("([^※])《.*?[^※]》", "$1").replaceFirst("^｜", "").replaceAll("([^※])｜", "$1");
-	}
-	
 	/** 目次やタイトル用の文字列を取得 ルビ関連の文字 ｜《》 は除外済で他の特殊文字は'※'エスケープ */
 	private String getChapterName(String line)
+	{
+		return getChapterName(line, this.maxChapterNameLength);
+	}
+	/** 目次やタイトル用の文字列を取得 ルビ関連の文字 ｜《》 は除外済で他の特殊文字は'※'エスケープ
+	 * @param maxLength 文字制限 これより大きい文字は短くして...をつける */
+	private String getChapterName(String line, int maxLength)
 	{
 		String name = line.replaceAll("［＃.+?］", "").replaceAll("<[^>]+>", "")//注記とタグ除去
 				.replaceAll("※(《|》|［|］|〔|〕|〔|〕|〔|〕|｜)", "$1") //エスケープ文字から※除外
@@ -899,7 +886,8 @@ public class AozoraEpub3Converter
 				//printLineBuffer内だと以下の変換が必要
 				/*.replaceAll("<span class=\"fullsp\"> </span>", "　").replaceAll(String.valueOf((char)(0x2000))+(char)(0x2000), "　")
 				.replaceAll("<rt>[^<]+</rt>", "")*/
-		return name.length()>maxChapterNameLength ? name.substring(0, maxChapterNameLength)+"..." : name;
+		if (maxLength == 0) return name;
+		return name.length()>maxLength ? name.substring(0, maxLength)+"..." : name;
 	}
 	
 	/** 文字が章の数字ならtrue */
@@ -1001,7 +989,7 @@ public class AozoraEpub3Converter
 	public void convertTextToEpub3(BufferedWriter out, BufferedReader src, BookInfo bookInfo) throws Exception
 	{
 		try {
-			
+		
 		this.canceled = false;
 		
 		//BookInfoの参照を保持
@@ -1020,6 +1008,16 @@ public class AozoraEpub3Converter
 		this.setPageBreakTrigger(pageBreakNormal);
 		////////////////////////////////
 		
+		//左右中央指定で先頭がタイトルなら左右中央に設定
+		if (this.bookInfo.titlePageType == BookInfo.TITLE_MIDDLE || this.bookInfo.titlePageType == BookInfo.TITLE_HORIZONTAL) {
+			if (bookInfo.preTitlePageBreak > -1 && bookInfo.titleLine > -1) {
+				//表題の後に改ページを設定
+				bookInfo.addPageBreakLine(bookInfo.titleEndLine+1);
+				bookInfo.insertTitlePage = true;
+			}
+		}
+		
+		
 		//コメントブロック内
 		boolean inComment = false;
 		
@@ -1028,10 +1026,10 @@ public class AozoraEpub3Converter
 			this.pageByteSize++;
 			
 			//強制改ページ行なら先頭で改ページ 空のページなら出力しない
-			//この行が改ページ注記だと差うう中央が上書きされるので、改ページ注記処理でも左右中央を設定
-			if (this.middleTitle && bookInfo.preTitlePageBreak == lineNum) {
+			//この行が改ページ注記だと左右中央が上書きされるので、改ページ注記処理でも左右中央を設定
+			if ((this.bookInfo.titlePageType == BookInfo.TITLE_MIDDLE || this.bookInfo.titlePageType == BookInfo.TITLE_HORIZONTAL) && bookInfo.preTitlePageBreak == lineNum) {
 				//タグの中ならずらす
-				if (this.tagLevel == 0) this.setPageBreakTrigger(pageBreakMiddle);
+				if (this.tagLevel == 0) this.setPageBreakTrigger(this.bookInfo.titlePageType == BookInfo.TITLE_HORIZONTAL? pageBreakNormal : pageBreakMiddle);
 				else bookInfo.preTitlePageBreak++;
 			}
 			else if (bookInfo.isPageBreakLine(lineNum) && sectionCharLength > 0) {
@@ -1350,7 +1348,7 @@ public class AozoraEpub3Converter
 			}
 			
 			//置換済みの文字列で注記追加位置を探す
-			int targetStart = this.getTargetStart(buf, chukiTagStart, chOffset, removeRuby(target).length());
+			int targetStart = this.getTargetStart(buf, chukiTagStart, chOffset, CharUtils.removeRuby(target).length());
 			
 			//後ろタグ置換
 			buf.delete(chukiTagStart+chOffset, chukiTagEnd+chOffset);
@@ -1545,7 +1543,9 @@ public class AozoraEpub3Converter
 					if (ch.length > charStart+chukiTag.length()) noBr = false;
 					
 					//改ページフラグ設定
-					if (chukiFlagMiddle.contains(chukiName)) {
+					if (bookInfo.preTitlePageBreak == lineNum && this.pageBreakTrigger != null) {
+						//タイトル行の前の改ページが設定済ならそのまま
+					} else if (chukiFlagMiddle.contains(chukiName)) {
 						//左右中央
 						this.setPageBreakTrigger(pageBreakMiddle);
 					} else if (chukiFlagBottom.contains(chukiName)) {
@@ -1856,10 +1856,11 @@ public class AozoraEpub3Converter
 			buf.append(chukiMap.get("画像開始下横")[0]);
 			buf.append(fileName);
 			buf.append(chukiMap.get("画像終了")[0]);
-		} else if (imagePageType != PageBreakTrigger.IMAGE_PAGE_NONE) {
+			
+		} else if (tagLevel == 0 && imagePageType != PageBreakTrigger.IMAGE_PAGE_NONE) {
+			//単一ページ出力 タグの外のみ
 			//改ページの前に文字があれば出力
 			if (buf.length() > 0) this.printLineBuffer(out, buf, lineNum, true);
-			//単一ページ出力
 			buf.append(chukiMap.get("画像開始")[0]);
 			buf.append(fileName);
 			buf.append(chukiMap.get("画像終了")[0]);
@@ -1871,8 +1872,15 @@ public class AozoraEpub3Converter
 		}
 	}
 	
-	/** 出力バッファに<>&をエスケープした状態で出力 */
-	public void convertEscapedText(StringBuilder buf, char[] ch, int begin, int end) throws IOException
+	/** <>&のエスケープと特殊文字の※を除去した文字を出力 */
+	public String convertEscapedText(String text) throws IOException
+	{
+		StringBuilder buf = new StringBuilder();
+		convertEscapedText(buf, text.toCharArray(), 0, text.length());
+		return buf.toString();
+	}
+	/** <>&のエスケープと特殊文字の※を除去した文字列を出力バッファに出力 */
+	private void convertEscapedText(StringBuilder buf, char[] ch, int begin, int end) throws IOException
 	{
 		//事前に《》の代替文字をエスケープ済※《 ※》 に変換
 		//全角ひらがな漢字スペースの存在もついでにチェック
@@ -2180,6 +2188,11 @@ public class AozoraEpub3Converter
 				break;
 			}
 			
+			//英字縦中横
+			if (autoAlpha2 ) {
+				
+			}
+			
 			//自動縦中横で出力していたらcontinueしていてここは実行されない
 			convertTcyChar(buf, ch, i, noTcy);
 		}
@@ -2240,7 +2253,7 @@ public class AozoraEpub3Converter
 			}
 		}
 		
-		if (this.bookInfo.vertical) {
+		if (this.vertical) {
 			switch (ch[idx]) {
 			case '≪': buf.append("《"); break;
 			case '≫': buf.append("》"); break;
@@ -2319,8 +2332,8 @@ public class AozoraEpub3Converter
 		}
 		printLineBuffer(out, buf, lineNum, true);
 		
-		//タイトルより前なら別処理
-		if (this.lineNum < this.bookInfo.titleLine && this.middleTitle)
+		//タイトルより前の改ページ
+		if (this.lineNum == this.bookInfo.preTitlePageBreak && this.bookInfo.titlePageType == BookInfo.TITLE_MIDDLE)
 			this.setPageBreakTrigger(pageBreakMiddle);
 		else if (hasPageBreakTriger) this.setPageBreakTrigger(pageBreakNormal);
 		else this.setPageBreakTrigger(pageBreakNoChapter);

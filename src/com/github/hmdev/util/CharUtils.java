@@ -151,6 +151,23 @@ public class CharUtils
 		return str.replaceAll("(\\?|\\&)", "/").replaceAll("(:|\\*|\\||\\<|\\>|\"|\\\\)", "_");
 	}
 	
+	/** 前後の空白を除外 */
+	static public String removeSpace(String text)
+	{
+		return text.replaceFirst("^[ |　]+", "").replaceFirst("[ |　]+$", "");
+	}
+	/** タグを除外 */
+	static public String removeTag(String text)
+	{
+		return text.replaceAll("［＃.+?］", "").replaceAll("<[^>]+>", "");
+	}
+	
+	/** ルビを除去 特殊文字はエスケープされている */
+	static public String removeRuby(String text)
+	{
+		return text.replaceAll("([^※])《.*?[^※]》", "$1").replaceFirst("^｜", "").replaceAll("([^※])｜", "$1");
+	}
+	
 	/** Test用 */
 	/*public static void main(String[] args)
 	{

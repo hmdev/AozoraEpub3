@@ -652,7 +652,7 @@
 副題後	</div>		1
 副原題前	<div class="pt2 font2">		1
 副原題後	</div>		1
-著者前	<div class="btm pb1 font1">		1
+著者前	<div class="btm pb2 font1">		1
 著者後	</div>		1
-副著者前	<div class="btm pb1 font1">		1
+副著者前	<div class="btm pb2 font1">		1
 副著者後	</div>		1

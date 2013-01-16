@@ -52,7 +52,7 @@ public class JProfileDialog extends JDialog
 		
 		JPanel outer = new JPanel();
 		outer.setLayout(new BoxLayout(outer, BoxLayout.Y_AXIS));
-		outer.setBorder(BorderFactory.createEmptyBorder(6, 6, 0, 6));
+		outer.setBorder(BorderFactory.createEmptyBorder(3, 6, 0, 6));
 		this.add(outer);
 		
 		panel = new JPanel();
@@ -145,7 +145,7 @@ public class JProfileDialog extends JDialog
 		this.jButtonDelete.setVisible(false);
 		
 		this.jTextProfileName.setText(name);
-		this.setLocation(location.x, location.y);
+		this.setLocation(location.x+16, location.y+8);
 		this.setVisible(true);
 	}
 	
@@ -158,7 +158,7 @@ public class JProfileDialog extends JDialog
 		
 		this.orgName = name;
 		this.jTextProfileName.setText(name);
-		this.setLocation(location.x+32, location.y+16);
+		this.setLocation(location.x+48, location.y+8);
 		this.setVisible(true);
 	}
 	

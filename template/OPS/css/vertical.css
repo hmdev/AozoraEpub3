@@ -292,34 +292,36 @@ div.pt29 { margin-top: 29em; }
 div.pt30 { margin-top: 30em; }
 
 /* 字上げ */
-div.pb1, div.pb1 p { margin-bottom: 1em; }
-div.pb2, div.pb2 p { margin-bottom: 2em; }
-div.pb3, div.pb3 p { margin-bottom: 3em; }
-div.pb4, div.pb4 p { margin-bottom: 4em; }
-div.pb5, div.pb5 p { margin-bottom: 5em; }
-div.pb6, div.pb6 p { margin-bottom: 6em; }
-div.pb7, div.pb7 p { margin-bottom: 7em; }
-div.pb8, div.pb8 p { margin-bottom: 8em; }
-div.pb9, div.pb9 p { margin-bottom: 9em; }
-div.pb10, div.pb10 p { margin-bottom: 10em; }
-div.pb11, div.pb11 p { margin-bottom: 11em; }
-div.pb12, div.pb12 p { margin-bottom: 12em; }
-div.pb13, div.pb13 p { margin-bottom: 13em; }
-div.pb14, div.pb14 p { margin-bottom: 14em; }
-div.pb15, div.pb15 p { margin-bottom: 15em; }
-div.pb16, div.pb16 p { margin-bottom: 16em; }
-div.pb17, div.pb17 p { margin-bottom: 17em; }
-div.pb18, div.pb18 p { margin-bottom: 18em; }
-div.pb19, div.pb19 p { margin-bottom: 19em; }
-div.pb20, div.pb20 p { margin-bottom: 20em; }
-div.pb21, div.pb21 p { margin-bottom: 21em; }
-div.pb22, div.pb22 p { margin-bottom: 22em; }
-div.pb23, div.pb23 p { margin-bottom: 23em; }
-div.pb24, div.pb24 p { margin-bottom: 24em; }
-div.pb25, div.pb25 p { margin-bottom: 25em; }
+div.pb1 { margin-bottom: 1em; }
+div.pb2 { margin-bottom: 2em; }
+div.pb3 { margin-bottom: 3em; }
+div.pb4 { margin-bottom: 4em; }
+div.pb5 { margin-bottom: 5em; }
+div.pb6 { margin-bottom: 6em; }
+div.pb7 { margin-bottom: 7em; }
+div.pb8 { margin-bottom: 8em; }
+div.pb9 { margin-bottom: 9em; }
+div.pb10 { margin-bottom: 10em; }
+div.pb11 { margin-bottom: 11em; }
+div.pb12 { margin-bottom: 12em; }
+div.pb13 { margin-bottom: 13em; }
+div.pb14 { margin-bottom: 14em; }
+div.pb15 { margin-bottom: 15em; }
+div.pb16 { margin-bottom: 16em; }
+div.pb17 { margin-bottom: 17em; }
+div.pb18 { margin-bottom: 18em; }
+div.pb19 { margin-bottom: 19em; }
+div.pb20 { margin-bottom: 20em; }
+div.pb21 { margin-bottom: 21em; }
+div.pb22 { margin-bottom: 22em; }
+div.pb23 { margin-bottom: 23em; }
+div.pb24 { margin-bottom: 24em; }
+div.pb25 { margin-bottom: 25em; }
 
 /* 地付き */
 div.btm, div.btm p { text-align: right; }
+/* 地付きで字詰め */
+div.btm .jzm { text-align: right;  display: inline-block; }
 
 /* 行内地付き */
 span.btm.fr {

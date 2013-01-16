@@ -25,7 +25,7 @@ import com.github.hmdev.writer.Epub3Writer;
 /** コマンドライン実行用mainとePub3変換関数 */
 public class AozoraEpub3
 {
-	public static final String VERSION = "1.1.0b18";
+	public static final String VERSION = "1.1.0b19";
 	
 	/** コマンドライン実行用 */
 	public static void main(String args[])
@@ -190,6 +190,7 @@ public class AozoraEpub3
 				} catch (Exception e) {}
 			}
 			int maxLength = 64; try { maxLength = Integer.parseInt((props.getProperty("ChapterNameLength"))); } catch (Exception e) {}
+			boolean insertTitleToc = "1".equals(props.getProperty("TitleToc"));
 			boolean chapterExclude = "1".equals(props.getProperty("ChapterExclude"));
 			boolean chapterUseNextLine = "1".equals(props.getProperty("ChapterUseNextLine"));
 			boolean chapterSection = !props.containsKey("ChapterSection")||"1".equals(props.getProperty("ChapterSection"));
@@ -234,8 +235,6 @@ public class AozoraEpub3
 			aozoraConverter.setAutoYoko(autoYoko, autoYokoNum1, autoYokoNum3, autoYokoEQ1);
 			//4バイト文字出力
 			aozoraConverter.setGaiji32(gaiji32);
-			//表題左右中央
-			aozoraConverter.setMiddleTitle(middleTitle);
 			//全角スペースの禁則
 			aozoraConverter.setSpaceHyphenation(spaceHyp);
 			//コメント
@@ -246,7 +245,7 @@ public class AozoraEpub3
 			//強制改ページ
 			aozoraConverter.setForcePageBreak(forcePageBreakSize, forcePageBreakEmpty, forcePageBreakEmptySize, forcePageBreakChapter, forcePageBreakChapterSize);
 			//目次設定
-			aozoraConverter.setChapterLevel(maxLength, chapterExclude, chapterUseNextLine, chapterSection,
+			aozoraConverter.setChapterLevel(maxLength, insertTitleToc, chapterExclude, chapterUseNextLine, chapterSection,
 					chapterH, chapterH1, chapterH2, chapterH3,
 					chapterName,
 					chapterNumOnly, chapterNumTitle, chapterNumParen, chapterNumParenTitle,
@@ -298,6 +297,9 @@ public class AozoraEpub3
 						bookInfo.vertical = vertical;
 						bookInfo.insertTocPage = tocPage;
 						bookInfo.setTocVertical(tocVertical);
+						aozoraConverter.vertical = vertical;
+						//表題ページ
+						if (middleTitle) bookInfo.titlePageType = BookInfo.TITLE_MIDDLE;
 					}
 					
 					Epub3Writer writer = epub3Writer;

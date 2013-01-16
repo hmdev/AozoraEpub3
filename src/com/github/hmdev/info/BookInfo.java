@@ -48,6 +48,20 @@ public class BookInfo
 		}
 	}
 	
+	/** 表題は出力しない  */
+	public final static int TITLE_NONE = -1;
+	/** 表題は別ページにせずそのまま出力  */
+	public final static int TITLE_NORMAL = 0;
+	/** 表題ページを左右中央 コメント行前の8行まで
+	 * コメント行がない場合と9行以上の場合は無効になる */
+	public final static int TITLE_MIDDLE = 1;
+	/** 表題ページ横書き */
+	public final static int TITLE_HORIZONTAL = 2;
+	
+	/** 表題種別 */
+	public int titlePageType = 0;
+	
+	
 	/** タイトル等の行 */
 	String[] metaLines;
 	/** タイトル等の開始行番号 */
@@ -81,6 +95,7 @@ public class BookInfo
 	/** タイトル行の最後 */
 	public int titleEndLine = -1;
 	
+	/** コメント先頭行 */
 	int firstCommentLineNum = -1;
 	
 	/** 発刊日時 */
@@ -442,6 +457,56 @@ public class BookInfo
 	public void setImageOnly(boolean imageOnly)
 	{
 		this.imageOnly = imageOnly;
+	}
+	
+	////////////////////////////////////////////////////////////////
+	public String getTitleText()
+	{
+		if (this.titleLine == -1) return null;
+		try {
+			return metaLines[this.titleLine-this.metaLineStart];
+		} catch (Exception e) {}
+		return null;
+	}
+	public String getSubTitleText()
+	{
+		if (this.subTitleLine == -1) return null;
+		try {
+			return metaLines[this.subTitleLine-this.metaLineStart];
+		} catch (Exception e) {}
+		return null;
+	}
+	public String getOrgTitleText()
+	{
+		if (this.orgTitleLine == -1) return null;
+		try {
+			return metaLines[this.orgTitleLine-this.metaLineStart];
+		} catch (Exception e) {}
+		return null;
+	}
+	public String getSubOrgTitleText()
+	{
+		if (this.subOrgTitleLine == -1) return null;
+		try {
+			return metaLines[this.subOrgTitleLine-this.metaLineStart];
+		} catch (Exception e) {}
+		return null;
+	}
+	public String getCreatorText()
+	{
+		if (this.creatorLine == -1) return null;
+		try {
+			return metaLines[this.creatorLine-this.metaLineStart];
+		} catch (Exception e) {}
+		return null;
+	}
+	public String getSubCreatorText()
+	{
+		if (this.subCreatorLine == -1) return null;
+		try {
+			return metaLines[this.subCreatorLine-this.metaLineStart];
+		} catch (Exception e) {}
+		return null;
 	}
 	
 	////////////////////////////////////////////////////////////////

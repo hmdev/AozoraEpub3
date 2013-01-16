@@ -51,7 +51,7 @@
 		<item id="cover-page" href="xhtml/cover.xhtml" media-type="application/xhtml+xml"/>
 #end
 #if (${bookInfo.InsertTitlePage})
-		<item id="sec0001" href="xhtml/0001.xhtml" media-type="application/xhtml+xml"/>
+		<item id="${title_page_id}" href="xhtml/${title_page_id}.xhtml" media-type="application/xhtml+xml"/>
 #end
 #foreach(${sectionInfo} in ${sections})
 		<item id="sec${sectionInfo.SectionId}" href="xhtml/${sectionInfo.SectionId}.xhtml" media-type="application/xhtml+xml"/>
@@ -74,7 +74,7 @@
 		<itemref idref="cover-page" linear="yes"/>
 #end
 #if (${bookInfo.InsertTitlePage})
-		<itemref idref="sec0001" linear="yes"/>
+		<itemref idref="${title_page_id}" linear="yes"/>
 #end
 #if (${bookInfo.InsertTocPage})
 		<itemref idref="nav" linear="yes"/>

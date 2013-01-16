@@ -246,34 +246,36 @@ div.pt24 { margin-left: 24em; }
 div.pt25 { margin-left: 25em; }
 
 /* 字上げ */
-div.pb1, div.pb1 p { margin-right: 1em; }
-div.pb2, div.pb2 p { margin-right: 2em; }
-div.pb3, div.pb3 p { margin-right: 3em; }
-div.pb4, div.pb4 p { margin-right: 4em; }
-div.pb5, div.pb5 p { margin-right: 5em; }
-div.pb6, div.pb6 p { margin-right: 6em; }
-div.pb7, div.pb7 p { margin-right: 7em; }
-div.pb8, div.pb8 p { margin-right: 8em; }
-div.pb9, div.pb9 p { margin-right: 9em; }
-div.pb10, div.pb10 p { margin-right: 10em; }
-div.pb11, div.pb11 p { margin-right: 11em; }
-div.pb12, div.pb12 p { margin-right: 12em; }
-div.pb13, div.pb13 p { margin-right: 13em; }
-div.pb14, div.pb14 p { margin-right: 14em; }
-div.pb15, div.pb15 p { margin-right: 15em; }
-div.pb16, div.pb16 p { margin-right: 16em; }
-div.pb17, div.pb17 p { margin-right: 17em; }
-div.pb18, div.pb18 p { margin-right: 18em; }
-div.pb19, div.pb19 p { margin-right: 19em; }
-div.pb20, div.pb20 p { margin-right: 20em; }
-div.pb21, div.pb21 p { margin-right: 21em; }
-div.pb22, div.pb22 p { margin-right: 22em; }
-div.pb23, div.pb23 p { margin-right: 23em; }
-div.pb24, div.pb24 p { margin-right: 24em; }
-div.pb25, div.pb25 p { margin-right: 25em; }
+div.pb1 { margin-right: 1em; }
+div.pb2 { margin-right: 2em; }
+div.pb3 { margin-right: 3em; }
+div.pb4 { margin-right: 4em; }
+div.pb5 { margin-right: 5em; }
+div.pb6 { margin-right: 6em; }
+div.pb7 { margin-right: 7em; }
+div.pb8 { margin-right: 8em; }
+div.pb9 { margin-right: 9em; }
+div.pb10 { margin-right: 10em; }
+div.pb11 { margin-right: 11em; }
+div.pb12 { margin-right: 12em; }
+div.pb13 { margin-right: 13em; }
+div.pb14 { margin-right: 14em; }
+div.pb15 { margin-right: 15em; }
+div.pb16 { margin-right: 16em; }
+div.pb17 { margin-right: 17em; }
+div.pb18 { margin-right: 18em; }
+div.pb19 { margin-right: 19em; }
+div.pb20 { margin-right: 20em; }
+div.pb21 { margin-right: 21em; }
+div.pb22 { margin-right: 22em; }
+div.pb23 { margin-right: 23em; }
+div.pb24 { margin-right: 24em; }
+div.pb25 { margin-right: 25em; }
 
 /* 地付き */
 div.btm, div.btm p { text-align: right; }
+/* 地付きで字詰め */
+div.btm .jzm { text-align: right;  display: inline-block; }
 
 /* 改行天付き、折り返して(.+?)字下げ → class="pt{$1} idt-{$1}" */
 /* ここから(.+?)字下げ、折り返して(.+?)字下げ → class="pt{$2} idt{$1-$2}" */

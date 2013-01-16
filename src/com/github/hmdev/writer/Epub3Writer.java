@@ -41,6 +41,7 @@ import com.github.hmdev.info.BookInfo;
 import com.github.hmdev.info.ChapterInfo;
 import com.github.hmdev.info.ImageInfo;
 import com.github.hmdev.info.SectionInfo;
+import com.github.hmdev.util.CharUtils;
 import com.github.hmdev.util.LogAppender;
 
 /** ePub3用のファイル一式をZipで固めたファイルを生成.
@@ -69,9 +70,14 @@ public class Epub3Writer
 	/** xhtmlフッタVelocityテンプレート */
 	final static String XHTML_FOOTER_VM = "xhtml_footer.vm";
 	
-	/** navファイル 未対応 */
+	/** タイトル横書き */
+	final static String TITLE_H_FILE = "title_h.xhtml";
+	/** タイトル横書き Velocityテンプレート */
+	final static String TITLE_H_VM = "title_h.vm";
+	
+	/** navファイル */
 	final static String XHTML_NAV_FILE = "nav.xhtml";
-	/** navファイル Velocityテンプレート 未対応 */
+	/** navファイル Velocityテンプレート */
 	final static String XHTML_NAV_VM = "xhtml_nav.vm";
 	
 	/** 表紙XHTMLファイル */
@@ -288,6 +294,22 @@ public class Epub3Writer
 		this.canceled = true;
 	}
 	
+	private void writeFile(ZipArchiveOutputStream zos, String fileName) throws IOException
+	{
+		zos.putArchiveEntry(new ZipArchiveEntry(fileName));
+		//customファイル優先
+		File file = new File(templatePath+fileName);
+		int idx = fileName.lastIndexOf('/');
+		if (idx > 0) { 
+			File customFile = new File(templatePath+fileName.substring(0, idx)+"_custom/"+fileName.substring(idx+1));
+			if (customFile.exists()) file = customFile;
+		}
+		FileInputStream fis = new FileInputStream(file);
+		IOUtils.copy(fis, zos);
+		fis.close();
+		zos.closeArchiveEntry();
+	}
+	
 	/** epubファイルを出力
 	 * @param converter 青空文庫テキスト変換クラス 画像のみの場合と切り替えて利用する
 	 * @param src 青空文庫テキストファイルの入力Stream
@@ -335,6 +357,9 @@ public class Epub3Writer
 		//更新日時
 		velocityContext.put("modified", dateFormat.format(bookInfo.modified));
 		
+		//タイトルページのxhtmlのID
+		String titlePageId = "0001";
+		
 		//端末種別
 		if (this.isKindle) velocityContext.put("kindle", true);
 		
@@ -360,23 +385,38 @@ public class Epub3Writer
 		zos.setLevel(9);
 		//テンプレートのファイルを格納
 		for (String fileName : getTemplateFiles()) {
-			zos.putArchiveEntry(new ZipArchiveEntry(fileName));
-			//customファイル優先
-			File file = new File(templatePath+fileName);
-			int idx = fileName.lastIndexOf('/');
-			if (idx > 0) { 
-				File customFile = new File(templatePath+fileName.substring(0, idx)+"_custom/"+fileName.substring(idx+1));
-				if (customFile.exists()) file = customFile;
-			}
-			fis = new FileInputStream(file);
-			IOUtils.copy(fis, zos);
-			fis.close();
-			zos.closeArchiveEntry();
+			writeFile(zos, fileName);
 		}
 		
 		//zip出力用Writer
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"));
 		
+		//表紙をテンプレート＋メタ情報から生成
+		if (bookInfo.titlePageType == BookInfo.TITLE_HORIZONTAL) {
+			converter.vertical = false;
+			String line = bookInfo.getTitleText();
+			if (line != null) velocityContext.put("TITLE", converter.convertEscapedText(CharUtils.removeSpace(CharUtils.removeTag(converter.convertGaijiChuki(line, true)))));
+			line = bookInfo.getSubTitleText();
+			if (line != null) velocityContext.put("SUBTITLE", converter.convertEscapedText(CharUtils.removeSpace(CharUtils.removeTag(converter.convertGaijiChuki(line, true)))));
+			line = bookInfo.getOrgTitleText();
+			if (line != null) velocityContext.put("ORGTITLE", converter.convertEscapedText(CharUtils.removeSpace(CharUtils.removeTag(converter.convertGaijiChuki(line, true)))));
+			line = bookInfo.getSubOrgTitleText();
+			if (line != null) velocityContext.put("SUBORGTITLE", converter.convertEscapedText(CharUtils.removeSpace(CharUtils.removeTag(converter.convertGaijiChuki(line, true)))));
+			line = bookInfo.getCreatorText();
+			if (line != null) velocityContext.put("CREATOR", converter.convertEscapedText(CharUtils.removeSpace(CharUtils.removeTag(converter.convertGaijiChuki(line, true)))));
+			line = bookInfo.getSubCreatorText();
+			if (line != null) velocityContext.put("SUBCREATOR", converter.convertEscapedText(CharUtils.removeSpace(CharUtils.removeTag(converter.convertGaijiChuki(line, true)))));
+			//line = bookInfo.getPublisherText();
+			//if (line != null) velocityContext.put("PUBLISHER", CharUtils.removeSpace(CharUtils.removeTag(converter.convertGaijiChuki(line, true))));
+			
+			zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+XHTML_PATH+TITLE_H_FILE));
+			bw = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"));
+			Velocity.mergeTemplate(templatePath+OPS_PATH+XHTML_PATH+TITLE_H_VM, "UTF-8", velocityContext, bw);
+			bw.flush();
+			zos.closeArchiveEntry();
+			
+			titlePageId = "title_h";
+		}
 		//本文を出力
 		this.writeSections(converter, src, bw);
 		if (this.canceled) return;
@@ -496,12 +536,13 @@ public class Epub3Writer
 			}
 		}
 		
-		//タイトルページは削除して別途0001.xhmlのみ目次前に出力
+		//Velocityの方で0001.xhmlのみ目次前に出力するので先頭削除
 		if (bookInfo.insertTitlePage) sectionInfos.remove(0);
 		
 		//package.opf 出力
 		velocityContext.put("sections", sectionInfos);
 		velocityContext.put("images", imageInfos);
+		velocityContext.put("title_page_id", titlePageId);
 		zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+PACKAGE_FILE));
 		bw = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"));
 		Velocity.mergeTemplate(templatePath+OPS_PATH+PACKAGE_VM, "UTF-8", velocityContext, bw);
@@ -547,24 +588,22 @@ public class Epub3Writer
 		
 		//出力前に縦中横とエスケープ処理
 		if (!bookInfo.imageOnly) {
-			boolean vertical = bookInfo.vertical;
-			bookInfo.vertical = bookInfo.tocVertical;
+			converter.vertical = bookInfo.tocVertical;
 			int spaceHyphenation = converter.getSpaceHyphenation();
 			converter.setSpaceHyphenation(0);
-			converter.bookInfo = bookInfo; //nullの場合があるので設定
 			StringBuilder buf = new StringBuilder();
 			for (ChapterInfo chapterInfo : chapterInfos) {
 				buf.setLength(0);
-				char[] ch = chapterInfo.getChapterName().toCharArray();
-				converter.convertEscapedText(buf, ch, 0, ch.length);
-				if (bookInfo.vertical) {
-					ch = buf.toString().toCharArray();
+				String converted = converter.convertEscapedText(chapterInfo.getChapterName());
+				if (bookInfo.tocVertical) {
+					char[] ch = converted.toCharArray();
 					buf.setLength(0);
 					converter.convertTcyText(buf, ch, 0, ch.length, false);
 				}
 				chapterInfo.setChapterName(buf.toString());
 			}
-			bookInfo.vertical = vertical;//戻す
+			//戻す
+			converter.vertical = bookInfo.vertical;
 			converter.setSpaceHyphenation(spaceHyphenation);
 		}
 		
@@ -757,6 +796,7 @@ public class Epub3Writer
 		
 		//ePub3変換して出力
 		//改ページ時にnextSection() を、画像出力時にgetImageFilePath() 呼び出し
+		converter.vertical = bookInfo.vertical;
 		converter.convertTextToEpub3(bw, src, bookInfo);
 		bw.flush();
 		
