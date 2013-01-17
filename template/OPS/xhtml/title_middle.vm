@@ -12,10 +12,14 @@
 <link rel="stylesheet" type="text/css" href="../css/horizontal.css"/>
 #end
 <style type="text/css">
-.title, .subtitle, .orgtitle, .suborgtitle, .creator, .subcreator, .publisher { line-height: 1.25; }
-.title { font-size:2em; }
-.subtitle { font-size:1.5em; }
-.orgtitle { font-size:1.75em; }
+.title, .subtitle, .orgtitle, .suborgtitle, .creator, .subcreator, .publisher. .series { line-height: 1.25; }
+.series { font-size:1.25em; }
+.title { font-size:1.75em; }
+.title ruby rt { font-size:.4em; }
+.orgtitle { font-size:1.4em; }
+.orgtitle ruby rt { font-size:.5em; }
+.subtitle { font-size:1.6em; }
+.subtitle ruby rt { font-size:.5em; }
 .suborgtitle { font-size:1.25em; }
 .creator { font-size:1.25em; }
 .subcreator { font-size:1.25em; }
@@ -27,18 +31,29 @@
 <table class="middle"><tr><td>
 
 #if (${PUBLISHER})
-<div class="publisher btm pb2">${PUBLISHER}</div>
+<div class="publisher">${PUBLISHER}</div>
 <br/>
 #end
-<div class="title">${TITLE}</div>
-#if (${SUBTITLE})
-<div class="subtitle pt2">${SUBTITLE}</div>
+
+#if (${CREATOR})
+<div class="creator btm pb2"><br/></div>
 #end
+#if (${SUBCREATOR})
+<div class="subcreator btm pb2"><br/></div>
+#end
+
+#if (${SERIES})
+	<div class="series">${SERIES}</div>
+#end
+<div class="title">${TITLE}</div>
 #if (${ORGTITLE})
 <div class="orgtitle pt1">${ORGTITLE}</div>
 #end
+#if (${SUBTITLE})
+<div class="subtitle pt1">${SUBTITLE}</div>
+#end
 #if (${SUBORGTITLE})
-<div class="suborgtitle pt3">${SUBORGTITLE}</div>
+<div class="suborgtitle pt2">${SUBORGTITLE}</div>
 #end
 #if (${CREATOR})
 <div class="creator btm pb2">${CREATOR}</div>
@@ -46,6 +61,13 @@
 #if (${SUBCREATOR})
 <div class="subcreator btm pb2">${SUBCREATOR}</div>
 #end
+
+#if (${PUBLISHER})
+<div class="publisher"><br/></div>
+<br/>
+#end
+
+
 </div>
 
 </td></tr></table>

@@ -19,17 +19,21 @@ margin:1.5% 2% 0 2%; width:96%; height:98.5%; text-align:center;
 /*border:1px solid black;*/
 #end
 }
-.upper { padding:30% 5% 0 5%; height:40%; text-align:center; }
-.lower { padding:0; height:30%; text-align:center; }
-.title, .subtitle, .orgtitle, .suborgtitle, .creator, .subcreator, .publisher { text-align:center; line-height: 1.25; }
-.title { font-size:2em; }
-.subtitle { padding-top:.25em; font-size:1.5em; }
-.orgtitle { padding-top:.5em; font-size:1.75em; }
+.upper { padding:0 5%; height:20%; text-align:center; }
+.publisher { padding-top:5%; }
+.center { padding:0 5%; height:50%; text-align:center; }
+.title, .subtitle, .orgtitle, .suborgtitle, .creator, .subcreator, .series { text-align:center; line-height: 1.25; }
+.series { padding-bottom:.5em; font-size:1.25em; }
+.title { font-size:1.75em; }
+.title ruby rt { font-size:.4em; }
+.orgtitle { padding-top:.5em; font-size:1.4em; }
+.orgtitle ruby rt { font-size:.5em; }
+.subtitle { padding-top:.25em; font-size:1.6em; }
+.subtitle ruby rt { font-size:.5em; }
 .suborgtitle { padding-top:.25em; font-size:1.25em; }
+.lower { padding:0; height:25%; text-align:center; }
 .creator { padding-top:5%; font-size:1.25em; }
 .subcreator { padding-top:1em; font-size:1.25em; }
-.series { padding-bottom:.5em; font-size:1.25em; }
-.publisher { margin-top:2em; }
 </style>
 <title>${title}</title>
 </head>
@@ -37,29 +41,31 @@ margin:1.5% 2% 0 2%; width:96%; height:98.5%; text-align:center;
 <body>
 <div class="outer">
 <div class="upper">
+#if (${PUBLISHER})
+	<div class="publisher">${PUBLISHER}</div>
+#end
+</div>
+<div class="center">
 #if (${SERIES})
-<div class="series">${SERIES}</div>
+	<div class="series">${SERIES}</div>
 #end
-<div class="title">${TITLE}</div>
-#if (${SUBTITLE})
-<div class="subtitle">${SUBTITLE}</div>
-#end
+	<div class="title">${TITLE}</div>
 #if (${ORGTITLE})
-<div class="orgtitle">${ORGTITLE}</div>
+	<div class="orgtitle">${ORGTITLE}</div>
+#end
+#if (${SUBTITLE})
+	<div class="subtitle">${SUBTITLE}</div>
 #end
 #if (${SUBORGTITLE})
-<div class="suborgtitle">${SUBORGTITLE}</div>
+	<div class="suborgtitle">${SUBORGTITLE}</div>
 #end
 </div>
 <div class="lower">
 #if (${CREATOR})
-<div class="creator">${CREATOR}</div>
+	<div class="creator">${CREATOR}</div>
 #end
 #if (${SUBCREATOR})
-<div class="subcreator">${SUBCREATOR}</div>
-#end
-#if (${PUBLISHER})
-<div class="publisher">${PUBLISHER}</div>
+	<div class="subcreator">${SUBCREATOR}</div>
 #end
 </div>
 </div>

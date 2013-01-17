@@ -2,7 +2,7 @@
 ### 一覧ページから本の情報とリンク抽出
 ### CONTENT_ から始まる物は各話HTMLからの抽出用
 ###
-### 書式: (タブ区切り文字列)
+### 書式： (タブ区切り文字列)
 ###内部ID	CssQuery[:位置][,CssQuery2[:位置]][	正規表現条件[	置換後]]
 ###  (CssQueryの後にElemtnsの位置:0～ 負の値は後ろから:-1～ (無しはすべて))
 ###  (CssQuery+位置情報はカンマで複数指定可(前を優先) )
@@ -13,6 +13,11 @@
 ###内部ID	.classLast:-1
 ###内部ID	.class	Pattern	Replacement
 ###内部ID	.class1 span:1,.class2 td:0
+###
+### 置換指定：
+### 前書き、本文、後書き以外は 指定タグのinnerHTML(改行除去後)に対して置換を行った後にタグを除外します。
+### brタグ前を除去 → ^.*<br />	
+### brタグ後を除去 → <br />.*$		
 ################################################################
 
 ################################
@@ -59,8 +64,8 @@ SUB_UPDATE	.long_update
 
 ## 各話 Chapter 先頭の章のみ大見出しで出力
 #CONTENT_CHAPTER	.chapter_title
-## 各話 章タイトル 中見出しで出力
-CONTENT_SUBTITLE	.novel_subtitle
+## 各話 章タイトル 中見出しで出力 「（改稿版）」の文字とbrタグ前を除去
+CONTENT_SUBTITLE	.novel_subtitle	(（改稿版）)|(^.*<br />)	
 ##各話内に記載されている更新日時
 #CONTENT_UPDATE	.date	^(.*)$	$1
 

@@ -872,7 +872,7 @@ public class AozoraEpub3Converter
 				.replaceAll("※(《|》|［|］|〔|〕|〔|〕|〔|〕|｜)", "$1") //エスケープ文字から※除外
 				.replaceFirst("^[\t| |　]+", "").replaceFirst("[\t| |　]+$","") //前後の不要な文字所除去
 				.replaceAll("〳〵", "く").replaceAll("〴〵", "ぐ").replaceAll("〻", "々")
-				//.replaceFirst("^(=|＝|-|―|─)(=|＝|-|―|─)+", "").replaceFirst("(=|＝|-|―|─)(=|＝|-|―|─)+$", "")//連続する記号除去
+				.replaceAll("(=|＝|-|―|─)+", "$1")//連続する記号は1つに
 				;
 				//printLineBuffer内だと以下の変換が必要
 				/*.replaceAll("<span class=\"fullsp\"> </span>", "　").replaceAll(String.valueOf((char)(0x2000))+(char)(0x2000), "　")
@@ -981,6 +981,9 @@ public class AozoraEpub3Converter
 	{
 		try {
 		
+		//ダミー切り替え用
+		BufferedWriter orgOut = out;
+			
 		this.canceled = false;
 		
 		//BookInfoの参照を保持
@@ -1025,8 +1028,7 @@ public class AozoraEpub3Converter
 				if (this.tagLevel == 0) {
 					//出力しない
 					skipTitle = true;
-					//if (this.bookInfo.titlePageType == BookInfo.TITLE_HORIZONTAL) skipTitle = true;
-					//else this.setPageBreakTrigger(pageBreakMiddle);
+					out = null;
 				}
 				else bookInfo.preTitlePageBreak++;
 			}
@@ -1037,11 +1039,12 @@ public class AozoraEpub3Converter
 			
 			//タイトルページの改ページ行
 			if (skipTitle && bookInfo.titleEndLine+1 == lineNum) {
-				skipTitle = false;
-				continue;
+				if (tagLevel > 0) bookInfo.titleEndLine++;
+				else {skipTitle = false;
+					//ダミーから戻す
+					out = orgOut;
+				}
 			}
-			//タイトルを出力しない
-			if (skipTitle) continue;
 			
 			//コメント除外
 			if (line.startsWith("--------------------------------------------------")) {
@@ -2436,6 +2439,9 @@ public class AozoraEpub3Converter
 				}
 			}
 		}
+		
+		if (out != null) {
+			
 		//強制改ページ処理
 		//改ページトリガが設定されていない＆タグの外
 		if (this.forcePageBreak && this.pageBreakTrigger == null && this.tagLevel == 0) {
@@ -2528,9 +2534,6 @@ public class AozoraEpub3Converter
 			out.write("</p>\n");
 		}
 		
-		//タグの階層を変更
-		this.tagLevel += tagStart-tagEnd;
-		
 		//見出しのChapterをWriterに追加 同じ行で数回呼ばれるので初回のみ
 		if (chapterLineInfo != null && lastChapterLine != lineNum) {
 			String name = chapterLineInfo.getChapterName();
@@ -2543,6 +2546,12 @@ public class AozoraEpub3Converter
 		}
 		
 		this.sectionCharLength += length;
+		
+		}
+		
+		//タグの階層を変更
+		this.tagLevel += tagStart-tagEnd;
+		
 		//バッファクリア
 		buf.setLength(0);
 	}

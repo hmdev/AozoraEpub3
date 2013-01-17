@@ -111,6 +111,8 @@ public class AozoraEpub3Applet extends JApplet
 	/** 上下分割Split */
 	JSplitPane jSplitPane;
 	
+	/** タブの上のパネル */
+	JPanel topPanel;
 	/** 上部タブパネル */
 	JTabbedPane jTabbedPane;
 	
@@ -433,6 +435,7 @@ public class AozoraEpub3Applet extends JApplet
 		});
 		////////////////////////////////
 		panel = new JPanel();
+		topPanel = panel;
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 		panel.setMinimumSize(panelSize28);
 		panel.setMaximumSize(panelSize28);
@@ -2984,6 +2987,7 @@ public class AozoraEpub3Applet extends JApplet
 	/** 変換中に操作不可にするコンポーネントのenabledを設定 */
 	private void setConvertEnabled(boolean enabled)
 	{
+		for (Component c : this.topPanel.getComponents()) this.setEnabledAll(c, enabled);
 		for (Component c : this.jTabbedPane.getComponents()) this.setEnabledAll(c, enabled);
 		//変換中に操作不可にしないもの
 		if (!enabled) this.jCheckConfirm.setEnabled(true);

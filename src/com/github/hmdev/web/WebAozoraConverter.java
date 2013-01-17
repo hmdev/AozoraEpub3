@@ -727,9 +727,15 @@ public class WebAozoraConverter
 		}
 	}
 	
+	/** タグを除去 */
+	String removeTag(String text)
+	{
+		return text.replaceAll("<br ?/?>", " ").replaceAll("<[^>]+>", "");
+	}
+	
 	////////////////////////////////////////////////////////////////
 	
-	/** Element内の文字列を取得
+	/** Element内のinnerHTMLを取得
 	 * 間にあるダグは無視 置換設定があれば置換してから返す */
 	String getExtractText(Document doc, ExtractInfo[] extractInfos)
 	{
@@ -744,7 +750,7 @@ public class WebAozoraConverter
 			StringBuilder buf = new StringBuilder();
 			if (extractInfo.idx == null) {
 				for (Element element : elements) {
-					buf.append(" ").append(getFirstText(element));
+					buf.append(" ").append(element.html());
 				}
 			} else {
 				for (int i=0; i<extractInfo.idx.length; i++) {
@@ -752,8 +758,8 @@ public class WebAozoraConverter
 						int pos = extractInfo.idx[i];
 						if (pos < 0) pos = elements.size()+pos;//負の値なら後ろから
 						if (pos >= 0 && elements.size() > pos) {
-							String firstText = getFirstText(elements.get(pos));
-							if (firstText != null) buf.append(" ").append(firstText);
+							String html = elements.get(pos).html();
+							if (html != null) buf.append(" ").append(html);
 						}
 					}
 				}
@@ -761,8 +767,9 @@ public class WebAozoraConverter
 			}
 			//置換指定ならreplaceして返す
 			if (text != null && text.length() > 0) {
-				if (replace) return extractInfo.replace(text);
-				else return text;
+				text = text.replaceAll("[\n|\r]", "").replaceAll("\t", " ");
+				if (replace) text = extractInfo.replace(text);
+				return removeTag(text);
 			}
 		}
 		return null;

@@ -11,7 +11,7 @@
 ## シリーズタイトル
 SERIES	.series a:0
 ## タイトル
-TITLE	.novel_title:0,.novel_subtitle:0
+TITLE	.novel_title:0,.novel_subtitle:0	(^.*</div>)	
 ## 著者
 AUTHOR	.novel_writername a:0,.novel_writername:0	作者：	
 ## 説明
@@ -35,7 +35,7 @@ CONTENT_UPDATE_LIST	.long_update	^(.+?)(<span title=\"(.+?)\".*)?$	$1 公開　$
 ## 各話 Chapter 先頭の章のみ大見出しで出力
 CONTENT_CHAPTER	.chapter_title:0
 ## 各話 章タイトル 中見出しで出力
-CONTENT_SUBTITLE	.novel_subtitle:0	（改稿版）	
+CONTENT_SUBTITLE	.novel_subtitle:0	(（改稿版）)|(^.*</div>)	
 
 ## 各話 本文
 CONTENT_ARTICLE	#novel_view:0
