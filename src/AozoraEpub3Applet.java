@@ -621,20 +621,20 @@ public class AozoraEpub3Applet extends JApplet
 		panel.add(label);
 		//左右中央
 		jCheckTitlePage = new JCheckBox("表題", true);
+		jCheckTitlePage.setToolTipText("表題を単独のページで出力します。チェック無し時はスタイルのみ変更して出力します");
 		jCheckTitlePage.setFocusPainted(false);
-		jCheckTitlePage.setBorder(padding0);
 		panel.add(jCheckTitlePage);
 		label = new JLabel("(");
 		panel.add(label);
 		buttonGroup = new ButtonGroup();
-		jRadioTitleMiddle = new JRadioButton("縦中央", true);
-		jRadioTitleMiddle.setToolTipText("縦書き左右中央で本文の順番で出力します");
+		jRadioTitleMiddle = new JRadioButton("中央 ", true);
+		jRadioTitleMiddle.setToolTipText("中央寄せの表題ページを出力します");
 		jRadioTitleMiddle.setBorder(padding0);
 		jRadioTitleMiddle.setIconTextGap(1);
 		panel.add(jRadioTitleMiddle);
 		buttonGroup.add(jRadioTitleMiddle);
 		jRadioTitleHorizontal = new JRadioButton("横書き");
-		jRadioTitleHorizontal.setToolTipText("横書きテンプレートの表示を出力します");
+		jRadioTitleHorizontal.setToolTipText("横書きの表題ページを出力します");
 		jRadioTitleHorizontal.setBorder(padding0);
 		jRadioTitleHorizontal.setIconTextGap(1);
 		panel.add(jRadioTitleHorizontal);
@@ -676,7 +676,7 @@ public class AozoraEpub3Applet extends JApplet
 		//拡張子
 		label = new JLabel("拡張子: ");
 		panel.add(label);
-		jComboExt = new JComboBox(new String[]{".epub", ".kepub.epub"});
+		jComboExt = new JComboBox(new String[]{".epub", ".kepub.epub", ".mobi"});
 		jComboExt.setEditable(true);
 		jComboExt.setMaximumSize(new Dimension(110, 24));
 		jComboExt.setPreferredSize(new Dimension(110, 24));
@@ -2439,7 +2439,7 @@ public class AozoraEpub3Applet extends JApplet
 			int maxLength = 64;
 			try { maxLength = Integer.parseInt((jTextMaxChapterNameLength.getText())); } catch (Exception e) {}
 			
-			this.aozoraConverter.setChapterLevel(maxLength, jCheckTitleToc.isSelected(), jCheckChapterExclude.isSelected(), jCheckChapterUseNextLine.isSelected(), jCheckChapterSection.isSelected(),
+			this.aozoraConverter.setChapterLevel(maxLength, jCheckChapterExclude.isSelected(), jCheckChapterUseNextLine.isSelected(), jCheckChapterSection.isSelected(),
 					jCheckChapterH.isSelected(), jCheckChapterH1.isSelected(), jCheckChapterH2.isSelected(), jCheckChapterH3.isSelected(),
 					jCheckChapterName.isSelected(),
 					jCheckChapterNumOnly.isSelected(), jCheckChapterNumTitle.isSelected(), jCheckChapterNumParen.isSelected(), jCheckChapterNumParenTitle.isSelected(),
@@ -2621,8 +2621,9 @@ public class AozoraEpub3Applet extends JApplet
 		
 		//表紙目次ページ出力設定
 		bookInfo.insertCoverPage = this.jCheckCoverPage.isSelected();
-		bookInfo.insertCoverPageToc = this.jCheckCoverPageToc.isSelected();
 		bookInfo.insertTocPage = this.jCheckTocPage.isSelected();
+		bookInfo.insertCoverPageToc = this.jCheckCoverPageToc.isSelected();
+		bookInfo.insertTitleToc = this.jCheckTitleToc.isSelected();
 		//目次縦書き
 		bookInfo.setTocVertical(this.jRadioTocV.isSelected());
 		//縦書き横書き設定追加
@@ -2689,6 +2690,7 @@ public class AozoraEpub3Applet extends JApplet
 		////////////////////////////////
 		//Kindleチェック
 		File kindlegen = null;
+		writer.setIsKindle(false);
 		if (outExt.endsWith(".mobi")) {
 			kindlegen = new File(this.jarPath+"kindlegen.exe");
 			if (!kindlegen.isFile()) {

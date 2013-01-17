@@ -168,6 +168,12 @@ public class CharUtils
 		return text.replaceAll("([^※])《.*?[^※]》", "$1").replaceFirst("^｜", "").replaceAll("([^※])｜", "$1");
 	}
 	
+	/** HTML特殊文字をエスケープ */
+	static public String escapeHtml(String text)
+	{
+		return text.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+	}
+	
 	/** Test用 */
 	/*public static void main(String[] args)
 	{

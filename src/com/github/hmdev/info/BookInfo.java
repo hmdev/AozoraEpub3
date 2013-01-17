@@ -9,7 +9,9 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.github.hmdev.converter.AozoraEpub3Converter;
 import com.github.hmdev.image.ImageUtils;
+import com.github.hmdev.util.CharUtils;
 
 /** タイトル著作者等のメタ情報を格納 */
 public class BookInfo
@@ -136,6 +138,8 @@ public class BookInfo
 	public boolean insertTocPage = false;
 	/** 目次縦書きならtrue */
 	public boolean tocVertical = false;
+	/** 表題を目次に追加 */
+	public boolean insertTitleToc = true;
 	
 	/** txtのない画像のみの場合 */
 	public boolean imageOnly = false;
@@ -721,6 +725,9 @@ public class BookInfo
 			}
 			
 			if (this.creator != null && (this.creator.startsWith("―") || this.creator.startsWith("【"))) this.creator = null;
+			
+			if (this.title != null) this.title = AozoraEpub3Converter.getChapterName(CharUtils.removeRuby(this.title), 0);
+			if (this.creator != null) this.creator = AozoraEpub3Converter.getChapterName(CharUtils.removeRuby(this.creator), 0);
 		}
 	}
 	/** 本文内のタイトル再読み込み */

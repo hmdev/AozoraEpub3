@@ -39,6 +39,7 @@ import com.github.hmdev.image.ImageInfoReader;
 import com.github.hmdev.image.ImageUtils;
 import com.github.hmdev.info.BookInfo;
 import com.github.hmdev.info.ChapterInfo;
+import com.github.hmdev.info.ChapterLineInfo;
 import com.github.hmdev.info.ImageInfo;
 import com.github.hmdev.info.SectionInfo;
 import com.github.hmdev.util.CharUtils;
@@ -70,10 +71,12 @@ public class Epub3Writer
 	/** xhtmlフッタVelocityテンプレート */
 	final static String XHTML_FOOTER_VM = "xhtml_footer.vm";
 	
-	/** タイトル横書き */
-	final static String TITLE_H_FILE = "title_h.xhtml";
+	/** タイトルページxhtml */
+	final static String TITLE_FILE = "title.xhtml";
+	/** タイトル縦中央 Velocityテンプレート */
+	final static String TITLE_M_VM = "title_middle.vm";
 	/** タイトル横書き Velocityテンプレート */
-	final static String TITLE_H_VM = "title_h.vm";
+	final static String TITLE_H_VM = "title_horizontal.vm";
 	
 	/** navファイル */
 	final static String XHTML_NAV_FILE = "nav.xhtml";
@@ -177,6 +180,7 @@ public class Epub3Writer
 	/** ガンマフィルタ */
 	LookupOp gammaOp;
 	
+	/** 拡張子に.mobiが選択されていてkindlegenがある場合 */
 	boolean isKindle = false;
 	
 	////////////////////////////////
@@ -344,24 +348,19 @@ public class Epub3Writer
 		
 		//固有ID
 		velocityContext.put("identifier", UUID.nameUUIDFromBytes((title+"-"+creator).getBytes()));
-		//目次名称
-		velocityContext.put("toc_name", "目次");
-		//表紙
+		//表紙の目次表示名
 		velocityContext.put("cover_name", "表紙");
 		//タイトル &<>はエスケープ
-		velocityContext.put("title", title.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;"));
+		velocityContext.put("title", CharUtils.escapeHtml(title));
 		//タイトル &<>はエスケープ
-		velocityContext.put("creator", creator.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;"));
+		velocityContext.put("creator", CharUtils.escapeHtml(creator));
 		//書籍情報
 		velocityContext.put("bookInfo", bookInfo);
 		//更新日時
 		velocityContext.put("modified", dateFormat.format(bookInfo.modified));
 		
-		//タイトルページのxhtmlのID
-		String titlePageId = "0001";
-		
 		//端末種別
-		if (this.isKindle) velocityContext.put("kindle", true);
+		velocityContext.put("kindle", this.isKindle);
 		
 		//出力先ePubのZipストリーム生成
 		zos = new ZipArchiveOutputStream(new BufferedOutputStream(new FileOutputStream(epubFile)));
@@ -392,31 +391,43 @@ public class Epub3Writer
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"));
 		
 		//表紙をテンプレート＋メタ情報から生成
-		if (bookInfo.titlePageType == BookInfo.TITLE_HORIZONTAL) {
-			converter.vertical = false;
-			String line = bookInfo.getTitleText();
-			if (line != null) velocityContext.put("TITLE", converter.convertEscapedText(CharUtils.removeSpace(CharUtils.removeTag(converter.convertGaijiChuki(line, true)))));
-			line = bookInfo.getSubTitleText();
-			if (line != null) velocityContext.put("SUBTITLE", converter.convertEscapedText(CharUtils.removeSpace(CharUtils.removeTag(converter.convertGaijiChuki(line, true)))));
-			line = bookInfo.getOrgTitleText();
-			if (line != null) velocityContext.put("ORGTITLE", converter.convertEscapedText(CharUtils.removeSpace(CharUtils.removeTag(converter.convertGaijiChuki(line, true)))));
-			line = bookInfo.getSubOrgTitleText();
-			if (line != null) velocityContext.put("SUBORGTITLE", converter.convertEscapedText(CharUtils.removeSpace(CharUtils.removeTag(converter.convertGaijiChuki(line, true)))));
-			line = bookInfo.getCreatorText();
-			if (line != null) velocityContext.put("CREATOR", converter.convertEscapedText(CharUtils.removeSpace(CharUtils.removeTag(converter.convertGaijiChuki(line, true)))));
-			line = bookInfo.getSubCreatorText();
-			if (line != null) velocityContext.put("SUBCREATOR", converter.convertEscapedText(CharUtils.removeSpace(CharUtils.removeTag(converter.convertGaijiChuki(line, true)))));
-			//line = bookInfo.getPublisherText();
-			//if (line != null) velocityContext.put("PUBLISHER", CharUtils.removeSpace(CharUtils.removeTag(converter.convertGaijiChuki(line, true))));
+		if (bookInfo.titlePageType == BookInfo.TITLE_MIDDLE || bookInfo.titlePageType == BookInfo.TITLE_HORIZONTAL) {
+			String vmFilePath = templatePath+OPS_PATH+XHTML_PATH+TITLE_M_VM;
+			if (bookInfo.titlePageType == BookInfo.TITLE_HORIZONTAL) {
+				converter.vertical = false;
+				vmFilePath = templatePath+OPS_PATH+XHTML_PATH+TITLE_H_VM;
+			}
 			
-			zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+XHTML_PATH+TITLE_H_FILE));
+			String line = bookInfo.getTitleText();
+			if (line != null) velocityContext.put("TITLE", converter.convertRubyText(converter.convertEscapedText(CharUtils.removeTag(line))));
+			line = bookInfo.getSubTitleText();
+			if (line != null) velocityContext.put("SUBTITLE", converter.convertRubyText(converter.convertEscapedText(CharUtils.removeTag(line))));
+			line = bookInfo.getOrgTitleText();
+			if (line != null) velocityContext.put("ORGTITLE", converter.convertRubyText(converter.convertEscapedText(CharUtils.removeTag(line))));
+			line = bookInfo.getSubOrgTitleText();
+			if (line != null) velocityContext.put("SUBORGTITLE", converter.convertRubyText(converter.convertEscapedText(CharUtils.removeTag(line))));
+			line = bookInfo.getCreatorText();
+			if (line != null) velocityContext.put("CREATOR", converter.convertRubyText(converter.convertEscapedText(CharUtils.removeTag(line))));
+			line = bookInfo.getSubCreatorText();
+			if (line != null) velocityContext.put("SUBCREATOR", converter.convertRubyText(converter.convertEscapedText(CharUtils.removeTag(line))));
+			//line = bookInfo.getPublisherText();
+			//if (line != null) velocityContext.put("PUBLISHER", converter.convertRubyText(converter.convertEscapedText(CharUtils.removeTag(line))));
+			
+			//package.opf内で目次前に出力
+			zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+XHTML_PATH+TITLE_FILE));
 			bw = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"));
-			Velocity.mergeTemplate(templatePath+OPS_PATH+XHTML_PATH+TITLE_H_VM, "UTF-8", velocityContext, bw);
+			Velocity.mergeTemplate(vmFilePath, "UTF-8", velocityContext, bw);
 			bw.flush();
 			zos.closeArchiveEntry();
 			
-			titlePageId = "title_h";
+			velocityContext.put("title_page", true);
+			
+			//目次にも追加
+			if (bookInfo.insertTitleToc) {
+				chapterInfos.add(0, new ChapterInfo("title", null, bookInfo.title, ChapterLineInfo.LEVEL_TITLE));
+			}
 		}
+		
 		//本文を出力
 		this.writeSections(converter, src, bw);
 		if (this.canceled) return;
@@ -536,13 +547,9 @@ public class Epub3Writer
 			}
 		}
 		
-		//Velocityの方で0001.xhmlのみ目次前に出力するので先頭削除
-		if (bookInfo.insertTitlePage) sectionInfos.remove(0);
-		
 		//package.opf 出力
 		velocityContext.put("sections", sectionInfos);
 		velocityContext.put("images", imageInfos);
-		velocityContext.put("title_page_id", titlePageId);
 		zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+PACKAGE_FILE));
 		bw = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"));
 		Velocity.mergeTemplate(templatePath+OPS_PATH+PACKAGE_VM, "UTF-8", velocityContext, bw);
@@ -553,6 +560,11 @@ public class Epub3Writer
 		for (int i=chapterInfos.size()-1; i>=0; i--) {
 			if (chapterInfos.get(i).getChapterName() == null) chapterInfos.remove(i);
 		}
+		//表題の見出しが非表示で業が追加されていたら削除
+		if (!bookInfo.insertTitleToc && bookInfo.titleLine >= 0) {
+			bookInfo.removeChapterLineInfo(bookInfo.titleLine);
+		}
+		
 		//目次の階層情報を設定
 		//レベルを0から開始に変更
 		/*int[] chapterCounts = new int[10];
@@ -596,11 +608,9 @@ public class Epub3Writer
 				buf.setLength(0);
 				String converted = converter.convertEscapedText(chapterInfo.getChapterName());
 				if (bookInfo.tocVertical) {
-					char[] ch = converted.toCharArray();
-					buf.setLength(0);
-					converter.convertTcyText(buf, ch, 0, ch.length, false);
+					converted = converter.convertTcyText(converted);
 				}
-				chapterInfo.setChapterName(buf.toString());
+				chapterInfo.setChapterName(converted);
 			}
 			//戻す
 			converter.vertical = bookInfo.vertical;
@@ -808,6 +818,7 @@ public class Epub3Writer
 	 * @throws IOException */
 	public void nextSection(BufferedWriter bw, int lineNum, int pageType, int imagePageType, String srcImageFilePath) throws IOException
 	{
+		//タイトル置き換え時は出力しない
 		if (this.sectionIndex >0) {
 			bw.flush();
 			this.endSection();
@@ -966,7 +977,7 @@ public class Epub3Writer
 	/** 画像が単一ページ画像にできるかチェック
 	 * @param srcFilePath テキスト内の画像相対パス文字列
 	 * @throws IOException */
-	public int getImagePageType(String srcFilePath, int tagLevel)
+	public int getImagePageType(String srcFilePath, int tagLevel, int lineNum)
 	{
 		try {
 			ImageInfo imageInfo = this.imageInfoReader.getImageInfo(srcFilePath);
@@ -983,25 +994,29 @@ public class Epub3Writer
 					return PageBreakTrigger.IMAGE_INLINE_BOTTOM;
 				}
 			}
-			//タグ内ならそのまま出力
-			if (tagLevel == 0) {
-				if (imageInfo.getWidth() >= this.singlePageWidth || imageInfo.getWidth() >= singlePageSizeW && imageInfo.getHeight() >= singlePageSizeH) {
-					//拡大しない＆画面より小さい場合
-					if (!this.fitImage && imageInfo.getWidth() <= this.dispW && imageInfo.getHeight() < this.dispH)
-						return PageBreakTrigger.IMAGE_PAGE_NOFIT;
-					//拡大するか画面より多きい場合
-					if ((double)imageInfo.getWidth()/imageInfo.getHeight() > (double)this.dispW/this.dispH) {
-						if (this.rotateAngle != 0 && this.dispW < this.dispH && imageInfo.getWidth() > imageInfo.getHeight()*1.1) { //縦長画面で110%以上横長
-							imageInfo.rotateAngle = this.rotateAngle;
-							return PageBreakTrigger.IMAGE_PAGE_H;
-						} else return PageBreakTrigger.IMAGE_PAGE_W;
+			//タグ外なら単ページ化
+			if (imageInfo.getWidth() >= this.singlePageWidth || imageInfo.getWidth() >= singlePageSizeW && imageInfo.getHeight() >= singlePageSizeH) {
+				//拡大しない＆画面より小さい場合
+				if (!this.fitImage && imageInfo.getWidth() <= this.dispW && imageInfo.getHeight() < this.dispH) {
+					if (tagLevel == 0) return PageBreakTrigger.IMAGE_PAGE_NOFIT;
+				}
+				//拡大するか画面より多きい場合
+				else if ((double)imageInfo.getWidth()/imageInfo.getHeight() > (double)this.dispW/this.dispH) {
+					if (this.rotateAngle != 0 && this.dispW < this.dispH && imageInfo.getWidth() > imageInfo.getHeight()*1.1) { //縦長画面で110%以上横長
+						imageInfo.rotateAngle = this.rotateAngle;
+						if (tagLevel == 0) return PageBreakTrigger.IMAGE_PAGE_H;
 					} else {
-						if (this.rotateAngle != 0 && this.dispW > this.dispH && imageInfo.getWidth()*1.1 < imageInfo.getHeight()) { //横長画面で110%以上縦長
-							imageInfo.rotateAngle = this.rotateAngle;
-							return PageBreakTrigger.IMAGE_PAGE_W;
-						} else return PageBreakTrigger.IMAGE_PAGE_H;
+						if (tagLevel == 0) return PageBreakTrigger.IMAGE_PAGE_W;
+					}
+				} else {
+					if (this.rotateAngle != 0 && this.dispW > this.dispH && imageInfo.getWidth()*1.1 < imageInfo.getHeight()) { //横長画面で110%以上縦長
+						imageInfo.rotateAngle = this.rotateAngle;
+						if (tagLevel == 0) return PageBreakTrigger.IMAGE_PAGE_W;
+					} else {
+						if (tagLevel == 0) return PageBreakTrigger.IMAGE_PAGE_H;
 					}
 				}
+				LogAppender.warn(lineNum, "タグ内のため画像単ページ化できません");
 			}
 			
 			//単ページ化も回り込みもない

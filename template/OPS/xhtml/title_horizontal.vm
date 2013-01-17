@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="ja" lang="ja">
+<head>
+<style type="text/css">
+@page { margin:0; }
+html {
+writing-mode:horizontal-tb;
+-webkit-writing-mode:horizontal-tb;
+-epub-writing-mode:horizontal-tb;
+margin:0;
+padding:0;
+height:98%;/*for ADE*/
+}
+body { margin:0; padding:0; height:98%; text-align:center; line-height: 1.5; }
+.outer {
+margin:1.5% 2% 0 2%; width:96%; height:98.5%; text-align:center;
+#if (!${kindle})
+/*border:1px solid black;*/
+#end
+}
+.upper { padding:30% 5% 0 5%; height:40%; text-align:center; }
+.lower { padding:0; height:30%; text-align:center; }
+.title, .subtitle, .orgtitle, .suborgtitle, .creator, .subcreator, .publisher { text-align:center; line-height: 1.25; }
+.title { font-size:2em; }
+.subtitle { padding-top:.25em; font-size:1.5em; }
+.orgtitle { padding-top:.5em; font-size:1.75em; }
+.suborgtitle { padding-top:.25em; font-size:1.25em; }
+.creator { padding-top:5%; font-size:1.25em; }
+.subcreator { padding-top:1em; font-size:1.25em; }
+.series { padding-bottom:.5em; font-size:1.25em; }
+.publisher { margin-top:2em; }
+</style>
+<title>${title}</title>
+</head>
+
+<body>
+<div class="outer">
+<div class="upper">
+#if (${SERIES})
+<div class="series">${SERIES}</div>
+#end
+<div class="title">${TITLE}</div>
+#if (${SUBTITLE})
+<div class="subtitle">${SUBTITLE}</div>
+#end
+#if (${ORGTITLE})
+<div class="orgtitle">${ORGTITLE}</div>
+#end
+#if (${SUBORGTITLE})
+<div class="suborgtitle">${SUBORGTITLE}</div>
+#end
+</div>
+<div class="lower">
+#if (${CREATOR})
+<div class="creator">${CREATOR}</div>
+#end
+#if (${SUBCREATOR})
+<div class="subcreator">${SUBCREATOR}</div>
+#end
+#if (${PUBLISHER})
+<div class="publisher">${PUBLISHER}</div>
+#end
+</div>
+</div>
+</body>
+</html>

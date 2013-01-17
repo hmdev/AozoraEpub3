@@ -31,6 +31,7 @@
 #end
 	<title>${title}</title>
 </head>
+
 #if (${sectionInfo.ImageFitW})
 <body class="fit_w">
 #elseif (${sectionInfo.ImageFitH})

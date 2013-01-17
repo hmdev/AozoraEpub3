@@ -5,18 +5,18 @@
 <title>${title}</title>
 <style type="text/css">
 #if (${bookInfo.TocVertical})
-@page {	margin:.5em .5em 0 0; }
+@page {margin:.5em .5em 0 0;}
 html {
 	writing-mode: vertical-rl;
 	-webkit-writing-mode: vertical-rl;
 	-epub-writing-mode: vertical-rl;
 }
-h1 {font-size:1.5em;padding-top:1em;}
+h1 {font-size:1.5em; padding-top:1em;}
 ol {list-style:disc;}
 li {padding:0 .5em 0 0;}
 ol ol li {padding:0 .25em 0 0;}
 ol ol ol li {padding:0;}
-li a {text-decoration:none; border-right-width:1px;border-right-style:solid;padding-right: 1px;}
+li a {text-decoration:none; border-right-width:1px; border-right-style:solid; padding-right: 1px;}
 .tcy span {
 	width: 1em;
 	text-combine: horizontal;
@@ -24,19 +24,25 @@ li a {text-decoration:none; border-right-width:1px;border-right-style:solid;padd
 	-epub-text-combine: horizontal;
 }
 #else
-@page {	margin:.5em 0 0 .5em; }
-h1 {font-size:1.5em;text-align:center;}
+@page {margin:.5em 0 0 .5em;}
+html {
+	writing-mode:horizontal-tb;
+	-webkit-writing-mode:horizontal-tb;
+	-epub-writing-mode:horizontal-tb;
+}
+h1 {font-size:1.5em; text-align:center;}
 ol {list-style:disc;}
 li {padding:.5em 0 0 0;}
 ol ol li {padding:.25em 0 0 0;}
 ol ol ol li {padding:0;}
-li a {text-decoration:none; border-bottom-width:1px;border-bottom-style:solid;padding-right: 1px;}
+li a {text-decoration:none; border-bottom-width:1px; border-bottom-style:solid; padding-right: 1px;}
 #end
 </style>
 </head>
+
 <body>
 	<nav xmlns:epub="http://www.idpf.org/2007/ops" epub:type="toc" id="toc">
-		<h1>${toc_name}</h1>
+		<h1>目　次</h1>
 		<ol>
 #if (${bookInfo.InsertCoverPage} && ${bookInfo.InsertCoverPageToc})
 			<li class="chapter" id="toccover"><a href="cover.xhtml">${cover_name}</a></li>

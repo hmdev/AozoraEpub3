@@ -245,7 +245,7 @@ public class AozoraEpub3
 			//強制改ページ
 			aozoraConverter.setForcePageBreak(forcePageBreakSize, forcePageBreakEmpty, forcePageBreakEmptySize, forcePageBreakChapter, forcePageBreakChapterSize);
 			//目次設定
-			aozoraConverter.setChapterLevel(maxLength, insertTitleToc, chapterExclude, chapterUseNextLine, chapterSection,
+			aozoraConverter.setChapterLevel(maxLength, chapterExclude, chapterUseNextLine, chapterSection,
 					chapterH, chapterH1, chapterH2, chapterH3,
 					chapterName,
 					chapterNumOnly, chapterNumTitle, chapterNumParen, chapterNumParenTitle,
@@ -297,6 +297,7 @@ public class AozoraEpub3
 						bookInfo.vertical = vertical;
 						bookInfo.insertTocPage = tocPage;
 						bookInfo.setTocVertical(tocVertical);
+						bookInfo.insertTitleToc = insertTitleToc;
 						aozoraConverter.vertical = vertical;
 						//表題ページ
 						if (middleTitle) bookInfo.titlePageType = BookInfo.TITLE_MIDDLE;

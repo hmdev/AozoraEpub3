@@ -34,7 +34,6 @@ public class SectionInfo
 	{
 		return sectionId;
 	}
-
 	public void setSectionId(String sectionId)
 	{
 		this.sectionId = sectionId;
@@ -44,7 +43,6 @@ public class SectionInfo
 	{
 		return imagePage;
 	}
-
 	public void setImagePage(boolean imagePage)
 	{
 		this.imagePage = imagePage;
@@ -54,7 +52,6 @@ public class SectionInfo
 	{
 		return imageFitW;
 	}
-
 	public void setImageFitW(boolean imageFitW)
 	{
 		this.imageFitW = imageFitW;
@@ -64,7 +61,6 @@ public class SectionInfo
 	{
 		return imageFitH;
 	}
-
 	public void setImageFitH(boolean imageFitH)
 	{
 		this.imageFitH = imageFitH;
@@ -92,7 +88,6 @@ public class SectionInfo
 	{
 		return startLine;
 	}
-
 	public void setStartLine(int startLine)
 	{
 		this.startLine = startLine;
@@ -102,7 +97,6 @@ public class SectionInfo
 	{
 		return endLine;
 	}
-
 	public void setEndLine(int endLine)
 	{
 		this.endLine = endLine;

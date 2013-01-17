@@ -100,9 +100,6 @@ public class AozoraEpub3Converter
 	/** 強制改行対象の空行後のパターン */
 	//Pattern forcePageBreakPattern = null;
 	
-	/** 表題を目次から除外しない */
-	boolean insertTitleToc = true;
-	
 	//---------------- Chapter Properties ----------------//
 	boolean autoChapterName = false;
 	boolean autoChapterNumOnly = false;
@@ -436,13 +433,11 @@ public class AozoraEpub3Converter
 	}
 	
 	/** 目次抽出 */
-	public void setChapterLevel(int maxLength, boolean insertTitleToc, boolean excludeSeqencialChapter, boolean useNextLineChapterName, boolean section, boolean h, boolean h1, boolean h2, boolean h3,
+	public void setChapterLevel(int maxLength, boolean excludeSeqencialChapter, boolean useNextLineChapterName, boolean section, boolean h, boolean h1, boolean h2, boolean h3,
 			boolean chapterName, boolean autoChapterNumOnly, boolean autoChapterNumTitle, boolean autoChapterNumParen, boolean autoChapterNumParenTitle,
 			String chapterPattern)
 	{
 		this.maxChapterNameLength = maxLength;
-		
-		this.insertTitleToc = insertTitleToc;
 		
 		this.chapterSection = section;
 		//見出し
@@ -537,7 +532,7 @@ public class AozoraEpub3Converter
 		int firstCommentLineNum = -1;
 		
 		//先頭行
-		String[] firstLines = new String[7];
+		String[] firstLines = new String[10];
 		//先頭行の開始行番号
 		int firstLineStart = -1;
 		
@@ -568,13 +563,13 @@ public class AozoraEpub3Converter
 			this.lineNum++;
 			
 			//見出し等の取得のため前方参照注記は変換 外字文字は置換
-			line = this.replaceChukiSufTag(this.convertGaijiChuki(line, true, false));
+			line = CharUtils.removeSpace(this.replaceChukiSufTag(this.convertGaijiChuki(line, true, false)));
 			//注記と画像のチェックなのでルビ除去 エスケープ文字は残す
-			line = CharUtils.removeRuby(line);
+			String noRubyLine = CharUtils.removeRuby(line);
 			
 			//コメント除外 50文字以上をコメントにする
-			if (line.startsWith("--------------------------------")) {
-				if (!line.startsWith("--------------------------------------------------")) {
+			if (noRubyLine.startsWith("--------------------------------")) {
+				if (!noRubyLine.startsWith("--------------------------------------------------")) {
 					LogAppender.warn(lineNum, "コメント行の文字数が足りません");
 				} else {
 					if (firstCommentLineNum == -1) firstCommentLineNum = this.lineNum;
@@ -597,7 +592,7 @@ public class AozoraEpub3Converter
 			}
 			
 			//空行チェック
-			if (line.equals("") || line.equals(" ") || line.equals("　")) {
+			if (noRubyLine.equals("") || noRubyLine.equals(" ") || noRubyLine.equals("　")) {
 				lastEmptyLine = lineNum;
 				//空行なので次の行へ
 				continue;
@@ -606,13 +601,13 @@ public class AozoraEpub3Converter
 			if (inComment && !this.commentPrint) continue;
 			
 			//2行前が改ページと画像の行かをチェックして行番号をbookInfoに保存
-			if (!noIllust) this.checkImageOnly(bookInfo, preLines, line, this.lineNum);
+			if (!noIllust) this.checkImageOnly(bookInfo, preLines, noRubyLine, this.lineNum);
 			
 			//見出しのChapter追加
 			if (addChapterName) {
 				if (preChapterLineInfo == null) addChapterName = false; //前の見出しがなければ中止
 				else {
-					String name = this.getChapterName(line);
+					String name = this.getChapterName(noRubyLine);
 					//字下げ注記等は飛ばして次の行を見る
 					if (name.length() > 0) {
 						preChapterLineInfo.setChapterName(name);
@@ -627,7 +622,7 @@ public class AozoraEpub3Converter
 				}
 			}
 			//画像のファイル名の順番を格納
-			Matcher m = chukiPattern.matcher(line);
+			Matcher m = chukiPattern.matcher(noRubyLine);
 			while (m.find()) {
 				String chukiTag = m.group();
 				String chukiName = chukiTag.substring(2, chukiTag.length()-1);
@@ -639,7 +634,7 @@ public class AozoraEpub3Converter
 					//見出し注記
 					//注記の後に文字がなければブロックなので次の行 (次の行にブロック注記はこない？)
 					int chapterType = chapterChukiMap.get(chukiName);
-					if (line.length() == m.start()+chukiTag.length())  {
+					if (noRubyLine.length() == m.start()+chukiTag.length())  {
 						preChapterLineInfo = new ChapterLineInfo(lineNum+1, chapterType, addSectionChapter, ChapterLineInfo.getLevel(chapterType), lastEmptyLine==lineNum-1);
 						bookInfo.addChapterLineInfo(preChapterLineInfo);
 						addChapterName = true; //次の行を見出しとして利用
@@ -647,7 +642,7 @@ public class AozoraEpub3Converter
 					}
 					else {
 						bookInfo.addChapterLineInfo(
-								new ChapterLineInfo(lineNum, chapterType, addSectionChapter, ChapterLineInfo.getLevel(chapterType), lastEmptyLine==lineNum-1, this.getChapterName(line.substring(m.end()))) );
+								new ChapterLineInfo(lineNum, chapterType, addSectionChapter, ChapterLineInfo.getLevel(chapterType), lastEmptyLine==lineNum-1, this.getChapterName(noRubyLine.substring(m.end()))) );
 						if (this.useNextLineChapterName) addNextChapterName = lineNum+1; //次の行を連結
 						addChapterName = false; //次の行を見出しとして利用しない
 					}
@@ -678,12 +673,12 @@ public class AozoraEpub3Converter
 			//TODO パターンと目次レベルは設定可能にする 空行指定の場合はpreLines利用
 			if (autoChapter && bookInfo.getChapterLevel(lineNum) == 0) {
 				//文字列から注記と前の空白を除去
-				String noChukiLine = CharUtils.removeSpace(CharUtils.removeTag(CharUtils.removeRuby(line)));
+				String noChukiLine = CharUtils.removeSpace(CharUtils.removeTag(noRubyLine));
 				
 				//その他パターン
 				if (this.chapterPattern != null) {
 					if (this.chapterPattern.matcher(noChukiLine).find()) {
-						bookInfo.addChapterLineInfo(new ChapterLineInfo(lineNum, ChapterLineInfo.TYPE_PATTERN, addSectionChapter, 13, lastEmptyLine==lineNum-1, this.getChapterName(line)));
+						bookInfo.addChapterLineInfo(new ChapterLineInfo(lineNum, ChapterLineInfo.TYPE_PATTERN, addSectionChapter, 13, lastEmptyLine==lineNum-1, this.getChapterName(noRubyLine)));
 						if (this.useNextLineChapterName) addNextChapterName = lineNum+1; //次の行を連結
 						addSectionChapter = false; //改ページ後のChapter出力を抑止
 					}
@@ -725,7 +720,7 @@ public class AozoraEpub3Converter
 						}
 					}
 					if (isChapter) {
-						bookInfo.addChapterLineInfo(new ChapterLineInfo(lineNum, ChapterLineInfo.TYPE_CHAPTER_NAME, addSectionChapter, 13, lastEmptyLine==lineNum-1, this.getChapterName(line)));
+						bookInfo.addChapterLineInfo(new ChapterLineInfo(lineNum, ChapterLineInfo.TYPE_CHAPTER_NAME, addSectionChapter, 13, lastEmptyLine==lineNum-1, this.getChapterName(noRubyLine)));
 						if (this.useNextLineChapterName) addNextChapterName = lineNum+1; //次の行を連結
 						addChapterName = false; //次の行を見出しとして利用
 						addSectionChapter = false; //改ページ後のChapter出力を抑止
@@ -738,7 +733,7 @@ public class AozoraEpub3Converter
 					if (idx > 0) {
 						if (this.autoChapterNumOnly && noChukiLine.length()==idx ||
 							this.autoChapterNumTitle && noChukiLine.length() > idx && isChapterSeparator(noChukiLine.charAt(idx))) { 
-							bookInfo.addChapterLineInfo(new ChapterLineInfo(lineNum, ChapterLineInfo.TYPE_CHAPTER_NUM, addSectionChapter, 13, lastEmptyLine==lineNum-1, this.getChapterName(line)));
+							bookInfo.addChapterLineInfo(new ChapterLineInfo(lineNum, ChapterLineInfo.TYPE_CHAPTER_NUM, addSectionChapter, 13, lastEmptyLine==lineNum-1, this.getChapterName(noRubyLine)));
 							if (this.useNextLineChapterName) addNextChapterName = lineNum+1; //次の行を連結
 							addChapterName = false; //次の行を見出しとして利用しない
 							addSectionChapter = false; //改ページ後のChapter出力を抑止
@@ -760,7 +755,7 @@ public class AozoraEpub3Converter
 								idx += suffix.length();
 								if (this.autoChapterNumParen && noChukiLine.length()==idx ||
 									this.autoChapterNumParenTitle && noChukiLine.length()>idx && isChapterSeparator(noChukiLine.charAt(idx))) {
-									bookInfo.addChapterLineInfo(new ChapterLineInfo(lineNum, ChapterLineInfo.TYPE_CHAPTER_NUM, addSectionChapter, 13, lastEmptyLine==lineNum-1, this.getChapterName(line)));
+									bookInfo.addChapterLineInfo(new ChapterLineInfo(lineNum, ChapterLineInfo.TYPE_CHAPTER_NUM, addSectionChapter, 13, lastEmptyLine==lineNum-1, this.getChapterName(noRubyLine)));
 									if (this.useNextLineChapterName) addNextChapterName = lineNum+1; //次の行を連結
 									addChapterName = false; //次の行を見出しとして利用しない
 									addSectionChapter = false; //改ページ後のChapter出力を抑止
@@ -773,11 +768,11 @@ public class AozoraEpub3Converter
 			//改ページ後の注記以外の本文を追加
 			if (this.chapterSection && addSectionChapter) {
 				//底本：は目次に出さない
-				if (line.length() > 2 && line.charAt(0)=='底' && line.charAt(1)=='本' && line.charAt(2)=='：' ) {
+				if (noRubyLine.length() > 2 && noRubyLine.charAt(0)=='底' && noRubyLine.charAt(1)=='本' && noRubyLine.charAt(2)=='：' ) {
 					addSectionChapter = false; //改ページ後のChapter出力を抑止
 				} else {
 					//記号のみの行は無視して次の行へ
-					String name = this.getChapterName(line);
+					String name = this.getChapterName(noRubyLine);
 					if (name.replaceAll("◇|◆|□|■|▽|▼|☆|★|＊|＋|×|†|　", "").length() > 0) {
 						bookInfo.addChapterLineInfo(new ChapterLineInfo(lineNum, ChapterLineInfo.TYPE_PAGEBREAK, true, 1, lastEmptyLine==lineNum-1, name));
 						if (this.useNextLineChapterName) addNextChapterName = lineNum+1;
@@ -789,7 +784,7 @@ public class AozoraEpub3Converter
 			//見出しの次の行＆見出しでない
 			if (addNextChapterName == lineNum && bookInfo.getChapterLineInfo(lineNum) == null) {
 				//見出しの次の行を繋げる
-				String name = this.getChapterName(line);
+				String name = this.getChapterName(noRubyLine);
 				if (name.length() > 0) {
 					ChapterLineInfo info = bookInfo.getChapterLineInfo(lineNum-1);
 					if (info != null) info.joinChapterName(name);
@@ -799,30 +794,30 @@ public class AozoraEpub3Converter
 			
 			//コメント行の後はタイトル取得はしない
 			if (!firstCommentStarted) {
-				String replaced = this.getChapterName(line, 0);
+				String replaced = getChapterName(noRubyLine, 0);
 				if (firstLineStart == -1) {
 					//改ページチェック
 					//タイトル前の改ページ位置を保存
-					if (isPageBreakLine(line))
+					if (isPageBreakLine(noRubyLine))
 						preTitlePageBreak = lineNum;
 					//文字の行が来たら先頭行開始
 					if (replaced.length() > 0) {
 						firstLineStart = this.lineNum;
-						firstLines[0] = replaced;
+						firstLines[0] = CharUtils.removeSpace(line);
 					}
 				} else {
 					//改ページで終了
-					if (isPageBreakLine(line)) firstCommentStarted = true;
+					if (isPageBreakLine(noRubyLine)) firstCommentStarted = true;
 					if (this.lineNum-firstLineStart > firstLines.length-1) {
 						firstCommentStarted = true;
-					} else {
-						firstLines[this.lineNum-firstLineStart] = replaced;
+					} else if (replaced.length() > 0) {
+						firstLines[this.lineNum-firstLineStart] = CharUtils.removeSpace(line);
 					}
 				}
 			}
 			//前の2行を保存
 			preLines[1] = preLines[0];
-			preLines[0] = line;
+			preLines[0] = noRubyLine;
 		}
 		
 		//行数設定
@@ -848,10 +843,6 @@ public class AozoraEpub3Converter
 			}
 		}
 		
-		//見出しに追加されたタイトル行は削除
-		if (!this.insertTitleToc && bookInfo.titleLine >= 0) {
-			bookInfo.removeChapterLineInfo(bookInfo.titleLine);
-		}
 		if (bookInfo.orgTitleLine > 0) bookInfo.removeChapterLineInfo(bookInfo.orgTitleLine);
 		if (bookInfo.subTitleLine > 0) bookInfo.removeChapterLineInfo(bookInfo.subTitleLine);
 		if (bookInfo.subOrgTitleLine > 0) bookInfo.removeChapterLineInfo(bookInfo.subOrgTitleLine);
@@ -875,7 +866,7 @@ public class AozoraEpub3Converter
 	}
 	/** 目次やタイトル用の文字列を取得 ルビ関連の文字 ｜《》 は除外済で他の特殊文字は'※'エスケープ
 	 * @param maxLength 文字制限 これより大きい文字は短くして...をつける */
-	private String getChapterName(String line, int maxLength)
+	static public String getChapterName(String line, int maxLength)
 	{
 		String name = line.replaceAll("［＃.+?］", "").replaceAll("<[^>]+>", "")//注記とタグ除去
 				.replaceAll("※(《|》|［|］|〔|〕|〔|〕|〔|〕|｜)", "$1") //エスケープ文字から※除外
@@ -1017,9 +1008,11 @@ public class AozoraEpub3Converter
 			}
 		}
 		
-		
 		//コメントブロック内
 		boolean inComment = false;
+		
+		//タイトルを出力しない
+		boolean skipTitle = false;
 		
 		while ((line = src.readLine()) != null) {
 			lineNum++;
@@ -1028,14 +1021,27 @@ public class AozoraEpub3Converter
 			//強制改ページ行なら先頭で改ページ 空のページなら出力しない
 			//この行が改ページ注記だと左右中央が上書きされるので、改ページ注記処理でも左右中央を設定
 			if ((this.bookInfo.titlePageType == BookInfo.TITLE_MIDDLE || this.bookInfo.titlePageType == BookInfo.TITLE_HORIZONTAL) && bookInfo.preTitlePageBreak == lineNum) {
-				//タグの中ならずらす
-				if (this.tagLevel == 0) this.setPageBreakTrigger(this.bookInfo.titlePageType == BookInfo.TITLE_HORIZONTAL? pageBreakNormal : pageBreakMiddle);
+				//開始位置がタグの中なら次の行へ
+				if (this.tagLevel == 0) {
+					//出力しない
+					skipTitle = true;
+					//if (this.bookInfo.titlePageType == BookInfo.TITLE_HORIZONTAL) skipTitle = true;
+					//else this.setPageBreakTrigger(pageBreakMiddle);
+				}
 				else bookInfo.preTitlePageBreak++;
 			}
 			else if (bookInfo.isPageBreakLine(lineNum) && sectionCharLength > 0) {
 				if (this.tagLevel == 0) this.setPageBreakTrigger(pageBreakNormal);
 				else bookInfo.addPageBreakLine(lineNum+1);
 			}
+			
+			//タイトルページの改ページ行
+			if (skipTitle && bookInfo.titleEndLine+1 == lineNum) {
+				skipTitle = false;
+				continue;
+			}
+			//タイトルを出力しない
+			if (skipTitle) continue;
 			
 			//コメント除外
 			if (line.startsWith("--------------------------------------------------")) {
@@ -1559,7 +1565,7 @@ public class AozoraEpub3Converter
 						} else {
 							this.setPageBreakTrigger(pageBreakImageAuto);
 							pageBreakImageAuto.imageFileName = bookInfo.getImageSectionFileName(lineNum+1);
-							pageBreakImageAuto.imagePageType = this.writer.getImagePageType(this.pageBreakTrigger.imageFileName, this.tagLevel);
+							pageBreakImageAuto.imagePageType = this.writer.getImagePageType(this.pageBreakTrigger.imageFileName, this.tagLevel, this.lineNum);
 						}
 					} else {
 						this.setPageBreakTrigger(pageBreakNormal);
@@ -1673,7 +1679,7 @@ public class AozoraEpub3Converter
 											buf.append(chukiMap.get("画像終了")[0]);
 										} else {
 											//画像注記またはページ出力
-											printImageChuki(out, buf, fileName, this.writer.getImagePageType(srcFilePath, this.tagLevel));
+											printImageChuki(out, buf, fileName, this.writer.getImagePageType(srcFilePath, this.tagLevel, this.lineNum));
 										}
 									}
 								}
@@ -1701,7 +1707,7 @@ public class AozoraEpub3Converter
 									buf.append(chukiMap.get("画像終了")[0]);
 								} else {
 									//画像注記またはページ出力
-									printImageChuki(out, buf, fileName, this.writer.getImagePageType(srcFilePath, this.tagLevel));
+									printImageChuki(out, buf, fileName, this.writer.getImagePageType(srcFilePath, this.tagLevel, this.lineNum));
 								}
 							}
 						}
@@ -1810,7 +1816,7 @@ public class AozoraEpub3Converter
 			if (this.sectionCharLength > 0 && buf.length() > 2 && buf.charAt(0)=='底' && buf.charAt(1)=='本' && buf.charAt(2)=='：' ) {
 				//字下げ状態エラー出力
 				if (inJisage >= 0) {
-					LogAppender.println("字下げ注記エラー : "+(inJisage+1));
+					LogAppender.error(inJisage, "字下げ注記エラー");
 				} else {
 					this.setPageBreakTrigger(pageBreakNoChapter);
 				}
@@ -1857,13 +1863,14 @@ public class AozoraEpub3Converter
 			buf.append(fileName);
 			buf.append(chukiMap.get("画像終了")[0]);
 			
-		} else if (tagLevel == 0 && imagePageType != PageBreakTrigger.IMAGE_PAGE_NONE) {
+		} else if (imagePageType != PageBreakTrigger.IMAGE_PAGE_NONE) {
 			//単一ページ出力 タグの外のみ
-			//改ページの前に文字があれば出力
+			//改ページの前に文字があれば前のページに出力
 			if (buf.length() > 0) this.printLineBuffer(out, buf, lineNum, true);
 			buf.append(chukiMap.get("画像開始")[0]);
 			buf.append(fileName);
 			buf.append(chukiMap.get("画像終了")[0]);
+			//単ページ出力
 			this.printImagePage(out, buf, lineNum, fileName, imagePageType);
 		} else {
 			buf.append(chukiMap.get("画像開始")[0]);
@@ -1879,11 +1886,10 @@ public class AozoraEpub3Converter
 		convertEscapedText(buf, text.toCharArray(), 0, text.length());
 		return buf.toString();
 	}
-	/** <>&のエスケープと特殊文字の※を除去した文字列を出力バッファに出力 */
+	/** 注記以外の部分を<>&のエスケープと《》置換した文字列を出力バッファに出力 ルビ変換前に呼び出す */
 	private void convertEscapedText(StringBuilder buf, char[] ch, int begin, int end) throws IOException
 	{
-		//事前に《》の代替文字をエスケープ済※《 ※》 に変換
-		//全角ひらがな漢字スペースの存在もついでにチェック
+		//事前に《,》の代替文字をエスケープ済※《,※》 に変換
 		for (int i=begin+1; i<end; i++) {
 			switch (ch[i]) {
 			case '<':
@@ -1916,6 +1922,14 @@ public class AozoraEpub3Converter
 			default: buf.append(ch[idx]);
 			}
 		}
+	}
+	
+	/** ルビ変換 外部呼び出し用 */
+	public String convertRubyText(String text) throws IOException
+	{
+		StringBuilder buf = new StringBuilder();
+		convertRubyText(buf, text.toCharArray());
+		return buf.toString();
 	}
 	
 	/** ルビタグに変換して出力
@@ -2063,136 +2077,145 @@ public class AozoraEpub3Converter
 		}
 	}
 	
+	/** ルビ変換 外部呼び出し用 */
+	public String convertTcyText(String text) throws IOException
+	{
+		StringBuilder buf = new StringBuilder();
+		convertTcyText(buf, text.toCharArray(), 0, text.length(), false);
+		return buf.toString();
+	}
+	
 	/** 縦中横変換してbufに出力 */
-	public void convertTcyText(StringBuilder buf, char[] ch, int begin, int end, boolean noTcy) throws IOException
+	private void convertTcyText(StringBuilder buf, char[] ch, int begin, int end, boolean noTcy) throws IOException
 	{
 		
 		for (int i=begin; i<end; i++) {
-			switch (ch[i]) {
-			case '0': case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9':
-				//数字2文字を縦横中で出力
-				if (this.autoYoko && !(this.inYoko || noTcy)) {
-					if (this.autoYokoNum3 && i+2<ch.length && CharUtils.isNum(ch[i+1]) && CharUtils.isNum(ch[i+2])) {
-						//数字3文字
-						//前後が半角かチェック
-						if (i>0 && CharUtils.isHalf(ch[i-1])) break;
-						if (i+3<ch.length && CharUtils.isHalf(ch[i+3])) break;
-						//半角スペースの前後が半角文字
-						if (i>1 && ch[i-1]==' ' && CharUtils.isHalf(ch[i-2])) break;
-						if (i+4<ch.length && ch[i+3]==' ' && CharUtils.isHalf(ch[i+3])) break;
-						buf.append(chukiMap.get("縦中横")[0]);
-						buf.append(ch[i]);
-						buf.append(ch[i+1]);
-						buf.append(ch[i+2]);
-						buf.append(chukiMap.get("縦中横終わり")[0]);
-						i+=2;
-						continue;
-					} else if (i+1<ch.length && CharUtils.isNum(ch[i+1])) {
-						//数字2文字
-						//前後が半角かチェック
-						if (i>0 && CharUtils.isHalf(ch[i-1])) break;
-						if (i+2<ch.length && CharUtils.isHalf(ch[i+2])) break;
-						//半角スペースの前後が半角文字
-						if (i>1 && ch[i-1]==' ' && CharUtils.isHalf(ch[i-2])) break;
-						if (i+3<ch.length && ch[i+2]==' ' && CharUtils.isHalf(ch[i+3])) break;
-						buf.append(chukiMap.get("縦中横")[0]);
-						buf.append(ch[i]);
-						buf.append(ch[i+1]);
-						buf.append(chukiMap.get("縦中横終わり")[0]);
-						i++;
-						continue;
-					} else if (this.autoYokoNum1 && (i==0 || !CharUtils.isNum(ch[i-1])) && (i+1==ch.length || !CharUtils.isNum(ch[i+1]))) {
-						//数字1文字
-						//前後が半角かチェック
-						if (i>0 && CharUtils.isHalf(ch[i-1])) break;
-						if (i+1<ch.length && CharUtils.isHalf(ch[i+1])) break;
-						//半角スペースの前後が半角文字
-						if (i>1 && ch[i-1]==' ' && CharUtils.isHalf(ch[i-2])) break;
-						if (i+2<ch.length && ch[i+1]==' ' && CharUtils.isHalf(ch[i+2])) break;
-						buf.append(chukiMap.get("縦中横")[0]);
-						buf.append(ch[i]);
-						buf.append(chukiMap.get("縦中横終わり")[0]);
-						continue;
+			if (this.vertical) {
+				switch (ch[i]) {
+				case '0': case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9':
+					//数字2文字を縦横中で出力
+					if (this.autoYoko && !(this.inYoko || noTcy)) {
+						if (this.autoYokoNum3 && i+2<ch.length && CharUtils.isNum(ch[i+1]) && CharUtils.isNum(ch[i+2])) {
+							//数字3文字
+							//前後が半角かチェック
+							if (i>0 && CharUtils.isHalf(ch[i-1])) break;
+							if (i+3<ch.length && CharUtils.isHalf(ch[i+3])) break;
+							//半角スペースの前後が半角文字
+							if (i>1 && ch[i-1]==' ' && CharUtils.isHalf(ch[i-2])) break;
+							if (i+4<ch.length && ch[i+3]==' ' && CharUtils.isHalf(ch[i+3])) break;
+							buf.append(chukiMap.get("縦中横")[0]);
+							buf.append(ch[i]);
+							buf.append(ch[i+1]);
+							buf.append(ch[i+2]);
+							buf.append(chukiMap.get("縦中横終わり")[0]);
+							i+=2;
+							continue;
+						} else if (i+1<ch.length && CharUtils.isNum(ch[i+1])) {
+							//数字2文字
+							//前後が半角かチェック
+							if (i>0 && CharUtils.isHalf(ch[i-1])) break;
+							if (i+2<ch.length && CharUtils.isHalf(ch[i+2])) break;
+							//半角スペースの前後が半角文字
+							if (i>1 && ch[i-1]==' ' && CharUtils.isHalf(ch[i-2])) break;
+							if (i+3<ch.length && ch[i+2]==' ' && CharUtils.isHalf(ch[i+3])) break;
+							buf.append(chukiMap.get("縦中横")[0]);
+							buf.append(ch[i]);
+							buf.append(ch[i+1]);
+							buf.append(chukiMap.get("縦中横終わり")[0]);
+							i++;
+							continue;
+						} else if (this.autoYokoNum1 && (i==0 || !CharUtils.isNum(ch[i-1])) && (i+1==ch.length || !CharUtils.isNum(ch[i+1]))) {
+							//数字1文字
+							//前後が半角かチェック
+							if (i>0 && CharUtils.isHalf(ch[i-1])) break;
+							if (i+1<ch.length && CharUtils.isHalf(ch[i+1])) break;
+							//半角スペースの前後が半角文字
+							if (i>1 && ch[i-1]==' ' && CharUtils.isHalf(ch[i-2])) break;
+							if (i+2<ch.length && ch[i+1]==' ' && CharUtils.isHalf(ch[i+2])) break;
+							buf.append(chukiMap.get("縦中横")[0]);
+							buf.append(ch[i]);
+							buf.append(chukiMap.get("縦中横終わり")[0]);
+							continue;
+						}
+						//begin～end外もチェックする
+						//1月1日のような場合
+						if (i+3<ch.length && ch[i+1]=='月' && '0'<=ch[i+2] && ch[i+2]<='9' && (
+							ch[i+3]=='日' || (i+4<ch.length && '0'<=ch[i+3] && ch[i+3]<='9' && ch[i+4]=='日'))) {
+							//1月2日 1月10日 の1を縦中横
+							buf.append(chukiMap.get("縦中横")[0]);
+							buf.append(ch[i]);
+							buf.append(chukiMap.get("縦中横終わり")[0]);
+							continue;
+						}
+						if (i>1 && i+1<ch.length && (ch[i-1]=='年' && ch[i+1]=='月' || ch[i-1]=='月' && ch[i+1]=='日' || ch[i-1]=='第' && (ch[i+1]=='刷' || ch[i+1]=='版' || ch[i+1]=='巻'))) {
+							//年3月 + 月4日 + 第5刷 + 第6版 + 第7巻 の数字１文字縦中横
+							buf.append(chukiMap.get("縦中横")[0]);
+							buf.append(ch[i]);
+							buf.append(chukiMap.get("縦中横終わり")[0]);
+							continue;
+						}
+						if (i>2 && (ch[i-2]=='明'&&ch[i-1]=='治' || ch[i-2]=='大'&&ch[i-1]=='正' || ch[i-2]=='昭'&&ch[i-1]=='和' || ch[i-2]=='平'&&ch[i-1]=='成')) {
+							//月5日 の5を縦中横
+							buf.append(chukiMap.get("縦中横")[0]);
+							buf.append(ch[i]);
+							buf.append(chukiMap.get("縦中横終わり")[0]);
+							continue;
+						}
 					}
-					//begin～end外もチェックする
-					//1月1日のような場合
-					if (i+3<ch.length && ch[i+1]=='月' && '0'<=ch[i+2] && ch[i+2]<='9' && (
-						ch[i+3]=='日' || (i+4<ch.length && '0'<=ch[i+3] && ch[i+3]<='9' && ch[i+4]=='日'))) {
-						//1月2日 1月10日 の1を縦中横
-						buf.append(chukiMap.get("縦中横")[0]);
-						buf.append(ch[i]);
-						buf.append(chukiMap.get("縦中横終わり")[0]);
-						continue;
+					break;
+				case '!': case '?':
+					if (autoYoko  && !(inYoko || noTcy)) {
+						if (autoYokoEQ3 && i+2<ch.length && (ch[i+1]=='!' || ch[i+1]=='?') && (ch[i+2]=='!' || ch[i+2]=='?')) {
+							//!? 3文字を縦中横で出力
+							//前後が半角かチェック
+							if (i!=0 && CharUtils.isHalf(ch[i-1])) break;
+							if (i+3<ch.length && CharUtils.isHalf(ch[i+3])) break;
+							//半角スペースの前後が半角文字
+							if (i>1 && ch[i-1]==' ' && CharUtils.isHalf(ch[i-2])) break;
+							if (i+4<ch.length && ch[i+3]==' ' && CharUtils.isHalf(ch[i+4])) break;
+							buf.append(chukiMap.get("縦中横")[0]);
+							buf.append(ch[i]);
+							buf.append(ch[i+1]);
+							buf.append(ch[i+2]);
+							buf.append(chukiMap.get("縦中横終わり")[0]);
+							i+=2;
+							continue;
+						} else if (i+1<ch.length && (ch[i+1]=='!' || ch[i+1]=='?')) {
+							//!? 2文字を縦横中で出力
+							//前後が半角かチェック
+							if (i!=0 && CharUtils.isHalf(ch[i-1])) break;
+							if (i+2<ch.length && CharUtils.isHalf(ch[i+2])) break;
+							//半角スペースの前後が半角文字
+							if (i>1 && ch[i-1]==' ' && CharUtils.isHalf(ch[i-2])) break;
+							if (i+3<ch.length && ch[i+2]==' ' && CharUtils.isHalf(ch[i+3])) break;
+							buf.append(chukiMap.get("縦中横")[0]);
+							buf.append(ch[i]);
+							buf.append(ch[i+1]);
+							buf.append(chukiMap.get("縦中横終わり")[0]);
+							i++;
+							continue;
+						} else if (autoYokoEQ1 && (i==0 || !CharUtils.isNum(ch[i-1])) && (i+1==ch.length || !CharUtils.isNum(ch[i+1]))) {
+							//!? 1文字
+							//前後が半角かチェック
+							if (i>0 && CharUtils.isHalf(ch[i-1])) break;
+							if (i+1<ch.length && CharUtils.isHalf(ch[i+1])) break;
+							//半角スペースの前後が半角文字
+							if (i>1 && ch[i-1]==' ' && CharUtils.isHalf(ch[i-2])) break;
+							if (i+2<ch.length && ch[i+1]==' ' && CharUtils.isHalf(ch[i+2])) break;
+							buf.append(chukiMap.get("縦中横")[0]);
+							buf.append(ch[i]);
+							buf.append(chukiMap.get("縦中横終わり")[0]);
+							continue;
+						}
 					}
-					if (i>1 && i+1<ch.length && (ch[i-1]=='年' && ch[i+1]=='月' || ch[i-1]=='月' && ch[i+1]=='日' || ch[i-1]=='第' && (ch[i+1]=='刷' || ch[i+1]=='版' || ch[i+1]=='巻'))) {
-						//年3月 + 月4日 + 第5刷 + 第6版 + 第7巻 の数字１文字縦中横
-						buf.append(chukiMap.get("縦中横")[0]);
-						buf.append(ch[i]);
-						buf.append(chukiMap.get("縦中横終わり")[0]);
-						continue;
-					}
-					if (i>2 && (ch[i-2]=='明'&&ch[i-1]=='治' || ch[i-2]=='大'&&ch[i-1]=='正' || ch[i-2]=='昭'&&ch[i-1]=='和' || ch[i-2]=='平'&&ch[i-1]=='成')) {
-						//月5日 の5を縦中横
-						buf.append(chukiMap.get("縦中横")[0]);
-						buf.append(ch[i]);
-						buf.append(chukiMap.get("縦中横終わり")[0]);
-						continue;
-					}
+					break;
 				}
-				break;
-			case '!': case '?':
-				if (autoYoko  && !(inYoko || noTcy)) {
-					if (autoYokoEQ3 && i+2<ch.length && (ch[i+1]=='!' || ch[i+1]=='?') && (ch[i+2]=='!' || ch[i+2]=='?')) {
-						//!? 3文字を縦中横で出力
-						//前後が半角かチェック
-						if (i!=0 && CharUtils.isHalf(ch[i-1])) break;
-						if (i+3<ch.length && CharUtils.isHalf(ch[i+3])) break;
-						//半角スペースの前後が半角文字
-						if (i>1 && ch[i-1]==' ' && CharUtils.isHalf(ch[i-2])) break;
-						if (i+4<ch.length && ch[i+3]==' ' && CharUtils.isHalf(ch[i+4])) break;
-						buf.append(chukiMap.get("縦中横")[0]);
-						buf.append(ch[i]);
-						buf.append(ch[i+1]);
-						buf.append(ch[i+2]);
-						buf.append(chukiMap.get("縦中横終わり")[0]);
-						i+=2;
-						continue;
-					} else if (i+1<ch.length && (ch[i+1]=='!' || ch[i+1]=='?')) {
-						//!? 2文字を縦横中で出力
-						//前後が半角かチェック
-						if (i!=0 && CharUtils.isHalf(ch[i-1])) break;
-						if (i+2<ch.length && CharUtils.isHalf(ch[i+2])) break;
-						//半角スペースの前後が半角文字
-						if (i>1 && ch[i-1]==' ' && CharUtils.isHalf(ch[i-2])) break;
-						if (i+3<ch.length && ch[i+2]==' ' && CharUtils.isHalf(ch[i+3])) break;
-						buf.append(chukiMap.get("縦中横")[0]);
-						buf.append(ch[i]);
-						buf.append(ch[i+1]);
-						buf.append(chukiMap.get("縦中横終わり")[0]);
-						i++;
-						continue;
-					} else if (autoYokoEQ1 && (i==0 || !CharUtils.isNum(ch[i-1])) && (i+1==ch.length || !CharUtils.isNum(ch[i+1]))) {
-						//!? 1文字
-						//前後が半角かチェック
-						if (i>0 && CharUtils.isHalf(ch[i-1])) break;
-						if (i+1<ch.length && CharUtils.isHalf(ch[i+1])) break;
-						//半角スペースの前後が半角文字
-						if (i>1 && ch[i-1]==' ' && CharUtils.isHalf(ch[i-2])) break;
-						if (i+2<ch.length && ch[i+1]==' ' && CharUtils.isHalf(ch[i+2])) break;
-						buf.append(chukiMap.get("縦中横")[0]);
-						buf.append(ch[i]);
-						buf.append(chukiMap.get("縦中横終わり")[0]);
-						continue;
-					}
-				}
-				break;
-			}
-			
-			//英字縦中横
-			if (autoAlpha2 ) {
 				
+				//英字縦中横
+				if (autoAlpha2 ) {
+					
+				}
 			}
-			
 			//自動縦中横で出力していたらcontinueしていてここは実行されない
 			convertTcyChar(buf, ch, i, noTcy);
 		}

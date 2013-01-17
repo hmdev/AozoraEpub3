@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="ja" lang="ja">
+<head>
+#if (${bookInfo.Vertical})
+<link rel="stylesheet" type="text/css" href="../css/vertical_font.css"/>
+<link rel="stylesheet" type="text/css" href="../css/vertical_middle.css"/>
+<link rel="stylesheet" type="text/css" href="../css/vertical.css"/>
+#else
+<link rel="stylesheet" type="text/css" href="../css/horizontal_font.css"/>
+<link rel="stylesheet" type="text/css" href="../css/horizontal_middle.css"/>
+<link rel="stylesheet" type="text/css" href="../css/horizontal.css"/>
+#end
+<style type="text/css">
+.title, .subtitle, .orgtitle, .suborgtitle, .creator, .subcreator, .publisher { line-height: 1.25; }
+.title { font-size:2em; }
+.subtitle { font-size:1.5em; }
+.orgtitle { font-size:1.75em; }
+.suborgtitle { font-size:1.25em; }
+.creator { font-size:1.25em; }
+.subcreator { font-size:1.25em; }
+</style>
+<title>${title}</title>
+</head>
+
+<body>
+<table class="middle"><tr><td>
+
+#if (${PUBLISHER})
+<div class="publisher btm pb2">${PUBLISHER}</div>
+<br/>
+#end
+<div class="title">${TITLE}</div>
+#if (${SUBTITLE})
+<div class="subtitle pt2">${SUBTITLE}</div>
+#end
+#if (${ORGTITLE})
+<div class="orgtitle pt1">${ORGTITLE}</div>
+#end
+#if (${SUBORGTITLE})
+<div class="suborgtitle pt3">${SUBORGTITLE}</div>
+#end
+#if (${CREATOR})
+<div class="creator btm pb2">${CREATOR}</div>
+#end
+#if (${SUBCREATOR})
+<div class="subcreator btm pb2">${SUBCREATOR}</div>
+#end
+</div>
+
+</td></tr></table>
+</body>
+</html>
