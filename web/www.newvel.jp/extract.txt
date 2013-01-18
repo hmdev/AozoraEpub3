@@ -11,7 +11,7 @@
 ## タイトル
 TITLE	.hpb-cnt-tb2 td:1
 ## 著者
-AUTHOR	.hpb-cnt-tb2 td:3
+AUTHOR	.hpb-cnt-tb2 td:3	<a .*$	
 ## 説明
 DESCRIPTION	.hpb-cnt-tb2:13
 

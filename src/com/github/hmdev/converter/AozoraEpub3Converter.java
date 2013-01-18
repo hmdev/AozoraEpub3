@@ -1514,13 +1514,6 @@ public class AozoraEpub3Converter
 	
 	/** 青空テキスト行をePub3のXHTMLで出力
 	 * @param out 出力先Writer
-	 * @param line 変換前の行文字列 */
-	private void convertTextLineToEpub3(BufferedWriter out, String line) throws IOException
-	{
-		convertTextLineToEpub3(out, line, lineNum, false, false);
-	}
-	/** 青空テキスト行をePub3のXHTMLで出力
-	 * @param out 出力先Writer
 	 * @param line 変換前の行文字列
 	 * @param noBr 改行を出力しない */
 	private void convertTextLineToEpub3(BufferedWriter out, String line, int lineNum, boolean noBr, boolean noImage) throws IOException
@@ -1977,13 +1970,6 @@ public class AozoraEpub3Converter
 		}
 	}
 	
-	/** <>&のエスケープと特殊文字の※を除去した文字を出力 */
-	private String convertEscapedText(String text) throws IOException
-	{
-		StringBuilder buf = new StringBuilder();
-		convertEscapedText(buf, text.toCharArray(), 0, text.length());
-		return buf.toString();
-	}
 	/** 注記以外の部分を<>&のエスケープと《》置換した文字列を出力バッファに出力 ルビ変換前に呼び出す */
 	private void convertEscapedText(StringBuilder buf, char[] ch, int begin, int end) throws IOException
 	{
@@ -2350,13 +2336,13 @@ public class AozoraEpub3Converter
 		if (!(inYoko || noTcy)) {
 			switch (this.spaceHyphenation) {
 			case 1:
-				if (ch[idx]=='　' && buf.length()>0 && buf.charAt(buf.length()-1)!='　' && (idx-1==ch.length || idx+1<ch.length && ch[idx+1]!='　')) {
+				if (idx > 10 && ch[idx]=='　' && buf.length()>0 && buf.charAt(buf.length()-1)!='　' && (idx-1==ch.length || idx+1<ch.length && ch[idx+1]!='　')) {
 					buf.append("<span class=\"fullsp\"> </span>");
 					return;
 				}
 				break;
 			case 2:
-				if (ch[idx]=='　' && buf.length()>0 && buf.charAt(buf.length()-1)!='　' && (idx-1==ch.length || idx+1<ch.length && ch[idx+1]!='　')) {
+				if (idx > 10 && ch[idx]=='　' && buf.length()>0 && buf.charAt(buf.length()-1)!='　' && (idx-1==ch.length || idx+1<ch.length && ch[idx+1]!='　')) {
 					buf.append((char)(0x2000)).append((char)(0x2000));
 					return;
 				}
@@ -2489,6 +2475,9 @@ public class AozoraEpub3Converter
 	{
 		String line = buf.toString();
 		int length = line.length();
+		//すべて空白は空行にする
+		if (CharUtils.isSpace(line)) { line = ""; length = 0; }
+		
 		int idIdx = 1;
 		String chapterId = null;
 		

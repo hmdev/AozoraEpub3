@@ -763,7 +763,7 @@ public class WebAozoraConverter
 			if (text != null && text.length() > 0) {
 				text = text.replaceAll("[\n|\r]", "").replaceAll("\t", " ");
 				if (replace) text = extractInfo.replace(text);
-				return removeTag(text);
+				return Jsoup.parse(removeTag(text)).text();
 			}
 		}
 		return null;
