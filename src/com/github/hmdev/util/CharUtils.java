@@ -146,11 +146,14 @@ public class CharUtils
 		return false;
 	}
 	
+	////////////////////////////////////////////////////////////////
+	/** ファイル名に使えない文字を'_'に置換 */
 	static public String escapeUrlToFile(String str)
 	{
 		return str.replaceAll("(\\?|\\&)", "/").replaceAll("(:|\\*|\\||\\<|\\>|\"|\\\\)", "_");
 	}
 	
+	////////////////////////////////////////////////////////////////
 	/** 前後の空白を除外 */
 	static public String removeSpace(String text)
 	{
@@ -174,6 +177,24 @@ public class CharUtils
 		return text.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
 	}
 	
+	/** 目次やタイトル用の文字列を取得 ルビ関連の文字 ｜《》 は除外済で他の特殊文字は'※'エスケープ
+	 * @param maxLength 文字制限 これより大きい文字は短くして...をつける */
+	static public String getChapterName(String line, int maxLength)
+	{
+		String name = line.replaceAll("［＃.+?］", "").replaceAll("<[^>]+>", "")//注記とタグ除去
+				.replaceAll("※(《|》|［|］|〔|〕|〔|〕|〔|〕|｜)", "$1") //エスケープ文字から※除外
+				.replaceFirst("^[\t| |　]+", "").replaceFirst("[\t| |　]+$","") //前後の不要な文字所除去
+				.replaceAll("〳〵", "く").replaceAll("〴〵", "ぐ").replaceAll("〻", "々")
+				.replaceAll("(=|＝|-|―|─)+", "$1")//連続する記号は1つに
+				;
+				//printLineBuffer内だと以下の変換が必要
+				/*.replaceAll("<span class=\"fullsp\"> </span>", "　").replaceAll(String.valueOf((char)(0x2000))+(char)(0x2000), "　")
+				.replaceAll("<rt>[^<]+</rt>", "")*/
+		if (maxLength == 0) return name;
+		return name.length()>maxLength ? name.substring(0, maxLength)+"..." : name;
+	}
+	
+	////////////////////////////////////////////////////////////////
 	/** Test用 */
 	/*public static void main(String[] args)
 	{

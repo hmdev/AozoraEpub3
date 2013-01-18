@@ -9,7 +9,6 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.github.hmdev.converter.AozoraEpub3Converter;
 import com.github.hmdev.image.ImageUtils;
 import com.github.hmdev.util.CharUtils;
 
@@ -63,11 +62,11 @@ public class BookInfo
 	/** 表題種別 */
 	public int titlePageType = 0;
 	
-	
+	////////////////////////////////
 	/** タイトル等の行 */
 	String[] metaLines;
 	/** タイトル等の開始行番号 */
-	int metaLineStart;
+	public int metaLineStart;
 	
 	/** テキストの行数 */
 	public int totalLineNum = -1;
@@ -93,6 +92,13 @@ public class BookInfo
 	public int creatorLine = -1;
 	/** 複著作者行番号 */
 	public int subCreatorLine = -1;
+	
+	/** シリーズ名 */
+	public int seriesLine = -1;
+	/** 刊行者 */
+	public int publisherLine = -1;
+	
+	////////////////////////////////
 	
 	/** タイトル行の最後 */
 	public int titleEndLine = -1;
@@ -144,8 +150,8 @@ public class BookInfo
 	/** txtのない画像のみの場合 */
 	public boolean imageOnly = false;
 	
-	/** タイトルページの改ページ行 前に改ページがなければ0 表題がなければ-1 */
-	public int preTitlePageBreak = -1;
+	/** タイトルページの改ページ行 前に改ページがなければ-1 表題がなければ-2 */
+	//public int preTitlePageBreak = -2;
 	
 	/** 改ページ単位で区切られたセクションの情報を格納 */
 	//Vector<SectionInfo> vecSectionInfo;
@@ -512,12 +518,24 @@ public class BookInfo
 		} catch (Exception e) {}
 		return null;
 	}
+	public String getSeriesText()
+	{
+		if (this.seriesLine == -1) return null;
+		try {
+			return metaLines[this.seriesLine-this.metaLineStart];
+		} catch (Exception e) {}
+		return null;
+	}
+	public String getPublisherText()
+	{
+		if (this.publisherLine == -1) return null;
+		try {
+			return metaLines[this.publisherLine-this.metaLineStart];
+		} catch (Exception e) {}
+		return null;
+	}
 	
 	////////////////////////////////////////////////////////////////
-	public void setPreTitlePageBreak(int preTitlePageBreak)
-	{
-		this.preTitlePageBreak = preTitlePageBreak;
-	}
 	/** 先頭行から表題と著者を取得 */
 	public void setMetaInfo(TitleType titleType, String[] metaLines, int metaLineStart, int firstCommentLineNum)
 	{
@@ -727,9 +745,9 @@ public class BookInfo
 			if (this.creator != null && (this.creator.startsWith("―") || this.creator.startsWith("【"))) this.creator = null;
 			
 			if (this.title != null) {
-				this.title = AozoraEpub3Converter.getChapterName(CharUtils.removeRuby(this.title), 0);
+				this.title = CharUtils.getChapterName(CharUtils.removeRuby(this.title), 0);
 			}
-			if (this.creator != null) this.creator = AozoraEpub3Converter.getChapterName(CharUtils.removeRuby(this.creator), 0);
+			if (this.creator != null) this.creator = CharUtils.getChapterName(CharUtils.removeRuby(this.creator), 0);
 		}
 	}
 	/** 本文内のタイトル再読み込み */

@@ -727,12 +727,6 @@ public class WebAozoraConverter
 		}
 	}
 	
-	/** タグを除去 */
-	String removeTag(String text)
-	{
-		return text.replaceAll("<br ?/?>", " ").replaceAll("<[^>]+>", "");
-	}
-	
 	////////////////////////////////////////////////////////////////
 	
 	/** Element内のinnerHTMLを取得
@@ -835,6 +829,13 @@ public class WebAozoraConverter
 			}
 		}
 		return null;
+	}
+	
+	////////////////////////////////////////////////////////////////
+	/** タグを除去 rt内の文字は非表示 */
+	String removeTag(String text)
+	{
+		return text.replaceAll("<br ?/?>", " ").replaceAll("<rt>.+?</rt>", "").replaceAll("<[^>]+>", "");
 	}
 	
 	////////////////////////////////////////////////////////////////

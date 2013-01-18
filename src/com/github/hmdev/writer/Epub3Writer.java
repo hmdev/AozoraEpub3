@@ -390,28 +390,34 @@ public class Epub3Writer
 		//zip出力用Writer
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"));
 		
-		//表紙をテンプレート＋メタ情報から生成
-		if (bookInfo.titlePageType == BookInfo.TITLE_MIDDLE || bookInfo.titlePageType == BookInfo.TITLE_HORIZONTAL) {
+		//本文を出力
+		this.writeSections(converter, src, bw);
+		if (this.canceled) return;
+		
+		//表紙をテンプレート＋メタ情報から生成 先に出力すると外字画像出力で表紙の順番が狂う
+		if (!bookInfo.imageOnly && (bookInfo.titlePageType == BookInfo.TITLE_MIDDLE || bookInfo.titlePageType == BookInfo.TITLE_HORIZONTAL)) {
 			String vmFilePath = templatePath+OPS_PATH+XHTML_PATH+TITLE_M_VM;
 			if (bookInfo.titlePageType == BookInfo.TITLE_HORIZONTAL) {
 				converter.vertical = false;
 				vmFilePath = templatePath+OPS_PATH+XHTML_PATH+TITLE_H_VM;
 			}
-			
+			//ルビと外字画像注記と縦中横注記(縦書きのみ)のみ変換する
 			String line = bookInfo.getTitleText();
-			if (line != null) velocityContext.put("TITLE", converter.convertRubyText(converter.convertEscapedText(CharUtils.removeTag(line))));
+			if (line != null) velocityContext.put("TITLE", converter.convertTitleLineToEpub3(line));
 			line = bookInfo.getSubTitleText();
-			if (line != null) velocityContext.put("SUBTITLE", converter.convertRubyText(converter.convertEscapedText(CharUtils.removeTag(line))));
+			if (line != null) velocityContext.put("SUBTITLE", converter.convertTitleLineToEpub3(line));
 			line = bookInfo.getOrgTitleText();
-			if (line != null) velocityContext.put("ORGTITLE", converter.convertRubyText(converter.convertEscapedText(CharUtils.removeTag(line))));
+			if (line != null) velocityContext.put("ORGTITLE", converter.convertTitleLineToEpub3(line));
 			line = bookInfo.getSubOrgTitleText();
-			if (line != null) velocityContext.put("SUBORGTITLE", converter.convertRubyText(converter.convertEscapedText(CharUtils.removeTag(line))));
+			if (line != null) velocityContext.put("SUBORGTITLE", converter.convertTitleLineToEpub3(line));
 			line = bookInfo.getCreatorText();
-			if (line != null) velocityContext.put("CREATOR", converter.convertRubyText(converter.convertEscapedText(CharUtils.removeTag(line))));
+			if (line != null) velocityContext.put("CREATOR", converter.convertTitleLineToEpub3(line));
 			line = bookInfo.getSubCreatorText();
-			if (line != null) velocityContext.put("SUBCREATOR", converter.convertRubyText(converter.convertEscapedText(CharUtils.removeTag(line))));
-			//line = bookInfo.getPublisherText();
-			//if (line != null) velocityContext.put("PUBLISHER", converter.convertRubyText(converter.convertEscapedText(CharUtils.removeTag(line))));
+			if (line != null) velocityContext.put("SUBCREATOR", converter.convertTitleLineToEpub3(line));
+			line = bookInfo.getSeriesText();
+			if (line != null) velocityContext.put("SERIES", converter.convertTitleLineToEpub3(line));
+			line = bookInfo.getPublisherText();
+			if (line != null) velocityContext.put("PUBLISHER", converter.convertTitleLineToEpub3(line));
 			
 			//package.opf内で目次前に出力
 			zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+XHTML_PATH+TITLE_FILE));
@@ -428,8 +434,6 @@ public class Epub3Writer
 			}
 		}
 		
-		//本文を出力
-		this.writeSections(converter, src, bw);
 		if (this.canceled) return;
 		
 		int zipPathLength = 0;
@@ -606,7 +610,7 @@ public class Epub3Writer
 			StringBuilder buf = new StringBuilder();
 			for (ChapterInfo chapterInfo : chapterInfos) {
 				buf.setLength(0);
-				String converted = converter.convertEscapedText(chapterInfo.getChapterName());
+				String converted = CharUtils.escapeHtml(chapterInfo.getChapterName());
 				if (bookInfo.tocVertical) {
 					converted = converter.convertTcyText(converted);
 				}
@@ -937,7 +941,7 @@ public class Epub3Writer
 			}
 		}
 		if (imageInfo != null) {
-			this.imageIndex++; //0001から開始
+			this.imageIndex++; //0001から開始 (本文内の順番に合せる用で同じ画像は出力しない)
 			String imageId = imageInfo.getId();
 			//画像は未だ出力されていない
 			if (imageId == null) {

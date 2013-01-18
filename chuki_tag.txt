@@ -4,7 +4,7 @@
 ##注記 : 注記から［＃］を除いた文字列
 ##タグ : 出力するタグ
 ##行末追加タグ : インラインで閉じていない場合はこのタグで自動で閉じます
-##フラグchar : 1=ブロック注記で改行不要, 2=ルビ排他開始, 3=ルビ排他終了, P=注記の前で改ページ処理, M=ページの左右中央, L=ページの左
+##フラグchar : 1=ブロック注記で改行不要, 2=ルビ排他開始, 3=ルビ排他終了, P=注記の前で改ページ処理, M=ページの左右中央, L=ページの左, K=訓点・返り点
 
 ############ 改ページ (xhtmlを分ける) ############
 改丁			P
@@ -71,31 +71,31 @@
 ############## 訓点 ##############
 ## 送り仮名（）内 → 画像注記処理で分岐し［＃行右小書き］注記に変更
 ## 返り点 左小書き 以下のもののみ対応
-一	<span class="sub">一</span>
-二	<span class="sub">二</span>
-三	<span class="sub">三</span>
-四	<span class="sub">四</span>
-レ	<span class="sub">レ</span>
-一レ	<span class="sub">一レ</span>
-二レ	<span class="sub">二レ</span>
-三レ	<span class="sub">三レ</span>
-上レ	<span class="sub">上レ</span>
-中レ	<span class="sub">中レ</span>
-下レ	<span class="sub">下レ</span>
-上	<span class="sub">上</span>
-中	<span class="sub">中</span>
-下	<span class="sub">下</span>
-甲	<span class="sub">甲</span>
-乙	<span class="sub">乙</span>
-丙	<span class="sub">丙</span>
-丁	<span class="sub">丁</span>
-天	<span class="sub">天</span>
-地	<span class="sub">地</span>
-人	<span class="sub">人</span>
+一	<span class="sub">一</span>		K
+二	<span class="sub">二</span>		K
+三	<span class="sub">三</span>		K
+四	<span class="sub">四</span>		K
+レ	<span class="sub">レ</span>		K
+一レ	<span class="sub">一レ</span>		K
+二レ	<span class="sub">二レ</span>		K
+三レ	<span class="sub">三レ</span>		K
+上レ	<span class="sub">上レ</span>		K
+中レ	<span class="sub">中レ</span>		K
+下レ	<span class="sub">下レ</span>		K
+上	<span class="sub">上</span>		K
+中	<span class="sub">中</span>		K
+下	<span class="sub">下</span>		K
+甲	<span class="sub">甲</span>		K
+乙	<span class="sub">乙</span>		K
+丙	<span class="sub">丙</span>		K
+丁	<span class="sub">丁</span>		K
+天	<span class="sub">天</span>		K
+地	<span class="sub">地</span>		K
+人	<span class="sub">人</span>		K
 
 ##［＃「二」は返り点］の注記
-返り点	<span class="sub">		2
-返り点終わり	</span>		3
+返り点	<span class="sub">		K
+返り点終わり	</span>		K
 
 ############## 強調 ##############
 ####圏点

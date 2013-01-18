@@ -31,44 +31,36 @@
 <table class="middle"><tr><td>
 
 #if (${PUBLISHER})
-<div class="publisher">${PUBLISHER}</div>
-<br/>
+	<div class="publisher">${PUBLISHER}</div>
+	<br/>
 #end
 
 #if (${CREATOR})
-<div class="creator btm pb2"><br/></div>
+	<br/>
 #end
 #if (${SUBCREATOR})
-<div class="subcreator btm pb2"><br/></div>
+	<br/>
 #end
 
 #if (${SERIES})
 	<div class="series">${SERIES}</div>
 #end
-<div class="title">${TITLE}</div>
+	<div class="title">${TITLE}</div>
 #if (${ORGTITLE})
-<div class="orgtitle pt1">${ORGTITLE}</div>
+	<div class="orgtitle pt1">${ORGTITLE}</div>
 #end
 #if (${SUBTITLE})
-<div class="subtitle pt1">${SUBTITLE}</div>
+	<div class="subtitle pt1">${SUBTITLE}</div>
 #end
 #if (${SUBORGTITLE})
-<div class="suborgtitle pt2">${SUBORGTITLE}</div>
+	<div class="suborgtitle pt2">${SUBORGTITLE}</div>
 #end
 #if (${CREATOR})
-<div class="creator btm pb2">${CREATOR}</div>
+	<div class="creator btm pb2">${CREATOR}</div>
 #end
 #if (${SUBCREATOR})
-<div class="subcreator btm pb2">${SUBCREATOR}</div>
+	<div class="subcreator btm pb2">${SUBCREATOR}</div>
 #end
-
-#if (${PUBLISHER})
-<div class="publisher"><br/></div>
-<br/>
-#end
-
-
-</div>
 
 </td></tr></table>
 </body>
