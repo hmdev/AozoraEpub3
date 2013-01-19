@@ -1666,7 +1666,7 @@ public class AozoraEpub3Converter
 				////////////////////////////////////////////////////////////////
 				
 				//字下げフラグ処理
-				else if (chukiName.endsWith("字下げ")) {
+				else if (chukiName.endsWith("字下げ") || chukiName.endsWith("地付き")) {
 					if (inJisage >= 0) {
 						LogAppender.warn(inJisage, "字下げ注記省略");
 						buf.append(chukiMap.get("字下げ省略")[0]);
@@ -1730,8 +1730,6 @@ public class AozoraEpub3Converter
 				if (chukiFlagNoBr.contains(chukiName)) noBr = true;
 				
 			} else {
-				//ダミー出力時は画像注記は無視
-				if (!noImage) {
 				//画像 (訓点 ［＃（ス）］ は . があるかで判断)
 				// <img src="img/filename"/> → <object src="filename"/>
 				// ［＃表紙（表紙.jpg）］［＃（表紙.jpg）］［＃「キャプション」（表紙.jpg、横321×縦123）入る）］
@@ -1747,32 +1745,35 @@ public class AozoraEpub3Converter
 						//拡張子を含まない
 						LogAppender.info(lineNum, "注記未変換", chukiTag);
 					} else {
-						//画像ファイル名置換処理実行
-						String srcFilePath = this.getImageChukiFileName(chukiTag, imageStartIdx);
-						if (srcFilePath == null) {
-							LogAppender.error(lineNum, "注記エラー", chukiTag);
-						} else {
-							//外字の場合 (注記末尾がフラグ文字列になっている)
-							if (chukiTag.endsWith("#GAIJI#］")) {
-								String fileName = writer.getImageFilePath(srcFilePath.trim(), lineNum);
-								buf.append(chukiMap.get("外字画像開始")[0]);
-								buf.append(fileName);
-								buf.append(chukiMap.get("外字画像終了")[0]);
-							} else { 
-								if (noIllust && !writer.isCoverImage()) {
-									LogAppender.info(lineNum, "挿絵なし設定", chukiTag);
-								} else {
+						//ダミー出力時は画像注記は無視
+						if (!noImage) {
+							//画像ファイル名置換処理実行
+							String srcFilePath = this.getImageChukiFileName(chukiTag, imageStartIdx);
+							if (srcFilePath == null) {
+								LogAppender.error(lineNum, "注記エラー", chukiTag);
+							} else {
+								//外字の場合 (注記末尾がフラグ文字列になっている)
+								if (chukiTag.endsWith("#GAIJI#］")) {
 									String fileName = writer.getImageFilePath(srcFilePath.trim(), lineNum);
-									if (fileName != null) { //先頭に移動してここで出力しない場合はnull
-										if (bookInfo.isImageSectionLine(lineNum)) {
-											//単ページ画像の場合は<p>タグを出さない
-											noBr = true;
-											buf.append(chukiMap.get("画像開始")[0]);
-											buf.append(fileName);
-											buf.append(chukiMap.get("画像終了")[0]);
-										} else {
-											//画像注記またはページ出力
-											printImageChuki(out, buf, fileName, this.writer.getImagePageType(srcFilePath, this.tagLevel, lineNum));
+									buf.append(chukiMap.get("外字画像開始")[0]);
+									buf.append(fileName);
+									buf.append(chukiMap.get("外字画像終了")[0]);
+								} else { 
+									if (noIllust && !writer.isCoverImage()) {
+										LogAppender.info(lineNum, "挿絵なし設定", chukiTag);
+									} else {
+										String fileName = writer.getImageFilePath(srcFilePath.trim(), lineNum);
+										if (fileName != null) { //先頭に移動してここで出力しない場合はnull
+											if (bookInfo.isImageSectionLine(lineNum)) {
+												//単ページ画像の場合は<p>タグを出さない
+												noBr = true;
+												buf.append(chukiMap.get("画像開始")[0]);
+												buf.append(fileName);
+												buf.append(chukiMap.get("画像終了")[0]);
+											} else {
+												//画像注記またはページ出力
+												printImageChuki(out, buf, fileName, this.writer.getImagePageType(srcFilePath, this.tagLevel, lineNum));
+											}
 										}
 									}
 								}
@@ -1783,28 +1784,30 @@ public class AozoraEpub3Converter
 					if (noIllust && !writer.isCoverImage()) {
 						LogAppender.info(lineNum, "挿絵なし設定", chukiTag);
 					} else {
-						//src=の値抽出
-						String srcFilePath = this.getImageTagFileName(chukiTag);
-						if (srcFilePath == null) {
-							LogAppender.error(lineNum, "画像注記エラー", chukiTag);
-						} else {
-							//単ページ画像の場合は<p>タグを出さない
-							if (bookInfo.isImageSectionLine(lineNum)) noBr = true;
-							String fileName = writer.getImageFilePath(srcFilePath.trim(), lineNum);
-							if (fileName != null) { //先頭に移動してここで出力しない場合はnull
+						//ダミー出力時は画像注記は無視
+						if (!noImage) {
+							//src=の値抽出
+							String srcFilePath = this.getImageTagFileName(chukiTag);
+							if (srcFilePath == null) {
+								LogAppender.error(lineNum, "画像注記エラー", chukiTag);
+							} else {
 								//単ページ画像の場合は<p>タグを出さない
-								if (bookInfo.isImageSectionLine(lineNum)) {
-									noBr = true;
-									buf.append(chukiMap.get("画像開始")[0]);
-									buf.append(fileName);
-									buf.append(chukiMap.get("画像終了")[0]);
-								} else {
-									//画像注記またはページ出力
-									printImageChuki(out, buf, fileName, this.writer.getImagePageType(srcFilePath, this.tagLevel, lineNum));
+								if (bookInfo.isImageSectionLine(lineNum)) noBr = true;
+								String fileName = writer.getImageFilePath(srcFilePath.trim(), lineNum);
+								if (fileName != null) { //先頭に移動してここで出力しない場合はnull
+									//単ページ画像の場合は<p>タグを出さない
+									if (bookInfo.isImageSectionLine(lineNum)) {
+										noBr = true;
+										buf.append(chukiMap.get("画像開始")[0]);
+										buf.append(fileName);
+										buf.append(chukiMap.get("画像終了")[0]);
+									} else {
+										//画像注記またはページ出力
+										printImageChuki(out, buf, fileName, this.writer.getImagePageType(srcFilePath, this.tagLevel, lineNum));
+									}
 								}
 							}
 						}
-					}
 					}
 				}
 				else {

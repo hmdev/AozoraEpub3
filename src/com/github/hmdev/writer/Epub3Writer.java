@@ -564,10 +564,6 @@ public class Epub3Writer
 		for (int i=chapterInfos.size()-1; i>=0; i--) {
 			if (chapterInfos.get(i).getChapterName() == null) chapterInfos.remove(i);
 		}
-		//表題の見出しが非表示で業が追加されていたら削除
-		if (!bookInfo.insertTitleToc && bookInfo.titleLine >= 0) {
-			bookInfo.removeChapterLineInfo(bookInfo.titleLine);
-		}
 		
 		//目次の階層情報を設定
 		//レベルを0から開始に変更

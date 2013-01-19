@@ -361,7 +361,7 @@ public class WebAozoraConverter
 						File chapterCacheFile = new File(cachePath.getAbsolutePath()+"/"+chapterPath+(chapterPath.endsWith("/")?"index.html":""));
 						//hrefsのときは更新分のみurlsに入っている
 						if (reload || !chapterCacheFile.exists()) {
-							LogAppender.append(chapterHref);
+							LogAppender.append("["+(i+1)+"/"+chapterHrefs.size()+"] "+chapterHref);
 							try {
 								cacheFile(chapterHref, chapterCacheFile);
 								LogAppender.println(" : Loaded.");

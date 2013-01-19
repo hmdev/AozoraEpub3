@@ -25,7 +25,7 @@ import com.github.hmdev.writer.Epub3Writer;
 /** コマンドライン実行用mainとePub3変換関数 */
 public class AozoraEpub3
 {
-	public static final String VERSION = "1.1.0b20";
+	public static final String VERSION = "1.1.0b22";
 	
 	/** コマンドライン実行用 */
 	public static void main(String args[])
@@ -301,6 +301,10 @@ public class AozoraEpub3
 						aozoraConverter.vertical = vertical;
 						//表題ページ
 						if (middleTitle) bookInfo.titlePageType = BookInfo.TITLE_MIDDLE;
+					}
+					//表題の見出しが非表示で行が追加されていたら削除
+					if (!bookInfo.insertTitleToc && bookInfo.titleLine >= 0) {
+						bookInfo.removeChapterLineInfo(bookInfo.titleLine);
 					}
 					
 					Epub3Writer writer = epub3Writer;

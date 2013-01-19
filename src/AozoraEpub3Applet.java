@@ -2627,6 +2627,11 @@ public class AozoraEpub3Applet extends JApplet
 		bookInfo.insertTocPage = this.jCheckTocPage.isSelected();
 		bookInfo.insertCoverPageToc = this.jCheckCoverPageToc.isSelected();
 		bookInfo.insertTitleToc = this.jCheckTitleToc.isSelected();
+		//表題の見出しが非表示で行が追加されていたら削除
+		if (!bookInfo.insertTitleToc && bookInfo.titleLine >= 0) {
+			bookInfo.removeChapterLineInfo(bookInfo.titleLine);
+		}
+		
 		//目次縦書き
 		bookInfo.setTocVertical(this.jRadioTocV.isSelected());
 		//縦書き横書き設定追加
@@ -2765,6 +2770,11 @@ public class AozoraEpub3Applet extends JApplet
 			}
 			
 			this.setBookInfoHistory(bookInfo);
+		} else {
+			//表題の見出しが非表示で行が追加されていたら削除
+			if (!bookInfo.insertTitleToc && bookInfo.titleLine >= 0) {
+				bookInfo.removeChapterLineInfo(bookInfo.titleLine);
+			}
 		}
 		
 		boolean autoFileName = this.jCheckAutoFileName.isSelected();
