@@ -138,6 +138,7 @@ public class AozoraEpub3Applet extends JApplet
 	JCheckBox jCheckUserFileName;
 	JCheckBox jCheckAutoFileName;
 	JCheckBox jCheckTitlePage;
+	JRadioButton jRadioTitleNormal;
 	JRadioButton jRadioTitleMiddle;
 	JRadioButton jRadioTitleHorizontal;
 	
@@ -165,6 +166,8 @@ public class AozoraEpub3Applet extends JApplet
 	JComboBox jComboCover;
 	JCheckBox jCheckCoverHistory;
 	JButton jButtonCover;
+	JTextField jTextMaxCoverLine;
+	JLabel jLabelMaxCoverLine;
 	
 	/** ページ出力 */
 	JCheckBox jCheckCoverPage;
@@ -569,7 +572,7 @@ public class AozoraEpub3Applet extends JApplet
 		panel.add(label);
 		jComboTitle = new JComboBox(BookInfo.TitleType.titleTypeNames);
 		jComboTitle.setFocusable(false);
-		jComboTitle.setMaximumSize(new Dimension(180, 22));
+		jComboTitle.setMaximumSize(new Dimension(200, 22));
 		jComboTitle.setBorder(padding0);
 		((JLabel)jComboTitle.getRenderer()).setBorder(padding2H);
 		panel.add(jComboTitle);
@@ -591,11 +594,35 @@ public class AozoraEpub3Applet extends JApplet
 		//表紙
 		label = new JLabel("表紙: ");
 		panel.add(label);
+		
+		jTextMaxCoverLine = new JTextField("10");
+		jTextMaxCoverLine.setToolTipText("先頭の挿絵を利用する行数 0なら制限なし");
+		jTextMaxCoverLine.setHorizontalAlignment(JTextField.RIGHT);
+		jTextMaxCoverLine.setMinimumSize(text4);
+		jTextMaxCoverLine.setMaximumSize(text4);
+		jTextMaxCoverLine.setPreferredSize(text4);
+		jTextMaxCoverLine.addFocusListener(new TextSelectFocusListener(jTextMaxCoverLine));
+		jTextMaxCoverLine.setInputVerifier(new IntegerInputVerifier(10, 0, 9999));
+		panel.add(jTextMaxCoverLine);
+		jLabelMaxCoverLine = new JLabel("行目までの");
+		jLabelMaxCoverLine.setToolTipText(jTextMaxCoverLine.getToolTipText());
+		jLabelMaxCoverLine.setBorder(padding2H);
+		panel.add(jLabelMaxCoverLine);
+		
 		jComboCover = new JComboBox(new String[]{"[先頭の挿絵]", "[入力ファイル名と同じ画像(png,jpg)]", "[表紙無し]", "http://"});
 		jComboCover.setEditable(true);
 		jComboCover.setPreferredSize(new Dimension(320, 24));
+		jComboCover.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent arg0) {
+			boolean visible = jComboCover.getSelectedIndex() == 0;
+			jTextMaxCoverLine.setVisible(visible);
+			jLabelMaxCoverLine.setVisible(visible);
+		}});
 		panel.add(jComboCover);
 		new DropTarget(jComboCover.getEditor().getEditorComponent(), DnDConstants.ACTION_COPY_OR_MOVE, new DropCoverListener(), true);
+		boolean visible = jComboCover.getSelectedIndex() == 0;
+		jTextMaxCoverLine.setVisible(visible);
+		jLabelMaxCoverLine.setVisible(visible);
+		
 		jButtonCover = new JButton("選択");
 		jButtonCover.setBorder(padding3);
 		jButtonCover.setIcon(new ImageIcon(AozoraEpub3Applet.class.getResource("images/cover.png")));
@@ -617,11 +644,9 @@ public class AozoraEpub3Applet extends JApplet
 		//ページ出力
 		label = new JLabel("ページ出力:");
 		panel.add(label);
-		jCheckCoverPage = new JCheckBox("表紙画像", true);
+		jCheckCoverPage = new JCheckBox("表紙画像 ", true);
 		jCheckCoverPage.setFocusPainted(false);
 		panel.add(jCheckCoverPage);
-		label = new JLabel("  ");
-		panel.add(label);
 		//左右中央
 		jCheckTitlePage = new JCheckBox("表題", true);
 		jCheckTitlePage.setToolTipText("表題を単独のページで出力します。チェック無し時はスタイルのみ変更して出力します");
@@ -630,7 +655,13 @@ public class AozoraEpub3Applet extends JApplet
 		label = new JLabel("(");
 		panel.add(label);
 		buttonGroup = new ButtonGroup();
-		jRadioTitleMiddle = new JRadioButton("中央 ", true);
+		jRadioTitleNormal = new JRadioButton("本文内 ", true);
+		jRadioTitleNormal.setToolTipText("別ページ処理せずに本文の順番で文字サイズのみ変更して出力します");
+		jRadioTitleNormal.setBorder(padding0);
+		jRadioTitleNormal.setIconTextGap(1);
+		panel.add(jRadioTitleNormal);
+		buttonGroup.add(jRadioTitleNormal);
+		jRadioTitleMiddle = new JRadioButton("中央 ");
 		jRadioTitleMiddle.setToolTipText("中央寄せの表題ページを出力します");
 		jRadioTitleMiddle.setBorder(padding0);
 		jRadioTitleMiddle.setIconTextGap(1);
@@ -642,7 +673,7 @@ public class AozoraEpub3Applet extends JApplet
 		jRadioTitleHorizontal.setIconTextGap(1);
 		panel.add(jRadioTitleHorizontal);
 		buttonGroup.add(jRadioTitleHorizontal);
-		label = new JLabel(")  ");
+		label = new JLabel(") ");
 		panel.add(label);
 		jCheckTocPage = new JCheckBox("目次");
 		jCheckTocPage.setFocusPainted(false);
@@ -2393,6 +2424,7 @@ public class AozoraEpub3Applet extends JApplet
 				imageFloatType, imageFloatW, imageFloatH, jpegQualty, gamma, autoMarginLimitH, autoMarginLimitV, autoMarginWhiteLevel, autoMarginPadding, autoMarginNombre, autoMarginNombreSize);
 		
 		try {
+			//挿絵なし
 			this.aozoraConverter.setNoIllust(jCheckNoIllust.isSelected()); 
 			//栞用ID出力
 			this.aozoraConverter.setWithMarkId(this.jCheckMarkId.isSelected());
@@ -2641,11 +2673,24 @@ public class AozoraEpub3Applet extends JApplet
 		//表紙設定
 		//表題左右中央
 		if (!this.jCheckTitlePage.isSelected()) {
+			bookInfo.titlePageType = BookInfo.TITLE_NONE;
+		} else if (this.jRadioTitleNormal.isSelected()) {
 			bookInfo.titlePageType = BookInfo.TITLE_NORMAL;
 		} else if (this.jRadioTitleMiddle.isSelected()) {
 			bookInfo.titlePageType = BookInfo.TITLE_MIDDLE;
 		} else if (this.jRadioTitleHorizontal.isSelected()) {
 			bookInfo.titlePageType = BookInfo.TITLE_HORIZONTAL;
+		}
+		
+		//先頭からの場合で指定行数以降なら表紙無し
+		if ("".equals(coverFileName)) {
+			try {
+				int maxCoverLine = Integer.parseInt(this.jTextMaxCoverLine.getText());
+				if (maxCoverLine > 0 && bookInfo.firstImageLineNum >= maxCoverLine) {
+					coverImageIndex = -1;
+					coverFileName = null;
+				}
+			} catch (Exception e) {}
 		}
 		
 		//表紙ページの情報をbookInfoに設定
@@ -2950,6 +2995,11 @@ public class AozoraEpub3Applet extends JApplet
 						LogAppender.println(" を読み込みます");
 						
 						webConverter = WebAozoraConverter.createWebAozoraConverter(urlString, webConfigPath);
+						if (webConverter == null) {
+							LogAppender.append(urlString);
+							LogAppender.println(" は変換できませんでした");
+							return null;
+						}
 						File srcFile = webConverter.convertToAozoraText(urlString, cachePath);
 						
 						if (srcFile == null) {
@@ -2999,9 +3049,16 @@ public class AozoraEpub3Applet extends JApplet
 	{
 		for (Component c : this.topPanel.getComponents()) this.setEnabledAll(c, enabled);
 		for (Component c : this.jTabbedPane.getComponents()) this.setEnabledAll(c, enabled);
+		jRadioVertical.getComponent(0).setEnabled(enabled);
+		jRadioHorizontal.getComponent(0).setEnabled(enabled);
 		//変換中に操作不可にしないもの
 		if (!enabled) this.jCheckConfirm.setEnabled(true);
 		this.jButtonCancel.setEnabled(!enabled);
+		//disabledになっているものは再チェック
+		if (enabled) {
+			this.setProfileMoveEnable();
+		}
+		
 	}
 	/** コンポーネント内をすべてsetEnabled */
 	private void setEnabledAll(Component c, boolean b)
@@ -3153,15 +3210,17 @@ public class AozoraEpub3Applet extends JApplet
 		//表紙
 		if (props.getProperty("Cover")==null||props.getProperty("Cover").length()==0) jComboCover.setSelectedIndex(0);
 		else jComboCover.setSelectedItem(props.getProperty("Cover"));
-		
 		//表紙履歴
 		setPropsSelected(jCheckCoverHistory, props, "CoverHistory");
+		//有効行数
+		setIntText(jTextMaxCoverLine, props, "MaxCoverLine");
 		
 		setPropsSelected(jCheckCoverPage, props, "CoverPage");
 		//表題ページ
+		setPropsSelected(jCheckTitlePage, props, "TitlePageWrite");
 		String propValue = props.getProperty("TitlePage");
 		if (propValue != null) {
-			jCheckTitlePage.setSelected(!"0".equals(propValue));
+			jRadioTitleNormal.setSelected(Integer.toString(BookInfo.TITLE_NORMAL).equals(propValue));
 			jRadioTitleMiddle.setSelected(Integer.toString(BookInfo.TITLE_MIDDLE).equals(propValue));
 			jRadioTitleHorizontal.setSelected(Integer.toString(BookInfo.TITLE_HORIZONTAL).equals(propValue));
 		}
@@ -3316,9 +3375,20 @@ public class AozoraEpub3Applet extends JApplet
 		if (this.jComboCover.getSelectedIndex() == 0) props.setProperty("Cover","");
 		else if (this.jComboCover.getSelectedIndex() == 1) props.setProperty("Cover", ""+this.jComboCover.getEditor().getItem().toString().trim());
 		props.setProperty("CoverHistory", this.jCheckCoverHistory.isSelected()?"1":"");
+		
+		props.setProperty("MaxCoverLine", this.jTextMaxCoverLine.getText());
+		
 		//ページ出力
 		props.setProperty("CoverPage", this.jCheckCoverPage.isSelected()?"1":"");
-		props.setProperty("TitlePage", this.jCheckTitlePage.isSelected()?(this.jRadioTitleMiddle.isSelected()?""+BookInfo.TITLE_MIDDLE:""+BookInfo.TITLE_HORIZONTAL):"");
+		
+		props.setProperty("TitlePageWrite", this.jCheckTitlePage.isSelected()?"1":"");
+		if (this.jRadioTitleNormal.isSelected()) {
+			props.setProperty("TitlePage", ""+BookInfo.TITLE_NORMAL);
+		} else if (this.jRadioTitleMiddle.isSelected()) {
+			props.setProperty("TitlePage", ""+BookInfo.TITLE_MIDDLE);
+		} else if (this.jRadioTitleHorizontal.isSelected()) {
+			props.setProperty("TitlePage", ""+BookInfo.TITLE_HORIZONTAL);
+		}
 		props.setProperty("TocPage", this.jCheckTocPage.isSelected()?"1":"");
 		props.setProperty("TocVertical", this.jRadioTocV.isSelected()?"1":"");
 		//挿絵非表示

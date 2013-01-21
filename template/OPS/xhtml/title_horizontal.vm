@@ -18,12 +18,18 @@ body { margin:0; padding:0; height:98%; text-align:center; line-height: 1.5; }
 border:1px solid black;
 #end
 }
-.upper { padding:25% 5% 0 5%; height:50%; text-align:center; }
+.upper { padding:20% 5% 0 5%; height:55%; text-align:center; }
 .lower { padding:0 5%; height:25%; text-align:center; }
 
 .title, .subtitle, .orgtitle, .suborgtitle, .creator, .subcreator, .series .publisher { text-align:center; line-height: 1.25; }
 .series { padding-bottom:.5em; font-size:1.25em; }
-.title { font-size:1.75em; }
+.title {
+#if (${TITLE.length()} > 30)
+font-size:1.75em;
+#else
+font-size:2em;
+#end
+}
 .title ruby rt { font-size:.4em; }
 .orgtitle { padding-top:.5em; font-size:1.4em; }
 .orgtitle ruby rt { font-size:.5em; }
@@ -33,6 +39,8 @@ border:1px solid black;
 .creator { padding-top:5%; font-size:1.25em; }
 .subcreator { padding-top:1em; font-size:1.25em; }
 .publisher {  }
+
+.space { padding-top: 5%; }
 
 .sup {
 vertical-align: super;
@@ -51,9 +59,21 @@ letter-spacing: -2px;
 
 <body>
 <div class="outer">
+
 <div class="upper">
 #if (${SERIES})
 	<div class="series">${SERIES}</div>
+#else
+	<div class="space"></div>
+#end
+#if (!${ORGTITLE})
+	<div class="space"></div>
+#end
+#if (!${SUBTITLE})
+	<div class="space"></div>
+#end
+#if (!${SUBORGTITLE})
+	<div class="space"></div>
 #end
 	<div class="title">${TITLE}</div>
 #if (${ORGTITLE})
@@ -66,6 +86,7 @@ letter-spacing: -2px;
 	<div class="suborgtitle">${SUBORGTITLE}</div>
 #end
 </div>
+
 <div class="lower">
 #if (${CREATOR})
 	<div class="creator">${CREATOR}</div>
@@ -78,6 +99,7 @@ letter-spacing: -2px;
 	<div class="publisher">${PUBLISHER}</div>
 #end
 </div>
+
 </div>
 </body>
 </html>

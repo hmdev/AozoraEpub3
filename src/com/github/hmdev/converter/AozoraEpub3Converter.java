@@ -660,12 +660,14 @@ public class AozoraEpub3Converter
 						String imageFileName = this.getImageChukiFileName(chukiTag, imageStartIdx);
 						//imageInfoReader.getImageInfo(imageFileName);
 						imageInfoReader.addImageFileName(imageFileName);
+						if (bookInfo.firstImageLineNum == -1) bookInfo.firstImageLineNum = lineNum;
 					}
 				} else if (lowerChukiTag.startsWith("<img")) {
 					//src=の値抽出
 					String imageFileName = this.getImageTagFileName(chukiTag);
 					//imageInfoReader.getImageInfo(imageFileName);
 					imageInfoReader.addImageFileName(imageFileName);
+					if (bookInfo.firstImageLineNum == -1) bookInfo.firstImageLineNum = lineNum;
 				}
 			}
 			
@@ -1002,7 +1004,7 @@ public class AozoraEpub3Converter
 		boolean noImage = false;
 		
 		//表題をバッファ処理
-		if ((this.bookInfo.titlePageType == BookInfo.TITLE_MIDDLE || this.bookInfo.titlePageType == BookInfo.TITLE_HORIZONTAL)) {
+		if ((this.bookInfo.titlePageType == BookInfo.TITLE_NONE || this.bookInfo.titlePageType == BookInfo.TITLE_MIDDLE || this.bookInfo.titlePageType == BookInfo.TITLE_HORIZONTAL)) {
 			//ページ出力設定
 			bookInfo.insertTitlePage = true;
 			//開始位置がタグの中なら次の行へ
@@ -1666,7 +1668,7 @@ public class AozoraEpub3Converter
 				////////////////////////////////////////////////////////////////
 				
 				//字下げフラグ処理
-				else if (chukiName.endsWith("字下げ") || chukiName.endsWith("地付き")) {
+				else if (chukiName.endsWith("字下げ")) {
 					if (inJisage >= 0) {
 						LogAppender.warn(inJisage, "字下げ注記省略");
 						buf.append(chukiMap.get("字下げ省略")[0]);

@@ -122,6 +122,9 @@ public class BookInfo
 	/** 圧縮ファイル内のテキストファイルエントリー名 */
 	public String textEntryName = null;
 	
+	/** 先頭の画像行番号 */
+	public int firstImageLineNum = -1;
+	
 	/** 表紙編集情報 */
 	public CoverEditInfo coverEditInfo;
 	/** 表紙ファイル名 フルパスかURL ""なら先頭の挿絵 nullなら表紙無し */

@@ -649,7 +649,7 @@ public class JConfirmDialog extends JDialog
 	
 	void userFileName()
 	{
-		String[] titleCreator = BookInfo.getFileTitleCreator(jTextSrcFileName.getText());
+		String[] titleCreator = BookInfo.getFileTitleCreator(this.bookInfo.srcFile.getName());
 		//テキストから取得できなければファイル名を利用
 		bookInfo.title = titleCreator[0]==null?"":titleCreator[0];
 		bookInfo.creator = titleCreator[1]==null?"":titleCreator[1];
