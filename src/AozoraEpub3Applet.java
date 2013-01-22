@@ -3012,8 +3012,15 @@ public class AozoraEpub3Applet extends JApplet
 						//エンコードを変換時のみUTF-8にする
 						int encIndex = applet.jComboEncType.getSelectedIndex();
 						applet.jComboEncType.setSelectedIndex(1);
+						int titleTypeIdx = applet.jComboTitle.getSelectedIndex();
+						applet.jComboTitle.setSelectedIndex(0);
+						
 						applet.convertFiles(new File[]{srcFile}, dstPath);
+						
+						//戻す
 						applet.jComboEncType.setSelectedIndex(encIndex);
+						applet.jComboTitle.setSelectedIndex(titleTypeIdx);
+						
 					} catch (Exception e) {
 						e.printStackTrace(); LogAppender.println("エラーが発生しました : "+e.getMessage());
 					}

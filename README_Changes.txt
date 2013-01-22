@@ -55,8 +55,9 @@ Changes
 ----
 1.1.0b24
 　- Web小説取得
-　　Refererに一覧ページを設定
-　　novelist.jp (http://novelist.jp/) 対応 (※ novelist.jp / 2.novelist.jp のみ)
+　　定義設定間違い時のエラー表示追加
+　　ファイル取得時のRefererに一覧ページのURLを設定
+　　novelist.jp (http://novelist.jp/) 対応 (※ 2.も対応 r18.は不可)
 　　dNoVeLs (http://www.dnovels.net/) 対応
 　　
 1.1.0b23 (2013/01/21)
