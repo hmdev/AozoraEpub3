@@ -47,6 +47,9 @@ public class WebAozoraConverter
 	/** テキスト出力先パス 末尾は/ */
 	String dstPath;
 	
+	/** DnDされたページのURL文字列 */
+	String urlString = null;
+	
 	/** http?://fqdn/ の文字列 */
 	String baseUri;
 	
@@ -167,6 +170,8 @@ public class WebAozoraConverter
 			connection.disconnect();
 		}
 		
+		this.urlString = urlString;
+		
 		this.baseUri = urlString.substring(0, urlString.indexOf('/', urlString.indexOf("//")+2));
 		//String fqdn = baseUri.substring(baseUri.indexOf("//")+2);
 		String listBaseUrl = urlString.substring(0, urlString.lastIndexOf('/')+1);
@@ -203,7 +208,7 @@ public class WebAozoraConverter
 			File cacheFile = new File(cachePath.getAbsolutePath()+"/"+urlFilePath);
 			try {
 				LogAppender.append(urlString);
-				cacheFile(urlString, cacheFile);
+				cacheFile(urlString, cacheFile, null);
 				LogAppender.println(" : List Loaded.");
 				try { Thread.sleep(500); } catch (InterruptedException e) { }
 			} catch (Exception e) {
@@ -363,7 +368,7 @@ public class WebAozoraConverter
 						if (reload || !chapterCacheFile.exists()) {
 							LogAppender.append("["+(i+1)+"/"+chapterHrefs.size()+"] "+chapterHref);
 							try {
-								cacheFile(chapterHref, chapterCacheFile);
+								cacheFile(chapterHref, chapterCacheFile, urlString);
 								LogAppender.println(" : Loaded.");
 								try { Thread.sleep(500); } catch (InterruptedException e) { }
 								//ファイルがロードされたら更新有り
@@ -685,7 +690,8 @@ public class WebAozoraConverter
 		}
 		else {
 			imagePath = "__/"+CharUtils.escapeUrlToFile(src);
-			src = this.pageBaseUri+"/"+src;
+			if (this.pageBaseUri.endsWith("/")) src = this.pageBaseUri+src;
+			else src = this.pageBaseUri+"/"+src;
 		}
 		
 		if (imagePath.endsWith("/")) imagePath += "image.png";
@@ -693,7 +699,7 @@ public class WebAozoraConverter
 		File imageFile = new File(this.dstPath+"images/"+imagePath);
 		if (!imageFile.exists()) {
 			try {
-				cacheFile(src, imageFile);
+				cacheFile(src, imageFile, this.urlString);
 			} catch (Exception e) {
 				e.printStackTrace();
 				LogAppender.println("画像が取得できませんでした : "+src);
@@ -805,7 +811,7 @@ public class WebAozoraConverter
 		if (extractInfos == null) return null;
 		for (ExtractInfo extractInfo : extractInfos) {
 			Elements elements = doc.select(extractInfo.query);
-			if (elements == null || elements.size() == 0) return null;
+			if (elements == null || elements.size() == 0) continue;
 			int pos = extractInfo.idx[0];
 			if (pos < 0) pos = elements.size()+pos;//負の値なら後ろから
 			if (pos >= 0 && elements.size() > pos) return elements.get(pos);
@@ -840,12 +846,14 @@ public class WebAozoraConverter
 	
 	////////////////////////////////////////////////////////////////
 	/** htmlをキャッシュ すでにあれば何もしない */
-	private boolean cacheFile(String urlString, File cacheFile) throws IOException
+	private boolean cacheFile(String urlString, File cacheFile, String referer) throws IOException
 	{
 		//if (!replace && cacheFile.exists()) return false;
+		if (cacheFile.isDirectory()) cacheFile.delete();
 		cacheFile.getParentFile().mkdirs();
 		//ダウンロード
 		URLConnection conn = new URL(urlString).openConnection();
+		if (referer != null) conn.setRequestProperty("Referer", referer);
 		conn.setConnectTimeout(5000);//5秒
 		BufferedInputStream bis = new BufferedInputStream(conn.getInputStream(), 8192);
 		BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(cacheFile));

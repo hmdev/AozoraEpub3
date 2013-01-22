@@ -53,6 +53,12 @@ Changes
 　- プロファイル設定(追加、削除、名称変更、並び替え)
 
 ----
+1.1.0b24
+　- Web小説取得
+　　Refererに一覧ページを設定
+　　novelist.jp (http://novelist.jp/) 対応 (※ novelist.jp / 2.novelist.jp のみ)
+　　dNoVeLs (http://www.dnovels.net/) 対応
+　　
 1.1.0b23 (2013/01/21)
 　- b22の地付き注記の修正は間違いなので元に戻す
 　- 先頭の挿絵の有効な行数を指定

@@ -1,0 +1,42 @@
+################################
+## novelist.jp
+## http://novelist.jp/
+################################
+
+## 変換対象URLパターン
+##PAGE_REGEX		/\d+\.html$
+
+################################
+## 一覧ページの抽出設定
+## タイトル
+TITLE	#work_detail h2:0
+## 著者
+AUTHOR	#work_detail .work_right p a:0
+## 説明
+DESCRIPTION	.work_discript:0
+## 表紙画像
+COVER_IMG	#work_detail .work_left img:0
+
+## 更新日時 比較文字列 (hrefに1:1で対応するタグ 内部のinnerHTML文字列で比較)
+UPDATE	.noveldescription table td p:0
+
+################
+## 各話へのリンク
+##HREF	a	^\/novel\.php\?mode=rd\&
+
+################
+## ページ番号 数字のみ利用 (前優先 ^[^\d]*(\d+) )
+PAGE_NUM	#work_detail .work_right p:1	^.*総ページ数：(\d+)ページ.*$	$1
+## ページ番号方式のベースURL ページ番号をURLの後ろにタブで結合した文字列の置換パターン
+PAGE_URL	#work_detail .work_left a.button01.ml26:0	^(.*_p)\d+(\.html)\t(\d+)$	$1$3$2
+
+################################
+###各話の抽出設定
+
+## 各話 章タイトル 中見出しで出力
+CONTENT_SUBTITLE	.work_read h4:0
+
+## 各話 本文
+CONTENT_ARTICLE	.work_read:0
+CONTENT_ARTICLE_START	.work_read h4:0,.work_read .work_read_header:0
+CONTENT_ARTICLE_END	.work_read .work_read_footer:0
