@@ -16,6 +16,7 @@ import com.github.hmdev.image.ImageInfoReader;
 import com.github.hmdev.info.BookInfo;
 import com.github.hmdev.info.BookInfo.TitleType;
 import com.github.hmdev.info.ChapterLineInfo;
+import com.github.hmdev.info.ImageInfo;
 import com.github.hmdev.util.CharUtils;
 import com.github.hmdev.util.LogAppender;
 import com.github.hmdev.writer.Epub3Writer;
@@ -660,14 +661,28 @@ public class AozoraEpub3Converter
 						String imageFileName = this.getImageChukiFileName(chukiTag, imageStartIdx);
 						//imageInfoReader.getImageInfo(imageFileName);
 						imageInfoReader.addImageFileName(imageFileName);
-						if (bookInfo.firstImageLineNum == -1) bookInfo.firstImageLineNum = lineNum;
+						if (bookInfo.firstImageLineNum == -1) {
+							//小さい画像は無視
+							ImageInfo imageInfo = imageInfoReader.getImageInfo(imageFileName);
+							if (imageInfo.getWidth() > 64 && imageInfo.getHeight() > 64) {
+								bookInfo.firstImageLineNum = lineNum;
+								bookInfo.firstImageIdx = imageInfoReader.countImageFileInfos()-1;
+							}
+						}
 					}
 				} else if (lowerChukiTag.startsWith("<img")) {
 					//src=の値抽出
 					String imageFileName = this.getImageTagFileName(chukiTag);
 					//imageInfoReader.getImageInfo(imageFileName);
 					imageInfoReader.addImageFileName(imageFileName);
-					if (bookInfo.firstImageLineNum == -1) bookInfo.firstImageLineNum = lineNum;
+					if (bookInfo.firstImageLineNum == -1) {
+						//小さい画像は無視
+						ImageInfo imageInfo = imageInfoReader.getImageInfo(imageFileName);
+						if (imageInfo.getWidth() > 64 && imageInfo.getHeight() > 64) {
+							bookInfo.firstImageLineNum = lineNum;
+							bookInfo.firstImageIdx = imageInfoReader.countImageFileInfos()-1;
+						}
+					}
 				}
 			}
 			

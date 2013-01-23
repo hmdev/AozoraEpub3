@@ -674,6 +674,7 @@ public class JConfirmDialog extends JDialog
 		this.bookInfo.coverImageIndex += offset;
 		this.bookInfo.coverImageIndex = Math.max(0, this.bookInfo.coverImageIndex);
 		bookInfo.coverEditInfo = null;
+		bookInfo.coverFileName = null;
 		try {
 			bookInfo.coverImage = imageInfoReader.getImage(bookInfo.coverImageIndex);
 			jCoverImagePanel.setBookInfo(bookInfo);

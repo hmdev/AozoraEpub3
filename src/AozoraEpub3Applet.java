@@ -2686,9 +2686,11 @@ public class AozoraEpub3Applet extends JApplet
 		if ("".equals(coverFileName)) {
 			try {
 				int maxCoverLine = Integer.parseInt(this.jTextMaxCoverLine.getText());
-				if (maxCoverLine > 0 && bookInfo.firstImageLineNum >= maxCoverLine) {
+				if (maxCoverLine > 0 && (bookInfo.firstImageLineNum == -1 || bookInfo.firstImageLineNum >= maxCoverLine)) {
 					coverImageIndex = -1;
 					coverFileName = null;
+				} else {
+					coverImageIndex = bookInfo.firstImageIdx;
 				}
 			} catch (Exception e) {}
 		}
