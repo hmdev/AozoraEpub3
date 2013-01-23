@@ -23,12 +23,15 @@ HREF	#maind .ss table a
 ##一覧に記載されている各話の更新日時
 SUB_UPDATE	#maind .ss table nobr
 
+##一覧ページのタイトル (本文側に無ければこれを利用)
+SUBTITLE_LIST	#maind .ss td a
+
 ################################
 ###各話の抽出設定
 
 ## 各話 Chapter 先頭の章のみ大見出しで出力
 #CONTENT_CHAPTER	
-## 各話 章タイトル 中見出しで出力
+## 各話 タイトル 中見出しで出力
 CONTENT_SUBTITLE	#maind .ss font:1
 
 ## 各話 本文

@@ -281,6 +281,11 @@ public class WebAozoraConverter
 				LogAppender.println("HREF : 各話のリンク先URLが取得できません");
 			}
 			
+			Vector<String> subtitles = getExtractStrings(doc, this.queryMap.get(ExtractId.SUBTITLE_LIST), true);
+			if (subtitles == null && this.queryMap.containsKey(ExtractId.SUBTITLE_LIST)) {
+				LogAppender.println("SUBTITLE_LIST : 各話タイトルが取得できません");
+			}
+			
 			//更新のない各話のURL(フルパス)を格納
 			//nullならキャッシュ更新無しで、空ならすべて更新される
 			HashSet<String> noUpdateUrls = null;
@@ -317,7 +322,7 @@ public class WebAozoraConverter
 					Elements contentDivs = getExtractElements(doc, this.queryMap.get(ExtractId.CONTENT_ARTICLE));
 					if (contentDivs != null) {
 						//一覧のリンクはないが本文がある場合
-						docToAozoraText(bw, doc, false, null);
+						docToAozoraText(bw, doc, false, null, null);
 					} else {
 						LogAppender.println("一覧のURLが取得できませんでした");
 						return null;
@@ -413,7 +418,10 @@ public class WebAozoraConverter
 						if (postDateList != null && postDateList.length > i) {
 							postDate = postDateList[i];
 						}
-						docToAozoraText(bw, chapterDoc, newChapter, postDate);
+						String subTitle = null;
+						if (subtitles != null && subtitles.size() > i) subTitle = subtitles.get(i);
+						
+						docToAozoraText(bw, chapterDoc, newChapter, subTitle, postDate);
 					}
 					i++;
 				}
@@ -525,8 +533,9 @@ public class WebAozoraConverter
 		return null;
 	}
 	
-	/** 各話のHTMLの変換 */
-	private void docToAozoraText(BufferedWriter bw, Document doc, boolean newChapter, String postDate) throws IOException
+	/** 各話のHTMLの変換
+	 * @param listSubTitle 一覧側で取得したタイトル */
+	private void docToAozoraText(BufferedWriter bw, Document doc, boolean newChapter, String listSubTitle, String postDate) throws IOException
 	{
 		Elements contentDivs = getExtractElements(doc, this.queryMap.get(ExtractId.CONTENT_ARTICLE));
 		if (contentDivs == null || contentDivs.size() == 0) {
@@ -534,6 +543,7 @@ public class WebAozoraConverter
 		} else {
 			if (!newChapter) bw.append("\n［＃改ページ］\n");
 			String subTitle = getExtractText(doc, this.queryMap.get(ExtractId.CONTENT_SUBTITLE));
+			if (subTitle == null) subTitle = listSubTitle; //一覧のタイトルを設定
 			if (subTitle != null) {
 				bw.append("［＃ここから中見出し］\n");
 				printText(bw, subTitle);
@@ -634,9 +644,11 @@ public class WebAozoraConverter
 				if ("br".equals(elem.tagName())) {
 					if (elem.nextSibling() != null) bw.append('\n');
 				} else if ("div".equals(elem.tagName())) {
+					if (elem.previousSibling() != null && !isBlockNode(elem.previousSibling())) bw.append('\n');
 					_printNode(bw, node); //子を出力
 					if (elem.nextSibling() != null) bw.append('\n');
 				} else if ("p".equals(elem.tagName())) {
+					if (elem.previousSibling() != null && !isBlockNode(elem.previousSibling())) bw.append('\n');
 					_printNode(bw, node); //子を出力
 					if (elem.nextSibling() != null) bw.append('\n');
 				} else if ("ruby".equals(elem.tagName())) {
@@ -674,6 +686,21 @@ public class WebAozoraConverter
 			}
 		}
 	}
+	/** 前がブロック注記かどうか */
+	private boolean isBlockNode(Node node)
+	{
+		if (node instanceof Element) {
+			Element elem = (Element)node;
+			String tagName = elem.tagName();
+			if ("br".equals(tagName)) return true;
+			if ("div".equals(tagName))  return true;
+			if ("p".equals(tagName))  return true;
+			if ("hr".equals(tagName))  return true;
+			if ("table".equals(tagName))  return true;
+		}
+		return false;
+	}
+	
 	/** ルビを青空ルビにして出力 */
 	private void printRuby(BufferedWriter bw, Element ruby) throws IOException
 	{
@@ -764,10 +791,12 @@ public class WebAozoraConverter
 		for (ExtractInfo extractInfo : extractInfos) {
 			String text = null;
 			Elements elements = doc.select(extractInfo.query);
+			if (elements == null || elements.size() == 0) continue;
 			StringBuilder buf = new StringBuilder();
 			if (extractInfo.idx == null) {
 				for (Element element : elements) {
-					buf.append(" ").append(element.html());
+					String html = element.html();
+					if (html != null) buf.append(" ").append(replaceHtmlText(html, replace?extractInfo:null));
 				}
 			} else {
 				for (int i=0; i<extractInfo.idx.length; i++) {
@@ -776,7 +805,7 @@ public class WebAozoraConverter
 						if (pos < 0) pos = elements.size()+pos;//負の値なら後ろから
 						if (pos >= 0 && elements.size() > pos) {
 							String html = elements.get(pos).html();
-							if (html != null) buf.append(" ").append(html);
+							if (html != null) buf.append(" ").append(replaceHtmlText(html, replace?extractInfo:null));
 						}
 					}
 				}
@@ -784,10 +813,37 @@ public class WebAozoraConverter
 			}
 			//置換指定ならreplaceして返す
 			if (text != null && text.length() > 0) {
-				text = text.replaceAll("[\n|\r]", "").replaceAll("\t", " ");
-				if (replace) text = extractInfo.replace(text);
-				return Jsoup.parse(removeTag(text)).text();
+				return text;
 			}
+		}
+		return null;
+	}
+	
+	Vector<String> getExtractStrings(Document doc, ExtractInfo[] extractInfos, boolean replace)
+	{
+		if (extractInfos == null) return null;
+		for (ExtractInfo extractInfo : extractInfos) {
+			Elements elements = doc.select(extractInfo.query);
+			if (elements == null || elements.size() == 0) continue;
+			Vector<String> vecString = new Vector<String>();
+			if (extractInfo.idx == null) {
+				for (Element element : elements) {
+					String html = element.html();
+					if (html != null) vecString.add(replaceHtmlText(html, replace?extractInfo:null));
+				}
+			} else {
+				for (int i=0; i<extractInfo.idx.length; i++) {
+					if (elements.size() > extractInfo.idx[i]) {
+						int pos = extractInfo.idx[i];
+						if (pos < 0) pos = elements.size()+pos;//負の値なら後ろから
+						if (pos >= 0 && elements.size() > pos) {
+							String html = elements.get(pos).html();
+							if (html != null) vecString.add(replaceHtmlText(html, replace?extractInfo:null));
+						}
+					}
+				}
+			}
+			return vecString;
 		}
 		return null;
 	}
@@ -855,6 +911,13 @@ public class WebAozoraConverter
 	}
 	
 	////////////////////////////////////////////////////////////////
+	
+	String replaceHtmlText(String text, ExtractInfo extractInfo) {
+		text = text.replaceAll("[\n|\r]", "").replaceAll("\t", " ");
+		if (extractInfo != null) text = extractInfo.replace(text);
+		return Jsoup.parse(removeTag(text)).text();
+	}
+	
 	/** タグを除去 rt内の文字は非表示 */
 	String removeTag(String text)
 	{
