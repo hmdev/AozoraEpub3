@@ -131,6 +131,55 @@ public class ImageInfoReader
 		ImageInfo imageInfo = this._getImageInfo(srcImageFileName);
 		return imageInfo;
 	}
+	
+	/** 拡張子修正 大文字小文字は3パターンのみ */
+	public String correctExt(String srcImageFileName) throws IOException
+	{
+		if (this.hasImage(srcImageFileName)) return srcImageFileName;
+		//拡張子修正
+		srcImageFileName = srcImageFileName.replaceFirst("\\.\\w+$", ".png");
+		if (this.hasImage(srcImageFileName)) return srcImageFileName;
+		srcImageFileName = srcImageFileName.replaceFirst("\\.\\w+$", ".jpg");
+		if (this.hasImage(srcImageFileName)) return srcImageFileName;
+		srcImageFileName = srcImageFileName.replaceFirst("\\.\\w+$", ".jpeg");
+		if (this.hasImage(srcImageFileName)) return srcImageFileName;
+		srcImageFileName = srcImageFileName.replaceFirst("\\.\\w+$", ".gif");
+		if (this.hasImage(srcImageFileName)) return srcImageFileName;
+		
+		srcImageFileName = srcImageFileName.replaceFirst("\\.\\w+$", ".PNG");
+		if (this.hasImage(srcImageFileName)) return srcImageFileName;
+		srcImageFileName = srcImageFileName.replaceFirst("\\.\\w+$", ".JPG");
+		if (this.hasImage(srcImageFileName)) return srcImageFileName;
+		srcImageFileName = srcImageFileName.replaceFirst("\\.\\w+$", ".JPEG");
+		if (this.hasImage(srcImageFileName)) return srcImageFileName;
+		srcImageFileName = srcImageFileName.replaceFirst("\\.\\w+$", ".GIF");
+		if (this.hasImage(srcImageFileName)) return srcImageFileName;
+		
+		srcImageFileName = srcImageFileName.replaceFirst("\\.\\w+$", ".Png");
+		if (this.hasImage(srcImageFileName)) return srcImageFileName;
+		srcImageFileName = srcImageFileName.replaceFirst("\\.\\w+$", ".Jpg");
+		if (this.hasImage(srcImageFileName)) return srcImageFileName;
+		srcImageFileName = srcImageFileName.replaceFirst("\\.\\w+$", ".Jpeg");
+		if (this.hasImage(srcImageFileName)) return srcImageFileName;
+		srcImageFileName = srcImageFileName.replaceFirst("\\.\\w+$", ".Gif");
+		if (this.hasImage(srcImageFileName)) return srcImageFileName;
+		
+		return null;
+	}
+	
+	private boolean hasImage(String srcImageFileName)
+	{
+		if (this.imageFileInfos.containsKey(srcImageFileName)) return true;
+		if (isFile) {
+			//ファイルシステムから取得
+			File imageFile = new File(this.srcParentPath+srcImageFileName);
+			if (imageFile.exists()) return true;
+		} else {
+			if (this.imageFileInfos.containsKey(this.zipTextParentPath+srcImageFileName)) return true;
+		}
+		return false;
+	}
+	
 	/** ImageInfoを取得
 	 * zip内テキストファイルがサブフォルダ以下にある場合はnullになるので本文中のパスに親のパスをつけて再取得
 	 * @param srcImageFileName テキスト内の画像注記で指定されている相対ファイル名 */
@@ -153,6 +202,7 @@ public class ImageInfoReader
 				} catch (IOException ioe) { System.err.println(ioe); }
 			}
 		} else {
+			//Zipで中にフォルダがある場合
 			imageInfo = this.imageFileInfos.get(this.zipTextParentPath+srcImageFileName);
 			return imageInfo;
 		}
@@ -213,7 +263,12 @@ public class ImageInfoReader
 	{
 		if (this.isFile) {
 			File file = new File(this.srcParentPath+srcImageFileName);
-			if (!file.exists()) return null; 
+			if (!file.exists()) {
+				//拡張子修正
+				srcImageFileName = this.correctExt(srcImageFileName);
+				file = new File(this.srcParentPath+srcImageFileName);
+				if (!file.exists()) return null;
+			}
 			BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file), 8192);
 			try {
 				return ImageUtils.readImage(srcImageFileName.substring(srcImageFileName.lastIndexOf('.')+1).toLowerCase(), bis);
@@ -221,7 +276,11 @@ public class ImageInfoReader
 		} else {
 			ZipFile zf = new ZipFile(this.srcFile, "MS932");
 			ZipArchiveEntry entry = zf.getEntry(srcImageFileName);
-			if (entry == null) return null;
+			if (entry == null) {
+				srcImageFileName = this.correctExt(srcImageFileName);
+				entry = zf.getEntry(srcImageFileName);
+				if (entry == null) return null;
+			}
 			InputStream is = zf.getInputStream(entry);
 			try {
 				return ImageUtils.readImage(srcImageFileName.substring(srcImageFileName.lastIndexOf('.')+1).toLowerCase(), is);

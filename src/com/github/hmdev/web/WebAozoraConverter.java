@@ -197,6 +197,8 @@ public class WebAozoraConverter
 		if (isPath) this.dstPath += urlParentPath;
 		else this.dstPath += urlFilePath+"_converted/";
 		File txtFile = new File(this.dstPath+"converted.txt");
+		//表紙画像はtxtと同じ名前で保存 拡張子はpngだが変換時にチェックするので関係ない
+		File coverImageFile = new File(this.dstPath+"converted.png");
 		//更新情報格納先
 		File updateInfoFile = new File(this.dstPath+"update.txt");
 		
@@ -224,7 +226,9 @@ public class WebAozoraConverter
 			
 			//表紙画像
 			Elements images = getExtractElements(doc, this.queryMap.get(ExtractId.COVER_IMG));
-			if (images != null) printImage(bw, images.get(0));
+			if (images != null) {
+				printImage(null, images.get(0), coverImageFile);
+			}
 			
 			//タイトル
 			boolean hasTitle = false;
@@ -721,6 +725,14 @@ public class WebAozoraConverter
 	/** 画像をキャッシュして相対パスの注記にする */
 	private void printImage(BufferedWriter bw, Element img) throws IOException
 	{
+		this.printImage(bw, img, null);
+	}
+	/** 画像をキャッシュして相対パスの注記にする
+	 * @param bw nullなら注記文字列は出力しない
+	 * @param img imgタグ
+	 * @param imageOutFile null出なければこのファイルに画像を出力 */
+	private void printImage(BufferedWriter bw, Element img, File imageOutFile) throws IOException
+	{
 		String src = img.attr("src");
 		if (src == null || src.length() == 0) return;
 		
@@ -741,17 +753,23 @@ public class WebAozoraConverter
 		if (imagePath.endsWith("/")) imagePath += "image.png";
 		
 		File imageFile = new File(this.dstPath+"images/"+imagePath);
-		if (!imageFile.exists()) {
-			try {
+		
+		try {
+			if (imageOutFile != null) {
+				if (imageOutFile.exists()) imageOutFile.delete();
+				cacheFile(src, imageOutFile, this.urlString);
+			} else if (!imageFile.exists()) {
 				cacheFile(src, imageFile, this.urlString);
-			} catch (Exception e) {
-				e.printStackTrace();
-				LogAppender.println("画像が取得できませんでした : "+src);
 			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			LogAppender.println("画像が取得できませんでした : "+src);
 		}
-		bw.append("［＃挿絵（");
-		bw.append("images/"+imagePath);
-		bw.append("）入る］\n");
+		if (bw != null) {
+			bw.append("［＃挿絵（");
+			bw.append("images/"+imagePath);
+			bw.append("）入る］\n");
+		}
 	}
 	
 	/** 文字を出力 特殊文字は注記に変換 */

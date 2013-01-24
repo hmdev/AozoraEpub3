@@ -422,7 +422,7 @@ public class JConfirmDialog extends JDialog
 					jButtonScale.setSelected(!jButtonScale.isSelected()); setCoverPaneSize(jButtonScale.isSelected()?2:1);
 					break;
 				case JCoverImagePanel.EVT_PAGE_UP:
-					if (bookInfo.coverImageIndex == 0) return;
+					if (bookInfo.coverImageIndex == 0 && (bookInfo.coverFileName == null || bookInfo.coverFileName.length() == 0)) return;
 					movePreviewImage(-1);
 					break;
 				case JCoverImagePanel.EVT_PAGE_DOWN:
@@ -641,28 +641,31 @@ public class JConfirmDialog extends JDialog
 	
 	void reloadTitle()
 	{
-		bookInfo.reloadMetadata(BookInfo.TitleType.indexOf(this.jComboTitle.getSelectedIndex()));
+		this.bookInfo.reloadMetadata(BookInfo.TitleType.indexOf(this.jComboTitle.getSelectedIndex()));
 		//テキストから取得できなければファイル名を利用
-		this.jTextTitle.setText(bookInfo.title);
-		this.jTextCreator.setText(bookInfo.creator);
+		this.jTextTitle.setText(this.bookInfo.title);
+		this.jTextCreator.setText(this.bookInfo.creator);
 	}
 	
 	void userFileName()
 	{
 		String[] titleCreator = BookInfo.getFileTitleCreator(this.bookInfo.srcFile.getName());
 		//テキストから取得できなければファイル名を利用
-		bookInfo.title = titleCreator[0]==null?"":titleCreator[0];
-		bookInfo.creator = titleCreator[1]==null?"":titleCreator[1];
-		this.jTextTitle.setText(bookInfo.title);
-		this.jTextCreator.setText(bookInfo.creator);
+		this.bookInfo.title = titleCreator[0]==null?"":titleCreator[0];
+		this.bookInfo.creator = titleCreator[1]==null?"":titleCreator[1];
+		this.jTextTitle.setText(this.bookInfo.title);
+		this.jTextCreator.setText(this.bookInfo.creator);
 	}
 	
 	void checkPreviewControlEnabled()
 	{
 		int count = this.imageInfoReader.countImageFileNames();
-		this.jButtonFirst.setEnabled(count > 0 && this.bookInfo.coverImageIndex > 0);
-		this.jButtonPrev.setEnabled(count > 0 && this.bookInfo.coverImageIndex > 0);
-		this.jButtonNext.setEnabled(count > 0 && this.bookInfo.coverImageIndex < count-1);
+		//ファイル指定されている場合はファイル名
+		boolean notFirst = (count > 0 && this.bookInfo.coverImageIndex > 0) || (this.bookInfo.coverImageIndex > -1 && this.bookInfo.coverFileName != null && this.bookInfo.coverFileName.length() > 0);
+		this.jButtonFirst.setEnabled(notFirst);
+		this.jButtonPrev.setEnabled(notFirst);
+		//最後でないor表紙無しでファイル指定か挿絵がある場合はtrue
+		this.jButtonNext.setEnabled((count > 0 && this.bookInfo.coverImageIndex < count-1) || (this.bookInfo.coverImage == null && (count > 0 || this.bookInfo.coverFileName != null && this.bookInfo.coverFileName.length() > 0)));
 		//this.jButtonMove.setEnabled(this.bookInfo.coverImage != null || this.bookInfo.coverImageIndex > 0);
 		//this.jButtonRange.setEnabled(this.bookInfo.coverImage != null || this.bookInfo.coverImageIndex > 0);
 		//this.jButtonDelete.setEnabled(this.bookInfo.coverImage != null || this.bookInfo.coverImageIndex > 0);
@@ -671,13 +674,18 @@ public class JConfirmDialog extends JDialog
 	
 	void movePreviewImage(int offset)
 	{
+		this.bookInfo.coverEditInfo = null;
 		this.bookInfo.coverImageIndex += offset;
-		this.bookInfo.coverImageIndex = Math.max(0, this.bookInfo.coverImageIndex);
-		bookInfo.coverEditInfo = null;
-		bookInfo.coverFileName = null;
 		try {
-			bookInfo.coverImage = imageInfoReader.getImage(bookInfo.coverImageIndex);
-			jCoverImagePanel.setBookInfo(bookInfo);
+			if (this.bookInfo.coverImageIndex < 0 && this.bookInfo.coverFileName != null && this.bookInfo.coverFileName.length() > 0) {
+				this.bookInfo.coverImageIndex = -1;
+				this.bookInfo.loadCoverImage(this.bookInfo.coverFileName);
+				jCoverImagePanel.setBookInfo(this.bookInfo);
+			} else {
+				this.bookInfo.coverImageIndex = Math.max(0, this.bookInfo.coverImageIndex);
+				this.bookInfo.coverImage = imageInfoReader.getImage(this.bookInfo.coverImageIndex);
+				jCoverImagePanel.setBookInfo(this.bookInfo);
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 			this.bookInfo.coverImage = null;
@@ -712,9 +720,8 @@ public class JConfirmDialog extends JDialog
 	/** 表紙削除 */
 	void deleteCover()
 	{
-		this.bookInfo.coverFileName = null;
 		this.bookInfo.coverImage = null;
-		this.bookInfo.coverImageIndex = -1;
+		this.bookInfo.coverImageIndex = -2;
 		this.jCoverImagePanel.setBookInfo(this.bookInfo);
 		this.checkPreviewControlEnabled();
 	}
@@ -727,6 +734,9 @@ public class JConfirmDialog extends JDialog
 		} else {
 			this.canceled = false;
 			this.setVisible(false);
+			
+			//挿絵が選択されていたらファイル名はnull
+			if (bookInfo.coverImageIndex > -1) bookInfo.coverFileName = null;
 			
 			//目次設定
 			if (!this.bookInfo.isImageOnly() && this.tocDataModel != null) {
@@ -754,6 +764,10 @@ public class JConfirmDialog extends JDialog
 	{
 		this.skipped = true;
 		this.setVisible(false);
+		
+		//挿絵が選択されていたらファイル名はnull
+		if (bookInfo.coverImageIndex > -1) bookInfo.coverFileName = null;
+		
 		//表紙情報保存
 		bookInfo.coverEditInfo = this.jCoverImagePanel.getCoverEditInfo();
 	}

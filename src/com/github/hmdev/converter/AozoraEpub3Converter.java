@@ -622,7 +622,7 @@ public class AozoraEpub3Converter
 					preChapterLineInfo = null;
 				}
 			}
-			//画像のファイル名の順番を格納
+			//画像のファイル名の順にimageInfoReaderにファイル名を追加
 			Matcher m = chukiPattern.matcher(noRubyLine);
 			while (m.find()) {
 				String chukiTag = m.group();
@@ -659,28 +659,26 @@ public class AozoraEpub3Converter
 					if (imageDotIdx > -1 && imageDotIdx < imageEndIdx) {
 						//画像ファイル名を取得し画像情報を格納
 						String imageFileName = this.getImageChukiFileName(chukiTag, imageStartIdx);
-						//imageInfoReader.getImageInfo(imageFileName);
 						imageInfoReader.addImageFileName(imageFileName);
 						if (bookInfo.firstImageLineNum == -1) {
 							//小さい画像は無視
-							ImageInfo imageInfo = imageInfoReader.getImageInfo(imageFileName);
-							if (imageInfo.getWidth() > 64 && imageInfo.getHeight() > 64) {
+							ImageInfo imageInfo = imageInfoReader.getImageInfo(imageInfoReader.correctExt(imageFileName));
+							if (imageInfo != null && imageInfo.getWidth() > 64 && imageInfo.getHeight() > 64) {
 								bookInfo.firstImageLineNum = lineNum;
-								bookInfo.firstImageIdx = imageInfoReader.countImageFileInfos()-1;
+								bookInfo.firstImageIdx = imageInfoReader.countImageFileNames()-1;
 							}
 						}
 					}
 				} else if (lowerChukiTag.startsWith("<img")) {
 					//src=の値抽出
 					String imageFileName = this.getImageTagFileName(chukiTag);
-					//imageInfoReader.getImageInfo(imageFileName);
-					imageInfoReader.addImageFileName(imageFileName);
+					imageInfoReader.addImageFileName(imageFileName);//画像がなければそのまま追加
 					if (bookInfo.firstImageLineNum == -1) {
 						//小さい画像は無視
-						ImageInfo imageInfo = imageInfoReader.getImageInfo(imageFileName);
-						if (imageInfo.getWidth() > 64 && imageInfo.getHeight() > 64) {
+						ImageInfo imageInfo = imageInfoReader.getImageInfo(imageInfoReader.correctExt(imageFileName));
+						if (imageInfo != null && imageInfo.getWidth() > 64 && imageInfo.getHeight() > 64) {
 							bookInfo.firstImageLineNum = lineNum;
-							bookInfo.firstImageIdx = imageInfoReader.countImageFileInfos()-1;
+							bookInfo.firstImageIdx = imageInfoReader.countImageFileNames()-1;
 						}
 					}
 				}

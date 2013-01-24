@@ -2576,11 +2576,22 @@ public class AozoraEpub3Applet extends JApplet
 			coverFileName = null; //表紙無し
 		}
 		
-		//BookInfo取得
-		BookInfo bookInfo = null;
-		
 		boolean isFile = "txt".equals(ext);
 		ImageInfoReader imageInfoReader = new ImageInfoReader(isFile, srcFile);
+		
+		//zip内の画像をロード
+		try {
+			if (!isFile) {
+				//Zip内の画像情報読み込み 画像のみならファイル順も格納
+				imageInfoReader.loadZipImageInfos(srcFile, imageOnly);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			LogAppender.println("[ERROR] "+e);
+		}
+		
+		//BookInfo取得
+		BookInfo bookInfo = null;
 		try {
 			if (!imageOnly) {
 				//テキストファイルからメタ情報や画像単独ページ情報を取得
@@ -2603,8 +2614,7 @@ public class AozoraEpub3Applet extends JApplet
 		Epub3Writer writer = this.epub3Writer;
 		try {
 			if (!isFile) {
-				//Zip内の画像情報読み込み
-				imageInfoReader.loadZipImageInfos(srcFile, imageOnly);
+				//Zip内の画像情報をbookInfoに設定
 				if (imageOnly) {
 					LogAppender.println("画像のみのePubファイルを生成します");
 					//画像出力用のBookInfo生成
@@ -2683,7 +2693,7 @@ public class AozoraEpub3Applet extends JApplet
 		}
 		
 		//先頭からの場合で指定行数以降なら表紙無し
-		if ("".equals(coverFileName)) {
+		if ("".equals(coverFileName) && !imageOnly) {
 			try {
 				int maxCoverLine = Integer.parseInt(this.jTextMaxCoverLine.getText());
 				if (maxCoverLine > 0 && (bookInfo.firstImageLineNum == -1 || bookInfo.firstImageLineNum >= maxCoverLine)) {
@@ -3016,12 +3026,15 @@ public class AozoraEpub3Applet extends JApplet
 						applet.jComboEncType.setSelectedIndex(1);
 						int titleTypeIdx = applet.jComboTitle.getSelectedIndex();
 						applet.jComboTitle.setSelectedIndex(0);
+						Object coverItem = applet.jComboCover.getSelectedItem();
+						applet.jComboCover.setSelectedIndex(1);
 						
 						applet.convertFiles(new File[]{srcFile}, dstPath);
 						
 						//戻す
 						applet.jComboEncType.setSelectedIndex(encIndex);
 						applet.jComboTitle.setSelectedIndex(titleTypeIdx);
+						applet.jComboCover.setSelectedItem(coverItem);
 						
 					} catch (Exception e) {
 						e.printStackTrace(); LogAppender.println("エラーが発生しました : "+e.getMessage());

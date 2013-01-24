@@ -347,6 +347,11 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 		this.linstener = linstener;
 	}
 	
+	ActionEvent changeAction = new ActionEvent(this, EVT_CHANGED, null);
+	ActionEvent dblclickAction = new ActionEvent(this, EVT_DBLCLICK, null);
+	ActionEvent pageDownAction = new ActionEvent(this, EVT_PAGE_DOWN, null);
+	ActionEvent pageUpAction = new ActionEvent(this, EVT_PAGE_UP, null);
+	
 	////////////////////////////////////////////////////////////////
 	//Events
 	////////////////////////////////////////////////////////////////
@@ -374,6 +379,7 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 					this.fitType = FIT_ZOOM;
 					this.setFitType(FIT_ALL, true);
 					repaint();
+					if (this.linstener != null) this.linstener.actionPerformed(this.changeAction);
 					return;
 				}
 			}
@@ -385,6 +391,7 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 				bookInfo.coverImageIndex = -1;
 				this.setFitType(FIT_ALL, true);
 				repaint();
+				if (this.linstener != null) this.linstener.actionPerformed(changeAction);
 				return;
 			}
 		} catch (Exception e) {
@@ -399,7 +406,7 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 	{
 		if (e.getClickCount() == 2) {
 			//2倍表示をコールバック
-			if (this.linstener != null) this.linstener.actionPerformed(new ActionEvent(this, EVT_DBLCLICK, null));
+			if (this.linstener != null) this.linstener.actionPerformed(dblclickAction);
 		}
 	}
 	@Override
@@ -425,14 +432,14 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 		//中ボタンは縦合わせ
 		if (this.mouseType == MouseEvent.BUTTON2) {
 			setFitType(FIT_H, false);
-			if (this.linstener != null) this.linstener.actionPerformed(new ActionEvent(this, EVT_CHANGED, null));
+			if (this.linstener != null) this.linstener.actionPerformed(changeAction);
 		}
 	}
 	@Override
 	public void mouseReleased(MouseEvent e)
 	{
 		this.startX = Integer.MIN_VALUE;
-		if (this.linstener != null) this.linstener.actionPerformed(new ActionEvent(this, EVT_CHANGED, null));
+		if (this.linstener != null) this.linstener.actionPerformed(changeAction);
 	}
 	/** マウスドラッグイベント */
 	@Override
@@ -467,7 +474,7 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 		} else {
 			this.setZoom(rate);
 		}
-		if (this.linstener != null) this.linstener.actionPerformed(new ActionEvent(this, EVT_CHANGED, null));
+		if (this.linstener != null) this.linstener.actionPerformed(changeAction);
 	}
 	
 	@Override
@@ -475,10 +482,10 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 	{
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_PAGE_DOWN:
-			if (this.linstener != null) this.linstener.actionPerformed(new ActionEvent(this, EVT_PAGE_DOWN, null));
+			if (this.linstener != null) this.linstener.actionPerformed(pageDownAction);
 			return;
 		case KeyEvent.VK_PAGE_UP:
-			if (this.linstener != null) this.linstener.actionPerformed(new ActionEvent(this, EVT_PAGE_UP, null));
+			if (this.linstener != null) this.linstener.actionPerformed(pageUpAction);
 			return;
 		}
 		
