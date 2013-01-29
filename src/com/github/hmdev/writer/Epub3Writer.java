@@ -428,8 +428,9 @@ public class Epub3Writer
 			
 			velocityContext.put("title_page", true);
 			
-			//目次にも追加
-			if (bookInfo.insertTitleToc) {
+			//表題行を目次に出力するならtitle.xhtmlを追加 （本文内の行はchapterinfosに追加されていない）
+			ChapterLineInfo titleLineInfo = bookInfo.getChapterLineInfo(bookInfo.titleLine);
+			if (titleLineInfo != null) {
 				chapterInfos.add(0, new ChapterInfo("title", null, bookInfo.title, ChapterLineInfo.LEVEL_TITLE));
 			}
 		}
