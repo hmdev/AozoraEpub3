@@ -507,8 +507,11 @@ public class Epub3Writer
 							imageFileName = imageFileName.substring(zipPathLength);
 							outImageFileNames.add(imageFileName);
 							//表紙フラグも設定
+							for(ImageInfo imageInfo2 : imageInfos) {
+								imageInfo2.setIsCover(false);
+							}
 							imageInfo.setIsCover(true);
-							this.imageInfos.add(imageInfo);
+							if (!this.imageInfos.contains(imageInfo)) this.imageInfos.add(imageInfo);
 						}
 					}
 				}
@@ -981,7 +984,7 @@ public class Epub3Writer
 			if (imageInfo == null) return PageBreakTrigger.IMAGE_PAGE_NONE;
 			//回り込みサイズ以下
 			if (this.imageFloatType != 0 &&
-				imageInfo.getWidth() >=64 &&  imageInfo.getHeight() >= 64 &&
+				(imageInfo.getWidth() >=64 || imageInfo.getHeight() >= 64) &&
 				imageInfo.getWidth() <= this.imageFloatW && imageInfo.getHeight() <= this.imageFloatH) {
 				if (this.imageFloatType==1) {
 					if (imageInfo.getWidth() > dispW) return PageBreakTrigger.IMAGE_INLINE_TOP_W;

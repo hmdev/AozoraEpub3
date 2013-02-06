@@ -52,3 +52,23 @@ vertical-align: middle;
 table.bottom td {
 vertical-align: bottom;
 }
+
+/* kindle左右中央 */
+div.kindle_outer {
+writing-mode: horizontal-tb;
+-webkit-writing-mode: horizontal-tb;
+-epub-writing-mode: horizontal-tb;
+text-align: center;
+width:100%;
+}
+div.kindle_outer.bottom {
+text-align: left;
+}
+div.kindle_inner {
+display: inline-block;
+writing-mode: vertical-rl;
+-webkit-writing-mode: vertical-rl;
+-epub-writing-mode: vertical-rl;
+text-align: left;
+height: 90%;
+}

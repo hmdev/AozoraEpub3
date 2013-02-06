@@ -40,8 +40,14 @@
 <body>
 #end
 #if (${sectionInfo.Middle})
+#if (${kindle})
+<div class="kindle_outer"><div class="kindle_inner">
+#end
 <table class="middle"><tr><td>
 #end
 #if (${sectionInfo.Bottom})
+#if (${kindle})
+<div class="kindle_outer bottom"><div class="kindle_inner">
+#end
 <table class="bottom"><tr><td>
 #end

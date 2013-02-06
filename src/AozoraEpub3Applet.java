@@ -629,7 +629,7 @@ public class AozoraEpub3Applet extends JApplet
 		jButtonCover.setFocusPainted(false);
 		jButtonCover.addActionListener(new CoverChooserListener(this));
 		panel.add(jButtonCover);
-		jCheckCoverHistory = new JCheckBox("表紙履歴利用");
+		jCheckCoverHistory = new JCheckBox("表紙履歴利用", true);
 		jCheckCoverHistory.setToolTipText("前回の変換(またはスキップ)で設定した表紙を利用します");
 		jCheckCoverHistory.setFocusPainted(false);
 		panel.add(jCheckCoverHistory);

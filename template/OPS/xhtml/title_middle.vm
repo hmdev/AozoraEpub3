@@ -28,6 +28,10 @@
 </head>
 
 <body>
+
+#if (${kindle})
+<div class="kindle_outer"><div class="kindle_inner">
+#end
 <table class="middle"><tr><td>
 
 #if (${PUBLISHER})
@@ -63,5 +67,9 @@
 #end
 
 </td></tr></table>
+#if (${kindle})
+</div></div>
+#end
+
 </body>
 </html>
