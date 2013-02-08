@@ -1001,17 +1001,26 @@ public class Epub3Writer
 					if (tagLevel == 0) return PageBreakTrigger.IMAGE_PAGE_NOFIT;
 				}
 				//拡大するか画面より多きい場合
+				//画面より横長
 				else if ((double)imageInfo.getWidth()/imageInfo.getHeight() > (double)this.dispW/this.dispH) {
 					if (this.rotateAngle != 0 && this.dispW < this.dispH && imageInfo.getWidth() > imageInfo.getHeight()*1.1) { //縦長画面で110%以上横長
 						imageInfo.rotateAngle = this.rotateAngle;
-						if (tagLevel == 0) return PageBreakTrigger.IMAGE_PAGE_H;
+						if (tagLevel == 0) {
+							if ((double)imageInfo.getHeight()/imageInfo.getWidth() > (double)dispW/dispH) return PageBreakTrigger.IMAGE_PAGE_W; //回転後画面より横長
+							return PageBreakTrigger.IMAGE_PAGE_H;
+						}
 					} else {
 						if (tagLevel == 0) return PageBreakTrigger.IMAGE_PAGE_W;
 					}
-				} else {
+				}
+				//画面より縦長
+				else {
 					if (this.rotateAngle != 0 && this.dispW > this.dispH && imageInfo.getWidth()*1.1 < imageInfo.getHeight()) { //横長画面で110%以上縦長
 						imageInfo.rotateAngle = this.rotateAngle;
-						if (tagLevel == 0) return PageBreakTrigger.IMAGE_PAGE_W;
+						if (tagLevel == 0) {
+							if ((double)imageInfo.getHeight()/imageInfo.getWidth() > (double)dispW/dispH) return PageBreakTrigger.IMAGE_PAGE_W; //回転後画面より横長
+							return PageBreakTrigger.IMAGE_PAGE_H;
+						}
 					} else {
 						if (tagLevel == 0) return PageBreakTrigger.IMAGE_PAGE_H;
 					}

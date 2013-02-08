@@ -1779,16 +1779,9 @@ public class AozoraEpub3Converter
 									} else {
 										String fileName = writer.getImageFilePath(srcFilePath.trim(), lineNum);
 										if (fileName != null) { //先頭に移動してここで出力しない場合はnull
-											if (bookInfo.isImageSectionLine(lineNum)) {
-												//単ページ画像の場合は<p>タグを出さない
-												noBr = true;
-												buf.append(chukiMap.get("画像開始")[0]);
-												buf.append(fileName);
-												buf.append(chukiMap.get("画像終了")[0]);
-											} else {
-												//画像注記またはページ出力
-												if (printImageChuki(out, buf, fileName, this.writer.getImagePageType(srcFilePath, this.tagLevel, lineNum))) noBr = true;
-											}
+											if (bookInfo.isImageSectionLine(lineNum)) noBr = true;
+											//画像注記またはページ出力
+											if (printImageChuki(out, buf, fileName, this.writer.getImagePageType(srcFilePath, this.tagLevel, lineNum))) noBr = true;
 										}
 									}
 								}
@@ -1807,19 +1800,11 @@ public class AozoraEpub3Converter
 								LogAppender.error(lineNum, "画像注記エラー", chukiTag);
 							} else {
 								//単ページ画像の場合は<p>タグを出さない
-								if (bookInfo.isImageSectionLine(lineNum)) noBr = true;
 								String fileName = writer.getImageFilePath(srcFilePath.trim(), lineNum);
 								if (fileName != null) { //先頭に移動してここで出力しない場合はnull
-									//単ページ画像の場合は<p>タグを出さない
-									if (bookInfo.isImageSectionLine(lineNum)) {
-										noBr = true;
-										buf.append(chukiMap.get("画像開始")[0]);
-										buf.append(fileName);
-										buf.append(chukiMap.get("画像終了")[0]);
-									} else {
-										//画像注記またはページ出力
-										if (printImageChuki(out, buf, fileName, this.writer.getImagePageType(srcFilePath, this.tagLevel, lineNum))) noBr = true;
-									}
+									if (bookInfo.isImageSectionLine(lineNum)) noBr = true;
+									//画像注記またはページ出力
+									if (printImageChuki(out, buf, fileName, this.writer.getImagePageType(srcFilePath, this.tagLevel, lineNum))) noBr = true;
 								}
 							}
 						}
@@ -2101,6 +2086,12 @@ public class AozoraEpub3Converter
 						if (noRuby) 
 							convertTcyText(buf, ch, rubyStart, rubyTopStart, noTcy); //本文
 						else {
+							//長すぎるルビを警告
+							if (rubyTopStart-rubyStart >= 30) {
+								//タグは除去 面倒なので文字列で置換
+								if (line.substring(rubyStart, rubyTopStart).replaceAll("<[^>]+>", " ").length() >= 30)
+									LogAppender.warn(lineNum, "ルビが長すぎます");
+							}
 							//同じ長さで同じ文字なら一文字づつルビを振る
 							if (rubyTopStart-rubyStart == i-rubyTopStart-1 && CharUtils.isSameChars(ch, rubyTopStart+1, i)) {
 								for (int j=0; j<rubyTopStart-rubyStart; j++) {

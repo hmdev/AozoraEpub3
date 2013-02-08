@@ -14,20 +14,19 @@ a:link img, a:visited img { border-style: none; }
 span.img {
 /*clear: both;*/
 display: inline-block;
-vertical-align: middle;
 max-width: 100%;
 max-height: 100%;
 }
 span.img.ft {
-/*clear: both;*/
 display: inline;
 float: left;
+/*clear: left;*/
 padding-bottom: 0.5em;
 }
 span.img.fb {
-/*clear: both;*/
 display: inline;
 float: right;
+/*clear: right;*/
 padding-top: 0.5em;
 }
 span.img.fw img {
@@ -199,7 +198,7 @@ text-combine: horizontal;
 }
 
 /* ルビ内改行無し (Kindleで縦中横でずれるため) */
-ruby .tcy {
+ruby {
 white-space: nowrap;
 }
 
