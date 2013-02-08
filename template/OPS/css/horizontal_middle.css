@@ -4,7 +4,7 @@
 /* 横書き左右中央 */
 @page {
 /* 上右下左 */
-margin: 0 0 0 0.5em;
+margin: 0 0 0 0;
 }
 
 html {
@@ -22,7 +22,7 @@ height:100%;
 }
 body {
 margin: 0;
-padding: 0;
+padding: 0 .5em;
 display: block;
 color: #000;
 font-size: 1em;
@@ -69,5 +69,5 @@ writing-mode: horizontal-tb;
 -webkit-writing-mode: horizontal-tb;
 -epub-writing-mode: horizontal-tb;
 text-align: left;
-width: 90%;
+width: 99%;
 }
