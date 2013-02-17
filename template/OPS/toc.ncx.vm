@@ -32,7 +32,9 @@
 #else
 		<content src="xhtml/${chapter.SectionId}.xhtml"/>
 #end
+#foreach(${end} in ${chapter.NavClose})
 	</navPoint>
+#end
 #end
 #end
 </navMap>

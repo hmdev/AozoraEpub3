@@ -25,7 +25,7 @@ import com.github.hmdev.writer.Epub3Writer;
 /** コマンドライン実行用mainとePub3変換関数 */
 public class AozoraEpub3
 {
-	public static final String VERSION = "1.1.0b27";
+	public static final String VERSION = "1.1.0b28";
 	
 	/** コマンドライン実行用 */
 	public static void main(String args[])
@@ -173,6 +173,8 @@ public class AozoraEpub3
 					imageFloatType, imageFloatW, imageFloatH, jpegQualty, gamma, autoMarginLimitH, autoMarginLimitV, autoMarginWhiteLevel, autoMarginPadding, autoMarginNombre, nobreSize);
 			epub3ImageWriter.setImageParam(dispW, dispH, coverW, coverH, resizeW, resizeH, singlePageSizeW, singlePageSizeH, singlePageWidth, fitImage, rotateImage,
 					imageFloatType, imageFloatW, imageFloatH, jpegQualty, gamma, autoMarginLimitH, autoMarginLimitV, autoMarginWhiteLevel, autoMarginPadding, autoMarginNombre, nobreSize);
+			//目次階層化設定
+			epub3Writer.setTocParam("1".equals(props.getProperty("NavNest")), "1".equals(props.getProperty("NcxNest")));
 			
 			//自動改ページ
 			int forcePageBreakSize = 0;
@@ -346,6 +348,16 @@ public class AozoraEpub3
 					bookInfo.insertCoverPageToc = coverPageToc;
 					bookInfo.insertCoverPage = coverPage;
 					bookInfo.coverImageIndex = coverImageIndex;
+					if (coverFileName != null && !coverFileName.startsWith("http")) {
+						File coverFile = new File(coverFileName);
+						if (!coverFile.exists()) {
+							coverFileName = srcFile.getParent()+"/"+coverFileName;
+							if (!new File(coverFileName).exists()) {
+								coverFileName = null;
+								LogAppender.println("[WARN] 表紙画像ファイルが見つかりません : "+coverFile.getAbsolutePath());
+							}
+						}
+					}
 					bookInfo.coverFileName = coverFileName;
 					
 					String[] titleCreator = BookInfo.getFileTitleCreator(srcFile.getName());

@@ -51,10 +51,20 @@ li a {text-decoration:none; border-bottom-width:1px; border-bottom-style:solid; 
 #foreach(${chapter} in ${chapters})
 #if ($chapter.ChapterName)
 #set($idx=$idx+1)
+#if (${navNest})
+#foreach(${start} in ${chapter.LevelStart})
+		<ol>
+#end
+#end
 #if ($chapter.ChapterId)
 			<li class="chapter" id="toc${idx}"><a href="${chapter.SectionId}.xhtml#${chapter.ChapterId}">${chapter.ChapterName}</a></li>
 #else
 			<li class="chapter" id="toc${idx}"><a href="${chapter.SectionId}.xhtml">${chapter.ChapterName}</a></li>
+#end
+#if (${navNest})
+#foreach(${end} in ${chapter.LevelEnd})
+		</ol>
+#end
 #end
 #end
 #end

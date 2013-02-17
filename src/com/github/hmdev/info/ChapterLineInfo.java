@@ -30,9 +30,9 @@ public class ChapterLineInfo
 	
 	public static final int LEVEL_TITLE = 0;
 	public static final int LEVEL_SECTION = 1;
-	public static final int LEVEL_H1 = 2;
-	public static final int LEVEL_H2 = 3;
-	public static final int LEVEL_H3 = 4;
+	public static final int LEVEL_H1 = 1;
+	public static final int LEVEL_H2 = 2;
+	public static final int LEVEL_H3 = 3;
 	
 	public ChapterLineInfo(int lineNum, int type, boolean pageBreak, int level, boolean emptyLineNext)
 	{
@@ -92,6 +92,7 @@ public class ChapterLineInfo
 		case TYPE_CHUKI_H1: return LEVEL_H1;
 		case TYPE_CHUKI_H2: return LEVEL_H2;
 		case TYPE_CHUKI_H3: return LEVEL_H3;
+		case TYPE_CHAPTER_NUM: return LEVEL_H2;
 		}
 		return LEVEL_H1;
 	}

@@ -56,6 +56,12 @@ public class WebAozoraConverter
 	/** 変換中のHTMLファイルのあるパス 末尾は/ */
 	String pageBaseUri;
 	
+	////////////////////////////////
+	//取得間隔 ミリ秒
+	int interval = 500;
+	
+	
+	////////////////////////////////
 	boolean canceled = false;
 	
 	////////////////////////////////////////////////////////////////
@@ -77,7 +83,6 @@ public class WebAozoraConverter
 		return converter;
 		//return converter._convertToAozoraText(urlString, baseUri, fqdn, cachePath);
 	}
-	
 	
 	////////////////////////////////////////////////////////////////
 	/** fqdnに対応したパラメータ取得 
@@ -158,9 +163,12 @@ public class WebAozoraConverter
 	
 	////////////////////////////////////////////////////////////////
 	/** 変換実行 */
-	public File convertToAozoraText(String urlString, File cachePath) throws IOException
+	public File convertToAozoraText(String urlString, File cachePath, int interval) throws IOException
 	{
 		this.canceled = false;
+		
+		this.interval = interval;
+		
 		//リダイレクトされていたら置き換え
 		urlString = urlString.trim();
 		if (!urlString.endsWith("/") && !urlString.endsWith(".html") && urlString.indexOf("?") == -1 ) {
@@ -212,7 +220,6 @@ public class WebAozoraConverter
 				LogAppender.append(urlString);
 				cacheFile(urlString, cacheFile, null);
 				LogAppender.println(" : List Loaded.");
-				try { Thread.sleep(500); } catch (InterruptedException e) { }
 			} catch (Exception e) {
 				e.printStackTrace();
 				LogAppender.println("一覧ページの取得に失敗しました。 ");
@@ -392,9 +399,9 @@ public class WebAozoraConverter
 						if (reload || !chapterCacheFile.exists()) {
 							LogAppender.append("["+(i+1)+"/"+chapterHrefs.size()+"] "+chapterHref);
 							try {
+								try { Thread.sleep(this.interval); } catch (InterruptedException e) { }
 								cacheFile(chapterHref, chapterCacheFile, urlString);
 								LogAppender.println(" : Loaded.");
-								try { Thread.sleep(500); } catch (InterruptedException e) { }
 								//ファイルがロードされたら更新有り
 								updated = true;
 							} catch (Exception e) {
@@ -953,7 +960,7 @@ public class WebAozoraConverter
 		//ダウンロード
 		URLConnection conn = new URL(urlString).openConnection();
 		if (referer != null) conn.setRequestProperty("Referer", referer);
-		conn.setConnectTimeout(5000);//5秒
+		conn.setConnectTimeout(10000);//10秒
 		BufferedInputStream bis = new BufferedInputStream(conn.getInputStream(), 8192);
 		BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(cacheFile));
 		IOUtils.copy(bis, bos);

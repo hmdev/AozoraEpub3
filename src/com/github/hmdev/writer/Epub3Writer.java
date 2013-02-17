@@ -180,6 +180,11 @@ public class Epub3Writer
 	/** ガンマフィルタ */
 	LookupOp gammaOp;
 	
+	/** nav.xhtml階層化 */
+	boolean navNest = false;
+	/** toc.ncx階層化 */
+	boolean ncxNest = false;
+	
 	/** 拡張子に.mobiが選択されていてkindlegenがある場合 */
 	boolean isKindle = false;
 	
@@ -292,6 +297,12 @@ public class Epub3Writer
 		this.autoMarginNombreSize = nombreSize;
 	}
 	
+	public void setTocParam(boolean navNest, boolean ncxNest)
+	{
+		this.navNest = navNest;
+		this.ncxNest = ncxNest;
+	}
+	
 	/** 処理を中止 */
 	public void cancel()
 	{
@@ -358,6 +369,9 @@ public class Epub3Writer
 		velocityContext.put("bookInfo", bookInfo);
 		//更新日時
 		velocityContext.put("modified", dateFormat.format(bookInfo.modified));
+		
+		//目次階層化
+		velocityContext.put("navNest", this.navNest);
 		
 		//端末種別
 		velocityContext.put("kindle", this.isKindle);
@@ -571,7 +585,7 @@ public class Epub3Writer
 		
 		//目次の階層情報を設定
 		//レベルを0から開始に変更
-		/*int[] chapterCounts = new int[10];
+		int[] chapterCounts = new int[10];
 		for (ChapterInfo chapterInfo : chapterInfos) {
 			chapterCounts[chapterInfo.getChapterLevel()]++;
 		}
@@ -586,6 +600,7 @@ public class Epub3Writer
 		for (ChapterInfo chapterInfo : chapterInfos) {
 			chapterInfo.chapterLevel = chapterInfo.chapterLevel-levelDiff[chapterInfo.chapterLevel];
 		}
+		//開始終了情報を追加 nav用
 		ChapterInfo preChapterInfo = new ChapterInfo(null, null, null, 0); //レベル0
 		for (ChapterInfo chapterInfo : chapterInfos) {
 			if (preChapterInfo != null) {
@@ -600,7 +615,51 @@ public class Epub3Writer
 		if (chapterInfos.size() > 0) {
 			ChapterInfo chapterInfo = chapterInfos.lastElement();
 			if (chapterInfo != null) chapterInfo.levelEnd = chapterInfo.chapterLevel;
-		}*/
+		}
+		
+		if (this.ncxNest) {
+		//navPointを閉じる回数をlevelEndに設定
+			int[] navPointLevel = new int[10]; //navPointを開始したレベルが1
+			preChapterInfo = null;
+			for (ChapterInfo chapterInfo : chapterInfos) {
+				if (preChapterInfo != null) {
+					int preLevel = Math.max(1, preChapterInfo.chapterLevel);
+					int curLevel = Math.max(1, chapterInfo.chapterLevel);
+					navPointLevel[preLevel] = 1;
+					if (preLevel < curLevel) {
+						//前より小さい場合
+						preChapterInfo.navClose = 0;
+					} else if (preLevel > curLevel) {
+						//前より大きい
+						int close = 0;
+						for (int i=curLevel; i<navPointLevel.length; i++) {
+							if (navPointLevel[i] == 1) {
+								close++;
+								navPointLevel[i] = 0;
+							}
+						}
+						preChapterInfo.navClose = close;
+					} else {
+						preChapterInfo.navClose = 1;
+						navPointLevel[preLevel] = 0;
+					}
+				}
+				preChapterInfo = chapterInfo;
+			}
+			//一番最後は閉じる
+			if (chapterInfos.size() > 0) {
+				ChapterInfo chapterInfo = chapterInfos.lastElement();
+				if (chapterInfo != null) {
+					int close = 0;
+					for (int i=0; i<navPointLevel.length; i++) {
+						if (navPointLevel[i] == 1) {
+							close++;
+						}
+					}
+					chapterInfo.navClose = close;
+				}
+			}
+		}
 		
 		//出力前に縦中横とエスケープ処理
 		if (!bookInfo.imageOnly) {

@@ -17,6 +17,8 @@ public class ChapterInfo
 	public int levelStart = 0;
 	/** 出力後に階層化終了タグを入れる回数 */
 	public int levelEnd = 0;
+	/** navPointを閉じる回数 */
+	public int navClose = 1;
 	
 	public ChapterInfo(String sectionId, String chapterId, String chapterName, int chapterLevel)
 	{
@@ -69,5 +71,11 @@ public class ChapterInfo
 	{
 		if (this.levelEnd == 0) return null;
 		return new int[this.levelEnd];
+	}
+	/** Velocityでループするために配列を返す */
+	public int[] getNavClose()
+	{
+		if (this.navClose <= 0) return null;
+		return new int[this.navClose];
 	}
 }
