@@ -152,7 +152,7 @@ public class AozoraEpub3
 			int imageFloatW = 0; try { imageFloatW = Integer.parseInt(props.getProperty("ImageFloatW")); } catch (Exception e) {}
 			int imageFloatH = 0; try { imageFloatH = Integer.parseInt(props.getProperty("ImageFloatH")); } catch (Exception e) {}
 			boolean fitImage = "1".equals(props.getProperty("FitImage"));
-			int rotateImage = 0; if ("1".equals(props.getProperty("RorateImage"))) rotateImage = 90; else if ("2".equals(props.getProperty("RorateImage"))) rotateImage = -90;
+			int rotateImage = 0; if ("1".equals(props.getProperty("RotateImage"))) rotateImage = 90; else if ("2".equals(props.getProperty("RotateImage"))) rotateImage = -90;
 			float jpegQualty = 0.8f; try { jpegQualty = Integer.parseInt(props.getProperty("JpegQuality"))/100f; } catch (Exception e) {}
 			float gamma = 1.0f; if ( "1".equals(props.getProperty("Gamma"))) try { gamma = Float.parseFloat(props.getProperty("GammaValue")); } catch (Exception e) {}
 			int autoMarginLimitH = 0;
