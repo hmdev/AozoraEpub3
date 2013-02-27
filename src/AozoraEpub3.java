@@ -61,7 +61,7 @@ public class AozoraEpub3
 			options.addOption("tf", false, "入力ファイル名を表題に利用");
 			options.addOption("c", "cover", true, "表紙画像\n[0:先頭の挿絵]\n[1:ファイル名と同じ画像]\n[ファイル名 or URL]");
 			options.addOption("ext", true, "出力ファイル拡張子\n[.epub] (default)\n[.kepub.epub]");
-			options.addOption("of", true, "出力ファイル名を入力ファイル名に合せる");
+			options.addOption("of", false, "出力ファイル名を入力ファイル名に合せる");
 			options.addOption("d", "dst", true, "出力先パス");
 			options.addOption("enc", true, "入力ファイルエンコード\n[MS932] (default)\n[UTF-8]");
 			//options.addOption("id", false, "栞用ID出力 (for Kobo)");
