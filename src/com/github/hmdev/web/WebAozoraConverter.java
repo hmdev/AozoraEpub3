@@ -167,7 +167,7 @@ public class WebAozoraConverter
 	{
 		this.canceled = false;
 		
-		this.interval = interval;
+		this.interval = Math.max(500, interval);
 		
 		//リダイレクトされていたら置き換え
 		urlString = urlString.trim();

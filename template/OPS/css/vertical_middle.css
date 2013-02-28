@@ -24,7 +24,7 @@ height:100%;
 }
 body {
 margin: 0;
-padding: .5em 0;
+padding: 0;
 display: block;
 color: #000;
 font-size: 1em;
@@ -60,6 +60,9 @@ writing-mode: horizontal-tb;
 -epub-writing-mode: horizontal-tb;
 text-align: center;
 width:100%;
+margin: 0;
+padding: 0;
+line-height: 0;
 }
 div.kindle_outer.bottom {
 text-align: left;

@@ -583,6 +583,7 @@ public class AozoraEpub3Converter
 						inComment = false; continue;
 					}
 					else {
+						if (lineNum > 10 && !(commentPrint && commentConvert)) LogAppender.warn(lineNum, "コメント開始行が10行目以降にあります");
 						//コメント行開始
 						commentLineStart = this.lineNum;
 						inComment = true;
