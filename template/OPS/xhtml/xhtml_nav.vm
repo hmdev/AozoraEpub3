@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2011/epub" lang="ja" xml:lang="ja">
 <head>
 <title>${title}</title>
 <style type="text/css">
@@ -41,34 +41,72 @@ li a {text-decoration:none; border-bottom-width:1px; border-bottom-style:solid; 
 </head>
 
 <body>
-	<nav xmlns:epub="http://www.idpf.org/2007/ops" epub:type="toc" id="toc">
-		<h1>目　次</h1>
+## epub3 landmarks nav ==========================
+	<nav epub:type="landmarks" id="landmarks" hidden="">
 		<ol>
-#if (${bookInfo.InsertCoverPage} && ${bookInfo.InsertCoverPageToc})
-			<li class="chapter" id="toccover"><a href="cover.xhtml">${cover_name}</a></li>
+#if (${bookInfo.InsertCoverPage})
+			<li><a epub:type="cover" href="cover.xhtml">表紙</a></li>
 #end
-#set($idx=0)
+#if (${bookInfo.InsertTocPage})
+			<li><a epub:type="toc" href="nav.xhtml">目次</a></li>
+#end
+#foreach (${chapter} in ${chapters})
+#if (${chapter.SectionId} == "title")
+			<li><a epub:type="titlepage" href="title.xhtml">扉</a></li>
+#else
+			<li><a epub:type="bodymatter" href="${chapter.SectionId}.xhtml">本文</a></li>
+#break
+#end
+#end
+		</ol>
+	</nav>
+## epub3 toc nav ================================
+	<nav epub:type="toc" id="toc">
+		<h1>目　次</h1>
+#if (${bookInfo.InsertCoverPage} && ${bookInfo.InsertCoverPageToc})
+		<ol>
+			<li class="chapter" id="toccover"><a href="cover.xhtml">${cover_name}</a></li>
+		</ol>
+#end
+#if (!${navNest})
+		<ol>
+#end
+#set ($idx=0)
+#set ($nest_level=-1)
 #foreach(${chapter} in ${chapters})
 #if ($chapter.ChapterName)
-#set($idx=$idx+1)
-#if (${navNest})
-#foreach(${start} in ${chapter.LevelStart})
-		<ol>
-#end
-#end
+#set ($idx=$idx+1)
 #if ($chapter.ChapterId)
-			<li class="chapter" id="toc${idx}"><a href="${chapter.SectionId}.xhtml#${chapter.ChapterId}">${chapter.ChapterName}</a></li>
+#set ($chapter_anchor="#"+$chapter.ChapterId)
+#end
+## enable nested toc ------------------------
+#if (${navNest})
+#if (${chapter.ChapterLevel} > ${nest_level})
+			<ol>
+#end
+#if (${chapter.ChapterLevel} == ${nest_level})
+				</li>
+#elseif (${chapter.ChapterLevel} < ${nest_level})
+			</li>
+			</ol>
+			</li>
+#end
+				<li class="chapter" id="toc${idx}"><a href="${chapter.SectionId}.xhtml$!{chapter_anchor}">${chapter.ChapterName}</a>
+#set ($nest_level=$chapter.ChapterLevel)
+## disable nested toc -----------------------
 #else
-			<li class="chapter" id="toc${idx}"><a href="${chapter.SectionId}.xhtml">${chapter.ChapterName}</a></li>
+			<li class="chapter" id="toc${idx}"><a href="${chapter.SectionId}.xhtml$!{chapter_anchor}">${chapter.ChapterName}</a></li>
+#end
+#end
 #end
 #if (${navNest})
-#foreach(${end} in ${chapter.LevelEnd})
+#foreach ($end in [$nest_level..0])
+			</li>
+			</ol>
+#end
+#else
 		</ol>
 #end
-#end
-#end
-#end
-		</ol>
 	</nav>
 </body>
 </html>
