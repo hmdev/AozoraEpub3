@@ -52,7 +52,7 @@ li a {text-decoration:none; border-bottom-width:1px; border-bottom-style:solid; 
 #end
 #foreach (${chapter} in ${chapters})
 #if (${chapter.SectionId} == "title")
-			<li><a epub:type="titlepage" href="title.xhtml">扉</a></li>
+			<li><a epub:type="title-page" href="title.xhtml">扉</a></li>
 #else
 			<li><a epub:type="bodymatter" href="${chapter.SectionId}.xhtml">本文</a></li>
 #break
@@ -63,33 +63,35 @@ li a {text-decoration:none; border-bottom-width:1px; border-bottom-style:solid; 
 ## epub3 toc nav ================================
 	<nav epub:type="toc" id="toc">
 		<h1>目　次</h1>
+		<ol>
 #if (${bookInfo.InsertCoverPage} && ${bookInfo.InsertCoverPageToc})
-		<ol>
 			<li class="chapter" id="toccover"><a href="cover.xhtml">${cover_name}</a></li>
-		</ol>
-#end
-#if (!${navNest})
-		<ol>
 #end
 #set ($idx=0)
-#set ($nest_level=-1)
+#set ($nest_level=0)
 #foreach(${chapter} in ${chapters})
 #if ($chapter.ChapterName)
 #set ($idx=$idx+1)
 #if ($chapter.ChapterId)
 #set ($chapter_anchor="#"+$chapter.ChapterId)
+#else
+#set ($chapter_anchor="")
 #end
 ## enable nested toc ------------------------
 #if (${navNest})
+#if (${idx} > 1)
 #if (${chapter.ChapterLevel} > ${nest_level})
 			<ol>
-#end
-#if (${chapter.ChapterLevel} == ${nest_level})
+#elseif (${chapter.ChapterLevel} == ${nest_level})
 				</li>
 #elseif (${chapter.ChapterLevel} < ${nest_level})
-			</li>
+#set ($loop_count=$nest_level - $chapter.ChapterLevel - 1)
+#foreach (${i} in [0..${loop_count}])
+				</li>
 			</ol>
+#end
 			</li>
+#end
 #end
 				<li class="chapter" id="toc${idx}"><a href="${chapter.SectionId}.xhtml$!{chapter_anchor}">${chapter.ChapterName}</a>
 #set ($nest_level=$chapter.ChapterLevel)
@@ -100,7 +102,7 @@ li a {text-decoration:none; border-bottom-width:1px; border-bottom-style:solid; 
 #end
 #end
 #if (${navNest})
-#foreach ($end in [$nest_level..0])
+#foreach (${end} in [${nest_level}..0])
 			</li>
 			</ol>
 #end
