@@ -70,7 +70,8 @@ public class AozoraEpub3
 			//options.addOption("tm", false, "表題を左右中央");
 			//options.addOption("cp", false, "表紙画像ページ追加");
 			options.addOption("hor", false, "横書き (指定がなければ縦書き)");
-			
+			options.addOption("device", true, "端末種別(指定した端末向けの例外処理を行う)\n[kindle]");
+
 			CommandLine commandLine;
 			try {
 				commandLine = new BasicParser().parse(options, args, true);
@@ -217,6 +218,7 @@ public class AozoraEpub3
 			String outExt = ".epub";
 			boolean autoFileName = true; //ファイル名を表題に利用
 			boolean vertical = true;
+			String targetDevice = null;
 			if(commandLine.hasOption("t")) try { titleIndex = Integer.parseInt(commandLine.getOptionValue("t")); } catch (Exception e) {}//表題
 			if(commandLine.hasOption("tf")) useFileName = true;
 			if(commandLine.hasOption("c")) coverFileName = commandLine.getOptionValue("c");
@@ -231,7 +233,13 @@ public class AozoraEpub3
 			//if(commandLine.hasOption("cc")) commentConvert = true;
 			//if(commandLine.hasOption("cp")) coverPage = true;
 			if(commandLine.hasOption("hor")) vertical = false;
-			
+			if(commandLine.hasOption("device")) {
+				targetDevice = commandLine.getOptionValue("device");
+				if (targetDevice.equalsIgnoreCase("kindle")) {
+					epub3Writer.setIsKindle(true);
+				}
+			}
+
 			//変換クラス生成とパラメータ設定
 			AozoraEpub3Converter  aozoraConverter = new AozoraEpub3Converter(epub3Writer, jarPath);
 			//挿絵なし
