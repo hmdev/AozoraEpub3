@@ -13,6 +13,8 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -34,6 +36,8 @@ import com.github.hmdev.web.ExtractInfo.ExtractId;
 /** HTMLを青空txtに変換 */
 public class WebAozoraConverter
 {
+	final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
+	
 	/** Singletonインスタンス格納 keyはFQDN */
 	static HashMap<String, WebAozoraConverter> converters = new HashMap<String, WebAozoraConverter>();
 	
@@ -433,9 +437,23 @@ public class WebAozoraConverter
 						if (subtitles != null && subtitles.size() > i) subTitle = subtitles.get(i);
 						
 						docToAozoraText(bw, chapterDoc, newChapter, subTitle, postDate);
+						
 					}
 					i++;
 				}
+				//底本にURL追加
+				bw.append("\n［＃改ページ］\n");
+				bw.append("底本： ");
+				bw.append("<a href=\"");
+				bw.append(urlString);
+				bw.append("\">");
+				bw.append(urlString);
+				bw.append("</a>");
+				bw.append('\n');
+				bw.append("変換日時： ");
+				bw.append(dateFormat.format(new Date()));
+				bw.append('\n');
+				
 				if (!updated) {
 					LogAppender.append(title);
 					LogAppender.println(" の更新はありません");

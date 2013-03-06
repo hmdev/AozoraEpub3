@@ -53,11 +53,16 @@ Changes
 　- プロファイル設定(追加、削除、名称変更、並び替え)
 
 ----
-1.1.0b29 (2013/03/02)
-　- nav.xhtmlの階層を調整 (Kindle向け)
+1.1.0b29 (2013/03/07)
+　- nav.xhtmlの階層タグを調整＋landmark出力(Kindleのみ)
+　　※KindlePreviewer2.8のNCX表示はKindle側の動作にバグ有り？
+　- nav.xhtmlのスタイルと行間調整
+　- toc.ncx内のタグ除去
+　- 表題の有無でtoc.ncxの中見出しレベルがずれていたのを修正
 　- コメント開始が10行目以降にあったらWARN出力
-　- 左右中央の上padding調整
-
+　- 左右中央の上paddingを0に修正(下がはみ出すため)
+　- 「http」で始まるaタグはリンクで出力する
+　- Web小説の最後のページに底本URLと変換日時を表示
 1.1.0b28 (2013/02/18)
 　- package.opf内表題ページのIDを title-page に変更 (metadataのtitleとID重複バグ)
 　- ショートカットの拡張子の大文字に対応

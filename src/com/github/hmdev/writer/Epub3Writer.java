@@ -589,17 +589,15 @@ public class Epub3Writer
 		for (ChapterInfo chapterInfo : chapterInfos) {
 			chapterCounts[chapterInfo.getChapterLevel()]++;
 		}
-		int[] levelDiff = new int[10];
+		int[] newLevel = new int[10];
+		int level = 0;
 		for (int i=0; i<chapterCounts.length; i++) {
-			if (chapterCounts[i] == 0) {
-				for (int j=i+1; j<levelDiff.length; j++) {
-					levelDiff[j]++;
-				}
-			}
+			if (chapterCounts[i] > 0) newLevel[i] = level++;
 		}
 		for (ChapterInfo chapterInfo : chapterInfos) {
-			chapterInfo.chapterLevel = chapterInfo.chapterLevel-levelDiff[chapterInfo.chapterLevel];
+			chapterInfo.chapterLevel = newLevel[chapterInfo.chapterLevel];
 		}
+		
 		//開始終了情報を追加 nav用
 		ChapterInfo preChapterInfo = new ChapterInfo(null, null, null, 0); //レベル0
 		for (ChapterInfo chapterInfo : chapterInfos) {
@@ -617,14 +615,20 @@ public class Epub3Writer
 			if (chapterInfo != null) chapterInfo.levelEnd = chapterInfo.chapterLevel;
 		}
 		
+		if (bookInfo.insertTitleToc && chapterInfos.size() >= 2) {
+			chapterInfos.get(0).chapterLevel = chapterInfos.get(1).chapterLevel;
+		}
 		if (this.ncxNest) {
-		//navPointを閉じる回数をlevelEndに設定
-			int[] navPointLevel = new int[10]; //navPointを開始したレベルが1
+			int minLevel = 99; int maxLevel = 0;
+			//navPointを閉じる回数をlevelEndに設定
+			int[] navPointLevel = new int[10]; //navPointを開始したレベルidxに1を設定
 			preChapterInfo = null;
 			for (ChapterInfo chapterInfo : chapterInfos) {
 				if (preChapterInfo != null) {
-					int preLevel = Math.max(1, preChapterInfo.chapterLevel);
-					int curLevel = Math.max(1, chapterInfo.chapterLevel);
+					int preLevel = preChapterInfo.chapterLevel;
+					int curLevel = chapterInfo.chapterLevel;
+					minLevel = Math.min(minLevel, curLevel);
+					maxLevel = Math.max(maxLevel, curLevel);
 					navPointLevel[preLevel] = 1;
 					if (preLevel < curLevel) {
 						//前より小さい場合
@@ -646,11 +650,14 @@ public class Epub3Writer
 				}
 				preChapterInfo = chapterInfo;
 			}
+			//velocityに設定 1～
+			velocityContext.put("ncx_depth", minLevel<maxLevel ? maxLevel-minLevel+1 : 1);
+			
 			//一番最後は閉じる
 			if (chapterInfos.size() > 0) {
 				ChapterInfo chapterInfo = chapterInfos.lastElement();
 				if (chapterInfo != null) {
-					int close = 0;
+					int close = 1;
 					for (int i=0; i<navPointLevel.length; i++) {
 						if (navPointLevel[i] == 1) {
 							close++;

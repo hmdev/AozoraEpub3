@@ -1,5 +1,7 @@
 package com.github.hmdev.info;
 
+import com.github.hmdev.util.CharUtils;
+
 /** 目次用の章の情報を格納（仮） */
 public class ChapterInfo
 {
@@ -53,6 +55,10 @@ public class ChapterInfo
 	public void setChapterName(String chapterName)
 	{
 		this.chapterName = chapterName;
+	}
+	public String getNoTagChapterName()
+	{
+		return CharUtils.removeTag(chapterName);
 	}
 	
 	public int getChapterLevel()
