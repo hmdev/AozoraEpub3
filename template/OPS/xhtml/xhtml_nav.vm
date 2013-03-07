@@ -31,12 +31,12 @@ h1 {font-size:1.5em; text-align:center;}
 li {padding:.25em 0 0 0; list-style:disc; line-height:1.75em;}
 li a {text-decoration:none; border-bottom-width:1px; border-bottom-style:solid; padding-right: 1px;}
 #end
+nav#landmarks { display:none; }
 </style>
 </head>
 
 <body>
 ## epub3 landmarks nav ==========================
-#if (${kindle})
 	<nav epub:type="landmarks" id="landmarks" hidden="">
 		<ol>
 #if (${bookInfo.InsertCoverPage})
@@ -47,7 +47,7 @@ li a {text-decoration:none; border-bottom-width:1px; border-bottom-style:solid; 
 #end
 #foreach (${chapter} in ${chapters})
 #if (${chapter.SectionId} == "title")
-			<li><a epub:type="titlepage" href="title.xhtml">扉</a></li>
+			<li><a epub:type="title-page" href="title.xhtml">扉</a></li>
 #else
 			<li><a epub:type="bodymatter" href="${chapter.SectionId}.xhtml">本文</a></li>
 #break
@@ -55,9 +55,8 @@ li a {text-decoration:none; border-bottom-width:1px; border-bottom-style:solid; 
 #end
 		</ol>
 	</nav>
-#end
 ## epub3 toc nav ================================
-	<nav xmlns:epub="http://www.idpf.org/2007/ops" epub:type="toc" id="toc">
+	<nav epub:type="toc" id="toc">
 		<h1>目　次</h1>
 #if (${kindle})
 		<ol></ol>
