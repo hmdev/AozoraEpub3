@@ -12,7 +12,7 @@ html {
 	-epub-writing-mode: vertical-rl;
 }
 h1 {font-size:1.5em; padding-top:1em;}
-li {list-style:disc; padding:0 .25em 0 0; line-height:1.75em;}
+li {padding:0 .25em 0 0;}
 li a {text-decoration:none; border-right-width:1px; border-right-style:solid; padding-right: 1px;}
 .tcy span {
 	width: 1em;
@@ -28,9 +28,10 @@ html {
 	-epub-writing-mode:horizontal-tb;
 }
 h1 {font-size:1.5em; text-align:center;}
-li {padding:.25em 0 0 0; list-style:disc; line-height:1.75em;}
+li {padding:.25em 0 0 0;}
 li a {text-decoration:none; border-bottom-width:1px; border-bottom-style:solid; padding-right: 1px;}
 #end
+li {list-style:disc; line-height:1.75em;}
 nav#landmarks { display:none; }
 </style>
 </head>
@@ -58,15 +59,10 @@ nav#landmarks { display:none; }
 ## epub3 toc nav ================================
 	<nav epub:type="toc" id="toc">
 		<h1>目　次</h1>
-#if (${kindle})
-		<ol></ol>
-#end
+		<ol>
 #if (${bookInfo.InsertCoverPage} && ${bookInfo.InsertCoverPageToc})
-		<ol>
 			<li class="chapter" id="toccover"><a href="cover.xhtml">${cover_name}</a></li>
-		</ol>
 #end
-		<ol>
 #set($idx=0)
 #foreach(${chapter} in ${chapters})
 #if ($chapter.ChapterName)
@@ -76,14 +72,17 @@ nav#landmarks { display:none; }
 		<ol>
 #end
 #end
+#if ($idx>0 && !${chapter.LevelStart})
+	</li>
+#end
 #if ($chapter.ChapterId)
-			<li class="chapter" id="toc${idx}"><a href="${chapter.SectionId}.xhtml#${chapter.ChapterId}">${chapter.ChapterName}</a></li>
+			<li class="chapter" id="toc${idx}"><a href="${chapter.SectionId}.xhtml#${chapter.ChapterId}">${chapter.ChapterName}</a>
 #else
-			<li class="chapter" id="toc${idx}"><a href="${chapter.SectionId}.xhtml">${chapter.ChapterName}</a></li>
+			<li class="chapter" id="toc${idx}"><a href="${chapter.SectionId}.xhtml">${chapter.ChapterName}</a>
 #end
 #if (${navNest})
 #foreach(${end} in ${chapter.LevelEnd})
-		</ol>
+		</ol></li>
 #end
 #end
 #end
