@@ -596,6 +596,7 @@
 字下げ枠囲み	border
 字下げ破線枠囲み	dashed_border
 字下げ中央揃え	center
+字下げ横書き	yoko
 
 ##行内地付き
 行内地付き	<span class="btm fr">	</span>

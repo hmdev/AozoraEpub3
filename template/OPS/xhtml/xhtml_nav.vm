@@ -31,7 +31,8 @@ h1 {font-size:1.5em; text-align:center;}
 li {padding:.25em 0 0 0;}
 li a {text-decoration:none; border-bottom-width:1px; border-bottom-style:solid; padding-right: 1px;}
 #end
-li {list-style:disc; line-height:1.75em;}
+li {list-style:none;}
+li.chapter {list-style:disc; line-height:1.75em;}
 nav#landmarks { display:none; }
 </style>
 </head>
@@ -39,6 +40,7 @@ nav#landmarks { display:none; }
 <body>
 ## epub3 landmarks nav ==========================
 	<nav epub:type="landmarks" id="landmarks" hidden="">
+		<h2>Guide</h2>
 		<ol>
 #if (${bookInfo.InsertCoverPage})
 			<li><a epub:type="cover" href="cover.xhtml">表紙</a></li>
@@ -46,18 +48,21 @@ nav#landmarks { display:none; }
 #if (${bookInfo.InsertTocPage})
 			<li><a epub:type="toc" href="nav.xhtml">目次</a></li>
 #end
-#foreach (${chapter} in ${chapters})
-#if (${chapter.SectionId} == "title")
+#if (${title_page})
 			<li><a epub:type="title-page" href="title.xhtml">扉</a></li>
-#else
-			<li><a epub:type="bodymatter" href="${chapter.SectionId}.xhtml">本文</a></li>
-#break
 #end
+#foreach(${sectionInfo} in ${sections})
+			<li><a epub:type="bodymatter" href="${sectionInfo.SectionId}.xhtml">本文</a></li>
+#break
 #end
 		</ol>
 	</nav>
 ## epub3 toc nav ================================
+#if (${kindle})
+	<nav id="toc">
+#else
 	<nav epub:type="toc" id="toc">
+#end
 		<h1>目　次</h1>
 		<ol>
 #if (${bookInfo.InsertCoverPage} && ${bookInfo.InsertCoverPageToc})
@@ -69,16 +74,13 @@ nav#landmarks { display:none; }
 #set($idx=$idx+1)
 #if (${navNest})
 #foreach(${start} in ${chapter.LevelStart})
-		<ol>
+		<li><ol>
 #end
-#end
-#if ($idx>0 && !${chapter.LevelStart})
-	</li>
 #end
 #if ($chapter.ChapterId)
-			<li class="chapter" id="toc${idx}"><a href="${chapter.SectionId}.xhtml#${chapter.ChapterId}">${chapter.ChapterName}</a>
+			<li class="chapter" id="toc${idx}"><a href="${chapter.SectionId}.xhtml#${chapter.ChapterId}">${chapter.ChapterName}</a></li>
 #else
-			<li class="chapter" id="toc${idx}"><a href="${chapter.SectionId}.xhtml">${chapter.ChapterName}</a>
+			<li class="chapter" id="toc${idx}"><a href="${chapter.SectionId}.xhtml">${chapter.ChapterName}</a></li>
 #end
 #if (${navNest})
 #foreach(${end} in ${chapter.LevelEnd})

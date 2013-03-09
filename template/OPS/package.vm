@@ -19,9 +19,18 @@
 		<meta name="fixed-layout" content="true"/>
 #if (${kindle})
 		<meta name="book-type" content="comic"/>
+		<meta name="zero-gutter" content="true"/>
+		<meta name="zero-margin" content="true"/>
+		<meta name="primary-writing-mode" content="horizontal-rl"/>
+		<meta name="RegionMagnification" content="false"/>
+		<meta name="orientation-lock" content="none"/>
+		<!--
+		<meta name="original-resolution" content="844x1200"/>
+		-->
 #end
 #end
 	</metadata>
+
 	<manifest>
 #if (${kindle} && ${bookInfo.ImageOnly})
 		<item id="k_image" href="css/kindle_image.css" media-type="text/css"/>
@@ -65,6 +74,7 @@
 #end
 		<item href="toc.ncx" id="ncx" media-type="application/x-dtbncx+xml"/>
 	</manifest>
+
 #if (${bookInfo.Vertical})
 	<spine page-progression-direction="rtl" toc="ncx">
 #else
@@ -79,17 +89,35 @@
 #if (${bookInfo.InsertTocPage})
 		<itemref idref="nav" linear="yes"/>
 #end
+
 #foreach(${sectionInfo} in ${sections})
+#if (${kindle} && ${bookInfo.ImageOnly})
+#if ($velocityCount % 2 == 0)
+		<itemref idref="sec${sectionInfo.SectionId}" linear="yes" properties="page-spread-left"/>
+#else
+		<itemref idref="sec${sectionInfo.SectionId}" linear="yes" properties="page-spread-right"/>
+#end
+#else
 		<itemref idref="sec${sectionInfo.SectionId}" linear="yes"/>
 #end
+#end
 	</spine>
+
+
 #if (${bookInfo.InsertCoverPage} || ${bookInfo.InsertTocPage})
 	<guide>
 #if (${bookInfo.InsertCoverPage})
 		<reference type="cover" title="cover-page" href="xhtml/cover.xhtml"/>
 #end
+#if (${title_page})
+		<reference type="title" title="title-page" href="xhtml/title.xhtml"/>
+#end
 #if (${bookInfo.InsertTocPage})
 		<reference type="toc" title="nav" href="xhtml/nav.xhtml"/>
+#end
+#foreach(${sectionInfo} in ${sections})
+		<reference type="text" title="sec${sectionInfo.SectionId}" href="xhtml/${sectionInfo.SectionId}.xhtml"/>
+#break
 #end
 	</guide>
 #end
