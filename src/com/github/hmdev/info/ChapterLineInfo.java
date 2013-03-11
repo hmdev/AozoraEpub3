@@ -97,6 +97,19 @@ public class ChapterLineInfo
 		return LEVEL_H1;
 	}
 	
+	/** 章名や数字やパターンでマッチした行ならtrue */
+	public boolean isPattern()
+	{
+		switch (type) {
+		case TYPE_TITLE:
+		case TYPE_PAGEBREAK:
+		case TYPE_CHUKI_H1:
+		case TYPE_CHUKI_H2:
+		case TYPE_CHUKI_H3: return false;
+		}
+		return true;
+	}
+	
 	public String getChapterName()
 	{
 		return this.chapterName;

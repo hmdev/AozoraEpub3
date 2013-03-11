@@ -28,3 +28,6 @@ font-size: 1em;
 line-height: 1.75;
 vertical-align: baseline;
 }
+body.kindle {
+line-height: 1.5;
+}

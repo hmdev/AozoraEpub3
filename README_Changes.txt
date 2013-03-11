@@ -53,13 +53,16 @@ Changes
 　- プロファイル設定(追加、削除、名称変更、並び替え)
 
 ----
-1.1.0b30 (2013/03/)
+1.1.0b30 (2013/03/12)
 　- package.opfのguideを調整
 　- package.opfのkindle画像metaを修正(画像解像度はコメント)
-　- kindle目次はtoc.ncxを使うようにnavタグのID変更
+　- kindle目次はtoc.ncxを使うようにnavタグのepub:type="toc"指定を無くす
 　- nav.xhtml内のlandmarksのずれ修正
+　- kindle左右中央の行間が詰まっていたのを調整
+　- kindleのテキストページはbodyタグにclass="kindle"追加
+　- kindleのみ行間を0.5文字に (他は0.75文字)
 　- 字下げ複合注記の横書きに対応
-
+　- 連続する見出しを除外されなくなっていたのを修正
 1.1.0b29 (2013/03/07)
 　- nav.xhtmlの階層タグを調整＋landmark出力(Kindleのみ)
 　　※KindlePreviewer2.8のNCX表示はKindle側の動作にバグ有り？

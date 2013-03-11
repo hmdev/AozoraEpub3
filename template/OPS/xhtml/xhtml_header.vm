@@ -36,6 +36,8 @@
 <body class="fit_w">
 #elseif (${sectionInfo.ImageFitH})
 <body class="fit_h">
+#elseif (${kindle})
+<body class="kindle">
 #else
 <body>
 #end

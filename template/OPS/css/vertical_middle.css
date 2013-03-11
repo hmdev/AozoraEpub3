@@ -33,6 +33,9 @@ vertical-align: middle;
 width:100%;
 height:100%;
 }
+body.kindle {
+line-height: 1.5;
+}
 
 table {
 width:100%;
@@ -73,5 +76,6 @@ writing-mode: vertical-rl;
 -webkit-writing-mode: vertical-rl;
 -epub-writing-mode: vertical-rl;
 text-align: left;
+line-height: 1.5;
 height: 95%;
 }
