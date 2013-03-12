@@ -26,7 +26,7 @@ HREF	.period_subtitle a,.long_subtitle a
 ##一覧に記載されている各話の更新日時
 SUB_UPDATE	.long_update
 
-##本文に日付が無い場合 innerHTML文字列を置換して公開文字列を出力
+##本文に日付が無い場合 公開。更新日時の文字列に利用
 CONTENT_UPDATE_LIST	.long_update	^(.+?)(<span title=\"(.+?)\".*)?$	$1 公開　$3
 
 ################################
@@ -35,7 +35,7 @@ CONTENT_UPDATE_LIST	.long_update	^(.+?)(<span title=\"(.+?)\".*)?$	$1 公開　$
 ## 各話 Chapter 先頭の章のみ大見出しで出力
 CONTENT_CHAPTER	.chapter_title:0
 ## 各話 章タイトル 中見出しで出力
-CONTENT_SUBTITLE	.novel_subtitle:0	(（改稿版）)|(^.*<br />)	
+CONTENT_SUBTITLE	.novel_subtitle:0	(（改稿版）)|(^.*</div>)	
 
 ## 各話 本文
 CONTENT_ARTICLE	#novel_view:0
