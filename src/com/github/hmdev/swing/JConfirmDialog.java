@@ -86,6 +86,7 @@ public class JConfirmDialog extends JDialog
 	TocTableDataModel tocDataModel;
 	
 	/** 目次選択 */
+	JCheckBox jCheckChapterAll;
 	JCheckBox jCheckChapterSection;
 	JCheckBox jCheckChapterH;
 	JCheckBox jCheckChapterH1;
@@ -144,6 +145,9 @@ public class JConfirmDialog extends JDialog
 	static final int LEFT_PANE_WIDTH = 430;
 	static final int PREVIEW_WIDTH = 180;
 	static final int PREVIEW_HEIGHT = 240;
+	
+	//初回表示後true
+	boolean firstShown = false;
 	
 	public JConfirmDialog(Image iconImage, String imageURLPath)
 	{
@@ -347,6 +351,11 @@ public class JConfirmDialog extends JDialog
 		label = new JLabel("目次選択:");
 		label.setBorder(padding2H);
 		panel.add(label);
+		jCheckChapterAll = new JCheckBox("全");
+		jCheckChapterAll.setFocusPainted(false);
+		jCheckChapterAll.setBorder(padding2H);
+		jCheckChapterAll.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e){ selectChapterAll(jCheckChapterAll.isSelected()); } });
+		panel.add(jCheckChapterAll);
 		jCheckChapterSection = new JCheckBox("改");
 		jCheckChapterSection.setFocusPainted(false);
 		jCheckChapterSection.setBorder(padding2H);
@@ -777,6 +786,22 @@ public class JConfirmDialog extends JDialog
 		this.canceled = true;
 		this.setVisible(false);
 	}
+	
+	void selectChapterAll(boolean selected)
+	{
+		for (int row=this.tocDataModel.getRowCount()-1; row>=0; row--) {
+			this.tocDataModel.setSelected(row, selected);
+		}
+		jCheckChapterSection.setSelected(selected);
+		jCheckChapterH.setSelected(selected);
+		jCheckChapterH1.setSelected(selected);
+		jCheckChapterH2.setSelected(selected);
+		jCheckChapterH3.setSelected(selected);
+		jCheckChapterName.setSelected(selected);
+		jCheckChapterNum.setSelected(selected);
+		jCheckChapterPattern.setSelected(selected);
+	}
+	
 	void selectChapterType(int chapterType)
 	{
 		if (this.tocDataModel == null) return;
@@ -851,7 +876,6 @@ public class JConfirmDialog extends JDialog
 				bookInfo.loadCoverImage(bookInfo.coverFileName);
 			}
 		} catch (Exception e) { e.printStackTrace(); }
-		this.jCoverImagePanel.setBookInfo(bookInfo);
 		
 		//フラグ初期化
 		this.canceled = false;
@@ -862,6 +886,9 @@ public class JConfirmDialog extends JDialog
 		
 		this.bookInfo = bookInfo;
 		this.imageInfoReader = imageInfoReader;
+		
+		//全選択チェック
+		jCheckChapterAll.setSelected(true);
 		
 		//目次に無いものはdisabled
 		jCheckChapterH.setEnabled(false);
@@ -904,9 +931,12 @@ public class JConfirmDialog extends JDialog
 			this.jScrollToc.getVerticalScrollBar().setValue(0);
 		}
 		
+		if (this.canceled) return;
+		
 		//サイズ調整
 		this.setCoverPaneSize(1);
-		if (this.canceled) return;
+		//表示画像設定
+		this.jCoverImagePanel.setBookInfo(bookInfo);
 		
 		this.jButtonScale.setSelected(false);
 		
@@ -917,7 +947,8 @@ public class JConfirmDialog extends JDialog
 		this.jCheckReplaceCover.setVisible(bookInfo.insertCoverPage);
 		
 		//本情報設定ダイアログ表示
-		this.setLocation(location.x+100, location.y+20);
+		if (!this.firstShown) this.setLocation(location.x+100, location.y+20);
+		this.firstShown = true;
 		this.setVisible(true);
 	}
 	

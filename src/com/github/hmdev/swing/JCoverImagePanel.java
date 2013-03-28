@@ -258,7 +258,7 @@ public class JCoverImagePanel extends JPanel implements MouseListener, MouseMoti
 	
 	private void setScale()
 	{
-		if (bookInfo.coverImage == null) {
+		if (bookInfo == null || bookInfo.coverImage == null) {
 			this.minScale = 0;
 			return;
 		}

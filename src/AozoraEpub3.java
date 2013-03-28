@@ -204,6 +204,7 @@ public class AozoraEpub3
 			boolean chapterH1 = "1".equals(props.getProperty("ChapterH1"));
 			boolean chapterH2 = "1".equals(props.getProperty("ChapterH2"));
 			boolean chapterH3 = "1".equals(props.getProperty("ChapterH3"));
+			boolean sameLineChapter = "1".equals(props.getProperty("SameLineChapter"));
 			boolean chapterName = "1".equals(props.getProperty("ChapterName"));
 			boolean chapterNumOnly = "1".equals(props.getProperty("ChapterNumOnly"));
 			boolean chapterNumTitle = "1".equals(props.getProperty("ChapterNumTitle"));
@@ -261,7 +262,7 @@ public class AozoraEpub3
 			aozoraConverter.setForcePageBreak(forcePageBreakSize, forcePageBreakEmpty, forcePageBreakEmptySize, forcePageBreakChapter, forcePageBreakChapterSize);
 			//目次設定
 			aozoraConverter.setChapterLevel(maxLength, chapterExclude, chapterUseNextLine, chapterSection,
-					chapterH, chapterH1, chapterH2, chapterH3,
+					chapterH, chapterH1, chapterH2, chapterH3, sameLineChapter,
 					chapterName,
 					chapterNumOnly, chapterNumTitle, chapterNumParen, chapterNumParenTitle,
 					chapterPattern);

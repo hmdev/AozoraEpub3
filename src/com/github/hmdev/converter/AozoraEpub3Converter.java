@@ -435,6 +435,7 @@ public class AozoraEpub3Converter
 	
 	/** 目次抽出 */
 	public void setChapterLevel(int maxLength, boolean excludeSeqencialChapter, boolean useNextLineChapterName, boolean section, boolean h, boolean h1, boolean h2, boolean h3,
+			boolean userSameLineChapter,
 			boolean chapterName, boolean autoChapterNumOnly, boolean autoChapterNumTitle, boolean autoChapterNumParen, boolean autoChapterNumParenTitle,
 			String chapterPattern)
 	{
@@ -447,18 +448,22 @@ public class AozoraEpub3Converter
 		if (h) {
 			chapterChukiMap.put("ここから見出し", ChapterLineInfo.TYPE_CHUKI_H);
 			chapterChukiMap.put("見出し", ChapterLineInfo.TYPE_CHUKI_H);
+			if (userSameLineChapter) chapterChukiMap.put("同行見出し", ChapterLineInfo.TYPE_CHUKI_H);
 		}
 		if (h1) {
 			chapterChukiMap.put("ここから大見出し", ChapterLineInfo.TYPE_CHUKI_H1);
 			chapterChukiMap.put("大見出し", ChapterLineInfo.TYPE_CHUKI_H1);
+			if (userSameLineChapter) chapterChukiMap.put("同行大見出し", ChapterLineInfo.TYPE_CHUKI_H1);
 		}
 		if (h2) {
 			chapterChukiMap.put("ここから中見出し", ChapterLineInfo.TYPE_CHUKI_H2);
 			chapterChukiMap.put("中見出し", ChapterLineInfo.TYPE_CHUKI_H2);
+			if (userSameLineChapter) chapterChukiMap.put("同行中見出し", ChapterLineInfo.TYPE_CHUKI_H2);
 		}
 		if (h3) {
 			chapterChukiMap.put("ここから小見出し", ChapterLineInfo.TYPE_CHUKI_H3);
 			chapterChukiMap.put("小見出し", ChapterLineInfo.TYPE_CHUKI_H3);
+			if (userSameLineChapter) chapterChukiMap.put("同行小見出し", ChapterLineInfo.TYPE_CHUKI_H3);
 		}
 		
 		this.useNextLineChapterName = useNextLineChapterName;

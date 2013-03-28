@@ -86,6 +86,7 @@ import org.apache.commons.compress.utils.IOUtils;
 import com.github.hmdev.converter.AozoraEpub3Converter;
 import com.github.hmdev.image.ImageInfoReader;
 import com.github.hmdev.info.BookInfo;
+import com.github.hmdev.info.BookInfoHistory;
 import com.github.hmdev.info.ProfileInfo;
 import com.github.hmdev.swing.JConfirmDialog;
 import com.github.hmdev.swing.JProfileDialog;
@@ -266,6 +267,7 @@ public class AozoraEpub3Applet extends JApplet
 	JCheckBox jCheckChapterH1;
 	JCheckBox jCheckChapterH2;
 	JCheckBox jCheckChapterH3;
+	JCheckBox jCheckSameLineChapter;
 	JCheckBox jCheckChapterName;
 	JCheckBox jCheckChapterNumTitle;
 	JCheckBox jCheckChapterNumOnly;
@@ -1600,14 +1602,8 @@ public class AozoraEpub3Applet extends JApplet
 		panel.setMaximumSize(panelVMaxSize);
 		panel.setBorder(padding3B);
 		panelV.add(panel);
-		//改ページ後を目次に追加
-		jCheckChapterSection = new JCheckBox("改ページ後 ", true);
-		jCheckChapterSection.setToolTipText("改ページ後の先頭行の文字を目次に出力します");
-		jCheckChapterSection.setFocusPainted(false);
-		jCheckChapterSection.setBorder(padding2);
-		panel.add(jCheckChapterSection);
 		//見出し注記
-		label = new JLabel(" 注記(");
+		label = new JLabel("注記(");
 		label.setBorder(padding2);
 		panel.add(label);
 		jCheckChapterH = new JCheckBox("見出し ", true);
@@ -1622,16 +1618,27 @@ public class AozoraEpub3Applet extends JApplet
 		jCheckChapterH2.setFocusPainted(false);
 		jCheckChapterH2.setBorder(padding2);
 		panel.add(jCheckChapterH2);
-		jCheckChapterH3 = new JCheckBox("小見出し )", true);
+		jCheckChapterH3 = new JCheckBox("小見出し ) ", true);
 		jCheckChapterH3.setFocusPainted(false);
 		jCheckChapterH3.setBorder(padding2);
 		panel.add(jCheckChapterH3);
+		
+		jCheckSameLineChapter = new JCheckBox("同行見出し含む", false);
+		jCheckSameLineChapter.setFocusPainted(false);
+		jCheckSameLineChapter.setBorder(padding2);
+		panel.add(jCheckSameLineChapter);
 		
 		panel = new JPanel();
 		panel.setLayout(new FlowLayout(FlowLayout.LEFT, 1, 0));
 		panel.setMaximumSize(panelVMaxSize);
 		panel.setBorder(padding3B);
 		panelV.add(panel);
+		//改ページ後を目次に追加
+		jCheckChapterSection = new JCheckBox("改ページ後 ", true);
+		jCheckChapterSection.setToolTipText("改ページ後の先頭行の文字を目次に出力します");
+		jCheckChapterSection.setFocusPainted(false);
+		jCheckChapterSection.setBorder(padding2);
+		panel.add(jCheckChapterSection);
 		jCheckChapterName = new JCheckBox("章見出し (第～章/その～/～章/序/プロローグ 等)", true);
 		jCheckChapterName.setToolTipText("第～話/第～章/第～篇/第～部/第～節/第～幕/第～編/その～/～章/プロローグ/エピローグ/モノローグ/序/序章/終章/転章/間章/幕間");
 		jCheckChapterName.setFocusPainted(false);
@@ -2540,7 +2547,7 @@ public class AozoraEpub3Applet extends JApplet
 			try { maxLength = Integer.parseInt((jTextMaxChapterNameLength.getText())); } catch (Exception e) {}
 			
 			this.aozoraConverter.setChapterLevel(maxLength, jCheckChapterExclude.isSelected(), jCheckChapterUseNextLine.isSelected(), jCheckChapterSection.isSelected(),
-					jCheckChapterH.isSelected(), jCheckChapterH1.isSelected(), jCheckChapterH2.isSelected(), jCheckChapterH3.isSelected(),
+					jCheckChapterH.isSelected(), jCheckChapterH1.isSelected(), jCheckChapterH2.isSelected(), jCheckChapterH3.isSelected(), jCheckSameLineChapter.isSelected(),
 					jCheckChapterName.isSelected(),
 					jCheckChapterNumOnly.isSelected(), jCheckChapterNumTitle.isSelected(), jCheckChapterNumParen.isSelected(), jCheckChapterNumParenTitle.isSelected(),
 					jCheckChapterPattern.isSelected()?jComboChapterPattern.getEditor().getItem().toString().trim():"");
@@ -2794,12 +2801,12 @@ public class AozoraEpub3Applet extends JApplet
 		
 		//前回の表紙変換設定を反映
 		if (jCheckCoverHistory.isSelected()) {
-			BookInfo preBookInfo =this.getBookInfoHistory(bookInfo);
-			if (preBookInfo != null) {
-				bookInfo.coverEditInfo = preBookInfo.coverEditInfo;
-				bookInfo.coverFileName = preBookInfo.coverFileName;
-				bookInfo.coverExt = preBookInfo.coverExt;
-				bookInfo.coverImageIndex = preBookInfo.coverImageIndex;
+			BookInfoHistory history = this.getBookInfoHistory(bookInfo);
+			if (history != null) {
+				bookInfo.coverEditInfo = history.coverEditInfo;
+				bookInfo.coverFileName = history.coverFileName;
+				bookInfo.coverExt = history.coverExt;
+				bookInfo.coverImageIndex = history.coverImageIndex;
 				
 				//確認ダイアログ表示しない場合はイメージを生成
 				if (!this.jCheckConfirm.isSelected() && bookInfo.coverEditInfo != null) {
@@ -2960,11 +2967,12 @@ public class AozoraEpub3Applet extends JApplet
 				String line;
 				int idx = 0;
 				int cnt = 0;
-				String msg = null;
+				String msg = "";
 				while ((line = br.readLine()) != null) {
 					if (line.length() > 0) {
 						System.out.println(line);
-						msg = line;
+						if (msg.startsWith("Error")) msg += line;
+						else msg = line;
 						if (idx++ % 2 == 0) {
 							if (cnt++ > 100) { cnt = 1; LogAppender.println(); }
 							LogAppender.append(".");
@@ -3440,6 +3448,7 @@ public class AozoraEpub3Applet extends JApplet
 		setPropsSelected(jCheckChapterH1, props, "ChapterH1");
 		setPropsSelected(jCheckChapterH2, props, "ChapterH2");
 		setPropsSelected(jCheckChapterH3, props, "ChapterH3");
+		setPropsSelected(jCheckSameLineChapter, props, "SameLineChapter");
 		//章番号、数字、パターン
 		setPropsSelected(jCheckChapterName, props, "ChapterName");
 		setPropsSelected(jCheckChapterNumOnly, props, "ChapterNumOnly");
@@ -3567,6 +3576,7 @@ public class AozoraEpub3Applet extends JApplet
 		props.setProperty("ChapterH1", this.jCheckChapterH1.isSelected()?"1":"");
 		props.setProperty("ChapterH2", this.jCheckChapterH2.isSelected()?"1":"");
 		props.setProperty("ChapterH3", this.jCheckChapterH3.isSelected()?"1":"");
+		props.setProperty("SameLineChapter", this.jCheckSameLineChapter.isSelected()?"1":"");
 		props.setProperty("ChapterName", this.jCheckChapterName.isSelected()?"1":"");
 		props.setProperty("ChapterNumOnly", this.jCheckChapterNumOnly.isSelected()?"1":"");
 		props.setProperty("ChapterNumTitle", this.jCheckChapterNumTitle.isSelected()?"1":"");
@@ -3743,20 +3753,20 @@ public class AozoraEpub3Applet extends JApplet
 	////////////////////////////////////////////////////////////////
 	//変換履歴  TODO 後でクラスを分ける
 	////////////////////////////////////////////////////////////////
-	HashMap<String, BookInfo> mapBookInfo = new HashMap<String, BookInfo>();
+	HashMap<String, BookInfoHistory> mapBookInfoHistory = new HashMap<String, BookInfoHistory>();
 	//以前の変換情報取得
-	BookInfo getBookInfoHistory(BookInfo bookInfo)
+	BookInfoHistory getBookInfoHistory(BookInfo bookInfo)
 	{
 		String key = bookInfo.srcFile.getAbsolutePath();
 		if (bookInfo.textEntryName != null) key += "/"+bookInfo.textEntryName;
-		return mapBookInfo.get(key);
+		return mapBookInfoHistory.get(key);
 	}
 	
 	void setBookInfoHistory(BookInfo bookInfo)
 	{
 		String key = bookInfo.srcFile.getAbsolutePath();
 		if (bookInfo.textEntryName != null) key += "/"+bookInfo.textEntryName;
-		mapBookInfo.put(key, bookInfo);
+		mapBookInfoHistory.put(key, new BookInfoHistory(bookInfo));
 	}
 	
 }

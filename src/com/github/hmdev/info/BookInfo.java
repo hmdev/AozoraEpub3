@@ -761,7 +761,7 @@ public class BookInfo
 			if (this.creator != null && (this.creator.startsWith("―") || this.creator.startsWith("【"))) this.creator = null;
 			
 			if (this.title != null) {
-				this.title = CharUtils.getChapterName(CharUtils.removeRuby(this.title), 0);
+				this.title = CharUtils.getChapterName(CharUtils.removeRuby(this.title), 0, false);
 			}
 			if (this.creator != null) this.creator = CharUtils.getChapterName(CharUtils.removeRuby(this.creator), 0);
 		}
