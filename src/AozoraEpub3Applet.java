@@ -40,9 +40,10 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Vector;
 
@@ -1060,9 +1061,11 @@ public class AozoraEpub3Applet extends JApplet
 		panelV.add(panel);
 		////////////////////////////////
 		//Jpeg圧縮率
-		panel.add(new JLabel("Jpeg画質"));
+		label = new JLabel("Jpeg画質");
+		label.setToolTipText("表紙編集、縮小、回転、余白除去時のJpeg保存時の画質(100が最高)");
+		panel.add(label);
 		jTextJpegQuality = new JTextField("85");
-		jTextJpegQuality.setToolTipText("Jpeg保存時の画質(100が最高) 表紙編集、縮小、回転、余白除去後の保存時に利用します");
+		jTextJpegQuality.setToolTipText(label.getToolTipText());
 		jTextJpegQuality.setHorizontalAlignment(JTextField.RIGHT);
 		jTextJpegQuality.setInputVerifier(new IntegerInputVerifier(85, 30, 100));
 		jTextJpegQuality.setMaximumSize(text3);
@@ -3751,9 +3754,15 @@ public class AozoraEpub3Applet extends JApplet
 	}
 	
 	////////////////////////////////////////////////////////////////
-	//変換履歴  TODO 後でクラスを分ける
+	//変換履歴
 	////////////////////////////////////////////////////////////////
-	HashMap<String, BookInfoHistory> mapBookInfoHistory = new HashMap<String, BookInfoHistory>();
+	/** 変換履歴格納用 最大255件 */
+	LinkedHashMap<String, BookInfoHistory> mapBookInfoHistory = new LinkedHashMap<String, BookInfoHistory>(){
+		private static final long serialVersionUID = 1L;
+		@SuppressWarnings("rawtypes")
+		protected boolean removeEldestEntry(Map.Entry eldest) { return size() > 256; }
+	};
+	
 	//以前の変換情報取得
 	BookInfoHistory getBookInfoHistory(BookInfo bookInfo)
 	{

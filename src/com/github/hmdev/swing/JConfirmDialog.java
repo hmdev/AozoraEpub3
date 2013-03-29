@@ -970,7 +970,7 @@ public class JConfirmDialog extends JDialog
 		int incHeight = previewHeight-PREVIEW_HEIGHT;
 		//目次サイズの応じてテーブルの高さを調整
 		if (!bookInfo.isImageOnly()) {
-			if (this.jTableToc.getRowCount() > 2) incHeight = Math.max(incHeight, Math.min(10, this.jTableToc.getRowCount()-2)*18);
+			if (this.jTableToc.getRowCount() > 1) incHeight = Math.max(incHeight, Math.min(10, this.jTableToc.getRowCount()-1)*16);
 		}
 		int dialogHeight = DIALOG_HEIGHT+incHeight;
 		
