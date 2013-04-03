@@ -18,6 +18,7 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import com.github.hmdev.converter.AozoraEpub3Converter;
 import com.github.hmdev.image.ImageInfoReader;
 import com.github.hmdev.info.BookInfo;
+import com.github.hmdev.info.SectionInfo;
 import com.github.hmdev.util.LogAppender;
 import com.github.hmdev.writer.Epub3ImageWriter;
 import com.github.hmdev.writer.Epub3Writer;
@@ -152,6 +153,7 @@ public class AozoraEpub3
 			int imageFloatType = 0; try { imageFloatType = Integer.parseInt(props.getProperty("ImageFloatType")); } catch (Exception e) {}
 			int imageFloatW = 0; try { imageFloatW = Integer.parseInt(props.getProperty("ImageFloatW")); } catch (Exception e) {}
 			int imageFloatH = 0; try { imageFloatH = Integer.parseInt(props.getProperty("ImageFloatH")); } catch (Exception e) {}
+			int imageFitType = SectionInfo.FIT_TYPE_HEIGHT; try { imageFitType = Integer.parseInt(props.getProperty("FitType")); } catch (Exception e) {}
 			boolean fitImage = "1".equals(props.getProperty("FitImage"));
 			int rotateImage = 0; if ("1".equals(props.getProperty("RotateImage"))) rotateImage = 90; else if ("2".equals(props.getProperty("RotateImage"))) rotateImage = -90;
 			float jpegQualty = 0.8f; try { jpegQualty = Integer.parseInt(props.getProperty("JpegQuality"))/100f; } catch (Exception e) {}
@@ -170,9 +172,9 @@ public class AozoraEpub3
 				try { autoMarginNombre = Integer.parseInt(props.getProperty("AutoMarginNombre")); } catch (Exception e) {} 
 				try { autoMarginPadding = Float.parseFloat(props.getProperty("AutoMarginNombreSize")); } catch (Exception e) {}
 			 }
-			epub3Writer.setImageParam(dispW, dispH, coverW, coverH, resizeW, resizeH, singlePageSizeW, singlePageSizeH, singlePageWidth, fitImage, rotateImage,
+			epub3Writer.setImageParam(dispW, dispH, coverW, coverH, resizeW, resizeH, singlePageSizeW, singlePageSizeH, singlePageWidth, imageFitType, fitImage, rotateImage,
 					imageFloatType, imageFloatW, imageFloatH, jpegQualty, gamma, autoMarginLimitH, autoMarginLimitV, autoMarginWhiteLevel, autoMarginPadding, autoMarginNombre, nobreSize);
-			epub3ImageWriter.setImageParam(dispW, dispH, coverW, coverH, resizeW, resizeH, singlePageSizeW, singlePageSizeH, singlePageWidth, fitImage, rotateImage,
+			epub3ImageWriter.setImageParam(dispW, dispH, coverW, coverH, resizeW, resizeH, singlePageSizeW, singlePageSizeH, singlePageWidth, imageFitType, fitImage, rotateImage,
 					imageFloatType, imageFloatW, imageFloatH, jpegQualty, gamma, autoMarginLimitH, autoMarginLimitV, autoMarginWhiteLevel, autoMarginPadding, autoMarginNombre, nobreSize);
 			//目次階層化設定
 			epub3Writer.setTocParam("1".equals(props.getProperty("NavNest")), "1".equals(props.getProperty("NcxNest")));

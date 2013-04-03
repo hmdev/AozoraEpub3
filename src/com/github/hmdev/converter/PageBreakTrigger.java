@@ -40,7 +40,9 @@ public class PageBreakTrigger
 	boolean noChapter = false;
 	
 	/** 画像単一ページの場合の画像ファイル名 */
-	String imageFileName = null;
+	String srcFileName = null;
+	/** 出力時のファイル名 */
+	String dstFileName = null;
 	
 	/**
 	 * @param ignoreEmptyPage

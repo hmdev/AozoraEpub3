@@ -26,6 +26,7 @@ text-align: center;
 body .img {
 width: 100%;
 height: 100%;
+text-align: center;
 }
 
 /* 幅を合わせる */

@@ -91,14 +91,22 @@ public class Epub3ImageWriter extends Epub3Writer
 			if ((double)imageInfo.getWidth()/imageInfo.getHeight() >= (double)this.dispW/this.dispH) {
 				if (this.rotateAngle != 0 && this.dispW < this.dispH && (double)imageInfo.getHeight()/imageInfo.getWidth() < (double)this.dispW/this.dispH) { //縦長画面で横長
 					imageInfo.rotateAngle = this.rotateAngle;
-					sectionInfo.setImageFitH(true);
-				} else 	sectionInfo.setImageFitW(true);
+					if (this.imageFitType != SectionInfo.FIT_TYPE_AUTO) sectionInfo.setImageFitH(true);
+				} else {
+					//高さでサイズ調整する場合は高さの%指定
+					if (this.imageFitType == SectionInfo.FIT_TYPE_HEIGHT) sectionInfo.setImageHeight(((double)imageInfo.getHeight()/imageInfo.getWidth())*((double)this.dispW/this.dispH));
+					else if (this.imageFitType == SectionInfo.FIT_TYPE_ASPECT) sectionInfo.setImageFitW(true);
+				}
 			}
 			else {
 				if (this.rotateAngle != 0 && this.dispW > this.dispH && (double)imageInfo.getHeight()/imageInfo.getWidth() > (double)this.dispW/this.dispH) { //横長画面で縦長
 					imageInfo.rotateAngle = this.rotateAngle;
-					sectionInfo.setImageFitW(true);
-				} else sectionInfo.setImageFitH(true);
+					//高さでサイズ調整する場合は高さの%指定
+					if (this.imageFitType == SectionInfo.FIT_TYPE_HEIGHT) sectionInfo.setImageHeight(((double)imageInfo.getHeight()/imageInfo.getWidth())*((double)this.dispW/this.dispH));
+					else if (this.imageFitType == SectionInfo.FIT_TYPE_ASPECT) sectionInfo.setImageFitW(true);
+				} else {
+					if (this.imageFitType != SectionInfo.FIT_TYPE_AUTO) sectionInfo.setImageFitH(true);
+				}
 			}
 		}
 		

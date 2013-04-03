@@ -150,6 +150,9 @@ public class Epub3Writer
 	/** 縦に関係なく横がこれ以上なら単ページ化 */
 	int singlePageWidth = 550;
 	
+	/** 単ページ表示時のサイズ指定方法 */
+	int imageFitType = SectionInfo.FIT_TYPE_HEIGHT;
+	
 	/** 画像を拡大する */
 	boolean fitImage = true;
 	
@@ -251,7 +254,8 @@ public class Epub3Writer
 	/** 画像のリサイズ用パラメータを設定 */
 	public void setImageParam(int dispW, int dispH, int coverW, int coverH,
 			int resizeW, int resizeH,
-			int singlePageSizeW, int singlePageSizeH, int singlePageWidth, boolean fitImage, int rotateAngle,
+			int singlePageSizeW, int singlePageSizeH, int singlePageWidth,
+			int imageFitType, boolean fitImage, int rotateAngle,
 			int imageFloatType, int imageFloatW, int imageFloatH,
 			float jpegQuality, float gamma,
 			int autoMarginLimitH, int autoMarginLimitV, int autoMarginWhiteLevel, float autoMarginPadding, int autoMarginNombre, float nombreSize)
@@ -270,6 +274,7 @@ public class Epub3Writer
 		this.imageFloatW = imageFloatW;
 		this.imageFloatH = imageFloatH;
 		
+		this.imageFitType = imageFitType;
 		this.fitImage = fitImage;
 		this.rotateAngle = rotateAngle;
 		
@@ -910,28 +915,17 @@ public class Epub3Writer
 		SectionInfo sectionInfo = new SectionInfo(sectionId);
 		//次の行が単一画像なら画像専用指定
 		switch (imagePageType) {
-		/*case PageBreakTrigger.IMAGE_PAGE_AUTO:
-			sectionInfo.setImagePage(true);
-			//画像サイズが横長なら幅に合わせる
-			ImageInfo imageInfo = this.imageInfoReader.getImageInfo(srcImageFilePath);
-			if (imageInfo != null) {
-				//小さい画像をそのまま出す場合
-				if (!this.fitImage && imageInfo.getWidth() <= this.dispW && imageInfo.getHeight() < this.dispH) {
-				} else {
-					//横長ならwidth100％
-					if ((double)imageInfo.getWidth()/imageInfo.getHeight() >= (double)this.dispW/this.dispH) sectionInfo.setImageFitW(true);
-					//縦がはみ出すならheight:100%
-					else sectionInfo.setImageFitH(true);
-				}
-			}
-			break;*/
 		case PageBreakTrigger.IMAGE_PAGE_W:
 			sectionInfo.setImagePage(true);
-			sectionInfo.setImageFitW(true);
+			//高さでサイズ調整する場合は高さの%指定
+			if (this.imageFitType == SectionInfo.FIT_TYPE_HEIGHT) {
+				ImageInfo imageInfo = this.imageInfoReader.getCollectImageInfo(srcImageFilePath);
+				if (imageInfo != null) sectionInfo.setImageHeight(((double)imageInfo.getHeight()/imageInfo.getWidth())*((double)this.dispW/this.dispH));
+			} else if (this.imageFitType == SectionInfo.FIT_TYPE_ASPECT) sectionInfo.setImageFitW(true);
 			break;
 		case PageBreakTrigger.IMAGE_PAGE_H:
 			sectionInfo.setImagePage(true);
-			sectionInfo.setImageFitH(true);
+			if (this.imageFitType != SectionInfo.FIT_TYPE_AUTO) sectionInfo.setImageFitH(true);
 			break;
 		case PageBreakTrigger.IMAGE_PAGE_NOFIT:
 			sectionInfo.setImagePage(true);

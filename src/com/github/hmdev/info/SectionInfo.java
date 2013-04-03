@@ -8,6 +8,16 @@ public class SectionInfo
 	
 	/** 画像のみのページ時にtrue */
 	public boolean imagePage = false;
+	
+	/** 単ページサイズ指定無し  */
+	final static public int FIT_TYPE_AUTO = 1;
+	/** 単ページサイズ高さ指定  */
+	final static public int FIT_TYPE_HEIGHT = 2;
+	/** 単ページサイズ画面縦横比  */
+	final static public int FIT_TYPE_ASPECT = 3;
+	
+	/** 画像のみのページで高さ%指定 -1なら指定無し */
+	public double imageHeight = -1;
 	/** 画像のみのページで幅に合わる場合にtrue */
 	public boolean imageFitW = false;
 	/** 画像のみのページで高さに合わる場合にtrue */
@@ -47,7 +57,20 @@ public class SectionInfo
 	{
 		this.imagePage = imagePage;
 	}
-
+	
+	public double getImageHeight()
+	{
+		return imageHeight;
+	}
+	public double getImageHeightPercent()
+	{
+		return (int)(imageHeight*1000)/10.0;
+	}
+	public void setImageHeight(double imageHeight)
+	{
+		this.imageHeight = imageHeight;
+	}
+	
 	public boolean isImageFitW()
 	{
 		return imageFitW;

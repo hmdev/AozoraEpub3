@@ -89,6 +89,7 @@ import com.github.hmdev.image.ImageInfoReader;
 import com.github.hmdev.info.BookInfo;
 import com.github.hmdev.info.BookInfoHistory;
 import com.github.hmdev.info.ProfileInfo;
+import com.github.hmdev.info.SectionInfo;
 import com.github.hmdev.swing.JConfirmDialog;
 import com.github.hmdev.swing.JProfileDialog;
 import com.github.hmdev.swing.NarrowTitledBorder;
@@ -194,6 +195,10 @@ public class AozoraEpub3Applet extends JApplet
 	JTextField jTextSinglePageSizeW;
 	JTextField jTextSinglePageSizeH;
 	JTextField jTextSinglePageWidth;
+	
+	JRadioButton jRadioFitType1;
+	JRadioButton jRadioFitType2;
+	JRadioButton jRadioFitType3;
 	JCheckBox jCheckFitImage;
 	
 	JComboBox jComboRotateImage;
@@ -851,7 +856,7 @@ public class AozoraEpub3Applet extends JApplet
 		tabPanel = new JPanel();
 		//tabPanel.setLayout(new BoxLayout(tabPanel, BoxLayout.Y_AXIS));
 		tabPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 1, 0));
-		jTabbedPane.addTab("画像設定", imageIcon, tabPanel);
+		jTabbedPane.addTab("画像1", imageIcon, tabPanel);
 		
 		////////////////////////////////
 		//挿絵なし
@@ -926,82 +931,22 @@ public class AozoraEpub3Applet extends JApplet
 		label.setBorder(padding2H);
 		panel.add(label);
 		
-		////////////////////////////////
-		//画像単ページ化
-		////////////////////////////////
-		panelV = new JPanel();
-		panelV.setLayout(new BoxLayout(panelV, BoxLayout.Y_AXIS));
-		panelV.setBorder(new NarrowTitledBorder("画像単ページ化・回り込み"));
-		tabPanel.add(panelV);
-		//画像単ページ
-		panel = new JPanel();
-		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-		panel.setMaximumSize(panelVMaxSize);
-		panel.setBorder(padding4B);
-		panelV.add(panel);
-		//横x縦
-		label = new JLabel("横");
-		panel.add(label);
-		jTextSinglePageSizeW = new JTextField("400");
-		jTextSinglePageSizeW.setHorizontalAlignment(JTextField.RIGHT);
-		jTextSinglePageSizeW.setInputVerifier(new IntegerInputVerifier(400, 1, 9999));
-		jTextSinglePageSizeW.setMaximumSize(text4);
-		jTextSinglePageSizeW.setPreferredSize(text4);
-		jTextSinglePageSizeW.addFocusListener(new TextSelectFocusListener(jTextSinglePageSizeW));
-		panel.add(jTextSinglePageSizeW);
-		label = new JLabel("x");
-		label.setBorder(padding2H);
-		panel.add(label);
-		label = new JLabel("縦");
-		panel.add(label);
-		jTextSinglePageSizeH = new JTextField("600");
-		jTextSinglePageSizeH.setHorizontalAlignment(JTextField.RIGHT);
-		jTextSinglePageSizeH.setInputVerifier(new IntegerInputVerifier(600, 1, 9999));
-		jTextSinglePageSizeH.setMaximumSize(text4);
-		jTextSinglePageSizeH.setPreferredSize(text4);
-		jTextSinglePageSizeH.addFocusListener(new TextSelectFocusListener(jTextSinglePageSizeH));
-		panel.add(jTextSinglePageSizeH);
-		label = new JLabel("px以上 ");
-		label.setBorder(padding2H);
-		panel.add(label);
-		//横のみ
-		label = new JLabel("横のみ");
-		label.setBorder(padding2H);
-		panel.add(label);
-		jTextSinglePageWidth = new JTextField("600");
-		jTextSinglePageWidth.setHorizontalAlignment(JTextField.RIGHT);
-		jTextSinglePageWidth.setInputVerifier(new IntegerInputVerifier(600, 1, 9999));
-		jTextSinglePageWidth.setMaximumSize(text4);
-		jTextSinglePageWidth.setPreferredSize(text4);
-		jTextSinglePageWidth.addFocusListener(new TextSelectFocusListener(jTextSinglePageWidth));
-		panel.add(jTextSinglePageWidth);
-		label = new JLabel("px以上");
-		label.setBorder(padding2H);
-		panel.add(label);
-		//拡大しない
-		panel.add(new JLabel("  "));
-		jCheckFitImage = new JCheckBox("拡大表示 ", true);
-		jCheckFitImage.setToolTipText("画面サイズより小さい画像を幅・高さに合わせて100%表示します");
-		jCheckFitImage.setFocusPainted(false);
-		jCheckFitImage.setBorder(padding2);
-		panel.add(jCheckFitImage);
-		//自動画像回転
-		label = new JLabel(" 自動回転");
-		label.setBorder(padding2H);
-		panel.add(label);
-		jComboRotateImage = new JComboBox(new String[]{"なし","右","左"});
-		jComboRotateImage.setToolTipText("単ページ時画面の縦横比に合わせて画像を回転します");
-		jComboRotateImage.setFocusable(false);
-		jComboRotateImage.setPreferredSize(new Dimension(text4.width+24, 20));
-		panel.add(jComboRotateImage);
 		
 		////////////////////////////////
 		//画像回り込み
 		////////////////////////////////
 		//画像回り込み
+		panelV = new JPanel();
+		panelV.setLayout(new BoxLayout(panelV, BoxLayout.Y_AXIS));
+		panelV.setBorder(new NarrowTitledBorder("画像回り込み (※単ページ化より優先)"));
+		tabPanel.add(panelV);
+		//上段
 		panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		panel.setMaximumSize(panelVMaxSize);
+		panel.setBorder(padding4B);
 		panelV.add(panel);
+		
 		jCheckImageFloat = new JCheckBox("回り込み有効 ");
 		jCheckImageFloat.setToolTipText("画像の実サイズが指定サイズ以下の画像を回り込み設定します");
 		jCheckImageFloat.setFocusPainted(false);
@@ -1044,41 +989,149 @@ public class AozoraEpub3Applet extends JApplet
 		jComboImageFloatType.setPreferredSize(new Dimension(text4.width+24, 20));
 		panel.add(jComboImageFloatType);
 		
-		label = new JLabel(" (※単ページ化より優先)");
-		panel.add(label);
-		
 		////////////////////////////////
-		//画像調整
+		//画像単ページ化
 		////////////////////////////////
 		panelV = new JPanel();
 		panelV.setLayout(new BoxLayout(panelV, BoxLayout.Y_AXIS));
-		panelV.setBorder(new NarrowTitledBorder("画像調整"));
+		panelV.setBorder(new NarrowTitledBorder("画像単ページ化"));
 		tabPanel.add(panelV);
+		//上段
 		panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 		panel.setMaximumSize(panelVMaxSize);
 		panel.setBorder(padding4B);
 		panelV.add(panel);
+		
+		//横x縦
+		label = new JLabel("横");
+		panel.add(label);
+		jTextSinglePageSizeW = new JTextField("400");
+		jTextSinglePageSizeW.setHorizontalAlignment(JTextField.RIGHT);
+		jTextSinglePageSizeW.setInputVerifier(new IntegerInputVerifier(400, 1, 9999));
+		jTextSinglePageSizeW.setMaximumSize(text4);
+		jTextSinglePageSizeW.setPreferredSize(text4);
+		jTextSinglePageSizeW.addFocusListener(new TextSelectFocusListener(jTextSinglePageSizeW));
+		panel.add(jTextSinglePageSizeW);
+		label = new JLabel("x");
+		label.setBorder(padding2H);
+		panel.add(label);
+		label = new JLabel("縦");
+		panel.add(label);
+		jTextSinglePageSizeH = new JTextField("600");
+		jTextSinglePageSizeH.setHorizontalAlignment(JTextField.RIGHT);
+		jTextSinglePageSizeH.setInputVerifier(new IntegerInputVerifier(600, 1, 9999));
+		jTextSinglePageSizeH.setMaximumSize(text4);
+		jTextSinglePageSizeH.setPreferredSize(text4);
+		jTextSinglePageSizeH.addFocusListener(new TextSelectFocusListener(jTextSinglePageSizeH));
+		panel.add(jTextSinglePageSizeH);
+		label = new JLabel("px以上 ");
+		label.setBorder(padding2H);
+		panel.add(label);
+		//横のみ
+		label = new JLabel("横のみ");
+		label.setBorder(padding2H);
+		panel.add(label);
+		jTextSinglePageWidth = new JTextField("600");
+		jTextSinglePageWidth.setHorizontalAlignment(JTextField.RIGHT);
+		jTextSinglePageWidth.setInputVerifier(new IntegerInputVerifier(600, 1, 9999));
+		jTextSinglePageWidth.setMaximumSize(text4);
+		jTextSinglePageWidth.setPreferredSize(text4);
+		jTextSinglePageWidth.addFocusListener(new TextSelectFocusListener(jTextSinglePageWidth));
+		panel.add(jTextSinglePageWidth);
+		label = new JLabel("px以上");
+		label.setBorder(padding2H);
+		panel.add(label);
+		
+		//自動画像回転
+		label = new JLabel(" 自動回転");
+		label.setBorder(padding2H);
+		panel.add(label);
+		jComboRotateImage = new JComboBox(new String[]{"なし","右","左"});
+		jComboRotateImage.setToolTipText("単ページ時画面の縦横比に合わせて画像を回転します");
+		jComboRotateImage.setFocusable(false);
+		jComboRotateImage.setPreferredSize(new Dimension(text4.width+24, 20));
+		panel.add(jComboRotateImage);
+		
+		//下段
+		panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		panelV.add(panel);
+		
+		label = new JLabel("サイズ指定 (");
+		label.setBorder(padding2H);
+		panel.add(label);
+		
+		buttonGroup = new ButtonGroup();
+		jRadioFitType1 = new JRadioButton("指定無し");
+		jRadioFitType1.setToolTipText("画像のサイズを指定しません。 Readerでは画面より大きい画像ははみ出します");
+		jRadioFitType1.setFocusPainted(false);
+		jRadioFitType1.setBorder(padding2);
+		jRadioFitType1.setIconTextGap(1);
+		panel.add(jRadioFitType1);
+		buttonGroup.add(jRadioFitType1);
+		jRadioFitType2 = new JRadioButton("高さ指定", true);
+		jRadioFitType2.setToolTipText("画面サイズに合わせて縦のサイズのみ指定します。 画面より横長な画像は横画面で小さくなります");
+		jRadioFitType2.setFocusPainted(false);
+		jRadioFitType2.setBorder(padding2);
+		jRadioFitType1.setIconTextGap(1);
+		panel.add(jRadioFitType2);
+		buttonGroup.add(jRadioFitType2);
+		jRadioFitType3 = new JRadioButton("画面縦横比");
+		jRadioFitType3.setToolTipText("画面サイズに合わせて舘股は横を100%指定します。 画面サイズが変わると歪む場合があります");
+		jRadioFitType3.setFocusPainted(false);
+		jRadioFitType3.setBorder(padding2);
+		jRadioFitType1.setIconTextGap(1);
+		panel.add(jRadioFitType3);
+		buttonGroup.add(jRadioFitType3);
+		
+		label = new JLabel(")  ");
+		label.setBorder(padding2H);
+		panel.add(label);
+		
+		//拡大しない
+		panel.add(new JLabel("  "));
+		jCheckFitImage = new JCheckBox("拡大表示 ", true);
+		jCheckFitImage.setToolTipText("画面サイズより小さい画像を幅・高さに合わせて100%表示します");
+		jCheckFitImage.setFocusPainted(false);
+		jCheckFitImage.setBorder(padding2);
+		panel.add(jCheckFitImage);
+		
+		////////////////////////////////////////////////////////////////
+		//Tab 画像2
+		////////////////////////////////////////////////////////////////
+		tabPanel = new JPanel();
+		//tabPanel.setLayout(new BoxLayout(tabPanel, BoxLayout.Y_AXIS));
+		tabPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 1, 0));
+		jTabbedPane.addTab("画像2", imageIcon, tabPanel);
+		
+		////////////////////////////////
+		//画像調整
 		////////////////////////////////
 		//Jpeg圧縮率
-		label = new JLabel("Jpeg画質");
-		label.setToolTipText("表紙編集、縮小、回転、余白除去時のJpeg保存時の画質(100が最高)");
-		panel.add(label);
+		panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		panel.setBorder(new NarrowTitledBorder("Jpeg圧縮率"));
+		tabPanel.add(panel);
 		jTextJpegQuality = new JTextField("85");
-		jTextJpegQuality.setToolTipText(label.getToolTipText());
+		jTextJpegQuality.setToolTipText("表紙編集、縮小、回転、余白除去時のJpeg保存時の画質(100が最高)");
 		jTextJpegQuality.setHorizontalAlignment(JTextField.RIGHT);
 		jTextJpegQuality.setInputVerifier(new IntegerInputVerifier(85, 30, 100));
 		jTextJpegQuality.setMaximumSize(text3);
 		jTextJpegQuality.setPreferredSize(text3);
 		jTextJpegQuality.addFocusListener(new TextSelectFocusListener(jTextJpegQuality));
 		panel.add(jTextJpegQuality);
+		panel.add(new JLabel(" (30～100)"));
 		
 		////////////////////////////////
-		//画像縮小指定
+		//画像縮小
+		panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		panel.setBorder(new NarrowTitledBorder("画像縮小"));
+		tabPanel.add(panel);
 		ChangeListener resizeChangeLister = new ChangeListener() {
 			public void stateChanged(ChangeEvent e) { setResizeTextEditable(true);  }
 		};
-		panel.add(new JLabel("  縮小("));
 		//横
 		jCheckResizeW = new JCheckBox("横");
 		jCheckResizeW.setFocusPainted(false);
@@ -1111,15 +1164,19 @@ public class AozoraEpub3Applet extends JApplet
 		jTextResizeNumH.setPreferredSize(text4);
 		jTextResizeNumH.addFocusListener(new TextSelectFocusListener(jTextResizeNumH));
 		panel.add(jTextResizeNumH);
-		label = new JLabel("px以下 )  ");
+		label = new JLabel("px以下");
 		label.setBorder(padding2H);
 		panel.add(label);
 		this.setResizeTextEditable(true);
 		
 		////////////////////////////////
 		//ガンマ補正
+		panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		panel.setBorder(new NarrowTitledBorder("色調整"));
+		tabPanel.add(panel);
 		jCheckGamma = new JCheckBox("ガンマ補正");
-		jCheckGamma.setToolTipText("画像の濃さを変更します (濃:0.5～1.5:淡)");
+		jCheckGamma.setToolTipText("画像の濃さを変更します (濃:0.2～1.8:淡)");
 		jCheckGamma.setFocusPainted(false);
 		jCheckGamma.setBorder(padding2);
 		jCheckGamma.setIconTextGap(2);
@@ -1136,15 +1193,17 @@ public class AozoraEpub3Applet extends JApplet
 		jTextGammaValue.setEditable(jCheckGamma.isSelected());
 		jTextGammaValue.addFocusListener(new TextSelectFocusListener(jTextGammaValue));
 		panel.add(jTextGammaValue);
-		label = new JLabel("%");
-		label.setBorder(padding2H);
-		panel.add(label);
 		
 		////////////////////////////////
 		//余白除去
 		////////////////////////////////
+		panelV = new JPanel();
+		panelV.setLayout(new BoxLayout(panelV, BoxLayout.Y_AXIS));
+		panelV.setBorder(new NarrowTitledBorder("有効"));
+		tabPanel.add(panelV);
 		panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		panel.setBorder(padding4B);
 		panelV.add(panel);
 		jCheckAutoMargin = new JCheckBox("余白除去");
 		jCheckAutoMargin.setFocusPainted(false);
@@ -1189,6 +1248,23 @@ public class AozoraEpub3Applet extends JApplet
 		label = new JLabel("%");
 		label.setBorder(padding2H);
 		panel.add(label);
+		panel.add(label);
+		label = new JLabel(" 余白追加");
+		label.setToolTipText("余白除去後に追加する余白の量(追加部分の画像はそのまま)");
+		panel.add(label);
+		jTextAutoMarginPadding = new JTextField("1.0");
+		jTextAutoMarginPadding.setToolTipText(label.getToolTipText());
+		jTextAutoMarginPadding.setHorizontalAlignment(JTextField.RIGHT);
+		jTextAutoMarginPadding.setInputVerifier(new FloatInputVerifier(1.0f, 0, 50));
+		jTextAutoMarginPadding.setMaximumSize(text3);
+		jTextAutoMarginPadding.setPreferredSize(text3);
+		jTextAutoMarginPadding.setEditable(jCheckAutoMargin.isSelected());
+		jTextAutoMarginPadding.addFocusListener(new TextSelectFocusListener(jTextAutoMarginPadding));
+		panel.add(jTextAutoMarginPadding);
+		label = new JLabel("%");
+		label.setBorder(padding2H);
+		panel.add(label);
+		
 		label = new JLabel(" 白レベル");
 		label.setToolTipText("余白部分の白い画素と判別するレベルを指定します (黒:0～白:100)");
 		panel.add(label);
@@ -1203,27 +1279,22 @@ public class AozoraEpub3Applet extends JApplet
 		panel.add(jTextAutoMarginWhiteLevel);
 		label = new JLabel("%");
 		label.setBorder(padding2H);
-		panel.add(label);
-		label = new JLabel(" 余白追加");
-		label.setToolTipText("余白除去後に追加する余白の量(追加部分の画像はそのまま)");
-		panel.add(label);
-		jTextAutoMarginPadding = new JTextField("1.0");
-		jTextAutoMarginPadding.setToolTipText(label.getToolTipText());
-		jTextAutoMarginPadding.setHorizontalAlignment(JTextField.RIGHT);
-		jTextAutoMarginPadding.setInputVerifier(new FloatInputVerifier(1.0f, 0, 50));
-		jTextAutoMarginPadding.setMaximumSize(text3);
-		jTextAutoMarginPadding.setPreferredSize(text3);
-		jTextAutoMarginPadding.setEditable(jCheckAutoMargin.isSelected());
-		jTextAutoMarginPadding.addFocusListener(new TextSelectFocusListener(jTextAutoMarginPadding));
-		panel.add(jTextAutoMarginPadding);
-		label = new JLabel("% ノンブル");
+		
+		panel = new JPanel();
+		panel.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
+		panelV.add(panel);
+		label = new JLabel("ノンブル");
 		label.setBorder(padding2H);
 		panel.add(label);
 		jComboAutoMarginNombre = new JComboBox(new String[]{"なし","上","下","上下"});
 		jComboAutoMarginNombre.setToolTipText("ノンブルを除去します。除去した場合は除去制限が5%追加されます");
 		jComboAutoMarginNombre.setFocusable(false);
+		jComboAutoMarginNombre.setMaximumSize(new Dimension(text3.width+24, 20));
 		jComboAutoMarginNombre.setPreferredSize(new Dimension(text3.width+24, 20));
 		panel.add(jComboAutoMarginNombre);
+		label = new JLabel(" 高さ");
+		label.setBorder(padding2H);
+		panel.add(label);
 		jTextAutoMarginNombreSize = new JTextField("3.0");
 		jTextAutoMarginNombreSize.setToolTipText("ノンブルの文字部分の高さを指定します。これより大きい場合はノンブル除去されません");
 		jTextAutoMarginNombreSize.setHorizontalAlignment(JTextField.RIGHT);
@@ -2491,9 +2562,13 @@ public class AozoraEpub3Applet extends JApplet
 		}
 		int rorateAngle = 0; if (jComboRotateImage.getSelectedIndex() == 1) rorateAngle = 90; else if (jComboRotateImage.getSelectedIndex() == 2) rorateAngle = -90;
 		
-		this.epub3Writer.setImageParam(dispW, dispH, coverW, coverH, resizeW, resizeH, singlePageSizeW, singlePageSizeH, singlePageWidth, jCheckFitImage.isSelected(), rorateAngle,
+		int imageFitType = SectionInfo.FIT_TYPE_HEIGHT;
+		if (jRadioFitType1.isSelected()) imageFitType = SectionInfo.FIT_TYPE_AUTO;
+		else if (jRadioFitType3.isSelected()) imageFitType = SectionInfo.FIT_TYPE_ASPECT;
+		
+		this.epub3Writer.setImageParam(dispW, dispH, coverW, coverH, resizeW, resizeH, singlePageSizeW, singlePageSizeH, singlePageWidth, imageFitType, jCheckFitImage.isSelected(), rorateAngle,
 				imageFloatType, imageFloatW, imageFloatH, jpegQualty, gamma, autoMarginLimitH, autoMarginLimitV, autoMarginWhiteLevel, autoMarginPadding, autoMarginNombre, autoMarginNombreSize);
-		this.epub3ImageWriter.setImageParam(dispW, dispH, coverW, coverH, resizeW, resizeH, singlePageSizeW, singlePageSizeH, singlePageWidth, jCheckFitImage.isSelected(), rorateAngle,
+		this.epub3ImageWriter.setImageParam(dispW, dispH, coverW, coverH, resizeW, resizeH, singlePageSizeW, singlePageSizeH, singlePageWidth, imageFitType, jCheckFitImage.isSelected(), rorateAngle,
 				imageFloatType, imageFloatW, imageFloatH, jpegQualty, gamma, autoMarginLimitH, autoMarginLimitV, autoMarginWhiteLevel, autoMarginPadding, autoMarginNombre, autoMarginNombreSize);
 		//目次階層化設定
 		this.epub3Writer.setTocParam(jCheckNavNest.isSelected(), jCheckNcxNest.isSelected());
@@ -3362,6 +3437,13 @@ public class AozoraEpub3Applet extends JApplet
 		setIntText(jTextSinglePageSizeH, props, "SinglePageSizeH");
 		//横のみ
 		setIntText(jTextSinglePageWidth, props, "SinglePageWidth");
+		//サイズ指定
+		propValue = props.getProperty("FitType");
+		if (propValue != null) {
+			jRadioFitType1.setSelected(Integer.toString(SectionInfo.FIT_TYPE_AUTO).equals(propValue));
+			jRadioFitType2.setSelected(Integer.toString(SectionInfo.FIT_TYPE_HEIGHT).equals(propValue));
+			jRadioFitType3.setSelected(Integer.toString(SectionInfo.FIT_TYPE_ASPECT).equals(propValue));
+		}
 		//拡大しない
 		setPropsSelected(jCheckFitImage, props, "FitImage");
 		try { jComboRotateImage.setSelectedIndex(Integer.parseInt(props.getProperty("RotateImage"))); } catch (Exception e) {}
@@ -3510,6 +3592,9 @@ public class AozoraEpub3Applet extends JApplet
 		props.setProperty("SinglePageSizeW", this.jTextSinglePageSizeW.getText());
 		props.setProperty("SinglePageSizeH", this.jTextSinglePageSizeH.getText());
 		props.setProperty("SinglePageWidth", this.jTextSinglePageWidth.getText());
+		
+		props.setProperty("FitType", ""+(this.jRadioFitType1.isSelected()?SectionInfo.FIT_TYPE_AUTO:
+			(this.jRadioFitType2.isSelected()?SectionInfo.FIT_TYPE_HEIGHT:SectionInfo.FIT_TYPE_ASPECT)));
 		props.setProperty("FitImage", this.jCheckFitImage.isSelected()?"1":"");
 		props.setProperty("RotateImage", ""+this.jComboRotateImage.getSelectedIndex());
 		//画像回り込み

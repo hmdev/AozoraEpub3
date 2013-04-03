@@ -128,7 +128,13 @@ public class ImageInfoReader
 	 * @param srcImageFileName テキスト内の画像注記で指定されている相対ファイル名 */
 	public ImageInfo getImageInfo(String srcImageFileName) throws IOException
 	{
+		return this._getImageInfo(srcImageFileName);
+	}
+	
+	public ImageInfo getCollectImageInfo(String srcImageFileName) throws IOException
+	{
 		ImageInfo imageInfo = this._getImageInfo(srcImageFileName);
+		if (imageInfo == null) imageInfo = this._getImageInfo(this.correctExt(srcImageFileName));
 		return imageInfo;
 	}
 	
