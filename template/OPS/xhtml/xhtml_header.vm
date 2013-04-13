@@ -35,6 +35,7 @@
 <style type="text/css">
 body .img img {
 height: ${sectionInfo.ImageHeightPercent}%;
+min-height: ${sectionInfo.ImageHeightPercent}%;
 }
 </style>
 #end

@@ -18,15 +18,10 @@ padding: 0;
 body {
 margin: 0;
 padding: 0;
-}
-body.fit_h {
 text-align: center;
 }
 /* ページ内 画像は縮小のみ */
 body .img {
-width: 100%;
-height: 100%;
-text-align: center;
 }
 
 /* 幅を合わせる */

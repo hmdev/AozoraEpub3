@@ -151,9 +151,9 @@ public class Epub3Writer
 	int singlePageWidth = 550;
 	
 	/** 単ページ表示時のサイズ指定方法 */
-	int imageFitType = SectionInfo.FIT_TYPE_HEIGHT;
+	int imageSizeType = SectionInfo.IMAGE_SIZE_TYPE_HEIGHT;
 	
-	/** 画像を拡大する */
+	/** 単ページで画像を拡大する */
 	boolean fitImage = true;
 	
 	/** 画像を縦横比に合わせて回転する */
@@ -255,7 +255,7 @@ public class Epub3Writer
 	public void setImageParam(int dispW, int dispH, int coverW, int coverH,
 			int resizeW, int resizeH,
 			int singlePageSizeW, int singlePageSizeH, int singlePageWidth,
-			int imageFitType, boolean fitImage, int rotateAngle,
+			int imageSizeType, boolean fitImage, int rotateAngle,
 			int imageFloatType, int imageFloatW, int imageFloatH,
 			float jpegQuality, float gamma,
 			int autoMarginLimitH, int autoMarginLimitV, int autoMarginWhiteLevel, float autoMarginPadding, int autoMarginNombre, float nombreSize)
@@ -274,7 +274,7 @@ public class Epub3Writer
 		this.imageFloatW = imageFloatW;
 		this.imageFloatH = imageFloatH;
 		
-		this.imageFitType = imageFitType;
+		this.imageSizeType = imageSizeType;
 		this.fitImage = fitImage;
 		this.rotateAngle = rotateAngle;
 		
@@ -916,16 +916,17 @@ public class Epub3Writer
 		//次の行が単一画像なら画像専用指定
 		switch (imagePageType) {
 		case PageBreakTrigger.IMAGE_PAGE_W:
+			//高さでサイズ調整すor画面より小さい場合は高さの%指定
 			sectionInfo.setImagePage(true);
-			//高さでサイズ調整する場合は高さの%指定
-			if (this.imageFitType == SectionInfo.FIT_TYPE_HEIGHT) {
-				ImageInfo imageInfo = this.imageInfoReader.getCollectImageInfo(srcImageFilePath);
+			ImageInfo imageInfo = this.imageInfoReader.getCollectImageInfo(srcImageFilePath);
+			if (this.imageSizeType == SectionInfo.IMAGE_SIZE_TYPE_HEIGHT || imageInfo.getWidth() <= this.dispW && imageInfo.getHeight() < this.dispH) {
 				if (imageInfo != null) sectionInfo.setImageHeight(((double)imageInfo.getHeight()/imageInfo.getWidth())*((double)this.dispW/this.dispH));
-			} else if (this.imageFitType == SectionInfo.FIT_TYPE_ASPECT) sectionInfo.setImageFitW(true);
+			} else if (this.imageSizeType == SectionInfo.IMAGE_SIZE_TYPE_ASPECT) sectionInfo.setImageFitW(true);
 			break;
 		case PageBreakTrigger.IMAGE_PAGE_H:
+			//他kさ100%指定
 			sectionInfo.setImagePage(true);
-			if (this.imageFitType != SectionInfo.FIT_TYPE_AUTO) sectionInfo.setImageFitH(true);
+			if (this.imageSizeType != SectionInfo.IMAGE_SIZE_TYPE_AUTO) sectionInfo.setImageFitH(true);
 			break;
 		case PageBreakTrigger.IMAGE_PAGE_NOFIT:
 			sectionInfo.setImagePage(true);

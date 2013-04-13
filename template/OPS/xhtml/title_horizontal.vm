@@ -18,10 +18,10 @@ body { margin:0; padding:0; height:98%; text-align:center; line-height: 1.5; }
 border:1px solid black;
 #end
 }
-.upper { padding:20% 5% 0 5%; height:55%; text-align:center; }
+.upper { padding:20% 5% 0 5%; height:50%; text-align:center; }
 .lower { padding:0 5%; height:25%; text-align:center; }
 
-.title, .subtitle, .orgtitle, .suborgtitle, .creator, .subcreator, .series .publisher { text-align:center; line-height: 1.25; }
+.title, .subtitle, .orgtitle, .suborgtitle, .creator, .subcreator, .series, .publisher { text-align:center; line-height: 1.25; }
 .series { padding-bottom:.5em; font-size:1.25em; }
 .title {
 #if (${TITLE.length()} > 30)

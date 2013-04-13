@@ -12,7 +12,7 @@
 <link rel="stylesheet" type="text/css" href="../css/horizontal.css"/>
 #end
 <style type="text/css">
-.title, .subtitle, .orgtitle, .suborgtitle, .creator, .subcreator, .publisher. .series { line-height: 1.25; }
+.title, .subtitle, .orgtitle, .suborgtitle, .creator, .subcreator, .publisher, .series { line-height: 1.25; }
 .series { font-size:1.25em; }
 .title { font-size:1.75em; }
 .title ruby rt { font-size:.4em; }

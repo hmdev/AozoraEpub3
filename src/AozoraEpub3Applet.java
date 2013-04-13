@@ -196,9 +196,9 @@ public class AozoraEpub3Applet extends JApplet
 	JTextField jTextSinglePageSizeH;
 	JTextField jTextSinglePageWidth;
 	
-	JRadioButton jRadioFitType1;
-	JRadioButton jRadioFitType2;
-	JRadioButton jRadioFitType3;
+	JRadioButton jRadioImageSizeType1;
+	JRadioButton jRadioImageSizeType2;
+	JRadioButton jRadioImageSizeType3;
 	JCheckBox jCheckFitImage;
 	
 	JComboBox jComboRotateImage;
@@ -1055,7 +1055,7 @@ public class AozoraEpub3Applet extends JApplet
 		
 		//下段
 		panel = new JPanel();
-		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		panel.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
 		panelV.add(panel);
 		
 		label = new JLabel("サイズ指定 (");
@@ -1063,39 +1063,55 @@ public class AozoraEpub3Applet extends JApplet
 		panel.add(label);
 		
 		buttonGroup = new ButtonGroup();
-		jRadioFitType1 = new JRadioButton("指定無し");
-		jRadioFitType1.setToolTipText("画像のサイズを指定しません。 Readerでは画面より大きい画像ははみ出します");
-		jRadioFitType1.setFocusPainted(false);
-		jRadioFitType1.setBorder(padding2);
-		jRadioFitType1.setIconTextGap(1);
-		panel.add(jRadioFitType1);
-		buttonGroup.add(jRadioFitType1);
-		jRadioFitType2 = new JRadioButton("高さ指定", true);
-		jRadioFitType2.setToolTipText("画面サイズに合わせて縦のサイズのみ指定します。 画面より横長な画像は横画面で小さくなります");
-		jRadioFitType2.setFocusPainted(false);
-		jRadioFitType2.setBorder(padding2);
-		jRadioFitType1.setIconTextGap(1);
-		panel.add(jRadioFitType2);
-		buttonGroup.add(jRadioFitType2);
-		jRadioFitType3 = new JRadioButton("画面縦横比");
-		jRadioFitType3.setToolTipText("画面サイズに合わせて舘股は横を100%指定します。 画面サイズが変わると歪む場合があります");
-		jRadioFitType3.setFocusPainted(false);
-		jRadioFitType3.setBorder(padding2);
-		jRadioFitType1.setIconTextGap(1);
-		panel.add(jRadioFitType3);
-		buttonGroup.add(jRadioFitType3);
+		jRadioImageSizeType1 = new JRadioButton("無し");
+		jRadioImageSizeType1.setToolTipText("画像のサイズを指定しません。 端末が自動で縮小します(Kindle, Kobo)");
+		jRadioImageSizeType1.setFocusPainted(false);
+		jRadioImageSizeType1.setBorder(padding2);
+		jRadioImageSizeType1.setIconTextGap(1);
+		panel.add(jRadioImageSizeType1);
+		buttonGroup.add(jRadioImageSizeType1);
+		jRadioImageSizeType2 = new JRadioButton("高さ%", true);
+		jRadioImageSizeType2.setToolTipText("画面の縦横比に合せて画像の高さのみ%指定します。画面設定より縦長の端末でははみ出すか縦長に表示されます");
+		jRadioImageSizeType2.setFocusPainted(false);
+		jRadioImageSizeType2.setBorder(padding2);
+		jRadioImageSizeType2.setIconTextGap(1);
+		panel.add(jRadioImageSizeType2);
+		buttonGroup.add(jRadioImageSizeType2);
+		jRadioImageSizeType3 = new JRadioButton("縦横比");
+		jRadioImageSizeType3.setToolTipText("画面の縦横比に合せて幅または高さを100%指定します。横画面で横に伸びる場合があります");
+		jRadioImageSizeType3.setFocusPainted(false);
+		jRadioImageSizeType3.setBorder(padding2);
+		jRadioImageSizeType3.setIconTextGap(1);
+		panel.add(jRadioImageSizeType3);
+		buttonGroup.add(jRadioImageSizeType3);
 		
 		label = new JLabel(")  ");
 		label.setBorder(padding2H);
 		panel.add(label);
 		
-		//拡大しない
-		panel.add(new JLabel("  "));
-		jCheckFitImage = new JCheckBox("拡大表示 ", true);
-		jCheckFitImage.setToolTipText("画面サイズより小さい画像を幅・高さに合わせて100%表示します");
+		jCheckFitImage = new JCheckBox("拡大表示", true);
+		jCheckFitImage.setToolTipText("画面サイズより小さい画像を幅・高さに合わせて拡大表示します。サイズは高さの%指定で行います");
 		jCheckFitImage.setFocusPainted(false);
 		jCheckFitImage.setBorder(padding2);
 		panel.add(jCheckFitImage);
+		buttonGroup = new ButtonGroup();
+		/*jRadioImageFitType2 = new JRadioButton("高さ%", true);
+		jRadioImageFitType2.setToolTipText("画面の縦横比に合せて画像の高さのみ%指定します。画面設定より縦長の端末でははみ出すか縦長に表示されます");
+		jRadioImageFitType2.setFocusPainted(false);
+		jRadioImageFitType2.setBorder(padding2);
+		jRadioImageFitType2.setIconTextGap(1);
+		panel.add(jRadioImageFitType2);
+		buttonGroup.add(jRadioImageFitType2);
+		jRadioImageFitType3 = new JRadioButton("縦横比");
+		jRadioImageFitType3.setToolTipText("画面の縦横比に合せて幅または高さを100%指定します。横画面で横に伸びる場合があります");
+		jRadioImageFitType3.setFocusPainted(false);
+		jRadioImageFitType3.setBorder(padding2);
+		jRadioImageFitType3.setIconTextGap(1);
+		panel.add(jRadioImageFitType3);
+		buttonGroup.add(jRadioImageFitType3);
+		label = new JLabel(")");
+		label.setBorder(padding2H);
+		panel.add(label);*/
 		
 		////////////////////////////////////////////////////////////////
 		//Tab 画像2
@@ -2562,13 +2578,18 @@ public class AozoraEpub3Applet extends JApplet
 		}
 		int rorateAngle = 0; if (jComboRotateImage.getSelectedIndex() == 1) rorateAngle = 90; else if (jComboRotateImage.getSelectedIndex() == 2) rorateAngle = -90;
 		
-		int imageFitType = SectionInfo.FIT_TYPE_HEIGHT;
-		if (jRadioFitType1.isSelected()) imageFitType = SectionInfo.FIT_TYPE_AUTO;
-		else if (jRadioFitType3.isSelected()) imageFitType = SectionInfo.FIT_TYPE_ASPECT;
+		int imageSizeType = SectionInfo.IMAGE_SIZE_TYPE_ASPECT;
+		if (jRadioImageSizeType1.isSelected()) imageSizeType = SectionInfo.IMAGE_SIZE_TYPE_AUTO;
+		else if (jRadioImageSizeType2.isSelected()) imageSizeType = SectionInfo.IMAGE_SIZE_TYPE_HEIGHT;
 		
-		this.epub3Writer.setImageParam(dispW, dispH, coverW, coverH, resizeW, resizeH, singlePageSizeW, singlePageSizeH, singlePageWidth, imageFitType, jCheckFitImage.isSelected(), rorateAngle,
+		//int imageFitType = SectionInfo.IMAGE_SIZE_TYPE_ASPECT;
+		//if (jRadioImageFitType2.isSelected()) imageFitType = SectionInfo.IMAGE_SIZE_TYPE_HEIGHT;
+		
+		this.epub3Writer.setImageParam(dispW, dispH, coverW, coverH, resizeW, resizeH, singlePageSizeW, singlePageSizeH, singlePageWidth,
+				imageSizeType, jCheckFitImage.isSelected(), rorateAngle,
 				imageFloatType, imageFloatW, imageFloatH, jpegQualty, gamma, autoMarginLimitH, autoMarginLimitV, autoMarginWhiteLevel, autoMarginPadding, autoMarginNombre, autoMarginNombreSize);
-		this.epub3ImageWriter.setImageParam(dispW, dispH, coverW, coverH, resizeW, resizeH, singlePageSizeW, singlePageSizeH, singlePageWidth, imageFitType, jCheckFitImage.isSelected(), rorateAngle,
+		this.epub3ImageWriter.setImageParam(dispW, dispH, coverW, coverH, resizeW, resizeH, singlePageSizeW, singlePageSizeH, singlePageWidth,
+				imageSizeType, jCheckFitImage.isSelected(), rorateAngle,
 				imageFloatType, imageFloatW, imageFloatH, jpegQualty, gamma, autoMarginLimitH, autoMarginLimitV, autoMarginWhiteLevel, autoMarginPadding, autoMarginNombre, autoMarginNombreSize);
 		//目次階層化設定
 		this.epub3Writer.setTocParam(jCheckNavNest.isSelected(), jCheckNcxNest.isSelected());
@@ -3438,11 +3459,11 @@ public class AozoraEpub3Applet extends JApplet
 		//横のみ
 		setIntText(jTextSinglePageWidth, props, "SinglePageWidth");
 		//サイズ指定
-		propValue = props.getProperty("FitType");
+		propValue = props.getProperty("ImageSizeType");
 		if (propValue != null) {
-			jRadioFitType1.setSelected(Integer.toString(SectionInfo.FIT_TYPE_AUTO).equals(propValue));
-			jRadioFitType2.setSelected(Integer.toString(SectionInfo.FIT_TYPE_HEIGHT).equals(propValue));
-			jRadioFitType3.setSelected(Integer.toString(SectionInfo.FIT_TYPE_ASPECT).equals(propValue));
+			jRadioImageSizeType1.setSelected(Integer.toString(SectionInfo.IMAGE_SIZE_TYPE_AUTO).equals(propValue));
+			jRadioImageSizeType2.setSelected(Integer.toString(SectionInfo.IMAGE_SIZE_TYPE_HEIGHT).equals(propValue));
+			jRadioImageSizeType3.setSelected(Integer.toString(SectionInfo.IMAGE_SIZE_TYPE_ASPECT).equals(propValue));
 		}
 		//拡大しない
 		setPropsSelected(jCheckFitImage, props, "FitImage");
@@ -3593,8 +3614,8 @@ public class AozoraEpub3Applet extends JApplet
 		props.setProperty("SinglePageSizeH", this.jTextSinglePageSizeH.getText());
 		props.setProperty("SinglePageWidth", this.jTextSinglePageWidth.getText());
 		
-		props.setProperty("FitType", ""+(this.jRadioFitType1.isSelected()?SectionInfo.FIT_TYPE_AUTO:
-			(this.jRadioFitType2.isSelected()?SectionInfo.FIT_TYPE_HEIGHT:SectionInfo.FIT_TYPE_ASPECT)));
+		props.setProperty("ImageSizeType", ""+(this.jRadioImageSizeType1.isSelected()?SectionInfo.IMAGE_SIZE_TYPE_AUTO:
+			(this.jRadioImageSizeType2.isSelected()?SectionInfo.IMAGE_SIZE_TYPE_HEIGHT:SectionInfo.IMAGE_SIZE_TYPE_ASPECT)));
 		props.setProperty("FitImage", this.jCheckFitImage.isSelected()?"1":"");
 		props.setProperty("RotateImage", ""+this.jComboRotateImage.getSelectedIndex());
 		//画像回り込み
