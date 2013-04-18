@@ -626,6 +626,7 @@ public class Epub3Writer
 			if (chapterInfo != null) chapterInfo.levelEnd = chapterInfo.chapterLevel;
 		}
 		
+		int ncxDepth = 1;
 		if (this.ncxNest) {
 			int minLevel = 99; int maxLevel = 0;
 			//navPointを閉じる回数をlevelEndに設定
@@ -658,8 +659,7 @@ public class Epub3Writer
 				}
 				preChapterInfo = chapterInfo;
 			}
-			//velocityに設定 1～
-			velocityContext.put("ncx_depth", minLevel<maxLevel ? maxLevel-minLevel+1 : 1);
+			if (minLevel<maxLevel) ncxDepth = maxLevel-minLevel+1;
 			
 			//一番最後は閉じる
 			if (chapterInfos.size() > 0) {
@@ -675,6 +675,9 @@ public class Epub3Writer
 				}
 			}
 		}
+		
+		//velocityに設定 1～
+		velocityContext.put("ncx_depth", ncxDepth);
 		
 		//出力前に縦中横とエスケープ処理
 		if (!bookInfo.imageOnly) {
