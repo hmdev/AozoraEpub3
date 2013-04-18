@@ -519,7 +519,7 @@ public class AozoraEpub3Converter
 	 * @param imageInfos テキスト内の画像ファイル名を格納して返却
 	 * @param titleType 表題種別
 	 * @param coverFileName 表紙ファイル名 nullなら表紙無し ""は先頭ファイル "*"は同じファイル名 */
-	public BookInfo getBookInfo(File srcFile, BufferedReader src, ImageInfoReader imageInfoReader, TitleType titleType) throws Exception
+	public BookInfo getBookInfo(File srcFile, BufferedReader src, ImageInfoReader imageInfoReader, TitleType titleType, boolean pubFirst) throws Exception
 	{
 		try {
 		BookInfo bookInfo = new BookInfo(srcFile);
@@ -849,7 +849,7 @@ public class AozoraEpub3Converter
 		}
 		
 		//表題と著者を先頭行から設定
-		bookInfo.setMetaInfo(titleType, firstLines, firstLineStart, firstCommentLineNum);
+		bookInfo.setMetaInfo(titleType, pubFirst, firstLines, firstLineStart, firstCommentLineNum);
 		//bookInfo.preTitlePageBreak = preTitlePageBreak; //タイトルがあればタイトル前の改ページ状況を設定
 		
 		//タイトルのChapter追加

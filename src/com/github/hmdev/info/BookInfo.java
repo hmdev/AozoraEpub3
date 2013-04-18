@@ -18,32 +18,32 @@ public class BookInfo
 	/** タイトル記載種別 */
 	public enum TitleType {
 		TITLE_AUTHOR, AUTHOR_TITLE, SUBTITLE_AUTHOR, TITLE_ONLY, TITLE_AUTHOR_ONLY, NONE;
-		final static public String[] titleTypeNames = {"表題→著者名", "著者名→表題", "表題→著者名(副題優先)", "表題のみ(1行)", "表題+著者のみ(2行)", "なし"};
+		final static public String[] titleTypeNames = {"表題 → 著者名", "著者名 → 表題", "表題 → 著者名(副題優先)", "表題のみ(1行)", "表題+著者のみ(2行)", "なし"};
 		static public TitleType indexOf(int idx)
 		{
 			return values()[idx];
 		}
 		boolean hasTitleAuthor() {
 			switch (this) {
-			case TITLE_AUTHOR: case SUBTITLE_AUTHOR: case AUTHOR_TITLE: return true;
-			default: return false;
+			case TITLE_ONLY: case NONE: return false;
+			default: return true;
 			}
 		}
 		boolean hasTitle() {
 			switch (this) {
-			case TITLE_AUTHOR: case SUBTITLE_AUTHOR: case AUTHOR_TITLE: case TITLE_ONLY: return true;
-			default: return false;
+			case NONE: return false;
+			default: return true;
 			}
 		}
 		boolean hasAuthor() {
 			switch (this) {
-			case TITLE_AUTHOR: case SUBTITLE_AUTHOR: case AUTHOR_TITLE: return true;
-			default: return false;
+			case TITLE_ONLY: case NONE: return false;
+			default: return true;
 			}
 		}
 		boolean titleFirst() {
 			switch (this) {
-			case TITLE_AUTHOR: case SUBTITLE_AUTHOR: case TITLE_ONLY: return true;
+			case TITLE_AUTHOR: case SUBTITLE_AUTHOR: case TITLE_ONLY: case TITLE_AUTHOR_ONLY: return true;
 			default: return false;
 			}
 		}
@@ -75,6 +75,8 @@ public class BookInfo
 	public String title;
 	/** タイトル行番号 */
 	public int titleLine = -1;
+	/** タイトル読み */
+	public String titleAs;
 	
 	/** 副題 */
 	public String subTitle;
@@ -92,11 +94,15 @@ public class BookInfo
 	public int creatorLine = -1;
 	/** 複著作者行番号 */
 	public int subCreatorLine = -1;
+	/** 著者読み */
+	public String creatorAs;
 	
 	/** シリーズ名 */
 	public int seriesLine = -1;
-	/** 刊行者 */
+	/** 刊行者行 */
 	public int publisherLine = -1;
+	/** 刊行者文字列 */
+	public String publisher;
 	
 	////////////////////////////////
 	
@@ -345,17 +351,14 @@ public class BookInfo
 	{
 		return title;
 	}
-
 	public void setTitle(String title)
 	{
 		this.title = title;
 	}
-
 	public int getTitleLine()
 	{
 		return titleLine;
 	}
-
 	public void setTitleLine(int titleLine)
 	{
 		this.titleLine = titleLine;
@@ -365,17 +368,14 @@ public class BookInfo
 	{
 		return creator;
 	}
-
 	public void setCreator(String creator)
 	{
 		this.creator = creator;
 	}
-
 	public int getCreatorLine()
 	{
 		return creatorLine;
 	}
-
 	public void setCreatorLine(int creatorLine)
 	{
 		this.creatorLine = creatorLine;
@@ -385,7 +385,6 @@ public class BookInfo
 	{
 		return published;
 	}
-
 	public void setPublished(Date published)
 	{
 		this.published = published;
@@ -395,7 +394,6 @@ public class BookInfo
 	{
 		return modified;
 	}
-
 	public void setModified(Date modified)
 	{
 		this.modified = modified;
@@ -405,7 +403,6 @@ public class BookInfo
 	{
 		return vertical;
 	}
-
 	public void setVertical(boolean vertical)
 	{
 		this.vertical = vertical;
@@ -415,7 +412,6 @@ public class BookInfo
 	{
 		return rtl;
 	}
-
 	public void setRtl(boolean rtl)
 	{
 		this.rtl = rtl;
@@ -425,7 +421,6 @@ public class BookInfo
 	{
 		return coverFileName;
 	}
-
 	public void setCoverFileName(String coverFileName)
 	{
 		this.coverFileName = coverFileName;
@@ -549,7 +544,7 @@ public class BookInfo
 	
 	////////////////////////////////////////////////////////////////
 	/** 先頭行から表題と著者を取得 */
-	public void setMetaInfo(TitleType titleType, String[] metaLines, int metaLineStart, int firstCommentLineNum)
+	public void setMetaInfo(TitleType titleType, boolean pubFirst, String[] metaLines, int metaLineStart, int firstCommentLineNum)
 	{
 		this.firstCommentLineNum = firstCommentLineNum;
 		
@@ -575,15 +570,25 @@ public class BookInfo
 				}
 			}
 			
+			int arrIndex = 0;
+			//先頭に発行者で2行以上
+			this.publisher = null;
+			if (pubFirst && linesLength >= 2) {
+				this.publisherLine = metaLineStart;
+				this.publisher = metaLines[0];
+				metaLineStart++;
+				linesLength--;
+				arrIndex++;
+			}
 			//表題のみ
 			if (linesLength > 0 && titleType == TitleType.TITLE_ONLY) {
 				this.titleLine = metaLineStart;
-				this.title = metaLines[0];
+				this.title = metaLines[0+arrIndex];
 				titleEndLine = metaLineStart;
 			} else if (linesLength > 0 && titleType == TitleType.TITLE_AUTHOR_ONLY) {
 				this.titleLine = metaLineStart;
-				this.title = metaLines[0];
-				this.creator = metaLines[1];
+				this.title = metaLines[0+arrIndex];
+				this.creator = metaLines[1+arrIndex];
 				titleEndLine = metaLineStart+1;
 			} else {
 				switch (Math.min(6, linesLength)) {
@@ -593,25 +598,25 @@ public class BookInfo
 						this.orgTitleLine = metaLineStart+1;
 						this.subTitleLine = metaLineStart+2;
 						this.subOrgTitleLine = metaLineStart+3;
-						this.title = metaLines[0]+" "+metaLines[2];
+						this.title = metaLines[0+arrIndex]+" "+metaLines[2+arrIndex];
 						titleEndLine = metaLineStart+3;
 						if (titleType.hasAuthor()) {
 							this.creatorLine = metaLineStart+4;
 							this.subCreatorLine = metaLineStart+5;
-							this.creator = metaLines[4];
+							this.creator = metaLines[4+arrIndex];
 							titleEndLine = metaLineStart+5;
 						}
 					} else {
 						this.creatorLine = metaLineStart;
 						this.subCreatorLine = metaLineStart+1;
-						this.creator = metaLines[0];
+						this.creator = metaLines[0+arrIndex];
 						titleEndLine = metaLineStart+1;
 						if (titleType.hasTitle()) {
 							this.titleLine = metaLineStart+2;
 							this.orgTitleLine = metaLineStart+3;
 							this.subTitleLine = metaLineStart+4;
 							this.subOrgTitleLine = metaLineStart+5;
-							this.title = metaLines[2]+" "+metaLines[4];
+							this.title = metaLines[2+arrIndex]+" "+metaLines[4+arrIndex];
 							titleEndLine = metaLineStart+5;
 						}
 					}
@@ -621,24 +626,24 @@ public class BookInfo
 						this.titleLine = metaLineStart;
 						this.orgTitleLine = metaLineStart+1;
 						this.subTitleLine = metaLineStart+2;
-						this.title = metaLines[0]+" "+metaLines[2];
+						this.title = metaLines[0+arrIndex]+" "+metaLines[2+arrIndex];
 						titleEndLine = metaLineStart+2;
 						if (titleType.hasAuthor()) {
 							this.creatorLine = metaLineStart+3;
 							this.subCreatorLine = metaLineStart+4;
-							this.creator = metaLines[3];
+							this.creator = metaLines[3+arrIndex];
 							titleEndLine = metaLineStart+4;
 						}
 					} else {
 						this.creatorLine = metaLineStart;
-						this.creator = metaLines[0];
+						this.creator = metaLines[0+arrIndex];
 						titleEndLine = metaLineStart;
 						if (titleType.hasTitle()) {
 							this.titleLine = metaLineStart+1;
 							this.orgTitleLine = metaLineStart+2;
 							this.subTitleLine = metaLineStart+3;
 							this.subOrgTitleLine = metaLineStart+4;
-							this.title = metaLines[1]+" "+metaLines[3];
+							this.title = metaLines[1+arrIndex]+" "+metaLines[3+arrIndex];
 						}
 						titleEndLine = metaLineStart+4;
 					}
@@ -647,23 +652,23 @@ public class BookInfo
 					if (titleType.titleFirst()) {
 						this.titleLine = metaLineStart;
 						this.subTitleLine = metaLineStart+1;
-						this.title = metaLines[0]+" "+metaLines[1];
+						this.title = metaLines[0+arrIndex]+" "+metaLines[1+arrIndex];
 						titleEndLine = metaLineStart+1;
 						if (titleType.hasAuthor()) {
 							this.creatorLine = metaLineStart+2;
 							this.subCreatorLine = metaLineStart+3;
-							this.creator = metaLines[2];
+							this.creator = metaLines[2+arrIndex];
 							titleEndLine = metaLineStart+3;
 						}
 					} else {
 						this.creatorLine = metaLineStart;
 						this.subCreatorLine = metaLineStart+1;
-						this.creator = metaLines[0];
+						this.creator = metaLines[0+arrIndex];
 						titleEndLine = metaLineStart+1;
 						if (titleType.hasTitle()) {
 							this.titleLine = metaLineStart+2;
 							this.subTitleLine = metaLineStart+3;
-							this.title = metaLines[2]+" "+metaLines[3];
+							this.title = metaLines[2+arrIndex]+" "+metaLines[3+arrIndex];
 							titleEndLine = metaLineStart+3;
 						}
 					}
@@ -672,32 +677,32 @@ public class BookInfo
 					if (titleType.titleFirst()) {
 						this.titleLine = metaLineStart;
 						this.subTitleLine = metaLineStart+1;
-						this.title = metaLines[0]+" "+metaLines[1];
+						this.title = metaLines[0+arrIndex]+" "+metaLines[1+arrIndex];
 						titleEndLine = metaLineStart+1;
 						if (titleType.hasAuthor()) {
 							//副著者を文字列で判断
 							if (titleType != TitleType.SUBTITLE_AUTHOR && !metaLines[1].startsWith("―") &&
-								(metaLines[2].endsWith("訳") || metaLines[2].endsWith("編纂") || metaLines[2].endsWith("校訂"))) {
+								(metaLines[2+arrIndex].endsWith("訳") || metaLines[2+arrIndex].endsWith("編纂") || metaLines[2+arrIndex].endsWith("校訂"))) {
 								this.titleLine = metaLineStart;
-								this.title = metaLines[0];
+								this.title = metaLines[0+arrIndex];
 								this.subTitleLine = -1;
 								this.creatorLine = metaLineStart+1;
-								this.creator = metaLines[1];
+								this.creator = metaLines[1+arrIndex];
 								this.subCreatorLine = metaLineStart+2;
 							} else {
 								this.creatorLine = metaLineStart+2;
-								this.creator = metaLines[2];
+								this.creator = metaLines[2+arrIndex];
 							}
 							titleEndLine = metaLineStart+2;
 						}
 					} else {
 						this.creatorLine = metaLineStart;
-						this.creator = metaLines[0];
+						this.creator = metaLines[0+arrIndex];
 						titleEndLine = metaLineStart;
 						if (titleType.hasTitle()) {
 							this.titleLine = metaLineStart+1;
 							this.subTitleLine = metaLineStart+2;
-							this.title = metaLines[1]+" "+metaLines[2];
+							this.title = metaLines[1+arrIndex]+" "+metaLines[2+arrIndex];
 							titleEndLine = metaLineStart+2;
 						}
 					}
@@ -705,27 +710,27 @@ public class BookInfo
 				case 2: //表題+著者 すぐ後にコメント行がある場合のみ表題+副題+空行+著者
 					if (titleType.titleFirst()) {
 						this.titleLine = metaLineStart;
-						this.title = metaLines[0];
+						this.title = metaLines[0+arrIndex];
 						if (titleType.hasAuthor()) {
-							if (firstCommentLineNum > 0 && firstCommentLineNum <= 6 && metaLines[3] != null && metaLines[3].length() > 0 && (metaLines[4] == null || metaLines[4].length() == 0)) {
+							if (firstCommentLineNum > 0 && firstCommentLineNum <= 6 && metaLines[3+arrIndex] != null && metaLines[3+arrIndex].length() > 0 && (metaLines[4+arrIndex] == null || metaLines[4+arrIndex].length() == 0)) {
 								this.titleLine = metaLineStart;
 								this.subTitleLine = metaLineStart+1;
-								this.title = metaLines[0]+" "+metaLines[1];
+								this.title = metaLines[0+arrIndex]+" "+metaLines[1+arrIndex];
 								this.creatorLine = metaLineStart+3;
-								this.creator = metaLines[3];
+								this.creator = metaLines[3+arrIndex];
 								titleEndLine = metaLineStart+3;
 							} else {
 								this.creatorLine = metaLineStart+1;
-								this.creator = metaLines[1];
+								this.creator = metaLines[1+arrIndex];
 								titleEndLine = metaLineStart+1;
 							}
 						}
 					} else {
 						this.creatorLine = metaLineStart;
-						this.creator = metaLines[0];
+						this.creator = metaLines[0+arrIndex];
 						if (titleType.hasTitle()) {
 							this.titleLine = metaLineStart+1;
-							this.title = metaLines[1];
+							this.title = metaLines[1+arrIndex];
 						}
 						titleEndLine = metaLineStart+1;
 					}
@@ -733,23 +738,23 @@ public class BookInfo
 				case 1: //表題のみ または 表題 空行 著者名 空行 も許可 TODO 章番号とかは除外する
 					if (titleType.titleFirst()) {
 						this.titleLine = metaLineStart;
-						this.title = metaLines[0];
+						this.title = metaLines[0+arrIndex];
 						titleEndLine = metaLineStart;
 						if (titleType.hasAuthor()) {
-							if (metaLines[2] != null && metaLines[2].length() > 0 && (metaLines[3] == null || metaLines[3].length() == 0)) {
+							if (metaLines[2+arrIndex] != null && metaLines[2+arrIndex].length() > 0 && (metaLines[3+arrIndex] == null || metaLines[3+arrIndex].length() == 0)) {
 								this.creatorLine = metaLineStart+2;
-								this.creator = metaLines[2];
+								this.creator = metaLines[2+arrIndex];
 								titleEndLine = metaLineStart+2;
 							}
 						}
 					} else {
 						this.creatorLine = metaLineStart;
-						this.creator = metaLines[0];
+						this.creator = metaLines[0+arrIndex];
 						titleEndLine = metaLineStart;
 						if (titleType.hasTitle()) {
-							if (metaLines[2] != null && metaLines[2].length() > 0 && (metaLines[3] == null || metaLines[3].length() == 0)) {
+							if (metaLines[2+arrIndex] != null && metaLines[2+arrIndex].length() > 0 && (metaLines[3+arrIndex] == null || metaLines[3+arrIndex].length() == 0)) {
 								this.titleLine = metaLineStart+2;
-								this.title = metaLines[2];
+								this.title = metaLines[2+arrIndex];
 								titleEndLine = metaLineStart+2;
 							}
 						}
@@ -767,9 +772,9 @@ public class BookInfo
 		}
 	}
 	/** 本文内のタイトル再読み込み */
-	public void reloadMetadata(TitleType titleType)
+	public void reloadMetadata(TitleType titleType, boolean pubFirst)
 	{
-		setMetaInfo(titleType, this.metaLines, this.metaLineStart, this.firstCommentLineNum);
+		setMetaInfo(titleType, pubFirst, this.metaLines, this.metaLineStart, this.firstCommentLineNum);
 	}
 	
 	/** ファイル名からタイトルと著者名を取得 */

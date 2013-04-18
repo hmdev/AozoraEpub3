@@ -311,7 +311,7 @@ public class AozoraEpub3
 					
 					BookInfo bookInfo = null;
 					if (!imageOnly) {
-						bookInfo = AozoraEpub3.getBookInfo(srcFile, ext, txtIdx, imageInfoReader, aozoraConverter, encType, BookInfo.TitleType.indexOf(titleIndex));
+						bookInfo = AozoraEpub3.getBookInfo(srcFile, ext, txtIdx, imageInfoReader, aozoraConverter, encType, BookInfo.TitleType.indexOf(titleIndex), false);
 						bookInfo.vertical = vertical;
 						bookInfo.insertTocPage = tocPage;
 						bookInfo.setTocVertical(tocVertical);
@@ -425,7 +425,7 @@ public class AozoraEpub3
 	
 	/** 前処理で一度読み込んでタイトル等の情報を取得 */
 	static public BookInfo getBookInfo(File srcFile, String ext, int txtIdx, ImageInfoReader imageInfoReader, AozoraEpub3Converter aozoraConverter,
-			String encType, BookInfo.TitleType titleType)
+			String encType, BookInfo.TitleType titleType, boolean pubFirst)
 	{
 		try {
 			String[] textEntryName = new String[1];
@@ -434,7 +434,7 @@ public class AozoraEpub3
 			
 			//タイトル、画像注記、左右中央注記、目次取得
 			BufferedReader src = new BufferedReader(new InputStreamReader(is, (String)encType));
-			BookInfo bookInfo = aozoraConverter.getBookInfo(srcFile, src, imageInfoReader, titleType);
+			BookInfo bookInfo = aozoraConverter.getBookInfo(srcFile, src, imageInfoReader, titleType, pubFirst);
 			is.close();
 			bookInfo.textEntryName = textEntryName[0];
 			return bookInfo;

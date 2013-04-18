@@ -138,6 +138,7 @@ public class AozoraEpub3Applet extends JApplet
 	
 	/** 表題 */
 	JComboBox jComboTitle;
+	JCheckBox jCheckPubFirst;
 	JCheckBox jCheckUserFileName;
 	JCheckBox jCheckAutoFileName;
 	JCheckBox jCheckTitlePage;
@@ -592,6 +593,11 @@ public class AozoraEpub3Applet extends JApplet
 		((JLabel)jComboTitle.getRenderer()).setBorder(padding2H);
 		panel.add(jComboTitle);
 		//入力ファイル名優先
+		jCheckPubFirst = new JCheckBox("先頭が発行者");
+		jCheckPubFirst.setFocusPainted(false);
+		panel.add(jCheckPubFirst);
+		//入力ファイル名優先
+		panel.add(new JLabel("  "));
 		jCheckUserFileName = new JCheckBox("ファイル名優先 ");
 		jCheckUserFileName.setFocusPainted(false);
 		panel.add(jCheckUserFileName);
@@ -2769,7 +2775,8 @@ public class AozoraEpub3Applet extends JApplet
 				bookInfo = AozoraEpub3.getBookInfo(
 					srcFile, ext, txtIdx, imageInfoReader, this.aozoraConverter,
 					this.jComboEncType.getSelectedItem().toString(),
-					BookInfo.TitleType.indexOf(this.jComboTitle.getSelectedIndex())
+					BookInfo.TitleType.indexOf(this.jComboTitle.getSelectedIndex()),
+					jCheckPubFirst.isSelected()
 				);
 			}
 		} catch (Exception e) {
@@ -2898,10 +2905,13 @@ public class AozoraEpub3Applet extends JApplet
 			return;
 		}
 		
-		//前回の表紙変換設定を反映
-		if (jCheckCoverHistory.isSelected()) {
-			BookInfoHistory history = this.getBookInfoHistory(bookInfo);
-			if (history != null) {
+		//前回の変換設定を反映
+		BookInfoHistory history = this.getBookInfoHistory(bookInfo);
+		if (history != null) {
+			bookInfo.titleAs = history.titleAs;
+			bookInfo.creatorAs = history.creatorAs;
+			//表紙設定
+			if (jCheckCoverHistory.isSelected()) {
 				bookInfo.coverEditInfo = history.coverEditInfo;
 				bookInfo.coverFileName = history.coverFileName;
 				bookInfo.coverExt = history.coverExt;
@@ -2959,7 +2969,7 @@ public class AozoraEpub3Applet extends JApplet
 			this.jConfirmDialog.showDialog(
 				srcFile.getName(),
 				(dstPath!=null ? dstPath.getAbsolutePath() : srcFile.getParentFile().getAbsolutePath())+File.separator,
-				title, creator, this.jComboTitle.getSelectedIndex(),
+				title, creator, this.jComboTitle.getSelectedIndex(), jCheckPubFirst.isSelected(),
 				bookInfo, imageInfoReader, this.jFrameParent.getLocation(),
 				coverW, coverH
 			);
@@ -2982,6 +2992,10 @@ public class AozoraEpub3Applet extends JApplet
 			//確認ダイアログの値をBookInfoに設定
 			bookInfo.title = this.jConfirmDialog.getMetaTitle();
 			bookInfo.creator = this.jConfirmDialog.getMetaCreator();
+			bookInfo.titleAs = this.jConfirmDialog.getMetaTitleAs();
+			bookInfo.creatorAs = this.jConfirmDialog.getMetaCreatorAs();
+			bookInfo.publisher = this.jConfirmDialog.getMetaPublisher();
+			
 			//著者が空欄なら著者行もクリア
 			if (bookInfo.creator.length() == 0) bookInfo.creatorLine = -1;
 			
@@ -3404,6 +3418,7 @@ public class AozoraEpub3Applet extends JApplet
 		
 		//表題
 		try { jComboTitle.setSelectedIndex(Integer.parseInt(props.getProperty("TitleType"))); } catch (Exception e) {}
+		setPropsSelected(jCheckPubFirst, props, "PubFirst");
 		setPropsSelected(jCheckUserFileName, props, "UseFileName");
 		//表紙
 		if (props.getProperty("Cover")==null||props.getProperty("Cover").length()==0) jComboCover.setSelectedIndex(0);
@@ -3574,6 +3589,7 @@ public class AozoraEpub3Applet extends JApplet
 	{
 		//アップレット設定の保存
 		props.setProperty("TitleType", ""+this.jComboTitle.getSelectedIndex());
+		props.setProperty("PubFirst", this.jCheckPubFirst.isSelected()?"1":"");
 		props.setProperty("UseFileName", this.jCheckUserFileName.isSelected()?"1":"");
 		props.setProperty("AutoFileName", this.jCheckAutoFileName.isSelected()?"1":"");
 		//変換設定

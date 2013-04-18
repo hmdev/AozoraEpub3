@@ -366,10 +366,18 @@ public class Epub3Writer
 		velocityContext.put("identifier", UUID.nameUUIDFromBytes((title+"-"+creator).getBytes()));
 		//表紙の目次表示名
 		velocityContext.put("cover_name", "表紙");
+		
 		//タイトル &<>はエスケープ
 		velocityContext.put("title", CharUtils.escapeHtml(title));
-		//タイトル &<>はエスケープ
+		//タイトル読み &<>はエスケープ
+		if (bookInfo.titleAs != null) velocityContext.put("titleAs", CharUtils.escapeHtml(bookInfo.titleAs));
+		//著者 &<>はエスケープ
 		velocityContext.put("creator", CharUtils.escapeHtml(creator));
+		//著者読み &<>はエスケープ
+		if (bookInfo.creatorAs != null) velocityContext.put("creatorAs", CharUtils.escapeHtml(bookInfo.creatorAs));
+		//刊行者情報
+		if (bookInfo.publisher != null) velocityContext.put("publisher", bookInfo.publisher);
+		
 		//書籍情報
 		velocityContext.put("bookInfo", bookInfo);
 		//更新日時

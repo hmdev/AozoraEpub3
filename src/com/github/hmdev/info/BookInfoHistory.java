@@ -14,11 +14,18 @@ public class BookInfoHistory
 	/** imageにしたとき用の元ファイルの拡張子 */
 	public String coverExt = null;
 	
+	public String titleAs;
+	public String creatorAs;
+	
+	
 	public BookInfoHistory(BookInfo bookInfo)
 	{
 		this.coverEditInfo = bookInfo.coverEditInfo;
 		this.coverFileName = bookInfo.coverFileName;
 		this.coverImageIndex = bookInfo.coverImageIndex;
 		this.coverExt = bookInfo.coverExt;
+		
+		this.titleAs = bookInfo.titleAs;
+		this.creatorAs = bookInfo.creatorAs;
 	}
 }

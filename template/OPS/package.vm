@@ -1,11 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <package xmlns="http://www.idpf.org/2007/opf" unique-identifier="pub-id" xml:lang="ja" version="3.0">
 	<metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
+#if (${titleAs})
+		<dc:title id="title" file-as="${titleAs}">${title}</dc:title>
+#else
 		<dc:title id="title">${title}</dc:title>
+#end
 		<meta refines="#title" property="dcterms:title">${title}</meta>
-#if (${bookInfo.Creator})
-		<dc:creator id="creator">${creator}</dc:creator>
+#if (${titleAs})
+		<meta refines="#title" property="file-as" xml:lang="ja-Hrkt-JP">${titleAs}</meta>
+#end
+#if (${creator})
+#if (${creatorAs})
+		<dc:creator id="creator" role="aut" file-as="${creatorAs}">${creator}</dc:creator>
+#else
+		<dc:creator id="creator" role="aut">${creator}</dc:creator>
+#end
 		<meta refines="#creator" property="dcterms:creator">${creator}</meta>
+#if (${creatorAs})
+		<meta refines="#creator" property="file-as" xml:lang="ja-Hrkt-JP">${creatorAs}</meta>
+#end
+#end
+#if (${publisher})
+		<dc:publisher id="publisher">${publisher}</dc:publisher>
+		<meta refines="#publisher" property="dcterms:publisher">${publisher}</meta>
 #end
 		<dc:language id="pub-lang">ja</dc:language>
 		<meta refines="#pub-lang" property="dcterms:language">ja</meta>

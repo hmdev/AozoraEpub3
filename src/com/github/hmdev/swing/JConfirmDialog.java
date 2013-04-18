@@ -57,6 +57,7 @@ public class JConfirmDialog extends JDialog
 	
 	/** 表題再取得 順番 */
 	JComboBox jComboTitle;
+	JCheckBox jCheckPubFirst;
 	/** 表題再取得 順番 */
 	JButton jButtonTitle;
 	/** 表題をファイル名から設定 */
@@ -64,8 +65,14 @@ public class JConfirmDialog extends JDialog
 	
 	/** 表題 (+副題)編集用 */
 	JTextField jTextTitle;
+	/** 表題読み編集用 */
+	JTextField jTextTitleAs;
 	/** 著者名編集用 */
 	JTextField jTextCreator;
+	/** 著者名読み編集用 */
+	JTextField jTextCreatorAs;
+	/** 刊行者編集用 */
+	JTextField jTextPublisher;
 	
 	/** 変更前確認チェック */
 	public JCheckBox jCheckConfirm2;
@@ -158,7 +165,9 @@ public class JConfirmDialog extends JDialog
 		Border paddingButton = BorderFactory.createEmptyBorder(3, 6, 3, 6);
 		Border padding4T2 = BorderFactory.createEmptyBorder(4, 2, 2, 2);
 		Border padding4 = BorderFactory.createEmptyBorder(4, 4, 4, 4);
+		Border padding1T = BorderFactory.createEmptyBorder(1, 0, 0, 0);
 		Border padding4T = BorderFactory.createEmptyBorder(4, 0, 0, 0);
+		Border padding4T2B = BorderFactory.createEmptyBorder(4, 0, 2, 0);
 		Border padding2H = BorderFactory.createEmptyBorder(0, 2, 0, 2);
 		Border padding3 = BorderFactory.createEmptyBorder(3, 3, 3, 3);
 		
@@ -222,15 +231,12 @@ public class JConfirmDialog extends JDialog
 		JPanel metadataOuter = new JPanel();
 		metadataOuter.setBorder(new NarrowTitledBorder("メタデータ設定 (本文は変更されません)"));
 		metadataOuter.setLayout(new BoxLayout(metadataOuter, BoxLayout.Y_AXIS));
-		metadataOuter.setMinimumSize(new Dimension(10, 110));
-		metadataOuter.setMaximumSize(new Dimension(LEFT_PANE_WIDTH, 110));
-		metadataOuter.setPreferredSize(new Dimension(LEFT_PANE_WIDTH, 110));
+		metadataOuter.setPreferredSize(new Dimension(LEFT_PANE_WIDTH, 200));
 		//再取得
 		panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 		panel.setBorder(padding4T);
 		label = new JLabel("本文内");
-		label.setBorder(padding2H);
 		panel.add(label);
 		jComboTitle = new JComboBox(BookInfo.TitleType.titleTypeNames);
 		jComboTitle.setFocusable(false);
@@ -239,15 +245,20 @@ public class JConfirmDialog extends JDialog
 		jComboTitle.setBorder(padding0);
 		((JLabel)jComboTitle.getRenderer()).setBorder(padding2H);
 		panel.add(jComboTitle);
+		//入力ファイル名優先
+		jCheckPubFirst = new JCheckBox("先頭が発行者");
+		jCheckPubFirst.setFocusPainted(false);
+		panel.add(jCheckPubFirst);
 		jButtonTitle = new JButton("再取得");
 		jButtonTitle.setBorder(padding3);
 		jButtonTitle.setPreferredSize(new Dimension(72, 24));
 		try { jButtonTitle.setIcon(new ImageIcon(new URL(imageURLPath+"title_reload.png"))); } catch (MalformedURLException e1) {}
 		jButtonTitle.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent arg0) { reloadTitle(); } });
 		panel.add(jButtonTitle);
-		panel.add(new JLabel("    "));
-		jButtonTitleFileName = new JButton("ファイル名から設定");
-		jButtonTitleFileName.setBorder(padding3);
+		panel.add(new JLabel("   "));
+		jButtonTitleFileName = new JButton();
+		jButtonTitleFileName.setToolTipText("ファイル名から設定");
+		jButtonTitleFileName.setBorder(BorderFactory.createEmptyBorder(3, 6, 3, 6));
 		jButtonTitleFileName.setPreferredSize(new Dimension(130, 24));
 		try { jButtonTitleFileName.setIcon(new ImageIcon(new URL(imageURLPath+"filename_copy.png"))); } catch (MalformedURLException e1) {}
 		jButtonTitleFileName.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent arg0) { userFileName(); } });
@@ -258,7 +269,7 @@ public class JConfirmDialog extends JDialog
 		//表題
 		panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-		panel.setBorder(padding4T);
+		panel.setBorder(padding1T);
 		panel.setPreferredSize(new Dimension(LEFT_PANE_WIDTH, 28));
 		panel.add(new JLabel("表題: "));
 		jTextTitle = new JTextField();
@@ -266,6 +277,17 @@ public class JConfirmDialog extends JDialog
 		jTextTitle.setMaximumSize(new Dimension(LEFT_PANE_WIDTH, 24));
 		jTextTitle.setPreferredSize(new Dimension(LEFT_PANE_WIDTH, 24));
 		panel.add(jTextTitle);
+		metadataOuter.add(panel);
+		panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		panel.setBorder(padding1T);
+		panel.setPreferredSize(new Dimension(LEFT_PANE_WIDTH, 28));
+		panel.add(new JLabel("フリガナ: "));
+		jTextTitleAs = new JTextField();
+		jTextTitleAs.setMinimumSize(new Dimension(10, 24));
+		jTextTitleAs.setMaximumSize(new Dimension(LEFT_PANE_WIDTH, 24));
+		jTextTitleAs.setPreferredSize(new Dimension(LEFT_PANE_WIDTH, 24));
+		panel.add(jTextTitleAs);
 		metadataOuter.add(panel);
 		//著者
 		panel = new JPanel();
@@ -278,6 +300,28 @@ public class JConfirmDialog extends JDialog
 		jTextCreator.setPreferredSize(new Dimension(LEFT_PANE_WIDTH, 24));
 		jTextCreator.setMaximumSize(new Dimension(LEFT_PANE_WIDTH, 24));
 		panel.add(jTextCreator);
+		metadataOuter.add(panel);
+		panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		panel.setBorder(padding1T);
+		panel.setPreferredSize(new Dimension(LEFT_PANE_WIDTH, 28));
+		panel.add(new JLabel("フリガナ: "));
+		jTextCreatorAs = new JTextField();
+		jTextCreatorAs.setMinimumSize(new Dimension(10, 24));
+		jTextCreatorAs.setMaximumSize(new Dimension(LEFT_PANE_WIDTH, 24));
+		jTextCreatorAs.setPreferredSize(new Dimension(LEFT_PANE_WIDTH, 24));
+		panel.add(jTextCreatorAs);
+		metadataOuter.add(panel);
+		panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		panel.setBorder(padding4T2B);
+		panel.setPreferredSize(new Dimension(LEFT_PANE_WIDTH, 28));
+		panel.add(new JLabel("発行: "));
+		jTextPublisher = new JTextField();
+		jTextPublisher.setMinimumSize(new Dimension(10, 24));
+		jTextPublisher.setMaximumSize(new Dimension(LEFT_PANE_WIDTH, 24));
+		jTextPublisher.setPreferredSize(new Dimension(LEFT_PANE_WIDTH, 24));
+		panel.add(jTextPublisher);
 		metadataOuter.add(panel);
 		previewLeft.add(metadataOuter);
 		
@@ -642,18 +686,36 @@ public class JConfirmDialog extends JDialog
 	{
 		return jTextTitle.getText().trim();
 	}
+	public String getMetaTitleAs()
+	{
+		String titleAs = jTextTitleAs.getText().trim();
+		if (titleAs.length() == 0) return null;
+		return titleAs;
+	}
 	public String getMetaCreator()
 	{
 		return jTextCreator.getText().trim();
 	}
-	
+	public String getMetaCreatorAs()
+	{
+		String creatorAs = jTextCreatorAs.getText().trim();
+		if (creatorAs.length() == 0) return null;
+		return creatorAs;
+	}
+	public String getMetaPublisher()
+	{
+		String publisher = jTextPublisher.getText().trim();
+		if (publisher.length() == 0) return null;
+		return publisher;
+	}
 	
 	void reloadTitle()
 	{
-		this.bookInfo.reloadMetadata(BookInfo.TitleType.indexOf(this.jComboTitle.getSelectedIndex()));
+		this.bookInfo.reloadMetadata(BookInfo.TitleType.indexOf(this.jComboTitle.getSelectedIndex()), jCheckPubFirst.isSelected());
 		//テキストから取得できなければファイル名を利用
 		this.jTextTitle.setText(this.bookInfo.title);
 		this.jTextCreator.setText(this.bookInfo.creator);
+		this.jTextPublisher.setText(bookInfo.publisher==null?"":bookInfo.publisher);
 	}
 	
 	void userFileName()
@@ -847,7 +909,7 @@ public class JConfirmDialog extends JDialog
 	
 	/** 確認ダイアログを表示
 	 * @param location ダイアログ表示位置 */
-	public void showDialog(String srcFile, String dstPath, String title, String creator, int titleTypeIndex,
+	public void showDialog(String srcFile, String dstPath, String title, String creator, int titleTypeIndex, boolean pubFirst,
 			BookInfo bookInfo, ImageInfoReader imageInfoReader, Point location, int coverW, int coverH)
 	{
 		//zip内テキストファイル名も表示
@@ -858,13 +920,20 @@ public class JConfirmDialog extends JDialog
 		this.jTextDstFileName.setText(dstPath);
 		this.jTextDstFileName.setToolTipText(dstPath);
 		//this.jTextDstFileName.setCaretPosition(0);
+		
+		//メタデータ設定
 		this.jTextTitle.setText(title);
+		this.jTextTitleAs.setText(bookInfo.titleAs==null?"":bookInfo.titleAs);
 		this.jTextCreator.setText(creator);
+		this.jTextCreatorAs.setText(bookInfo.creatorAs==null?"":bookInfo.creatorAs);
+		this.jTextPublisher.setText(bookInfo.publisher==null?"":bookInfo.publisher);
+		
 		//this.jCheckReplaceCover.setSelected(false);
 		//変更前確認設定用
 		this.jCheckConfirm2.setSelected(true);
 		
 		this.jComboTitle.setSelectedIndex(titleTypeIndex);
+		this.jCheckPubFirst.setSelected(pubFirst);
 		this.jComboTitle.setEnabled(!bookInfo.isImageOnly());
 		this.jButtonTitle.setEnabled(!bookInfo.isImageOnly());
 		
