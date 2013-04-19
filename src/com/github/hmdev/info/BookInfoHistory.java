@@ -14,9 +14,11 @@ public class BookInfoHistory
 	/** imageにしたとき用の元ファイルの拡張子 */
 	public String coverExt = null;
 	
+	public String title;
 	public String titleAs;
+	public String creator;
 	public String creatorAs;
-	
+	public String publisher;
 	
 	public BookInfoHistory(BookInfo bookInfo)
 	{
@@ -25,7 +27,10 @@ public class BookInfoHistory
 		this.coverImageIndex = bookInfo.coverImageIndex;
 		this.coverExt = bookInfo.coverExt;
 		
+		this.title = bookInfo.title;
 		this.titleAs = bookInfo.titleAs;
+		this.creator = bookInfo.creator;
 		this.creatorAs = bookInfo.creatorAs;
+		this.publisher = bookInfo.publisher;
 	}
 }

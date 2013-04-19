@@ -1136,7 +1136,7 @@ public class AozoraEpub3Applet extends JApplet
 		panel.setBorder(new NarrowTitledBorder("Jpeg圧縮率"));
 		tabPanel.add(panel);
 		jTextJpegQuality = new JTextField("85");
-		jTextJpegQuality.setToolTipText("表紙編集、縮小、回転、余白除去時のJpeg保存時の画質(100が最高)");
+		jTextJpegQuality.setToolTipText("表紙編集、縮小、回転、余白除去時のJpeg保存時の画質(100が最高画質)");
 		jTextJpegQuality.setHorizontalAlignment(JTextField.RIGHT);
 		jTextJpegQuality.setInputVerifier(new IntegerInputVerifier(85, 30, 100));
 		jTextJpegQuality.setMaximumSize(text3);
@@ -1221,13 +1221,13 @@ public class AozoraEpub3Applet extends JApplet
 		////////////////////////////////
 		panelV = new JPanel();
 		panelV.setLayout(new BoxLayout(panelV, BoxLayout.Y_AXIS));
-		panelV.setBorder(new NarrowTitledBorder("有効"));
+		panelV.setBorder(new NarrowTitledBorder("余白除去"));
 		tabPanel.add(panelV);
 		panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 		panel.setBorder(padding4B);
 		panelV.add(panel);
-		jCheckAutoMargin = new JCheckBox("余白除去");
+		jCheckAutoMargin = new JCheckBox("有効 ");
 		jCheckAutoMargin.setFocusPainted(false);
 		jCheckAutoMargin.setBorder(padding2);
 		jCheckAutoMargin.setIconTextGap(2);
@@ -1271,7 +1271,7 @@ public class AozoraEpub3Applet extends JApplet
 		label.setBorder(padding2H);
 		panel.add(label);
 		panel.add(label);
-		label = new JLabel(" 余白追加");
+		label = new JLabel("  余白追加");
 		label.setToolTipText("余白除去後に追加する余白の量(追加部分の画像はそのまま)");
 		panel.add(label);
 		jTextAutoMarginPadding = new JTextField("1.0");
@@ -1287,7 +1287,7 @@ public class AozoraEpub3Applet extends JApplet
 		label.setBorder(padding2H);
 		panel.add(label);
 		
-		label = new JLabel(" 白レベル");
+		label = new JLabel("  白レベル");
 		label.setToolTipText("余白部分の白い画素と判別するレベルを指定します (黒:0～白:100)");
 		panel.add(label);
 		jTextAutoMarginWhiteLevel = new JTextField("80");
@@ -1305,7 +1305,7 @@ public class AozoraEpub3Applet extends JApplet
 		panel = new JPanel();
 		panel.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
 		panelV.add(panel);
-		label = new JLabel("ノンブル");
+		label = new JLabel("ノンブル除去 (位置");
 		label.setBorder(padding2H);
 		panel.add(label);
 		jComboAutoMarginNombre = new JComboBox(new String[]{"なし","上","下","上下"});
@@ -1326,7 +1326,7 @@ public class AozoraEpub3Applet extends JApplet
 		jTextAutoMarginNombreSize.setEditable(jCheckAutoMargin.isSelected());
 		jTextAutoMarginNombreSize.addFocusListener(new TextSelectFocusListener(jTextAutoMarginPadding));
 		panel.add(jTextAutoMarginNombreSize);
-		label = new JLabel("%");
+		label = new JLabel("% )");
 		label.setBorder(padding2H);
 		panel.add(label);
 		
@@ -2896,8 +2896,10 @@ public class AozoraEpub3Applet extends JApplet
 			if (titleCreator[1] != null) bookInfo.creator = titleCreator[1];
 		} else {
 			//テキストから取得できなければファイル名を利用
-			if (bookInfo.title == null || bookInfo.title.length() == 0) bookInfo.title = titleCreator[0]==null?"":titleCreator[0];
-			if (bookInfo.creator == null || bookInfo.creator.length() == 0) bookInfo.creator = titleCreator[1]==null?"":titleCreator[1];
+			if (bookInfo.title == null || bookInfo.title.length() == 0) {
+				bookInfo.title = titleCreator[0]==null?"":titleCreator[0];
+				if (bookInfo.creator == null || bookInfo.creator.length() == 0) bookInfo.creator = titleCreator[1]==null?"":titleCreator[1];
+			}
 		}
 		
 		if (this.convertCanceled){
@@ -2908,8 +2910,11 @@ public class AozoraEpub3Applet extends JApplet
 		//前回の変換設定を反映
 		BookInfoHistory history = this.getBookInfoHistory(bookInfo);
 		if (history != null) {
+			if (bookInfo.title.length() == 0) bookInfo.title = history.title;
 			bookInfo.titleAs = history.titleAs;
+			if (bookInfo.creator.length() == 0) bookInfo.creator = history.creator;
 			bookInfo.creatorAs = history.creatorAs;
+			if (bookInfo.publisher == null) bookInfo.publisher = history.publisher;
 			//表紙設定
 			if (jCheckCoverHistory.isSelected()) {
 				bookInfo.coverEditInfo = history.coverEditInfo;

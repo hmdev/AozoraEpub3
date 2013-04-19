@@ -554,8 +554,12 @@ public class BookInfo
 		this.subOrgTitleLine = -1;
 		this.creatorLine = -1;
 		this.subCreatorLine = -1;
+		this.publisherLine = -1;
 		this.title = "";
+		this.titleAs = null;
 		this.creator = "";
+		this.creatorAs = null;
+		this.publisher = null;
 		
 		if (titleType != TitleType.NONE) {
 			
@@ -572,7 +576,6 @@ public class BookInfo
 			
 			int arrIndex = 0;
 			//先頭に発行者で2行以上
-			this.publisher = null;
 			if (pubFirst && linesLength >= 2) {
 				this.publisherLine = metaLineStart;
 				this.publisher = metaLines[0];
@@ -717,7 +720,7 @@ public class BookInfo
 								this.subTitleLine = metaLineStart+1;
 								this.title = metaLines[0+arrIndex]+" "+metaLines[1+arrIndex];
 								this.creatorLine = metaLineStart+3;
-								this.creator = metaLines[3+arrIndex];
+								this.creator = metaLines[2+arrIndex];
 								titleEndLine = metaLineStart+3;
 							} else {
 								this.creatorLine = metaLineStart+1;

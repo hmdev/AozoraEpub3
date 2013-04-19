@@ -147,7 +147,7 @@ public class JConfirmDialog extends JDialog
 	
 	//Size
 	static final int DIALOG_WIDTH = 640;
-	static final int DIALOG_HEIGHT = 340;
+	static final int DIALOG_HEIGHT = 420;
 	
 	static final int LEFT_PANE_WIDTH = 430;
 	static final int PREVIEW_WIDTH = 180;
@@ -282,8 +282,9 @@ public class JConfirmDialog extends JDialog
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 		panel.setBorder(padding1T);
 		panel.setPreferredSize(new Dimension(LEFT_PANE_WIDTH, 28));
-		panel.add(new JLabel("フリガナ: "));
+		panel.add(new JLabel("ふりがな: "));
 		jTextTitleAs = new JTextField();
+		jTextTitleAs.setToolTipText("表題のよみを入力します");
 		jTextTitleAs.setMinimumSize(new Dimension(10, 24));
 		jTextTitleAs.setMaximumSize(new Dimension(LEFT_PANE_WIDTH, 24));
 		jTextTitleAs.setPreferredSize(new Dimension(LEFT_PANE_WIDTH, 24));
@@ -296,6 +297,7 @@ public class JConfirmDialog extends JDialog
 		panel.setPreferredSize(new Dimension(LEFT_PANE_WIDTH, 28));
 		panel.add(new JLabel("著者: "));
 		jTextCreator = new JTextField();
+		jTextCreator.setToolTipText("著者のよみを入力します");
 		jTextCreator.setMinimumSize(new Dimension(10, 24));
 		jTextCreator.setPreferredSize(new Dimension(LEFT_PANE_WIDTH, 24));
 		jTextCreator.setMaximumSize(new Dimension(LEFT_PANE_WIDTH, 24));
@@ -305,7 +307,7 @@ public class JConfirmDialog extends JDialog
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 		panel.setBorder(padding1T);
 		panel.setPreferredSize(new Dimension(LEFT_PANE_WIDTH, 28));
-		panel.add(new JLabel("フリガナ: "));
+		panel.add(new JLabel("ふりがな: "));
 		jTextCreatorAs = new JTextField();
 		jTextCreatorAs.setMinimumSize(new Dimension(10, 24));
 		jTextCreatorAs.setMaximumSize(new Dimension(LEFT_PANE_WIDTH, 24));
@@ -1039,7 +1041,7 @@ public class JConfirmDialog extends JDialog
 		int incHeight = previewHeight-PREVIEW_HEIGHT;
 		//目次サイズの応じてテーブルの高さを調整
 		if (!bookInfo.isImageOnly()) {
-			if (this.jTableToc.getRowCount() > 1) incHeight = Math.max(incHeight, Math.min(10, this.jTableToc.getRowCount()-1)*16);
+			if (this.jTableToc.getRowCount() > 1) incHeight = Math.max(incHeight, Math.min(16, this.jTableToc.getRowCount()-1)*16);
 		}
 		int dialogHeight = DIALOG_HEIGHT+incHeight;
 		
