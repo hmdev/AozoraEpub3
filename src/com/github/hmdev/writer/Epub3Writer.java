@@ -567,9 +567,15 @@ public class Epub3Writer
 				}
 			}
 			if (insertCoverInfo != null) {
-				//画像が横長なら幅100% それ以外は高さ100%
 				SectionInfo sectionInfo = new SectionInfo("cover-page");
-				if ((double)insertCoverInfo.getWidth()/insertCoverInfo.getHeight() >= 3.0/4) sectionInfo.setImageFitW(true);
+				if (this.imageSizeType != SectionInfo.IMAGE_SIZE_TYPE_AUTO) {
+					//画像が横長なら幅100% それ以外は高さ100%
+					if ((double)insertCoverInfo.getWidth()/insertCoverInfo.getHeight() >= (double)this.coverW/this.coverH) sectionInfo.setImageFitW(true);
+					else sectionInfo.setImageFitH(true);
+				} else {
+					sectionInfo.setImageFitW(false);
+					sectionInfo.setImageFitH(false);
+				}
 				this.velocityContext.put("sectionInfo", sectionInfo);
 				this.velocityContext.put("coverImage", insertCoverInfo);
 				zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+XHTML_PATH+COVER_FILE));
@@ -927,17 +933,14 @@ public class Epub3Writer
 		//次の行が単一画像なら画像専用指定
 		switch (imagePageType) {
 		case PageBreakTrigger.IMAGE_PAGE_W:
-			//高さでサイズ調整すor画面より小さい場合は高さの%指定
+			//幅100％指定
 			sectionInfo.setImagePage(true);
-			ImageInfo imageInfo = this.imageInfoReader.getCollectImageInfo(srcImageFilePath);
-			if (this.imageSizeType == SectionInfo.IMAGE_SIZE_TYPE_HEIGHT || imageInfo.getWidth() <= this.dispW && imageInfo.getHeight() < this.dispH) {
-				if (imageInfo != null) sectionInfo.setImageHeight(((double)imageInfo.getHeight()/imageInfo.getWidth())*((double)this.dispW/this.dispH));
-			} else if (this.imageSizeType == SectionInfo.IMAGE_SIZE_TYPE_ASPECT) sectionInfo.setImageFitW(true);
+			sectionInfo.setImageFitW(true);
 			break;
 		case PageBreakTrigger.IMAGE_PAGE_H:
-			//他kさ100%指定
+			//高さ100%指定
 			sectionInfo.setImagePage(true);
-			if (this.imageSizeType != SectionInfo.IMAGE_SIZE_TYPE_AUTO) sectionInfo.setImageFitH(true);
+			sectionInfo.setImageFitH(true);
 			break;
 		case PageBreakTrigger.IMAGE_PAGE_NOFIT:
 			sectionInfo.setImagePage(true);
@@ -1071,33 +1074,34 @@ public class Epub3Writer
 			}
 			//タグ外なら単ページ化
 			if (imageInfo.getWidth() >= this.singlePageWidth || imageInfo.getWidth() >= singlePageSizeW && imageInfo.getHeight() >= singlePageSizeH) {
-				//拡大しない＆画面より小さい場合
-				if (!this.fitImage && imageInfo.getWidth() <= this.dispW && imageInfo.getHeight() < this.dispH) {
-					if (tagLevel == 0) return PageBreakTrigger.IMAGE_PAGE_NOFIT;
-				}
-				//拡大するか画面より多きい場合
-				//画面より横長
-				else if ((double)imageInfo.getWidth()/imageInfo.getHeight() > (double)this.dispW/this.dispH) {
-					if (this.rotateAngle != 0 && this.dispW < this.dispH && imageInfo.getWidth() > imageInfo.getHeight()*1.1) { //縦長画面で110%以上横長
-						imageInfo.rotateAngle = this.rotateAngle;
-						if (tagLevel == 0) {
-							if ((double)imageInfo.getHeight()/imageInfo.getWidth() > (double)dispW/dispH) return PageBreakTrigger.IMAGE_PAGE_W; //回転後画面より横長
-							return PageBreakTrigger.IMAGE_PAGE_H;
-						}
+				if (tagLevel == 0) {
+					if (imageInfo.getWidth() <= this.dispW && imageInfo.getHeight() < this.dispH) {
+						//画面より小さい場合
+						if (!this.fitImage) return PageBreakTrigger.IMAGE_PAGE_NOFIT;
 					} else {
-						if (tagLevel == 0) return PageBreakTrigger.IMAGE_PAGE_W;
+						//画面より大きく、サイズ指定無し
+						if (this.imageSizeType == SectionInfo.IMAGE_SIZE_TYPE_AUTO) return PageBreakTrigger.IMAGE_PAGE_NOFIT;
 					}
-				}
-				//画面より縦長
-				else {
-					if (this.rotateAngle != 0 && this.dispW > this.dispH && imageInfo.getWidth()*1.1 < imageInfo.getHeight()) { //横長画面で110%以上縦長
-						imageInfo.rotateAngle = this.rotateAngle;
-						if (tagLevel == 0) {
+					//拡大するか画面より多きい場合
+					//画面より横長
+					if ((double)imageInfo.getWidth()/imageInfo.getHeight() > (double)this.dispW/this.dispH) {
+						if (this.rotateAngle != 0 && this.dispW < this.dispH && imageInfo.getWidth() > imageInfo.getHeight()*1.1) { //縦長画面で110%以上横長
+							imageInfo.rotateAngle = this.rotateAngle;
 							if ((double)imageInfo.getHeight()/imageInfo.getWidth() > (double)dispW/dispH) return PageBreakTrigger.IMAGE_PAGE_W; //回転後画面より横長
 							return PageBreakTrigger.IMAGE_PAGE_H;
+						} else {
+							return PageBreakTrigger.IMAGE_PAGE_W;
 						}
-					} else {
-						if (tagLevel == 0) return PageBreakTrigger.IMAGE_PAGE_H;
+					}
+					//画面より縦長
+					else {
+						if (this.rotateAngle != 0 && this.dispW > this.dispH && imageInfo.getWidth()*1.1 < imageInfo.getHeight()) { //横長画面で110%以上縦長
+							imageInfo.rotateAngle = this.rotateAngle;
+							if ((double)imageInfo.getHeight()/imageInfo.getWidth() > (double)dispW/dispH) return PageBreakTrigger.IMAGE_PAGE_W; //回転後画面より横長
+							return PageBreakTrigger.IMAGE_PAGE_H;
+						} else {
+							return PageBreakTrigger.IMAGE_PAGE_H;
+						}
 					}
 				}
 				LogAppender.warn(lineNum, "タグ内のため画像単ページ化できません");

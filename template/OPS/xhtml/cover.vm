@@ -21,8 +21,10 @@ min-height: ${sectionInfo.ImageHeightPercent}%;
 </head>
 #if (${sectionInfo.ImageFitW})
 <body class="fit_w">
-#else
+#elseif (${sectionInfo.ImageFitH})
 <body class="fit_h">
+#else
+<body>
 #end
 <span class="img"><img src="../images/${coverImage.OutFileName}"/></span>
 </body>
