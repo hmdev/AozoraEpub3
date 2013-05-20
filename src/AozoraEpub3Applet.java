@@ -3542,9 +3542,9 @@ public class AozoraEpub3Applet extends JApplet
 		setPropsSelected(jCheckCommentPrint, props, "CommentPrint");
 		setPropsSelected(jCheckCommentConvert, props, "CommentConvert");
 		//空行除去
-		try { jComboxRemoveEmptyLine.setSelectedItem(Integer.parseInt(props.getProperty("RemoveEmptyLine"))); }catch (Exception e) {}
+		try { jComboxRemoveEmptyLine.setSelectedItem(Integer.parseInt(props.getProperty("RemoveEmptyLine"))); } catch (Exception e) {}
 		propValue = props.getProperty("MaxEmptyLine");
-		jComboxMaxEmptyLine.setSelectedItem(propValue==null?"0":propValue);
+		try { jComboxMaxEmptyLine.setSelectedIndex(Integer.parseInt(propValue)); } catch (Exception e) {}
 		//行頭字下げ追加
 		setPropsSelected(jCheckForceIndent, props, "ForceIndent");
 		//強制改ページ

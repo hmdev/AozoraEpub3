@@ -1336,7 +1336,7 @@ public class AozoraEpub3Converter
 	/** 前方参照注記をインライン注記に変換
 	 * 重複等の法則が変則すぎるのでバッファを利用
 	 * 前にルビがあって｜で始まる場合は｜の前に追加 */
-	private String replaceChukiSufTag(String line)
+	public String replaceChukiSufTag(String line)
 	{
 		Matcher m = chukiSufPattern.matcher(line);
 		
@@ -2219,11 +2219,8 @@ public class AozoraEpub3Converter
 						if (this.autoYokoNum3 && i+2<ch.length && CharUtils.isNum(ch[i+1]) && CharUtils.isNum(ch[i+2])) {
 							//数字3文字
 							//前後が半角かチェック
-							if (i>0 && CharUtils.isHalf(ch[i-1])) break;
-							if (i+3<ch.length && CharUtils.isHalf(ch[i+3])) break;
-							//半角スペースの前後が半角文字
-							if (i>1 && ch[i-1]==' ' && CharUtils.isHalf(ch[i-2])) break;
-							if (i+4<ch.length && ch[i+3]==' ' && CharUtils.isHalf(ch[i+3])) break;
+							if (!this.checkTcyPrev(ch, i-1)) break;
+							if (!this.checkTcyNext(ch, i+3)) break;
 							buf.append(chukiMap.get("縦中横")[0]);
 							buf.append(ch[i]);
 							buf.append(ch[i+1]);
@@ -2234,11 +2231,8 @@ public class AozoraEpub3Converter
 						} else if (i+1<ch.length && CharUtils.isNum(ch[i+1])) {
 							//数字2文字
 							//前後が半角かチェック
-							if (i>0 && CharUtils.isHalf(ch[i-1])) break;
-							if (i+2<ch.length && CharUtils.isHalf(ch[i+2])) break;
-							//半角スペースの前後が半角文字
-							if (i>1 && ch[i-1]==' ' && CharUtils.isHalf(ch[i-2])) break;
-							if (i+3<ch.length && ch[i+2]==' ' && CharUtils.isHalf(ch[i+3])) break;
+							if (!this.checkTcyPrev(ch, i-1)) break;
+							if (!this.checkTcyNext(ch, i+2)) break;
 							buf.append(chukiMap.get("縦中横")[0]);
 							buf.append(ch[i]);
 							buf.append(ch[i+1]);
@@ -2248,11 +2242,8 @@ public class AozoraEpub3Converter
 						} else if (this.autoYokoNum1 && (i==0 || !CharUtils.isNum(ch[i-1])) && (i+1==ch.length || !CharUtils.isNum(ch[i+1]))) {
 							//数字1文字
 							//前後が半角かチェック
-							if (i>0 && CharUtils.isHalf(ch[i-1])) break;
-							if (i+1<ch.length && CharUtils.isHalf(ch[i+1])) break;
-							//半角スペースの前後が半角文字
-							if (i>1 && ch[i-1]==' ' && CharUtils.isHalf(ch[i-2])) break;
-							if (i+2<ch.length && ch[i+1]==' ' && CharUtils.isHalf(ch[i+2])) break;
+							if (!this.checkTcyPrev(ch, i-1)) break;
+							if (!this.checkTcyNext(ch, i+1)) break;
 							buf.append(chukiMap.get("縦中横")[0]);
 							buf.append(ch[i]);
 							buf.append(chukiMap.get("縦中横終わり")[0]);
@@ -2289,11 +2280,8 @@ public class AozoraEpub3Converter
 						if (autoYokoEQ3 && i+2<ch.length && (ch[i+1]=='!' || ch[i+1]=='?') && (ch[i+2]=='!' || ch[i+2]=='?')) {
 							//!? 3文字を縦中横で出力
 							//前後が半角かチェック
-							if (i!=0 && CharUtils.isHalf(ch[i-1])) break;
-							if (i+3<ch.length && CharUtils.isHalf(ch[i+3])) break;
-							//半角スペースの前後が半角文字
-							if (i>1 && ch[i-1]==' ' && CharUtils.isHalf(ch[i-2])) break;
-							if (i+4<ch.length && ch[i+3]==' ' && CharUtils.isHalf(ch[i+4])) break;
+							if (!this.checkTcyPrev(ch, i-1)) break;
+							if (!this.checkTcyNext(ch, i+3)) break;
 							buf.append(chukiMap.get("縦中横")[0]);
 							buf.append(ch[i]);
 							buf.append(ch[i+1]);
@@ -2304,11 +2292,8 @@ public class AozoraEpub3Converter
 						} else if (i+1<ch.length && (ch[i+1]=='!' || ch[i+1]=='?')) {
 							//!? 2文字を縦横中で出力
 							//前後が半角かチェック
-							if (i!=0 && CharUtils.isHalf(ch[i-1])) break;
-							if (i+2<ch.length && CharUtils.isHalf(ch[i+2])) break;
-							//半角スペースの前後が半角文字
-							if (i>1 && ch[i-1]==' ' && CharUtils.isHalf(ch[i-2])) break;
-							if (i+3<ch.length && ch[i+2]==' ' && CharUtils.isHalf(ch[i+3])) break;
+							if (!this.checkTcyPrev(ch, i-1)) break;
+							if (!this.checkTcyNext(ch, i+2)) break;
 							buf.append(chukiMap.get("縦中横")[0]);
 							buf.append(ch[i]);
 							buf.append(ch[i+1]);
@@ -2318,11 +2303,8 @@ public class AozoraEpub3Converter
 						} else if (autoYokoEQ1 && (i==0 || !CharUtils.isNum(ch[i-1])) && (i+1==ch.length || !CharUtils.isNum(ch[i+1]))) {
 							//!? 1文字
 							//前後が半角かチェック
-							if (i>0 && CharUtils.isHalf(ch[i-1])) break;
-							if (i+1<ch.length && CharUtils.isHalf(ch[i+1])) break;
-							//半角スペースの前後が半角文字
-							if (i>1 && ch[i-1]==' ' && CharUtils.isHalf(ch[i-2])) break;
-							if (i+2<ch.length && ch[i+1]==' ' && CharUtils.isHalf(ch[i+2])) break;
+							if (!this.checkTcyPrev(ch, i-1)) break;
+							if (!this.checkTcyNext(ch, i+1)) break;
 							buf.append(chukiMap.get("縦中横")[0]);
 							buf.append(ch[i]);
 							buf.append(chukiMap.get("縦中横終わり")[0]);
@@ -2340,6 +2322,49 @@ public class AozoraEpub3Converter
 			//自動縦中横で出力していたらcontinueしていてここは実行されない
 			convertTcyChar(buf, ch, i, noTcy);
 		}
+	}
+	
+	/** 自動縦中横の前の半角チェック タグは無視
+	 * @param i 縦中横文字の前の文字の位置 */
+	public boolean checkTcyPrev(char[] ch, int i)
+	{
+		while (i >= 0) {
+			if (ch[i] == '>') {
+				do {
+					i--;
+				} while (i >= 0 && ch[i] != '<');
+				i--;
+				continue;
+			}
+			if (ch[i] == ' ') {
+				i--; //半角スペースは無視
+				continue;
+			}
+			if (CharUtils.isHalf(ch[i])) return false;
+			return true;
+		}
+		return true;
+	}
+	/** 自動縦中横の後ろ半角チェック タグは無視
+	 * @param i 縦中横文字の次の文字の位置 */
+	public boolean checkTcyNext(char[] ch, int i)
+	{
+		while (i < ch.length) {
+			if (ch[i] == '<') {
+				do {
+					i++;
+				} while (i < ch.length && ch[i] != '>');
+				i++;
+				continue;
+			}
+			if (ch[i] == ' ') {
+				i++; //半角スペースは無視
+				continue;
+			}
+			if (CharUtils.isHalf(ch[i])) return false;
+			return true;
+		}
+		return true;
 	}
 	
 	/** 出力バッファに文字出力 
