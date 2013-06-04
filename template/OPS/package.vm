@@ -12,9 +12,9 @@
 #end
 #if (${creator})
 #if (${creatorAs})
-		<dc:creator id="creator" opf:role="aut" opf:file-as="${creatorAs}">${creator}</dc:creator>
+		<dc:creator id="creator" opf:file-as="${creatorAs}">${creator}</dc:creator>
 #else
-		<dc:creator id="creator" opf:role="aut">${creator}</dc:creator>
+		<dc:creator id="creator">${creator}</dc:creator>
 #end
 		<meta refines="#creator" property="dcterms:creator">${creator}</meta>
 #if (${creatorAs})

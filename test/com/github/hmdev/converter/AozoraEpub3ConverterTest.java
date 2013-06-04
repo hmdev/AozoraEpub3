@@ -32,29 +32,48 @@ public class AozoraEpub3ConverterTest
 	@Test
 	public void testCheckTcyPrev()
 	{
-		Assert.assertTrue(converter.checkTcyPrev("10".toCharArray(), -1));
-		Assert.assertTrue(converter.checkTcyPrev("<a href=\"aaa\">10</a>".toCharArray(), 13));
-		Assert.assertTrue(converter.checkTcyPrev("<a href=\"aaa\"> 10</a>".toCharArray(), 14));
-		Assert.assertTrue(converter.checkTcyPrev("<b><a href=\"aaa\">10</a></b>".toCharArray(), 16));
-		Assert.assertTrue(converter.checkTcyPrev("あ<b><a href=\"aaa\">10</a></b>".toCharArray(), 17));
+		String prev, cur, next;
+		prev = ""; cur = "10"; next = "";
+		Assert.assertTrue(converter.checkTcyPrev((prev+cur+next).toCharArray(), prev.length()-1));
+		prev = "<a href=\"aaa\">"; cur = "10"; next = "</a>";
+		Assert.assertTrue(converter.checkTcyPrev((prev+cur+next).toCharArray(), prev.length()-1));
+		prev = "<a href=\"aaa\"> "; cur = "10"; next = " </a>";
+		Assert.assertTrue(converter.checkTcyPrev((prev+cur+next).toCharArray(), prev.length()-1));
+		prev = "<b> <a href=\"aaa\"> "; cur = "10"; next = " </a></b>";
+		Assert.assertTrue(converter.checkTcyPrev((prev+cur+next).toCharArray(), prev.length()-1));
+		prev = " あ<b> <a href=\"aaa\"> "; cur = "10"; next = " </a></b>";
+		Assert.assertTrue(converter.checkTcyPrev((prev+cur+next).toCharArray(), prev.length()-1));
 		
-		Assert.assertFalse(converter.checkTcyPrev("a10".toCharArray(), 0));
-		Assert.assertFalse(converter.checkTcyPrev("a 10".toCharArray(), 1));
-		Assert.assertFalse(converter.checkTcyPrev("a<b><a href=\"aaa\">10</a></b>".toCharArray(), 17));
+		prev = "a"; cur = "10"; next = "";
+		Assert.assertFalse(converter.checkTcyPrev((prev+cur+next).toCharArray(), prev.length()-1));
+		prev = "a "; cur = "10"; next = "";
+		Assert.assertFalse(converter.checkTcyPrev((prev+cur+next).toCharArray(), prev.length()-1));
+		prev = "a<b><a href=\"aaa\">"; cur = "10"; next = "</a></b>";
+		Assert.assertFalse(converter.checkTcyPrev((prev+cur+next).toCharArray(), prev.length()-1));
 	}
 	
 	@Test
 	public void testCheckTcyNext()
 	{
-		Assert.assertTrue(converter.checkTcyNext("10".toCharArray(), 2));
-		Assert.assertTrue(converter.checkTcyNext("<a href=\"aaa\">10</a>".toCharArray(), 16));
-		Assert.assertTrue(converter.checkTcyNext("<a href=\"aaa\"> 10 </a>".toCharArray(), 17));
-		Assert.assertTrue(converter.checkTcyNext("<b><a href=\"aaa\">10</a></b>".toCharArray(), 19));
-		Assert.assertTrue(converter.checkTcyNext("<b><a href=\"aaa\">10</a></b>あ".toCharArray(), 19));
+		String prev, cur, next;
+		prev = ""; cur = "10"; next = "";
+		Assert.assertTrue(converter.checkTcyNext((prev+cur+next).toCharArray(), prev.length()+cur.length()));
+		prev = "<a href=\"aaa\">"; cur = "10"; next = "</a>";
+		Assert.assertTrue(converter.checkTcyNext((prev+cur+next).toCharArray(), prev.length()+cur.length()));
+		prev = "<a href=\"aaa\"> "; cur = "10"; next = "</a>";
+		Assert.assertTrue(converter.checkTcyNext((prev+cur+next).toCharArray(), prev.length()+cur.length()));
+		prev = "<b><a href=\"aaa\">"; cur = "10"; next = "</a></b>";
+		Assert.assertTrue(converter.checkTcyNext((prev+cur+next).toCharArray(), prev.length()+cur.length()));
+		prev = "<b><a href=\"aaa\">"; cur = "10"; next = "</a></b>あ";
+		Assert.assertTrue(converter.checkTcyNext((prev+cur+next).toCharArray(), prev.length()+cur.length()));
 		
-		Assert.assertFalse(converter.checkTcyNext("a10a".toCharArray(), 3));
-		Assert.assertFalse(converter.checkTcyNext("a 10a".toCharArray(), 4));
-		Assert.assertFalse(converter.checkTcyNext("a<b><a href=\"aaa\">10</a></b>a".toCharArray(), 20));
-		Assert.assertFalse(converter.checkTcyNext("a<b><a href=\"aaa\">10</a></b> a".toCharArray(), 20));
+		prev = ""; cur = "10"; next = "a";
+		Assert.assertFalse(converter.checkTcyNext((prev+cur+next).toCharArray(), prev.length()+cur.length()));
+		prev = " "; cur = "10"; next = " a";
+		Assert.assertFalse(converter.checkTcyNext((prev+cur+next).toCharArray(), prev.length()+cur.length()));
+		prev = "a<b><a href=\"aaa\">"; cur = "10"; next = "</a></b>a";
+		Assert.assertFalse(converter.checkTcyNext((prev+cur+next).toCharArray(), prev.length()+cur.length()));
+		prev = "<b><a href=\"aaa\">"; cur = "10"; next = "</a></b> a";
+		Assert.assertFalse(converter.checkTcyNext((prev+cur+next).toCharArray(), prev.length()+cur.length()));
 	}
 }

@@ -1336,7 +1336,7 @@ public class AozoraEpub3Converter
 	/** 前方参照注記をインライン注記に変換
 	 * 重複等の法則が変則すぎるのでバッファを利用
 	 * 前にルビがあって｜で始まる場合は｜の前に追加 */
-	public String replaceChukiSufTag(String line)
+	String replaceChukiSufTag(String line)
 	{
 		Matcher m = chukiSufPattern.matcher(line);
 		
@@ -2326,7 +2326,7 @@ public class AozoraEpub3Converter
 	
 	/** 自動縦中横の前の半角チェック タグは無視
 	 * @param i 縦中横文字の前の文字の位置 */
-	public boolean checkTcyPrev(char[] ch, int i)
+	boolean checkTcyPrev(char[] ch, int i)
 	{
 		while (i >= 0) {
 			if (ch[i] == '>') {
@@ -2347,7 +2347,7 @@ public class AozoraEpub3Converter
 	}
 	/** 自動縦中横の後ろ半角チェック タグは無視
 	 * @param i 縦中横文字の次の文字の位置 */
-	public boolean checkTcyNext(char[] ch, int i)
+	boolean checkTcyNext(char[] ch, int i)
 	{
 		while (i < ch.length) {
 			if (ch[i] == '<') {
