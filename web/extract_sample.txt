@@ -50,7 +50,7 @@ HREF	a	^\/novel\.php\?mode=rd\&
 ## (HREFと1:1で対応している必要有り)
 SUB_UPDATE	.long_update
 
-##本文に日付が無い場合 公開。更新日時の文字列に利用
+##本文に日付が無い場合 公開・更新日時の文字列に利用
 #CONTENT_UPDATE_LIST	.long_update	^(.+?)(<span title=\"(.+?)\".*)?$	$1 公開　$3
 
 ##一覧ページのタイトル (本文側に無ければこれを利用)
@@ -95,5 +95,5 @@ CONTENT_PREAMBLE	.novel_p .novel_view:0
 #CONTENT_APPENDIX_START	.novel_a .novel_view hr:1
 ## 補足 (再帰的に出力するので置換設定無効)
 CONTENT_APPENDIX	.novel_a .novel_view:0
-## 前書き 抽出終了 このタグの前まで
+## 補足 抽出終了 このタグの前まで
 #CONTENT_APPENDIX_END	.novel_a .novel_view p:-1
