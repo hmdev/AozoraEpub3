@@ -198,6 +198,20 @@ public class CharUtils
 		return getChapterName(line, maxLength, true);
 	}
 	
+	/** BOMが文字列の先頭にある場合は除去 */
+	static public String removeBOM(String str)
+	{
+		if (str != null && str.length() > 0) {
+			if (Integer.toHexString(str.charAt(0)).equals("feff")) {
+				return str.substring(1);
+			} else {
+				return str;
+			}
+		} else {
+			return null;
+		}
+	}
+	
 	////////////////////////////////////////////////////////////////
 	/** Test用 */
 	/*public static void main(String[] args)

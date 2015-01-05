@@ -1037,7 +1037,14 @@ public class AozoraEpub3Converter
 			noImage = true;
 		}
 		
-		while ((line = src.readLine()) != null) {
+		//先頭行取得
+		line = src.readLine();
+		if (line == null) {
+			return;
+		}
+		//BOM除去
+		line = CharUtils.removeBOM(line);
+		do {
 			lineNum++;
 			
 			if (skipTitle) {
@@ -1163,7 +1170,7 @@ public class AozoraEpub3Converter
 			}
 			
 			if (tagLevel == 0) lastZeroTagLevelLineNum = lineNum;
-		}
+		} while ((line = src.readLine()) != null);
 		
 		} catch (Exception e) {
 			e.printStackTrace();
