@@ -36,7 +36,7 @@ import com.github.hmdev.web.ExtractInfo.ExtractId;
 /** HTMLを青空txtに変換 */
 public class WebAozoraConverter
 {
-	final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
+	final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 	
 	/** Singletonインスタンス格納 keyはFQDN */
 	static HashMap<String, WebAozoraConverter> converters = new HashMap<String, WebAozoraConverter>();
