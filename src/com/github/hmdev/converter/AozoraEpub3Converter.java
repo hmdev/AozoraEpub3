@@ -2460,10 +2460,10 @@ public class AozoraEpub3Converter
 			case '‼': case '⁇': case '⁉': case '⁈':
 			case '©': case '®': case '⁑': case '⁂':
 			case '◐': case '◑': case '◒': case '◓': case '▷': case '▶': case '◁': case '◀':
-			case '♤': case '♠': case '♢': case '♦': case '♡': case '♥': case '♧': case '♣': 
+			case '♤': case '♠': case '♢': case '♦': case '♡': case '♥': case '♧': case '♣': case '❤':
 			case '☖': case '☗': case '☎': case '☁': case '☂': case '☃': case '♨': case '▱': case '⊿': case '✿':
 			case '☹': case '☺': case '☻':
-			case '✓': case '␣': case '⏎': case '♩': case '♮': case '♫': case '♬': case 'ℓ': case '№': case '℡':
+			case '✓': case '✔': case '␣': case '⏎': case '♩': case '♮': case '♫': case '♬': case 'ℓ': case '№': case '℡':
 			case 'ℵ': case 'ℏ': case '℧':
 				//縦中横の中でなければタグで括る
 				if (!(inYoko || noTcy)) {

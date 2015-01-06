@@ -83,6 +83,8 @@ CONTENT_IMG	.novel_img img
 CONTENT_ARTICLE	.novel_body
 ## 本文 抽出終了 このタグの前まで
 #CONTENT_ARTICLE_END	.novel_body hr:-1
+## 本文が複数のElememtの場合に間に入れるセパレータ (CssQuery部分に追加文字列を設定)
+#CONTENT_ARTICLE_SEPARATOR	［＃空行］［＃区切り線］［＃空行］
 
 ## 前書き 抽出開始 このタグの次から
 #CONTENT_PREAMBLE_START	.novel_p .novel_view p:1

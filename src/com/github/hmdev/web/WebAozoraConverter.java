@@ -611,10 +611,19 @@ public class WebAozoraConverter
 				bw.append("\n\n");
 			}
 			//本文
+			String separator = null;
+			ExtractInfo[] separatorInfo = this.queryMap.get(ExtractId.CONTENT_ARTICLE_SEPARATOR);
+			if (separatorInfo != null && separatorInfo.length > 0) {
+				separator = separatorInfo[0].query;
+			}
 			boolean first = true;
 			for (Element elem : contentDivs) {
 				//複数のDivの場合は間に改行追加
-				if (first) first = false; else bw.append("\n");
+				if (first) first = false;
+				else {
+					bw.append("\n");
+					if (separator != null) bw.append(separator);
+				}
 				Element startElement = getExtractFirstElement(doc, this.queryMap.get(ExtractId.CONTENT_ARTICLE_START));
 				Element endElement = getExtractFirstElement(doc, this.queryMap.get(ExtractId.CONTENT_ARTICLE_END));
 				printNode(bw, elem, startElement, endElement, false);
