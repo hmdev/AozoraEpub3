@@ -202,7 +202,7 @@ public class CharUtils
 	static public String removeBOM(String str)
 	{
 		if (str != null && str.length() > 0) {
-			if (Integer.toHexString(str.charAt(0)).equals("feff")) {
+			if (str.charAt(0) == 0xFEFF) {
 				return str.substring(1);
 			} else {
 				return str;

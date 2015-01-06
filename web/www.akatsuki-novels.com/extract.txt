@@ -11,7 +11,7 @@
 ## シリーズタイトル
 ##SERIES	a#LookNovel:0	
 ## タイトル
-TITLE	a#LookNovel:0	
+TITLE	a#LookNovel:0,h2:0	
 ## 著者
 AUTHOR	h3.font-bb a:1	
 ## 説明
@@ -32,9 +32,9 @@ CONTENT_UPDATE_LIST	.list .font-s	&nbsp;
 ###各話の抽出設定
 
 ## 各話 Chapter 先頭の章のみ大見出しで出力
-CONTENT_CHAPTER	h2:0
+#CONTENT_CHAPTER	
 ## 各話 章タイトル 中見出しで出力
-#CONTENT_SUBTITLE		
+CONTENT_SUBTITLE	h2:0
 
 ## 各話 本文 + 前書き + 後書き
 CONTENT_ARTICLE	.body-novel

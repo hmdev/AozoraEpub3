@@ -441,24 +441,23 @@ public class WebAozoraConverter
 					}
 					i++;
 				}
-				//底本にURL追加
-				bw.append("\n［＃改ページ］\n");
-				bw.append("底本： ");
-				bw.append("<a href=\"");
-				bw.append(urlString);
-				bw.append("\">");
-				bw.append(urlString);
-				bw.append("</a>");
-				bw.append('\n');
-				bw.append("変換日時： ");
-				bw.append(dateFormat.format(new Date()));
-				bw.append('\n');
-				
 				if (!updated) {
 					LogAppender.append(title);
 					LogAppender.println(" の更新はありません");
 				}
 			}
+			//底本にURL追加
+			bw.append("\n［＃改ページ］\n");
+			bw.append("底本： ");
+			bw.append("<a href=\"");
+			bw.append(urlString);
+			bw.append("\">");
+			bw.append(urlString);
+			bw.append("</a>");
+			bw.append('\n');
+			bw.append("変換日時： ");
+			bw.append(dateFormat.format(new Date()));
+			bw.append('\n');
 			
 		} finally {
 			bw.close();
@@ -612,7 +611,10 @@ public class WebAozoraConverter
 				bw.append("\n\n");
 			}
 			//本文
+			boolean first = true;
 			for (Element elem : contentDivs) {
+				//複数のDivの場合は間に改行追加
+				if (first) first = false; else bw.append("\n");
 				Element startElement = getExtractFirstElement(doc, this.queryMap.get(ExtractId.CONTENT_ARTICLE_START));
 				Element endElement = getExtractFirstElement(doc, this.queryMap.get(ExtractId.CONTENT_ARTICLE_END));
 				printNode(bw, elem, startElement, endElement, false);

@@ -1834,7 +1834,7 @@ public class AozoraEpub3Converter
 					
 					String href = getTagAttr(chukiTag, "href");
 					if (href != null && href.startsWith("http")) {
-						buf.append(chukiTag);
+						buf.append(chukiTag.replaceAll("&", "&amp;"));
 						linkStarted = true;
 					} else {
 						linkStarted = false;
@@ -2039,8 +2039,15 @@ public class AozoraEpub3Converter
 				break;
 			}
 		}
+		//NULLや非表示文字は除去
 		for (int idx=begin; idx<end; idx++) {
 			switch (ch[idx]) {
+			case '\0':
+			case 0xFE00: case 0xFE01: case 0xFE02: case 0xFE03:
+			case 0xFE04: case 0xFE05: case 0xFE06: case 0xFE07:
+			case 0xFE08: case 0xFE09: case 0xFE0A: case 0xFE0B:
+			case 0xFE0C: case 0xFE0D: case 0xFE0E: case 0xFE0F:
+				break;
 			case '&': buf.append("&amp;"); break;
 			case '<': buf.append("&lt;"); break;
 			case '>': buf.append("&gt;"); break;
