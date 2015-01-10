@@ -2,6 +2,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -14,6 +15,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
+import org.apache.commons.compress.utils.IOUtils;
 
 import com.github.hmdev.converter.AozoraEpub3Converter;
 import com.github.hmdev.image.ImageInfoReader;
@@ -22,6 +24,9 @@ import com.github.hmdev.info.SectionInfo;
 import com.github.hmdev.util.LogAppender;
 import com.github.hmdev.writer.Epub3ImageWriter;
 import com.github.hmdev.writer.Epub3Writer;
+import com.github.junrar.Archive;
+import com.github.junrar.exception.RarException;
+import com.github.junrar.rarfile.FileHeader;
 
 /** コマンドライン実行用mainとePub3変換関数 */
 public class AozoraEpub3
@@ -304,6 +309,17 @@ public class AozoraEpub3
 						e.printStackTrace();
 					}
 					if (txtCount == 0) { txtCount = 1; imageOnly = true; }
+				} else if("rar".equals(ext)) { 
+					try {
+						txtCount = AozoraEpub3.countRarText(srcFile);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					if (txtCount == 0) { txtCount = 1; imageOnly = true; }
+					else {
+						LogAppender.println("rarは画像のみ変換可能です");
+						return;
+					}
 				} else if ("cbz".equals(ext)) {
 					imageOnly = true;
 				}
@@ -328,7 +344,11 @@ public class AozoraEpub3
 					
 					Epub3Writer writer = epub3Writer;
 					if (!isFile) {
-						imageInfoReader.loadZipImageInfos(srcFile, imageOnly);
+						if ("rar".equals(ext)) {
+							imageInfoReader.loadRarImageInfos(srcFile, imageOnly);
+						} else {
+							imageInfoReader.loadZipImageInfos(srcFile, imageOnly);
+						}
 						if (imageOnly) {
 							LogAppender.println("画像のみのePubファイルを生成します");
 							//画像出力用のBookInfo生成
@@ -391,7 +411,7 @@ public class AozoraEpub3
 							encType, bookInfo, imageInfoReader, txtIdx);
 				}
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -430,7 +450,7 @@ public class AozoraEpub3
 	{
 		try {
 			String[] textEntryName = new String[1];
-			InputStream is = AozoraEpub3.getInputStream(srcFile, ext, imageInfoReader, textEntryName, txtIdx);
+			InputStream is = AozoraEpub3.getTextInputStream(srcFile, ext, imageInfoReader, textEntryName, txtIdx);
 			if (is == null) return null;
 			
 			//タイトル、画像注記、左右中央注記、目次取得
@@ -462,7 +482,7 @@ public class AozoraEpub3
 			//入力Stream再オープン
 			BufferedReader src = null;
 			if (!bookInfo.imageOnly) {
-				src = new BufferedReader(new InputStreamReader(getInputStream(srcFile, ext, null, null, txtIdx), encType));
+				src = new BufferedReader(new InputStreamReader(getTextInputStream(srcFile, ext, null, null, txtIdx), encType));
 			}
 			
 			//ePub書き出し srcは中でクローズされる
@@ -485,12 +505,13 @@ public class AozoraEpub3
 	 * @param imageInfoReader
 	 * @param txtIdx テキストファイルのZip内の位置
 	 * @return テキストファイルのストリーム (close()は呼び出し側ですること)
+	 * @throws RarException 
 	 */
-	@SuppressWarnings("resource")
-	static public InputStream getInputStream(File srcFile, String ext, ImageInfoReader imageInfoReader, String[] textEntryName, int txtIdx) throws IOException
+	static public InputStream getTextInputStream(File srcFile, String ext, ImageInfoReader imageInfoReader, String[] textEntryName, int txtIdx) throws IOException, RarException
 	{
-		InputStream is = null;
-		if ("zip".equals(ext) || "txtz".equals(ext)) {
+		if ("txt".equals(ext)) {
+			return new FileInputStream(srcFile);
+		} else if ("zip".equals(ext) || "txtz".equals(ext)) {
 			//Zipなら最初のtxt
 			ZipArchiveInputStream zis = new ZipArchiveInputStream(new BufferedInputStream(new FileInputStream(srcFile), 65536), "MS932", false);
 			ArchiveEntry entry;
@@ -499,22 +520,21 @@ public class AozoraEpub3
 				if (entryName.substring(entryName.lastIndexOf('.')+1).equalsIgnoreCase("txt") && txtIdx-- == 0) {
 					if (imageInfoReader != null) imageInfoReader.setZipTextEntry(entryName);
 					if (textEntryName != null) textEntryName[0] = entryName;
-					is = zis; break;
+					return zis;
 				}
 			}
-			if (is == null) {
-				LogAppender.append("zip内にtxtファイルがありません: ");
-				LogAppender.println(srcFile.getName());
-				zis.close();
-				return null;
-			}
-		} else if ("txt".equals(ext)) {
-			is = new FileInputStream(srcFile);
+			LogAppender.append("zip内にtxtファイルがありません: ");
+			LogAppender.println(srcFile.getName());
+			return null;
+		} else if ("rar".equals(ext)) {
+			LogAppender.append("rarは画像のみ変換可能です : ");
+			LogAppender.println(srcFile.getName());
+			return null;
 		} else {
-			LogAppender.append("txt, zip, txtzのみ変換可能です: ");
+			LogAppender.append("txt, zip, txtz, cbz のみ変換可能です: ");
 			LogAppender.println(srcFile.getPath());
 		}
-		return is;
+		return null;
 	}
 	
 	/** Zipファイル内のテキストファイルの数を取得 */
@@ -522,12 +542,37 @@ public class AozoraEpub3
 	{
 		int txtCount = 0;
 		ZipArchiveInputStream zis = new ZipArchiveInputStream(new BufferedInputStream(new FileInputStream(zipFile), 65536), "MS932", false);
-		ArchiveEntry entry;
-		while ((entry = zis.getNextEntry()) != null) {
-			String entryName = entry.getName();
-			if (entryName.substring(entryName.lastIndexOf('.')+1).equalsIgnoreCase("txt")) txtCount++;
+		try {
+			ArchiveEntry entry;
+			while ((entry = zis.getNextEntry()) != null) {
+				String entryName = entry.getName();
+				if (entryName.substring(entryName.lastIndexOf('.')+1).equalsIgnoreCase("txt")) txtCount++;
+			}
+		} finally {
+			zis.close();
 		}
-		zis.close();
+		return txtCount;
+	}
+	
+	/** Ripファイル内のテキストファイルの数を取得 */
+	static public int countRarText(File rarFile) throws IOException, RarException
+	{
+		int txtCount = 0;
+		try {
+		Archive archive = new Archive(rarFile);
+		try {
+			for (FileHeader fileHeader : archive.getFileHeaders()) {
+				if (!fileHeader.isDirectory()) { 
+					String entryName = fileHeader.getFileNameString();
+					if (entryName.substring(entryName.lastIndexOf('.')+1).equalsIgnoreCase("txt")) txtCount++;
+				}
+			}
+		} finally {
+			archive.close();
+		}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return txtCount;
 	}
 	

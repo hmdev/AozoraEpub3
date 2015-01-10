@@ -3,8 +3,6 @@ package com.github.hmdev.writer;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -15,13 +13,15 @@ import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
-import org.apache.commons.compress.utils.IOUtils;
 import org.apache.velocity.app.Velocity;
 
 import com.github.hmdev.converter.AozoraEpub3Converter;
 import com.github.hmdev.info.ImageInfo;
 import com.github.hmdev.info.SectionInfo;
 import com.github.hmdev.util.LogAppender;
+import com.github.junrar.Archive;
+import com.github.junrar.exception.RarException;
+import com.github.junrar.rarfile.FileHeader;
 
 /** ePub3用のファイル一式をZipで固めたファイルを生成.
  * 画像のみのZipの場合こちらで画像専用の処理を行う
@@ -65,9 +65,10 @@ public class Epub3ImageWriter extends Epub3Writer
 	}
 	
 	/** 本文を出力する
-	 * setFileNamesで sortedFileNames が設定されている必要がある */
+	 * setFileNamesで sortedFileNames が設定されている必要がある 
+	 * @throws RarException */
 	@Override
-	void writeSections(AozoraEpub3Converter converter, BufferedReader src, BufferedWriter bw, File srcFile, ZipArchiveOutputStream zos) throws IOException
+	void writeSections(AozoraEpub3Converter converter, BufferedReader src, BufferedWriter bw, File srcFile, String srcExt, ZipArchiveOutputStream zos) throws IOException, RarException
 	{
 		Vector<String> vecFileName = new Vector<>();
 		//ファイル名取得してImageInfoのIDを設定
@@ -81,48 +82,32 @@ public class Epub3ImageWriter extends Epub3Writer
 		//画像を出力して出力サイズを取得
 		zos.setLevel(0);
 		//サブパスの文字長
-		int zipPathLength = 0;
-		if (this.bookInfo.textEntryName != null) zipPathLength = this.bookInfo.textEntryName.indexOf('/')+1;
+		int archivePathLength = 0;
+		if (this.bookInfo.textEntryName != null) archivePathLength = this.bookInfo.textEntryName.indexOf('/')+1;
 		
-		//zipの場合 画像のみのZipはセクション出力時に画像も出力
-		ZipArchiveInputStream zis = new ZipArchiveInputStream(new BufferedInputStream(new FileInputStream(srcFile), 65536), "MS932", false);
-		try {
-		ArchiveEntry entry;
-		while( (entry = zis.getNextZipEntry()) != null ) {
-			//Zip内のサブフォルダは除外してテキストからのパスにする
-			String srcImageFileName = entry.getName().substring(zipPathLength);
-			srcImageFileName = imageInfoReader.correctExt(srcImageFileName); //拡張子修正
-			ImageInfo imageInfo = imageInfoReader.getImageInfo(srcImageFileName);
-			//Zip内テキストの場合はidと出力ファイル名が登録されていなければ出力しない。
-			if (imageInfo != null) {
-				if (imageInfo.getId() != null) {
-					//回転チェック
-					if ((double)imageInfo.getWidth()/imageInfo.getHeight() >= (double)this.dispW/this.dispH) {
-						if (this.rotateAngle != 0 && this.dispW < this.dispH && (double)imageInfo.getHeight()/imageInfo.getWidth() < (double)this.dispW/this.dispH) { //縦長画面で横長
-							imageInfo.rotateAngle = this.rotateAngle;
-						}
-					} else {
-						if (this.rotateAngle != 0 && this.dispW > this.dispH && (double)imageInfo.getHeight()/imageInfo.getWidth() > (double)this.dispW/this.dispH) { //横長画面で縦長
-							imageInfo.rotateAngle = this.rotateAngle;
-						}
-					}
-					
-					zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+IMAGES_PATH+imageInfo.getOutFileName()));
-					//Zipからの直接読み込みは失敗するので一旦バイト配列にする
-					ByteArrayOutputStream baos = new ByteArrayOutputStream();
-					IOUtils.copy(zis, baos);
-					byte[] bytes = baos.toByteArray();
-					baos.close();
-					ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-					this.writeImage(bais, zos, imageInfo);
-					bais.close();
-					zos.closeArchiveEntry();
+		if ("rar".equals(srcExt)) {
+			Archive archive = new Archive(srcFile);
+			try {
+			for (FileHeader fileHeader : archive.getFileHeaders()) {
+				if (!fileHeader.isDirectory()) {
+					String entryName = fileHeader.getFileNameString();
+					//アーカイブ内のサブフォルダは除外してテキストからのパスにする
+					String srcImageFileName = entryName.substring(archivePathLength);
+					this.writeArchiveImage(srcImageFileName, archive.getInputStream(fileHeader));
 				}
-				if (this.canceled) return;
-				if (this.jProgressBar != null) this.jProgressBar.setValue(this.jProgressBar.getValue()+10);
 			}
+			} finally { archive.close(); }
+		} else {
+			ZipArchiveInputStream zis = new ZipArchiveInputStream(new BufferedInputStream(new FileInputStream(srcFile), 65536), "MS932", false);
+			try {
+			ArchiveEntry entry;
+			while( (entry = zis.getNextZipEntry()) != null ) {
+				//アーカイブ内のサブフォルダは除外してテキストからのパスにする
+				String srcImageFileName = entry.getName().substring(archivePathLength);
+				this.writeArchiveImage(srcImageFileName, zis);
+			}
+			} finally { zis.close(); }
 		}
-		} finally { zis.close(); }
 		
 		//画像xhtmlを出力
 		zos.setLevel(9);

@@ -329,8 +329,6 @@ public class AozoraEpub3Applet extends JApplet
 	File currentPath = null;
 	/** キャッシュ保存パス */
 	File cachePath = null;
-	/** RAR解凍先tmpパス */
-	File tmpPath = null;
 	/** Web小説取得情報格納パス */
 	File webConfigPath = null;
 	
@@ -2289,7 +2287,7 @@ public class AozoraEpub3Applet extends JApplet
 			
 			JFileChooser fileChooser = new JFileChooser(currentPath);
 			fileChooser.setDialogTitle("変換する青空文庫テキストを開く");
-			fileChooser.setFileFilter(new FileNameExtensionFilter("青空文庫(txt,zip),画像(zip),ショートカット(url)", new String[]{"txt","zip","cbz","txtz","url"}));
+			fileChooser.setFileFilter(new FileNameExtensionFilter("青空文庫(txt,zip,txtz),画像(zip,rar,cbz),ショートカット(url)", new String[]{"txt","zip","rar","cbz","txtz","url"}));
 			fileChooser.setMultiSelectionEnabled(true);
 			int state = fileChooser.showOpenDialog(parent);
 			switch (state) {
@@ -2400,9 +2398,10 @@ public class AozoraEpub3Applet extends JApplet
 						dstPath = null;
 					}
 					
-					//URL変換 の最後が .zip
-					if (urlString != null && urlString.toLowerCase().endsWith(".zip")) {
-						convertZip(urlString);
+					//URLの最後が .zip
+					String ext = urlString.substring(urlString.lastIndexOf('.')+1).toLowerCase();
+					if (urlString != null && (ext.equals("zip") || ext.equals("txtz"))) {
+						convertArchive(urlString);
 						return;
 					}
 					
@@ -2420,7 +2419,7 @@ public class AozoraEpub3Applet extends JApplet
 		}
 	}
 	
-	void convertZip(String urlString) throws IOException
+	void convertArchive(String urlString) throws IOException
 	{
 		//出力先が指定されていない
 		if (jComboDstPath.getSelectedIndex() == 0) {
@@ -2705,10 +2704,22 @@ public class AozoraEpub3Applet extends JApplet
 			LogAppender.println("--------");
 			try {
 				txtCount = AozoraEpub3.countZipText(srcFile);
-			} catch (IOException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			if (txtCount == 0) { txtCount = 1; imageOnly = true; }
+		} else if ("rar".equals(ext)) {
+			LogAppender.println("--------");
+			try {
+				txtCount = AozoraEpub3.countRarText(srcFile);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			if (txtCount == 0) { txtCount = 1; imageOnly = true; }
+			else {
+				LogAppender.println("rarは画像のみ変換可能です");
+				this.convertCanceled = true;
+			}
 		} else if ("cbz".equals(ext)) {
 			LogAppender.println("--------");
 			imageOnly = true;
@@ -2733,9 +2744,9 @@ public class AozoraEpub3Applet extends JApplet
 	{
 		if (txtIdx > 0) LogAppender.println("--------");
 		//パラメータ設定
-		if (!"txt".equals(ext) && !"txtz".equals(ext) && !"zip".equals(ext) && !"cbz".equals(ext) ) {
+		if (!"txt".equals(ext) && !"txtz".equals(ext) && !"zip".equals(ext) && !"cbz".equals(ext) && !"rar".equals(ext) ) {
 			if (!"png".equals(ext) && !"jpg".equals(ext) && !"jpeg".equals(ext) && !"gif".equals(ext)) {
-				LogAppender.println("txt, txtz, zip, cbz 以外は変換できません");
+				LogAppender.println("txt, txtz, zip, cbz rar 以外は変換できません");
 			}
 			return;
 		}
@@ -2758,8 +2769,13 @@ public class AozoraEpub3Applet extends JApplet
 		//zip内の画像をロード
 		try {
 			if (!isFile) {
-				//Zip内の画像情報読み込み 画像のみならファイル順も格納
-				imageInfoReader.loadZipImageInfos(srcFile, imageOnly);
+				if ("rar".equals(ext)) {
+					//Rar内の画像情報読み込み 画像のみならファイル順も格納
+					imageInfoReader.loadRarImageInfos(srcFile, imageOnly);
+				} else {
+					//Zip内の画像情報読み込み 画像のみならファイル順も格納
+					imageInfoReader.loadZipImageInfos(srcFile, imageOnly);
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

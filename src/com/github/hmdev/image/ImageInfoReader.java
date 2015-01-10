@@ -18,6 +18,9 @@ import org.apache.commons.compress.archivers.zip.ZipFile;
 import com.github.hmdev.info.ImageInfo;
 import com.github.hmdev.util.FileNameComparator;
 import com.github.hmdev.util.LogAppender;
+import com.github.junrar.Archive;
+import com.github.junrar.exception.RarException;
+import com.github.junrar.rarfile.FileHeader;
 
 /**
  * 画像情報を格納するクラス
@@ -241,6 +244,36 @@ public class ImageInfoReader
 		}
 		zis.close();
 	}
+	/** rar内の画像情報をすべて読み込み
+	 * @throws IOException 
+	 * @throws RarException */
+	public void loadRarImageInfos(File srcFile, boolean addFileName) throws IOException, RarException
+	{
+		Archive archive = new Archive(srcFile);
+		for (FileHeader fileHeader : archive.getFileHeaders()) {
+			if (!fileHeader.isDirectory()) {
+				String entryName = fileHeader.getFileNameString();
+				String lowerName = entryName.toLowerCase();
+				if (lowerName.endsWith(".png") || lowerName.endsWith(".jpg") || lowerName.endsWith(".jpeg") || lowerName.endsWith(".gif")) {
+					ImageInfo imageInfo = null;
+					try {
+						InputStream is = archive.getInputStream(fileHeader);
+						imageInfo = ImageInfo.getImageInfo(is);
+					} catch (Exception e) {
+						LogAppender.append("[ERROR] 画像が読み込めませんでした: ");
+						LogAppender.println(srcFile.getPath());
+						e.printStackTrace();
+					}
+					if (imageInfo != null) {
+						this.imageFileInfos.put(entryName, imageInfo);
+						if (addFileName) this.addImageFileName(entryName);
+					}
+				}
+			}
+		}
+		archive.close();
+	}
+	
 	/** 圧縮ファイル内の画像で画像注記以外の画像も表紙に選択できるように追加 */
 	public void addNoNameImageFileName()
 	{
@@ -253,8 +286,9 @@ public class ImageInfoReader
 		for (String name : names) this.imageFileNames.add(name);
 	}
 	
-	/** 指定した順番の画像情報を取得 */
-	public BufferedImage getImage(int idx) throws IOException
+	/** 指定した順番の画像情報を取得 
+	 * @throws RarException */
+	public BufferedImage getImage(int idx) throws IOException, RarException
 	{
 		return this.getImage(this.imageFileNames.get(idx));
 	}
@@ -264,8 +298,9 @@ public class ImageInfoReader
 	 * 拡張子変更等は外側で修正しておく
 	 * ファイルシステムまたはZipファイルから指定されたファイル名の画像を取得
 	 * @param srcImageFileName ファイル名 Zipならエントリ名
-	 * ※先頭からシークされるので遅い? */
-	public BufferedImage getImage(String srcImageFileName) throws IOException
+	 * ※先頭からシークされるので遅い? 
+	 * @throws RarException */
+	public BufferedImage getImage(String srcImageFileName) throws IOException, RarException
 	{
 		if (this.isFile) {
 			File file = new File(this.srcParentPath+srcImageFileName);
@@ -280,21 +315,42 @@ public class ImageInfoReader
 				return ImageUtils.readImage(srcImageFileName.substring(srcImageFileName.lastIndexOf('.')+1).toLowerCase(), bis);
 			} finally { bis.close(); }
 		} else {
-			ZipFile zf = new ZipFile(this.srcFile, "MS932");
-			ZipArchiveEntry entry = zf.getEntry(srcImageFileName);
-			if (entry == null) {
-				srcImageFileName = this.correctExt(srcImageFileName);
-				entry = zf.getEntry(srcImageFileName);
-				if (entry == null) return null;
-			}
-			InputStream is = zf.getInputStream(entry);
-			try {
-				return ImageUtils.readImage(srcImageFileName.substring(srcImageFileName.lastIndexOf('.')+1).toLowerCase(), is);
-			} catch (Exception e) {
-				e.printStackTrace();
-			} finally {
-				is.close();
-				zf.close();
+			if (this.srcFile.getName().endsWith(".rar")) {
+				InputStream is = null;
+				try {
+				@SuppressWarnings("resource")
+				Archive archive = new Archive(srcFile);
+				FileHeader fileHeader = archive.nextFileHeader(); 
+				while (fileHeader != null) {
+					if (!fileHeader.isDirectory()) {
+						if (srcImageFileName.equals(fileHeader.getFileNameString())) {
+							is = archive.getInputStream(fileHeader);
+							return ImageUtils.readImage(srcImageFileName.substring(srcImageFileName.lastIndexOf('.')+1).toLowerCase(), is);
+						}
+					}
+					fileHeader = archive.nextFileHeader();
+				}
+				} finally {
+					if (is != null) is.close();
+				}
+				
+			} else {
+				ZipFile zf = new ZipFile(this.srcFile, "MS932");
+				ZipArchiveEntry entry = zf.getEntry(srcImageFileName);
+				if (entry == null) {
+					srcImageFileName = this.correctExt(srcImageFileName);
+					entry = zf.getEntry(srcImageFileName);
+					if (entry == null) return null;
+				}
+				InputStream is = zf.getInputStream(entry);
+				try {
+					return ImageUtils.readImage(srcImageFileName.substring(srcImageFileName.lastIndexOf('.')+1).toLowerCase(), is);
+				} catch (Exception e) {
+					e.printStackTrace();
+				} finally {
+					is.close();
+					zf.close();
+				}
 			}
 		}
 		return null;

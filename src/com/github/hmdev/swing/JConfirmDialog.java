@@ -759,7 +759,7 @@ public class JConfirmDialog extends JDialog
 				this.bookInfo.coverImage = imageInfoReader.getImage(this.bookInfo.coverImageIndex);
 				jCoverImagePanel.setBookInfo(this.bookInfo);
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			this.bookInfo.coverImage = null;
 			this.bookInfo.coverImageIndex = -1;
