@@ -28,6 +28,11 @@ public class ImageInfo
 	/** 画像高さ */
 	int height = -1;
 	
+	/** 出力画像幅 */
+	int outWidth = -1;
+	/** 出力画像高さ */
+	int outHeight = -1;
+	
 	/** Zip内ファイルentryの位置 */
 	int zipIndex = -1;
 	
@@ -143,6 +148,24 @@ public class ImageInfo
 	{
 		this.height = height;
 	}
+	
+	public int getOutWidth()
+	{
+		return outWidth;
+	}
+	public void setOutWidth(int outWidth)
+	{
+		this.outWidth = outWidth;
+	}
+	public int getOutHeight()
+	{
+		return outHeight;
+	}
+	public void setOutHeight(int outHeight)
+	{
+		this.outHeight = outHeight;
+	}
+	
 	public int getZipIndex()
 	{
 		return zipIndex;

@@ -1,0 +1,11 @@
+@charset "utf-8";
+@namespace "http://www.w3.org/1999/xhtml";
+
+html, body, svg {
+	margin: 0;
+	padding: 0;
+}
+html, body {
+	font-size:0;
+	background-color:white;
+}

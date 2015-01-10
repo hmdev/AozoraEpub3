@@ -19,7 +19,7 @@ margin: 0;
 padding: 0;
 }
 body {
-margin: 0;
+margin: .5em .5em 0 0;
 padding: 0;
 display: block;
 color: #000;
@@ -29,4 +29,8 @@ vertical-align: baseline;
 }
 body.kindle {
 line-height: 1.5;
+}
+/* Kobo全画面時の上下余白 */
+body.kobofull p {
+padding: 1em 0 1em 0;
 }

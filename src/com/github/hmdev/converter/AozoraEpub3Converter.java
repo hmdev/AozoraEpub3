@@ -516,7 +516,7 @@ public class AozoraEpub3Converter
 	/** タイトルと著作者を取得. 行番号も保存して出力時に変換出力
 	 * 章洗濯用に見出しの行もここで取得
 	 * @param src 青空テキストファイルのReader
-	 * @param imageInfos テキスト内の画像ファイル名を格納して返却
+	 * @param imageInfoReader テキスト内の画像ファイル名を格納して返却
 	 * @param titleType 表題種別
 	 * @param coverFileName 表紙ファイル名 nullなら表紙無し ""は先頭ファイル "*"は同じファイル名 */
 	public BookInfo getBookInfo(File srcFile, BufferedReader src, ImageInfoReader imageInfoReader, TitleType titleType, boolean pubFirst) throws Exception

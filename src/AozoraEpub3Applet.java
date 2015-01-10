@@ -202,6 +202,8 @@ public class AozoraEpub3Applet extends JApplet
 	JRadioButton jRadioImageSizeType3;
 	JCheckBox jCheckFitImage;
 	
+	JCheckBox jCheckSvgImage;
+	
 	JComboBox jComboRotateImage;
 	
 	JCheckBox jCheckImageFloat;
@@ -871,7 +873,7 @@ public class AozoraEpub3Applet extends JApplet
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 		panel.setBorder(new NarrowTitledBorder("画像注記"));
 		tabPanel.add(panel);
-		jCheckNoIllust = new JCheckBox("挿絵なし ");
+		jCheckNoIllust = new JCheckBox("挿絵除外 ");
 		jCheckNoIllust.setFocusPainted(false);
 		jCheckNoIllust.setToolTipText("テキストの画像注記は表紙と外字画像以外はePubに格納されません");
 		jCheckNoIllust.setBorder(padding2);
@@ -1049,16 +1051,6 @@ public class AozoraEpub3Applet extends JApplet
 		label.setBorder(padding2H);
 		panel.add(label);
 		
-		//自動画像回転
-		label = new JLabel(" 自動回転");
-		label.setBorder(padding2H);
-		panel.add(label);
-		jComboRotateImage = new JComboBox(new String[]{"なし","右","左"});
-		jComboRotateImage.setToolTipText("単ページ時画面の縦横比に合わせて画像を回転します");
-		jComboRotateImage.setFocusable(false);
-		jComboRotateImage.setPreferredSize(new Dimension(text4.width+24, 20));
-		panel.add(jComboRotateImage);
-		
 		//下段
 		panel = new JPanel();
 		panel.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
@@ -1096,28 +1088,25 @@ public class AozoraEpub3Applet extends JApplet
 		panel.add(label);
 		
 		jCheckFitImage = new JCheckBox("拡大表示", true);
-		jCheckFitImage.setToolTipText("画面サイズより小さい画像を幅・高さに合わせて拡大表示します。画面の縦横比に合せて幅または高さを100%指定します");
+		jCheckFitImage.setToolTipText("画面サイズより小さい画像を幅高さに合わせて拡大表示します。画面の縦横比に合せて幅または高さを100%で表示します");
 		jCheckFitImage.setFocusPainted(false);
 		jCheckFitImage.setBorder(padding2);
 		panel.add(jCheckFitImage);
 		buttonGroup = new ButtonGroup();
-		/*jRadioImageFitType2 = new JRadioButton("高さ%", true);
-		jRadioImageFitType2.setToolTipText("画面の縦横比に合せて画像の高さのみ%指定します。画面設定より縦長の端末でははみ出すか縦長に表示されます");
-		jRadioImageFitType2.setFocusPainted(false);
-		jRadioImageFitType2.setBorder(padding2);
-		jRadioImageFitType2.setIconTextGap(1);
-		panel.add(jRadioImageFitType2);
-		buttonGroup.add(jRadioImageFitType2);
-		jRadioImageFitType3 = new JRadioButton("縦横比");
-		jRadioImageFitType3.setToolTipText("画面の縦横比に合せて幅または高さを100%指定します。横画面で横に伸びる場合があります");
-		jRadioImageFitType3.setFocusPainted(false);
-		jRadioImageFitType3.setBorder(padding2);
-		jRadioImageFitType3.setIconTextGap(1);
-		panel.add(jRadioImageFitType3);
-		buttonGroup.add(jRadioImageFitType3);
-		label = new JLabel(")");
-		label.setBorder(padding2H);
-		panel.add(label);*/
+		
+		////////////////////////////////
+		//全画面＋SVG
+		////////////////////////////////
+		panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		panel.setBorder(new NarrowTitledBorder("全画面表示"));
+		tabPanel.add(panel);
+		jCheckSvgImage = new JCheckBox("SVGタグ出力（画像zipのみ） ");
+		jCheckSvgImage.setFocusPainted(false);
+		jCheckSvgImage.setToolTipText("画像のみのzipの場合、固定レイアウト＋SVGタグで出力します");
+		jCheckSvgImage.setBorder(padding2);
+		panel.add(jCheckSvgImage);
+		
 		
 		////////////////////////////////////////////////////////////////
 		//Tab 画像2
@@ -1146,10 +1135,35 @@ public class AozoraEpub3Applet extends JApplet
 		panel.add(new JLabel(" (30～100)"));
 		
 		////////////////////////////////
+		//ガンマ補正
+		panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		panel.setBorder(new NarrowTitledBorder("色調整"));
+		tabPanel.add(panel);
+		jCheckGamma = new JCheckBox("ガンマ補正");
+		jCheckGamma.setToolTipText("画像の濃さを変更します (濃:0.2～1.8:淡)");
+		jCheckGamma.setFocusPainted(false);
+		jCheckGamma.setBorder(padding2);
+		jCheckGamma.setIconTextGap(2);
+		jCheckGamma.addChangeListener(new ChangeListener() {public void stateChanged(ChangeEvent e){
+			jTextGammaValue.setEditable(jCheckGamma.isSelected());
+		}});
+		panel.add(jCheckGamma);
+		jTextGammaValue = new JTextField("1.0");
+		jTextGammaValue.setToolTipText(jCheckGamma.getToolTipText());
+		jTextGammaValue.setHorizontalAlignment(JTextField.RIGHT);
+		jTextGammaValue.setInputVerifier(new FloatInputVerifier(1.0f, 0.2f, 1.8f));
+		jTextGammaValue.setMaximumSize(text3);
+		jTextGammaValue.setPreferredSize(text3);
+		jTextGammaValue.setEditable(jCheckGamma.isSelected());
+		jTextGammaValue.addFocusListener(new TextSelectFocusListener(jTextGammaValue));
+		panel.add(jTextGammaValue);
+		
+		////////////////////////////////
 		//画像縮小
 		panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-		panel.setBorder(new NarrowTitledBorder("画像縮小"));
+		panel.setBorder(new NarrowTitledBorder("画像縮小回転"));
 		tabPanel.add(panel);
 		ChangeListener resizeChangeLister = new ChangeListener() {
 			public void stateChanged(ChangeEvent e) { setResizeTextEditable(true);  }
@@ -1191,30 +1205,15 @@ public class AozoraEpub3Applet extends JApplet
 		panel.add(label);
 		this.setResizeTextEditable(true);
 		
-		////////////////////////////////
-		//ガンマ補正
-		panel = new JPanel();
-		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-		panel.setBorder(new NarrowTitledBorder("色調整"));
-		tabPanel.add(panel);
-		jCheckGamma = new JCheckBox("ガンマ補正");
-		jCheckGamma.setToolTipText("画像の濃さを変更します (濃:0.2～1.8:淡)");
-		jCheckGamma.setFocusPainted(false);
-		jCheckGamma.setBorder(padding2);
-		jCheckGamma.setIconTextGap(2);
-		jCheckGamma.addChangeListener(new ChangeListener() {public void stateChanged(ChangeEvent e){
-			jTextGammaValue.setEditable(jCheckGamma.isSelected());
-		}});
-		panel.add(jCheckGamma);
-		jTextGammaValue = new JTextField("1.0");
-		jTextGammaValue.setToolTipText(jCheckGamma.getToolTipText());
-		jTextGammaValue.setHorizontalAlignment(JTextField.RIGHT);
-		jTextGammaValue.setInputVerifier(new FloatInputVerifier(1.0f, 0.2f, 1.8f));
-		jTextGammaValue.setMaximumSize(text3);
-		jTextGammaValue.setPreferredSize(text3);
-		jTextGammaValue.setEditable(jCheckGamma.isSelected());
-		jTextGammaValue.addFocusListener(new TextSelectFocusListener(jTextGammaValue));
-		panel.add(jTextGammaValue);
+		//自動画像回転
+		label = new JLabel(" 自動回転");
+		label.setBorder(padding2H);
+		panel.add(label);
+		jComboRotateImage = new JComboBox(new String[]{"なし","右","左"});
+		jComboRotateImage.setToolTipText("単ページ時画面の縦横比に合わせて画像を回転します");
+		jComboRotateImage.setFocusable(false);
+		jComboRotateImage.setPreferredSize(new Dimension(text4.width+24, 20));
+		panel.add(jComboRotateImage);
 		
 		////////////////////////////////
 		//余白除去
@@ -2592,10 +2591,10 @@ public class AozoraEpub3Applet extends JApplet
 		//if (jRadioImageFitType2.isSelected()) imageFitType = SectionInfo.IMAGE_SIZE_TYPE_HEIGHT;
 		
 		this.epub3Writer.setImageParam(dispW, dispH, coverW, coverH, resizeW, resizeH, singlePageSizeW, singlePageSizeH, singlePageWidth,
-				imageSizeType, jCheckFitImage.isSelected(), rorateAngle,
+				imageSizeType, jCheckFitImage.isSelected(), jCheckSvgImage.isSelected(), rorateAngle,
 				imageFloatType, imageFloatW, imageFloatH, jpegQualty, gamma, autoMarginLimitH, autoMarginLimitV, autoMarginWhiteLevel, autoMarginPadding, autoMarginNombre, autoMarginNombreSize);
 		this.epub3ImageWriter.setImageParam(dispW, dispH, coverW, coverH, resizeW, resizeH, singlePageSizeW, singlePageSizeH, singlePageWidth,
-				imageSizeType, jCheckFitImage.isSelected(), rorateAngle,
+				imageSizeType, jCheckFitImage.isSelected(), jCheckSvgImage.isSelected(), rorateAngle,
 				imageFloatType, imageFloatW, imageFloatH, jpegQualty, gamma, autoMarginLimitH, autoMarginLimitV, autoMarginWhiteLevel, autoMarginPadding, autoMarginNombre, autoMarginNombreSize);
 		//目次階層化設定
 		this.epub3Writer.setTocParam(jCheckNavNest.isSelected(), jCheckNcxNest.isSelected());
@@ -3498,6 +3497,8 @@ public class AozoraEpub3Applet extends JApplet
 		}
 		//拡大しない
 		setPropsSelected(jCheckFitImage, props, "FitImage");
+		//SVG画像タグ出力
+		setPropsSelected(jCheckSvgImage, props, "SvgImage");
 		try { jComboRotateImage.setSelectedIndex(Integer.parseInt(props.getProperty("RotateImage"))); } catch (Exception e) {}
 		//画像回り込み
 		setPropsSelected(jCheckImageFloat, props, "ImageFloat");
@@ -3649,6 +3650,7 @@ public class AozoraEpub3Applet extends JApplet
 		props.setProperty("ImageSizeType", ""+(this.jRadioImageSizeType1.isSelected()?SectionInfo.IMAGE_SIZE_TYPE_AUTO:
 			(this.jRadioImageSizeType2.isSelected()?SectionInfo.IMAGE_SIZE_TYPE_HEIGHT:SectionInfo.IMAGE_SIZE_TYPE_ASPECT)));
 		props.setProperty("FitImage", this.jCheckFitImage.isSelected()?"1":"");
+		props.setProperty("SvgImage", this.jCheckSvgImage.isSelected()?"1":"");
 		props.setProperty("RotateImage", ""+this.jComboRotateImage.getSelectedIndex());
 		//画像回り込み
 		props.setProperty("ImageFloat", this.jCheckImageFloat.isSelected()?"1":"");

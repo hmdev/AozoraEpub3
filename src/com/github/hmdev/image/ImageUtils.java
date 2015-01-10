@@ -134,6 +134,8 @@ public class ImageUtils
 		int imgH = imageInfo.getHeight();
 		int w = imgW;
 		int h = imgH;
+		imageInfo.setOutWidth(imgW);
+		imageInfo.setOutHeight(imgH);
 		//余白チェック時に読み込んだ画像のバッファ
 		byte[] imgBuf = null;
 		
@@ -236,6 +238,8 @@ public class ImageUtils
 						srcImage = filterdImage;
 					}
 					_writeImage(zos, srcImage, ext, jpegQuality);
+					imageInfo.setOutWidth(srcImage.getWidth());
+					imageInfo.setOutHeight(srcImage.getHeight());
 					if (imageInfo.rotateAngle != 0) LogAppender.println("画像回転"+": "+imageInfo.getOutFileName()+" ("+h+","+w+")");
 				}
 			}
@@ -356,6 +360,8 @@ public class ImageUtils
 				}
 			}
 			_writeImage(zos, outImage, ext, jpegQuality);
+			imageInfo.setOutWidth(outImage.getWidth());
+			imageInfo.setOutHeight(outImage.getHeight());
 			if (scale < 1) {
 				LogAppender.append("画像縮小");
 				if (imageInfo.rotateAngle!=0) LogAppender.append("回転");

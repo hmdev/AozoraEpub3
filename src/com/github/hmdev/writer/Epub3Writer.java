@@ -88,6 +88,9 @@ public class Epub3Writer
 	/** 表紙ページ Velocityテンプレート */
 	final static String COVER_VM = "cover.vm";
 	
+	/** SVG画像ページ Velocityテンプレート */
+	final static String SVG_IMAGE_VM = "svg_image.vm";
+	
 	/** opfファイル */
 	final static String PACKAGE_FILE = "package.opf";
 	/** opfファイル Velocityテンプレート */
@@ -188,6 +191,9 @@ public class Epub3Writer
 	/** toc.ncx階層化 */
 	boolean ncxNest = false;
 	
+	/** svgタグのimageでxhtml出力 */
+	boolean isSvgImage = false;
+	
 	/** 拡張子に.mobiが選択されていてkindlegenがある場合 */
 	boolean isKindle = false;
 	
@@ -255,7 +261,7 @@ public class Epub3Writer
 	public void setImageParam(int dispW, int dispH, int coverW, int coverH,
 			int resizeW, int resizeH,
 			int singlePageSizeW, int singlePageSizeH, int singlePageWidth,
-			int imageSizeType, boolean fitImage, int rotateAngle,
+			int imageSizeType, boolean fitImage, boolean isSvgImage, int rotateAngle,
 			int imageFloatType, int imageFloatW, int imageFloatH,
 			float jpegQuality, float gamma,
 			int autoMarginLimitH, int autoMarginLimitV, int autoMarginWhiteLevel, float autoMarginPadding, int autoMarginNombre, float nombreSize)
@@ -276,6 +282,7 @@ public class Epub3Writer
 		
 		this.imageSizeType = imageSizeType;
 		this.fitImage = fitImage;
+		this.isSvgImage = isSvgImage;
 		this.rotateAngle = rotateAngle;
 		
 		this.coverW = coverW;
@@ -387,7 +394,10 @@ public class Epub3Writer
 		velocityContext.put("navNest", this.navNest);
 		
 		//端末種別
-		velocityContext.put("kindle", this.isKindle);
+		if (this.isKindle) velocityContext.put("kindle", true);
+		
+		//SVG画像出力
+		if (this.isSvgImage) velocityContext.put("svgImage", true);
 		
 		//出力先ePubのZipストリーム生成
 		zos = new ZipArchiveOutputStream(new BufferedOutputStream(new FileOutputStream(epubFile)));
@@ -414,11 +424,15 @@ public class Epub3Writer
 			writeFile(zos, fileName);
 		}
 		
+		//サブパスの文字長
+		int zipPathLength = 0;
+		if (this.bookInfo.textEntryName != null) zipPathLength = this.bookInfo.textEntryName.indexOf('/')+1;
+		
 		//zip出力用Writer
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"));
 		
 		//本文を出力
-		this.writeSections(converter, src, bw);
+		this.writeSections(converter, src, bw, srcFile, zos);
 		if (this.canceled) return;
 		
 		//表紙をテンプレート＋メタ情報から生成 先に出力すると外字画像出力で表紙の順番が狂う
@@ -463,9 +477,6 @@ public class Epub3Writer
 		}
 		
 		if (this.canceled) return;
-		
-		int zipPathLength = 0;
-		if (this.bookInfo.textEntryName != null) zipPathLength = this.bookInfo.textEntryName.indexOf('/')+1;
 		
 		//表紙データと表示の画像情報
 		byte[] coverImageBytes = null;
@@ -751,7 +762,6 @@ public class Epub3Writer
 		
 		zos.setLevel(0);
 		////////////////////////////////////////////////////////////////////////////////////////////////
-		//画像ファイル出力 (連番にリネーム)
 		//表紙指定があればそれを入力に設定 先頭画像のisCoverはfalseになっている
 		//プレビューで編集された場合はここで追加する
 		////////////////////////////////
@@ -790,10 +800,9 @@ public class Epub3Writer
 				LogAppender.println("[ERROR] 表紙画像取得エラー: "+bookInfo.coverFileName);
 			}
 		}
-		
 		if (this.canceled) return;
 		
-		//出力済み画像チェック用
+		//画像出力
 		if ("txt".equals(srcExt)) {
 			////////////////////////////////
 			//txtの場合はファイルシステムから取得
@@ -818,9 +827,9 @@ public class Epub3Writer
 				if (this.canceled) return;
 				if (this.jProgressBar != null) this.jProgressBar.setValue(this.jProgressBar.getValue()+10);
 			}
-		} else {
+		} else if (!bookInfo.imageOnly) {
 			////////////////////////////////
-			//zipの場合
+			//zipの場合 画像のみのZipはセクション出力時に画像も出力
 			ZipArchiveInputStream zis = new ZipArchiveInputStream(new BufferedInputStream(new FileInputStream(srcFile), 65536), "MS932", false);
 			try {
 			ArchiveEntry entry;
@@ -828,7 +837,7 @@ public class Epub3Writer
 				//Zip内のサブフォルダは除外してテキストからのパスにする
 				String srcImageFileName = entry.getName().substring(zipPathLength);
 				srcImageFileName = imageInfoReader.correctExt(srcImageFileName); //拡張子修正
-				if (bookInfo.imageOnly || outImageFileNames.contains(srcImageFileName)) {
+				if (outImageFileNames.contains(srcImageFileName)) {
 					ImageInfo imageInfo = imageInfoReader.getImageInfo(srcImageFileName);
 					//Zip内テキストの場合はidと出力ファイル名が登録されていなければ出力しない。
 					if (imageInfo != null) {
@@ -897,7 +906,7 @@ public class Epub3Writer
 	}
 	
 	/** 本文を出力する */
-	void writeSections(AozoraEpub3Converter converter, BufferedReader src, BufferedWriter bw) throws Exception
+	void writeSections(AozoraEpub3Converter converter, BufferedReader src, BufferedWriter bw, File srcFile, ZipArchiveOutputStream zos) throws Exception
 	{
 		//this.startSection(0, bookInfo.startMiddle);
 		

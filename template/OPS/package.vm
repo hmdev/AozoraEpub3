@@ -1,21 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<package xmlns="http://www.idpf.org/2007/opf" unique-identifier="pub-id" xml:lang="ja" version="3.0">
-	<metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">
-#if (${titleAs})
-		<dc:title id="title" opf:file-as="${titleAs}">${title}</dc:title>
-#else
+<package xmlns="http://www.idpf.org/2007/opf" unique-identifier="pub-id" xml:lang="ja" version="3.0"
+	prefix="rendition: http://www.idpf.org/vocab/rendition/#">
+	<metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
+
 		<dc:title id="title">${title}</dc:title>
-#end
 		<meta refines="#title" property="dcterms:title">${title}</meta>
 #if (${titleAs})
 		<meta refines="#title" property="file-as">${titleAs}</meta>
 #end
 #if (${creator})
-#if (${creatorAs})
-		<dc:creator id="creator" opf:file-as="${creatorAs}">${creator}</dc:creator>
-#else
 		<dc:creator id="creator">${creator}</dc:creator>
-#end
 		<meta refines="#creator" property="dcterms:creator">${creator}</meta>
 #if (${creatorAs})
 		<meta refines="#creator" property="file-as">${creatorAs}</meta>
@@ -34,17 +28,18 @@
 		<meta name="cover" content="img${coverImage.Id}"/>
 #end
 #if (${bookInfo.ImageOnly})
+#if (${svgImage})
+		<meta property="rendition:layout">pre-paginated</meta>
+#end
 		<meta name="fixed-layout" content="true"/>
-#if (${kindle})
 		<meta name="book-type" content="comic"/>
+#if (${kindle})
 		<meta name="zero-gutter" content="true"/>
 		<meta name="zero-margin" content="true"/>
 		<meta name="primary-writing-mode" content="horizontal-rl"/>
 		<meta name="RegionMagnification" content="false"/>
 		<meta name="orientation-lock" content="none"/>
-		<!--
-		<meta name="original-resolution" content="844x1200"/>
-		-->
+		<!--<meta name="original-resolution" content="844x1200"/>-->
 #end
 #end
 	</metadata>
@@ -52,6 +47,8 @@
 	<manifest>
 #if (${kindle} && ${bookInfo.ImageOnly})
 		<item id="k_image" href="css/kindle_image.css" media-type="text/css"/>
+#elseif (${svgImage} && ${bookInfo.ImageOnly})
+		<item id="svg_image" href="css/svg_image.css" media-type="text/css"/>
 #elseif (${bookInfo.Vertical})
 #if (${bookInfo.ImageOnly})
 		<item id="v_image" href="css/vertical_image.css" media-type="text/css"/>
@@ -73,15 +70,28 @@
 		<item id="h_image" href="css/horizontal_image.css" media-type="text/css"/>
 #end
 #end
+
 		<item id="nav" properties="nav" href="xhtml/nav.xhtml" media-type="application/xhtml+xml"/>
+
 #if (${bookInfo.InsertCoverPage})
+#if ($svgImage)
+		<item id="cover-page" href="xhtml/cover.xhtml" media-type="application/xhtml+xml" properties="svg"/>
+#else
 		<item id="cover-page" href="xhtml/cover.xhtml" media-type="application/xhtml+xml"/>
+#end
 #end
 #if (${title_page})
 		<item id="title-page" href="xhtml/title.xhtml" media-type="application/xhtml+xml"/>
 #end
+
+#if ($svgImage)
+#foreach(${sectionInfo} in ${sections})
+		<item id="sec${sectionInfo.SectionId}" href="xhtml/${sectionInfo.SectionId}.xhtml" media-type="application/xhtml+xml" properties="svg"/>
+#end
+#else
 #foreach(${sectionInfo} in ${sections})
 		<item id="sec${sectionInfo.SectionId}" href="xhtml/${sectionInfo.SectionId}.xhtml" media-type="application/xhtml+xml"/>
+#end
 #end
 #foreach($image in ${images})
 #if ($image.IsCover)
@@ -120,7 +130,6 @@
 #end
 #end
 	</spine>
-
 
 #if (${bookInfo.InsertCoverPage} || ${bookInfo.InsertTocPage})
 	<guide>

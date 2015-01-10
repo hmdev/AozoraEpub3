@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="ja" lang="ja">
+
 <head>
-#if (${kindle} && ${bookInfo.ImageOnly})
+#if (${svgImage})
+	<link rel="stylesheet" type="text/css" href="../css/svg_image.css"/>
+#elseif (${kindle} && ${bookInfo.ImageOnly})
 	<link rel="stylesheet" type="text/css" href="../css/kindle_image.css"/>
 #elseif (${bookInfo.Vertical})
 	<link rel="stylesheet" type="text/css" href="../css/vertical_image.css"/>
@@ -19,6 +22,16 @@ min-height: ${sectionInfo.ImageHeightPercent}%;
 </style>
 #end
 </head>
+
+#if (${svgImage})
+<body>
+<div>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="100%" height="100%" viewBox="0 0 ${coverImage.Width} ${coverImage.Height}">
+<image width="${coverImage.Width}" height="${coverImage.Height}" xlink:href="../images/${coverImage.OutFileName}"/>
+</svg>
+</div>
+</body>
+#else
 #if (${sectionInfo.ImageFitW})
 <body class="fit_w">
 #elseif (${sectionInfo.ImageFitH})
@@ -28,4 +41,6 @@ min-height: ${sectionInfo.ImageHeightPercent}%;
 #end
 <span class="img"><img src="../images/${coverImage.OutFileName}"/></span>
 </body>
+#end
+
 </html>
