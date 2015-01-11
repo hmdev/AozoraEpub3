@@ -173,13 +173,20 @@ public class WebAozoraConverter
 		
 		this.interval = Math.max(500, interval);
 		
-		//リダイレクトされていたら置き換え
+		//末尾の / をリダイレクトで取得
 		urlString = urlString.trim();
-		if (!urlString.endsWith("/") && !urlString.endsWith(".html") && urlString.indexOf("?") == -1 ) {
-			HttpURLConnection connection = (HttpURLConnection) new URL(urlString).openConnection();
-			connection.getResponseCode();
-			urlString = connection.getURL().toString();
-			connection.disconnect();
+		if (!urlString.endsWith("/") && !urlString.endsWith(".html") && !urlString.endsWith(".htm") && urlString.indexOf("?") == -1 ) {
+			HttpURLConnection connection = null;
+			try {
+				connection = (HttpURLConnection) new URL(urlString+"/").openConnection();
+				if (connection.getResponseCode() == 200) {
+					urlString += "/";
+					LogAppender.println("URL修正 : "+urlString);
+				}
+			} catch (Exception e) {
+			} finally {
+				if (connection != null) connection.disconnect();
+			}
 		}
 		
 		this.urlString = urlString;
@@ -209,12 +216,17 @@ public class WebAozoraConverter
 		if (isPath) this.dstPath += urlParentPath;
 		else this.dstPath += urlFilePath+"_converted/";
 		File txtFile = new File(this.dstPath+"converted.txt");
-		//表紙画像はtxtと同じ名前で保存 拡張子はpngだが変換時にチェックするので関係ない
+		//表紙画像はtxtと同じ名前で保存 拡張子はpngだが表示はできるのでそのまま
 		File coverImageFile = new File(this.dstPath+"converted.png");
 		//更新情報格納先
 		File updateInfoFile = new File(this.dstPath+"update.txt");
 		
-		txtFile.getParentFile().mkdirs();
+		//フォルダ以外がすでにあったら削除
+		File parentFile = txtFile.getParentFile();
+		if (parentFile.exists() && !parentFile.isDirectory()) {
+			parentFile.delete();
+		}
+		parentFile.mkdirs();
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(txtFile), "UTF-8"));
 		try {
 			
@@ -985,6 +997,11 @@ public class WebAozoraConverter
 		//if (!replace && cacheFile.exists()) return false;
 		try { if (cacheFile.isDirectory()) cacheFile.delete(); } catch (Exception e) {} //空のディレクトリなら消す
 		if (cacheFile.isDirectory()) { LogAppender.println("フォルダがあるためキャッシュできません : "+cacheFile.getAbsolutePath()); }
+		//フォルダ以外がすでにあったら削除
+		File parentFile = cacheFile.getParentFile();
+		if (parentFile.exists() && !parentFile.isDirectory()) {
+			parentFile.delete();
+		}
 		cacheFile.getParentFile().mkdirs();
 		//ダウンロード
 		URLConnection conn = new URL(urlString).openConnection();
