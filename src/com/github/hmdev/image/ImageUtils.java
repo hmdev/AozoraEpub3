@@ -97,10 +97,14 @@ public class ImageUtils
 	{
 		BufferedImage image;
 		if (ext.equals("jpg") || ext.equals("jpeg")) {
-			ImageDecoder dec = ImageCodec.createImageDecoder("jpeg", is, null);
-			RenderedImage ri = dec.decodeAsRenderedImage();
-			image = new BufferedImage(ri.getWidth(), ri.getHeight(), BufferedImage.TYPE_INT_RGB);
-			image.createGraphics().drawRenderedImage(ri, NO_TRANSFORM);
+			try {
+				ImageDecoder dec = ImageCodec.createImageDecoder("jpeg", is, null);
+				RenderedImage ri = dec.decodeAsRenderedImage();
+				image = new BufferedImage(ri.getWidth(), ri.getHeight(), BufferedImage.TYPE_INT_RGB);
+				image.createGraphics().drawRenderedImage(ri, NO_TRANSFORM);
+			} catch (Exception e) {
+				image = ImageIO.read(is);
+			}
 		} else {
 			image = ImageIO.read(is);
 		}

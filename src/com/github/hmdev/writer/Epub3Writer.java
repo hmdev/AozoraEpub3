@@ -804,13 +804,13 @@ public class Epub3Writer
 		}
 		if (this.canceled) return;
 		
-		//画像出力
+		//本文画像出力 (画像のみの場合は出力済)
 		if ("txt".equals(srcExt)) {
 			////////////////////////////////
 			//txtの場合はファイルシステムから取得
 			for (String srcImageFileName : imageInfoReader.getImageFileNames()) {
 				srcImageFileName = imageInfoReader.correctExt(srcImageFileName); //拡張子修正
-				if (bookInfo.imageOnly || outImageFileNames.contains(srcImageFileName)) {
+				if (outImageFileNames.contains(srcImageFileName)) {
 					ImageInfo imageInfo = imageInfoReader.getImageInfo(srcImageFileName);
 					if (imageInfo == null) {
 						LogAppender.println("[WARN] 画像ファイルなし: "+srcImageFileName);
@@ -830,27 +830,41 @@ public class Epub3Writer
 				if (this.jProgressBar != null) this.jProgressBar.setValue(this.jProgressBar.getValue()+10);
 			}
 		} else if (!bookInfo.imageOnly) {
-			////////////////////////////////
 			if ("rar".equals(srcExt)) {
+				////////////////////////////////
+				//Rar
 				Archive archive = new Archive(srcFile);
 				try {
 				for (FileHeader fileHeader : archive.getFileHeaders()) {
 					if (!fileHeader.isDirectory()) {
-						String entryName = fileHeader.getFileNameString();
+						String entryName = fileHeader.getFileNameW();
+						if (entryName.length() == 0) entryName = fileHeader.getFileNameString();
+						entryName = entryName.replace('\\', '/');
 						//アーカイブ内のサブフォルダは除外してテキストからのパスにする
 						String srcImageFileName = entryName.substring(archivePathLength);
-						this.writeArchiveImage(srcImageFileName, archive.getInputStream(fileHeader));
+						if (outImageFileNames.contains(srcImageFileName)) {
+							InputStream is = archive.getInputStream(fileHeader);
+							try {
+								this.writeArchiveImage(srcImageFileName, is);
+							} finally {
+								is.close();
+							}
+						}
 					}
 				}
 				} finally { archive.close(); }
 			} else {
+				////////////////////////////////
+				//Zip
 				ZipArchiveInputStream zis = new ZipArchiveInputStream(new BufferedInputStream(new FileInputStream(srcFile), 65536), "MS932", false);
 				try {
 				ArchiveEntry entry;
 				while( (entry = zis.getNextZipEntry()) != null ) {
 					//アーカイブ内のサブフォルダは除外してテキストからのパスにする
 					String srcImageFileName = entry.getName().substring(archivePathLength);
-					this.writeArchiveImage(srcImageFileName, zis);
+					if (outImageFileNames.contains(srcImageFileName)) {
+						this.writeArchiveImage(srcImageFileName, zis);
+					}
 				}
 				} finally { zis.close(); }
 			}

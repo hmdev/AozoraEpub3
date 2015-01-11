@@ -6,6 +6,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.util.Vector;
 
@@ -90,10 +91,17 @@ public class Epub3ImageWriter extends Epub3Writer
 			try {
 			for (FileHeader fileHeader : archive.getFileHeaders()) {
 				if (!fileHeader.isDirectory()) {
-					String entryName = fileHeader.getFileNameString();
+					String entryName = fileHeader.getFileNameW();
+					if (entryName.length() == 0) entryName = fileHeader.getFileNameString();
+					entryName = entryName.replace('\\', '/');
 					//アーカイブ内のサブフォルダは除外してテキストからのパスにする
 					String srcImageFileName = entryName.substring(archivePathLength);
-					this.writeArchiveImage(srcImageFileName, archive.getInputStream(fileHeader));
+					InputStream is = archive.getInputStream(fileHeader);
+					try {
+						this.writeArchiveImage(srcImageFileName, is);
+					} finally {
+						is.close();
+					}
 				}
 			}
 			} finally { archive.close(); }

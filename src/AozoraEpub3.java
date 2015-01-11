@@ -316,10 +316,6 @@ public class AozoraEpub3
 						e.printStackTrace();
 					}
 					if (txtCount == 0) { txtCount = 1; imageOnly = true; }
-					else {
-						LogAppender.println("rarは画像のみ変換可能です");
-						return;
-					}
 				} else if ("cbz".equals(ext)) {
 					imageOnly = true;
 				}
@@ -518,7 +514,7 @@ public class AozoraEpub3
 			while ((entry = zis.getNextEntry()) != null) {
 				String entryName = entry.getName();
 				if (entryName.substring(entryName.lastIndexOf('.')+1).equalsIgnoreCase("txt") && txtIdx-- == 0) {
-					if (imageInfoReader != null) imageInfoReader.setZipTextEntry(entryName);
+					if (imageInfoReader != null) imageInfoReader.setArchiveTextEntry(entryName);
 					if (textEntryName != null) textEntryName[0] = entryName;
 					return zis;
 				}
@@ -527,11 +523,42 @@ public class AozoraEpub3
 			LogAppender.println(srcFile.getName());
 			return null;
 		} else if ("rar".equals(ext)) {
-			LogAppender.append("rarは画像のみ変換可能です : ");
+			//tempのtxtファイル作成
+			Archive archive = new Archive(srcFile);
+			try {
+			FileHeader fileHeader = archive.nextFileHeader();
+			while (fileHeader != null) {
+				if (!fileHeader.isDirectory()) {
+					String entryName = fileHeader.getFileNameW();
+					if (entryName.length() == 0) entryName = fileHeader.getFileNameString();
+					entryName = entryName.replace('\\', '/');
+					if (entryName.substring(entryName.lastIndexOf('.')+1).equalsIgnoreCase("txt") && txtIdx-- == 0) {
+						if (imageInfoReader != null) imageInfoReader.setArchiveTextEntry(entryName);
+						if (textEntryName != null) textEntryName[0] = entryName;
+						//tmpファイルにコピーして終了時に削除
+						File tmpFile = File.createTempFile("rarTmp", "txt");
+						tmpFile.deleteOnExit();
+						FileOutputStream fos = new FileOutputStream(tmpFile);
+						InputStream is = archive.getInputStream(fileHeader);
+						try {
+							IOUtils.copy(is, fos);
+						} finally {
+							is.close();
+							fos.close();
+						}
+						return new BufferedInputStream(new FileInputStream(tmpFile), 65536);
+					}
+				}
+				fileHeader = archive.nextFileHeader();
+			}
+			} finally {
+				archive.close();
+			}
+			LogAppender.append("rar内にtxtファイルがありません: ");
 			LogAppender.println(srcFile.getName());
 			return null;
 		} else {
-			LogAppender.append("txt, zip, txtz, cbz のみ変換可能です: ");
+			LogAppender.append("txt, zip, rar, txtz, cbz のみ変換可能です: ");
 			LogAppender.println(srcFile.getPath());
 		}
 		return null;
@@ -558,20 +585,18 @@ public class AozoraEpub3
 	static public int countRarText(File rarFile) throws IOException, RarException
 	{
 		int txtCount = 0;
-		try {
 		Archive archive = new Archive(rarFile);
 		try {
 			for (FileHeader fileHeader : archive.getFileHeaders()) {
 				if (!fileHeader.isDirectory()) { 
-					String entryName = fileHeader.getFileNameString();
+					String entryName = fileHeader.getFileNameW();
+					if (entryName.length() == 0) entryName = fileHeader.getFileNameString();
+					entryName = entryName.replace('\\', '/');
 					if (entryName.substring(entryName.lastIndexOf('.')+1).equalsIgnoreCase("txt")) txtCount++;
 				}
 			}
 		} finally {
 			archive.close();
-		}
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
 		return txtCount;
 	}

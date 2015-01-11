@@ -2287,7 +2287,7 @@ public class AozoraEpub3Applet extends JApplet
 			
 			JFileChooser fileChooser = new JFileChooser(currentPath);
 			fileChooser.setDialogTitle("変換する青空文庫テキストを開く");
-			fileChooser.setFileFilter(new FileNameExtensionFilter("青空文庫(txt,zip,txtz),画像(zip,rar,cbz),ショートカット(url)", new String[]{"txt","zip","rar","cbz","txtz","url"}));
+			fileChooser.setFileFilter(new FileNameExtensionFilter("青空文庫(txt,zip,rar,txtz),画像(zip,rar,cbz),ショートカット(url)", new String[]{"txt","zip","rar","cbz","txtz","url"}));
 			fileChooser.setMultiSelectionEnabled(true);
 			int state = fileChooser.showOpenDialog(parent);
 			switch (state) {
@@ -2400,7 +2400,7 @@ public class AozoraEpub3Applet extends JApplet
 					
 					//URLの最後が .zip
 					String ext = urlString.substring(urlString.lastIndexOf('.')+1).toLowerCase();
-					if (urlString != null && (ext.equals("zip") || ext.equals("txtz"))) {
+					if (urlString != null && (ext.equals("zip") || ext.equals("txtz") || ext.equals("rar"))) {
 						convertArchive(urlString);
 						return;
 					}
@@ -2716,10 +2716,6 @@ public class AozoraEpub3Applet extends JApplet
 				e.printStackTrace();
 			}
 			if (txtCount == 0) { txtCount = 1; imageOnly = true; }
-			else {
-				LogAppender.println("rarは画像のみ変換可能です");
-				this.convertCanceled = true;
-			}
 		} else if ("cbz".equals(ext)) {
 			LogAppender.println("--------");
 			imageOnly = true;

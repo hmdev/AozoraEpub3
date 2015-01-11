@@ -39,10 +39,8 @@ public class ImageInfoReader
 	 *  txtなら絶対パス zipならentryのパス */
 	String srcParentPath = null;
 	
-	/** Zipならzip内テキストのentry */
-	public String zipTextEntry = null;
 	/** Zipならzip内テキストの親entry ルートならnull */
-	public String zipTextParentPath = "";
+	public String archiveTextParentPath = "";
 	
 	/** 出力順にファイル名を格納 imageFileInfosのkeyと同じ文字列 */
 	Vector<String> imageFileNames;
@@ -54,25 +52,24 @@ public class ImageInfoReader
 	/** 初期化 画像情報格納用のvectorとマップを生成
 	 * @param isFile 圧縮ファイル内ならfalse
 	 * @param srcParentPath 変換するソースの親のパス
-	 * @param zipTextParentPath Zipならテキストファイルのentryの親のパス 圧縮ファイルで無い場合やルートならnull */
+	 * @param archiveTextParentPath Zipならテキストファイルのentryの親のパス 圧縮ファイルで無い場合やルートならnull */
 	public ImageInfoReader(boolean isFile, File srcFile)
 	{
 		this.isFile = isFile;
 		this.srcFile = srcFile;
 		this.srcParentPath = srcFile.getParent()+"/";
-		this.zipTextParentPath = "";
+		this.archiveTextParentPath = "";
 		this.imageFileNames = new Vector<String>();
 		this.imageFileInfos = new HashMap<String, ImageInfo>();
 	}
 	
 	/** zipの場合はzip内のtxtのentryNameと親のパスを設定 */
-	public void setZipTextEntry(String zipTextEntry)
+	public void setArchiveTextEntry(String archiveTextEntry)
 	{
-		this.zipTextEntry = zipTextEntry;
-		int idx = zipTextEntry.lastIndexOf('/');
+		int idx = archiveTextEntry.lastIndexOf('/');
 		if (idx > -1) {
-			//Zipのテキストの親のパスを設定
-			this.zipTextParentPath = this.zipTextEntry.substring(0, idx+1);
+			//アーカイブ内のテキストの親のパスを設定
+			this.archiveTextParentPath = archiveTextEntry.substring(0, idx+1);
 		}
 	}
 	
@@ -85,7 +82,7 @@ public class ImageInfoReader
 	/** 画像出力順にImageInfoを格納 zipの場合は後で並び替える */
 	public void addImageFileName(String imageFileName)
 	{
-		this.imageFileNames.add(this.zipTextParentPath+imageFileName);
+		this.imageFileNames.add(this.archiveTextParentPath+imageFileName);
 	}
 	
 	/** 名前順で並び替え */
@@ -184,7 +181,7 @@ public class ImageInfoReader
 			File imageFile = new File(this.srcParentPath+srcImageFileName);
 			if (imageFile.exists()) return true;
 		} else {
-			if (this.imageFileInfos.containsKey(this.zipTextParentPath+srcImageFileName)) return true;
+			if (this.imageFileInfos.containsKey(this.archiveTextParentPath+srcImageFileName)) return true;
 		}
 		return false;
 	}
@@ -212,7 +209,7 @@ public class ImageInfoReader
 			}
 		} else {
 			//Zipで中にフォルダがある場合
-			imageInfo = this.imageFileInfos.get(this.zipTextParentPath+srcImageFileName);
+			imageInfo = this.imageFileInfos.get(this.archiveTextParentPath+srcImageFileName);
 			return imageInfo;
 		}
 		return null;
@@ -244,25 +241,29 @@ public class ImageInfoReader
 		}
 		zis.close();
 	}
-	/** rar内の画像情報をすべて読み込み
-	 * @throws IOException 
-	 * @throws RarException */
+	/** rar内の画像情報をすべて読み込み */
 	public void loadRarImageInfos(File srcFile, boolean addFileName) throws IOException, RarException
 	{
 		Archive archive = new Archive(srcFile);
+		try {
 		for (FileHeader fileHeader : archive.getFileHeaders()) {
 			if (!fileHeader.isDirectory()) {
-				String entryName = fileHeader.getFileNameString();
+				String entryName = fileHeader.getFileNameW();
+				if (entryName.length() == 0) entryName = fileHeader.getFileNameString();
+				entryName = entryName.replace('\\', '/');
 				String lowerName = entryName.toLowerCase();
 				if (lowerName.endsWith(".png") || lowerName.endsWith(".jpg") || lowerName.endsWith(".jpeg") || lowerName.endsWith(".gif")) {
 					ImageInfo imageInfo = null;
+					InputStream is = null;
 					try {
-						InputStream is = archive.getInputStream(fileHeader);
+						is = archive.getInputStream(fileHeader);
 						imageInfo = ImageInfo.getImageInfo(is);
 					} catch (Exception e) {
 						LogAppender.append("[ERROR] 画像が読み込めませんでした: ");
 						LogAppender.println(srcFile.getPath());
 						e.printStackTrace();
+					} finally {
+						if (is != null) is.close();
 					}
 					if (imageInfo != null) {
 						this.imageFileInfos.put(entryName, imageInfo);
@@ -271,7 +272,9 @@ public class ImageInfoReader
 				}
 			}
 		}
-		archive.close();
+		} finally {
+			archive.close();
+		}
 	}
 	
 	/** 圧縮ファイル内の画像で画像注記以外の画像も表紙に選択できるように追加 */
@@ -317,13 +320,15 @@ public class ImageInfoReader
 		} else {
 			if (this.srcFile.getName().endsWith(".rar")) {
 				InputStream is = null;
-				try {
-				@SuppressWarnings("resource")
 				Archive archive = new Archive(srcFile);
+				try {
 				FileHeader fileHeader = archive.nextFileHeader(); 
 				while (fileHeader != null) {
 					if (!fileHeader.isDirectory()) {
-						if (srcImageFileName.equals(fileHeader.getFileNameString())) {
+						String entryName = fileHeader.getFileNameW();
+						if (entryName.length() == 0) entryName = fileHeader.getFileNameString();
+						entryName = entryName.replace('\\', '/');
+						if (srcImageFileName.equals(entryName)) {
 							is = archive.getInputStream(fileHeader);
 							return ImageUtils.readImage(srcImageFileName.substring(srcImageFileName.lastIndexOf('.')+1).toLowerCase(), is);
 						}
@@ -332,6 +337,7 @@ public class ImageInfoReader
 				}
 				} finally {
 					if (is != null) is.close();
+					archive.close();
 				}
 				
 			} else {
