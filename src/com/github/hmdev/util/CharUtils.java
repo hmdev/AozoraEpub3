@@ -81,14 +81,15 @@ public class CharUtils
 		return false;
 	}
 	
+	/** ひらがなかチェック */
 	static public boolean isHiragana(char ch)
 	{
-		return ('ぁ' <= ch && ch <= 'ゖ') || 'ー' == ch || 'ゝ' == ch || 'ゞ' == ch || 'ヽ' == ch || 'ヾ' == ch;
+		return ('ぁ'<=ch && ch<='ん') || 'ゖ'==ch || 'ー'==ch || 'ゝ'==ch || 'ゞ'==ch || 'ヽ'==ch || 'ヾ'==ch || '゛'==ch || 'ﾞ'==ch || '゜'==ch || 'ﾟ'== ch;
 	}
-	
+	/** カタカナかチェック */
 	static public boolean isKatakana(char ch)
 	{
-		return ('ァ' <= ch && ch <= 'ヺ') || 'ー' == ch || 'ゝ' == ch || 'ゞ' == ch || 'ヽ' == ch || 'ヾ' == ch;
+		return ('ァ'<=ch && ch<='ヶ') || 'ー'==ch || 'ゝ'==ch || 'ゞ'==ch || 'ヽ'==ch || 'ヾ'==ch || '゛'==ch || 'ﾞ'==ch || '゜'==ch || 'ﾟ'== ch;
 	}
 	
 	static public boolean isSpace(String line)
@@ -119,12 +120,12 @@ public class CharUtils
 	static public boolean isKanji(char pre, char ch, char suf)
 	{
 		switch (ch) {
-		case '〓': return true;
-		case '々': return true;
-		case '〻': return true;
-		case '〆': return true;
-		case 'ヶ': return true;
-		case 'ヵ': return true;
+		case '〓': case '々': case '〻': case '〆':
+			return true;
+		case 'ノ': case 'カ': case 'ケ': case 'ヵ': case 'ヶ':
+			//先頭の場合は漢字ではない
+			if (pre == (char)-1) return false;
+			return isKanji((char)-1, pre, (char)-1);
 		}
 		if (0x4E00 <= ch && ch <= 0x9FFF) return true;//'一' <= ch && ch <= '龠'
 		if (0xF900 <= ch && ch <= 0xFAFF) return true;//CJK互換漢字

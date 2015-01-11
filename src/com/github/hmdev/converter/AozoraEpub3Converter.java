@@ -2184,18 +2184,18 @@ public class AozoraEpub3Converter
 					// ルビ中でなく漢字
 					if (CharUtils.isKanji(ch, i)) {
 						rubyStart = i; rubyCharType = RubyCharType.KANJI;
-					} else if (CharUtils.isHalfSpace(ch[i]) && ch[i]!='>') {
-						//英数字または空白
-						rubyStart = i; rubyCharType = RubyCharType.ALPHA;
-					} else if (CharUtils.isFullAlpha(ch[i]) || CharUtils.isFullNum(ch[i])) {
-						//全角英数字
-						rubyStart = i; rubyCharType = RubyCharType.FULLALPHA;
 					} else if (CharUtils.isHiragana(ch[i])) {
 						//全角英数字
 						rubyStart = i; rubyCharType = RubyCharType.HIRAGANA;
 					} else if (CharUtils.isKatakana(ch[i])) {
 						//全角英数字
 						rubyStart = i; rubyCharType = RubyCharType.KATAKANA;
+					} else if (CharUtils.isHalfSpace(ch[i]) && ch[i]!='>') {
+						//英数字または空白
+						rubyStart = i; rubyCharType = RubyCharType.ALPHA;
+					} else if (CharUtils.isFullAlpha(ch[i]) || CharUtils.isFullNum(ch[i])) {
+						//全角英数字
+						rubyStart = i; rubyCharType = RubyCharType.FULLALPHA;
 					}
 					// ルビ中でなく漢字、半角以外は出力 数字と!?は英字扱いになっている
 					else {
@@ -2225,11 +2225,11 @@ public class AozoraEpub3Converter
 	{
 		
 		for (int i=begin; i<end; i++) {
-			if (this.vertical) {
+			if (this.vertical && !(inYoko || noTcy)) {
 				switch (ch[i]) {
 				case '0': case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9':
 					//数字2文字を縦横中で出力
-					if (this.autoYoko && !(this.inYoko || noTcy)) {
+					if (this.autoYoko) {
 						if (this.autoYokoNum3 && i+2<ch.length && CharUtils.isNum(ch[i+1]) && CharUtils.isNum(ch[i+2])) {
 							//数字3文字
 							//前後が半角かチェック
@@ -2290,7 +2290,7 @@ public class AozoraEpub3Converter
 					}
 					break;
 				case '!': case '?':
-					if (autoYoko  && !(inYoko || noTcy)) {
+					if (autoYoko) {
 						if (autoYokoEQ3 && i+2<ch.length && (ch[i+1]=='!' || ch[i+1]=='?') && (ch[i+2]=='!' || ch[i+2]=='?')) {
 							//!? 3文字を縦中横で出力
 							//前後が半角かチェック
@@ -2328,10 +2328,28 @@ public class AozoraEpub3Converter
 					break;
 				}
 				
-				//英字縦中横
-				if (autoAlpha2 ) {
-					
+				//ひらがな/カタカナ＋濁点/半濁点
+				if (i+1<ch.length && (ch[i+1]=='゛' || ch[i+1]=='ﾞ' || ch[i+1]=='゜' || ch[i+1]=='ﾟ')) {
+					if ('ぁ' <= ch[i] && ch[i] <= 'ん' || 'ぁ' <= ch[i] && ch[i] <= 'ヶ' ) {
+						buf.append(chukiMap.get("縦中横")[0]);
+						buf.append(" ");
+						buf.append(ch[i]);
+						//半角文字で追加
+						if (ch[i+1]=='゛' || ch[i+1]=='ﾞ') {
+							buf.append("ﾞ");
+						} else {
+							buf.append("ﾟ");
+						}
+						buf.append(chukiMap.get("縦中横終わり")[0]);
+						i++;
+						continue;
+					}
 				}
+				
+				//英字縦中横
+				//if (autoAlpha2 ) {
+				//	
+				//}
 			}
 			//自動縦中横で出力していたらcontinueしていてここは実行されない
 			convertTcyChar(buf, ch, i, noTcy);
