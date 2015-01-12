@@ -60,26 +60,12 @@ left: -.2em;
 border: 1px solid #000;
 margin: 0.25em;
 padding: 0.25em;
-display: inline-block;
-}
-.jzm .border {
-display: block;
-}
-.jzm .p .border {
-display: inline-block;
 }
 /* 破線罫囲み */
 .dashed_border {
 border: 1px dashed #000;
 margin: 0.25em;
 padding: 0.25em;
-display: inline-block;
-}
-.jzm .dashed_border {
-display: block;
-}
-.jzm .p .dashed_border {
-display: inline-block;
 }
 
 /* 圏点 */
@@ -186,7 +172,7 @@ border-left-width: 1px;
 .kogaki { font-size: 70%; }
 
 /* 縦中横 */
-/* 外字画像と重ならない対策 ※有効にすると字下げ折り返し内で画面外にずれる */ 
+/* 外字画像と重ならない対策 ※有効にすると字下げ折り返し内で画面外にずれる */
 /*span.tcy { display: inline-block; }*/
 .tcy span {
 text-combine: horizontal;
