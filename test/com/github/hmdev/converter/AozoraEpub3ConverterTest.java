@@ -25,8 +25,19 @@ public class AozoraEpub3ConverterTest
 	@Test
 	public void testReplaceChukiSufTag()
 	{
-		String ret = converter.replaceChukiSufTag("　　　あ１［＃「あ１」は中見出し］");
-		Assert.assertEquals(ret, "　　　［＃中見出し］あ１［＃中見出し終わり］");
+		try {
+		System.out.println(converter.replaceChukiSufTag("人間は考える｜蘆［＃「人間は考える｜蘆」は太字］《あし》"));
+		Assert.assertEquals(
+			converter.replaceChukiSufTag("人間は考える｜蘆［＃「人間は考える｜蘆」は太字］《あし》"),
+			"［＃太字］人間は考える｜蘆《あし》［＃太字終わり］");
+		
+		Assert.assertEquals(
+			converter.replaceChukiSufTag("　　　あ１［＃「あ１」は中見出し］"),
+			"　　　［＃中見出し］あ１［＃中見出し終わり］");
+		} catch (Exception e) {
+			e.printStackTrace();
+			Assert.fail();
+		}
 	}
 	
 	@Test

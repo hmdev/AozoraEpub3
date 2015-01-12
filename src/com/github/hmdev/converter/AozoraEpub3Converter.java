@@ -1361,6 +1361,17 @@ public class AozoraEpub3Converter
 			int targetLength = target.length();
 			int chukiTagStart = m.start();
 			int chukiTagEnd = m.end();
+			
+			//後ろにルビがあったら前に移動して位置を調整
+			if (chukiTagEnd < buf.length() && buf.charAt(chukiTagEnd) == '《') {
+				int rubyEnd = buf.indexOf("》", chukiTagEnd+2);
+				String ruby = buf.substring(chukiTagEnd, rubyEnd+1);
+				buf.delete(chukiTagEnd, rubyEnd+1);
+				buf.insert(chukiTagStart, ruby);
+				chukiTagStart += ruby.length();
+				chukiTagEnd += ruby.length();
+			}
+			
 			if (tags == null) {
 				if (chuki.endsWith("の注記付き終わり")) {
 					//［＃注記付き］○○［＃「××」の注記付き終わり］の例外処理

@@ -110,36 +110,31 @@ public class CharUtils
 	
 	static public boolean isKanji(char[] ch, int i)
 	{
-		return isKanji(i==0?(char)-1:ch[i-1], ch[i], i+1>=ch.length?(char)-1:ch[i+1]);
-	}
-	/** 漢字かどうかをチェック
-	 * 拡張領域はJavaではUTF-16の2文字になる
-	 * @param pre 1文字前 なければ -1
-	 * @param ch 漢字かチェックする文字
-	 * @param suf 1文字後 なければ -1 */
-	static public boolean isKanji(char pre, char ch, char suf)
-	{
-		switch (ch) {
-		case '〓': case '々': case '〻': case '〆':
+		char pre = i==0?(char)-1:ch[i-1];
+		char c = ch[i];
+		char suf = i+1>=ch.length?(char)-1:ch[i+1];
+		switch (c) {
+		case '〓': case '〆': case '々': case '〻':
 			return true;
 		case 'ノ': case 'カ': case 'ケ': case 'ヵ': case 'ヶ':
-			//先頭の場合は漢字ではない
-			if (pre == (char)-1) return false;
-			return isKanji((char)-1, pre, (char)-1);
+			//漢字の間にある場合だけ漢字扱い
+			if (i==0 || i+1==ch.length) return false;
+			if (pre == (char)-1 || suf == (char)-1) return false;
+			return isKanji(ch, i-1) && isKanji(ch, i+1);
 		}
-		if (0x4E00 <= ch && ch <= 0x9FFF) return true;//'一' <= ch && ch <= '龠'
-		if (0xF900 <= ch && ch <= 0xFAFF) return true;//CJK互換漢字
+		if (0x4E00 <= c && c <= 0x9FFF) return true;//'一' <= ch && ch <= '龠'
+		if (0xF900 <= c && c <= 0xFAFF) return true;//CJK互換漢字
 		//0x20000-0x2A6DF UTF-32({d840,dc00}-{d869,dedf})
 		//0x2A700-0x2B81F UTF-32({d869,df00}-{d86e,dc1f})
 		//0x2F800-0x2FA1F UTF-32({d87e,dc00}-{d87e,de1f})
 		if (pre >= 0) {
-			int code = pre<<16|ch&0xFFFF;
+			int code = pre<<16|c&0xFFFF;
 			if (0xD840DC00 <= code && code <= 0xD869DEDF) return true;
 			if (0xD869DF00 <= code && code <= 0xD86EDC1F) return true;
 			if (0xD87EDc00 <= code && code <= 0xD87EDE1F) return true;
 		}
 		if (suf >= 0) {
-			int code = ch<<16|suf&0xFFFF;
+			int code = c<<16|suf&0xFFFF;
 			if (0xD840DC00 <= code && code <= 0xD869DEDF) return true;
 			if (0xD869DF00 <= code && code <= 0xD86EDC1F) return true;
 			if (0xD87EDc00 <= code && code <= 0xD87EDE1F) return true;
