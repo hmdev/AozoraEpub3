@@ -26,7 +26,6 @@ public class AozoraEpub3ConverterTest
 	public void testReplaceChukiSufTag()
 	{
 		try {
-		System.out.println(converter.replaceChukiSufTag("人間は考える｜蘆［＃「人間は考える｜蘆」は太字］《あし》"));
 		Assert.assertEquals(
 			converter.replaceChukiSufTag("人間は考える｜蘆［＃「人間は考える｜蘆」は太字］《あし》"),
 			"［＃太字］人間は考える｜蘆《あし》［＃太字終わり］");
