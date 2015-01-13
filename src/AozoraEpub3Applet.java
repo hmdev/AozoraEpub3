@@ -1512,7 +1512,7 @@ public class AozoraEpub3Applet extends JApplet
 		label.setBorder(padding2);
 		panel.add(label);
 		jComboxMaxEmptyLine = new JComboBox(new String[]{"-", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"});
-		jComboxMaxEmptyLine.setToolTipText("空行の連続をこの行数以下にします");
+		jComboxMaxEmptyLine.setToolTipText("空行の連続を指定行数以下に制限します");
 		jComboxMaxEmptyLine.setFocusable(false);
 		jComboxMaxEmptyLine.setBorder(padding0);
 		jComboxMaxEmptyLine.setMaximumSize(text5);
@@ -1622,7 +1622,7 @@ public class AozoraEpub3Applet extends JApplet
 		//目次抽出
 		panelV = new JPanel();
 		panelV.setLayout(new BoxLayout(panelV, BoxLayout.Y_AXIS));
-		panelV.setBorder(new NarrowTitledBorder("目次出力"));
+		panelV.setBorder(new NarrowTitledBorder("目次設定"));
 		tabPanel.add(panelV);
 		panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
@@ -2509,29 +2509,8 @@ public class AozoraEpub3Applet extends JApplet
 			Vector<String> vecUrlString = new Vector<String>();
 			File dstPath = null;
 			
-			if (transfer.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
-				//LogAppender.println("FileList形式");
-				//IEはurlはショートカットとURL文字列の両方がくる
-				@SuppressWarnings("unchecked")
-				List<File> files = (List<File>)transfer.getTransferData(DataFlavor.javaFileListFlavor);
-				if (files.size() > 0) {
-					dstPath = files.get(0).getParentFile();
-					for (File file : files) {
-						if (file.getName().toLowerCase().endsWith(".url")) {
-							if (vecUrlString == null) vecUrlString = new Vector<String>();
-							String urlLine = readInternetShortCut(file);
-							if (urlLine != null && urlLine.startsWith("http://")) {
-								vecUrlString.add(urlLine);
-							}
-						} else {
-							vecFiles.add(file);
-						}
-					}
-				}
-			}
-			else if (transfer.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-				//LogAppender.println("String形式");
-				//URLかどうか
+			if (transfer.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+				//ブラウザからだとStringとFileの両方が来る Linuxは file:// 文字列
 				String urlString = null;
 				try {
 					Object transferData = transfer.getTransferData(DataFlavor.stringFlavor);
@@ -2546,8 +2525,8 @@ public class AozoraEpub3Applet extends JApplet
 						for (String path : fileNames) {
 							File file = new File(URLDecoder.decode(path.substring(7).trim(),"UTF-8"));
 							if (file.exists()) {
+								dstPath = file.getParentFile();
 								if (file.getName().toLowerCase().endsWith(".url")) {
-									dstPath = file.getParentFile();
 									String urlLine = readInternetShortCut(file);
 									if (urlLine != null && urlLine.startsWith("http://")) {
 										vecUrlString.add(urlLine);
@@ -2560,7 +2539,7 @@ public class AozoraEpub3Applet extends JApplet
 					} catch (Exception e) { e.printStackTrace(); }
 				}
 				else if (urlString != null) {
-					//ブラウザからのDnDならファイルの方は削除
+					//ブラウザからのDnD
 					dstPath = null;
 					try {
 						String[] urlLines = urlString.split("\n| ");
@@ -2571,6 +2550,27 @@ public class AozoraEpub3Applet extends JApplet
 							}
 						}
 					} catch (Exception e) { e.printStackTrace(); }
+				}
+			}
+			else if (transfer.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+				//ローカルファイルはFileのみ
+				@SuppressWarnings("unchecked")
+				List<File> files = (List<File>)transfer.getTransferData(DataFlavor.javaFileListFlavor);
+				if (files.size() > 0) {
+					for (File file : files) {
+						if (file.exists()) {
+							dstPath = file.getParentFile();
+							if (file.getName().toLowerCase().endsWith(".url")) {
+								if (vecUrlString == null) vecUrlString = new Vector<String>();
+								String urlLine = readInternetShortCut(file);
+								if (urlLine != null && urlLine.startsWith("http://")) {
+									vecUrlString.add(urlLine);
+								}
+							} else {
+								vecFiles.add(file);
+							}
+						}
+					}
 				}
 			}
 			

@@ -1,1 +1,0 @@
-README.mdにMarkdown形式で記載 (更新履歴は README_Changes.txt 参照)
