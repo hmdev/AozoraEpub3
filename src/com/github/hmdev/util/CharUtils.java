@@ -108,7 +108,21 @@ public class CharUtils
 		return ('A' <= ch  && ch <= 'Z') || ('a' <= ch && ch <= 'z') || (0x80 <= ch && ch <= 0x02AF);
 	}
 	
+	/** 漢字かどうかをチェック
+	 * 4バイト文字のも対応
+	 * 漢字の間の「ノカケヵヶ」も漢字扱い */
 	static public boolean isKanji(char[] ch, int i)
+	{
+		switch (ch[i]) {
+		case 'ノ': case 'カ': case 'ケ': case 'ヵ': case 'ヶ':
+			//漢字の間にある場合だけ漢字扱い
+			if (i==0 || i+1==ch.length) return false;
+			return _isKanji(ch, i-1) && _isKanji(ch, i+1);
+		}
+		return _isKanji(ch, i);
+	}
+	/** カタカナ以外の漢字チェック */
+	static private boolean _isKanji(char[] ch, int i)
 	{
 		char pre = i==0?(char)-1:ch[i-1];
 		char c = ch[i];
@@ -116,11 +130,6 @@ public class CharUtils
 		switch (c) {
 		case '〓': case '〆': case '々': case '〻':
 			return true;
-		case 'ノ': case 'カ': case 'ケ': case 'ヵ': case 'ヶ':
-			//漢字の間にある場合だけ漢字扱い
-			if (i==0 || i+1==ch.length) return false;
-			if (pre == (char)-1 || suf == (char)-1) return false;
-			return isKanji(ch, i-1) && isKanji(ch, i+1);
 		}
 		if (0x4E00 <= c && c <= 0x9FFF) return true;//'一' <= ch && ch <= '龠'
 		if (0xF900 <= c && c <= 0xFAFF) return true;//CJK互換漢字

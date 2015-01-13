@@ -2529,7 +2529,7 @@ public class AozoraEpub3Applet extends JApplet
 					}
 				}
 			}
-			if (vecUrlString != null || transfer.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+			else if (transfer.isDataFlavorSupported(DataFlavor.stringFlavor)) {
 				//LogAppender.println("String形式");
 				//URLかどうか
 				String urlString = null;
@@ -2572,12 +2572,13 @@ public class AozoraEpub3Applet extends JApplet
 						}
 					} catch (Exception e) { e.printStackTrace(); }
 				}
-				
-				//何も変換しなければfalse
-				if (vecFiles.size() == 0 && vecUrlString.size() == 0) return false;
-				//変換実行
-				startConvertWorker(vecFiles, vecUrlString, dstPath);
 			}
+			
+			//何も変換しなければfalse
+			if (vecFiles.size() == 0 && vecUrlString.size() == 0) return false;
+			//変換実行
+			startConvertWorker(vecFiles, vecUrlString, dstPath);
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
@@ -2654,7 +2655,8 @@ public class AozoraEpub3Applet extends JApplet
 			else if (!srcFiles[0].getAbsolutePath().startsWith(cachePath.getAbsolutePath())) currentPath = srcFiles[0].getParentFile();
 			
 		} else {
-			if (dstPath == null) dstPath = new File(jComboDstPath.getEditor().getItem().toString());
+			//指定の出力先にする
+			dstPath = new File(jComboDstPath.getEditor().getItem().toString());
 			if (!dstPath.isDirectory()) {
 				String dstPathName = dstPath.getAbsolutePath();
 				if (dstPathName.length() > 70) dstPathName = dstPathName.substring(0, 32)+" ... "+dstPathName.substring(dstPathName.length()-32);
