@@ -154,6 +154,9 @@ public class AozoraEpub3Applet extends JApplet
 	
 	JCheckBox jCheckConfirm;
 	
+	//出力先
+	/** 入力と同じ */
+	JCheckBox jCheckSamePath;
 	JComboBox jComboDstPath;
 	JButton jButtonDstPath;
 	
@@ -737,7 +740,7 @@ public class AozoraEpub3Applet extends JApplet
 		//拡張子
 		label = new JLabel("拡張子: ");
 		panel.add(label);
-		jComboExt = new JComboBox(new String[]{".epub", ".kepub.epub", ".mobi"});
+		jComboExt = new JComboBox(new String[]{".epub", ".kepub.epub", ".mobi", ".mobi+.epub"});
 		jComboExt.setEditable(true);
 		jComboExt.setMaximumSize(new Dimension(110, 24));
 		jComboExt.setPreferredSize(new Dimension(110, 24));
@@ -770,19 +773,34 @@ public class AozoraEpub3Applet extends JApplet
 		//出力先
 		label = new JLabel("出力先: ");
 		panel.add(label);
-		Vector<String> vecDstPath = new Vector<String>();
-		vecDstPath.add("[入力ファイルと同じ場所]");
-		String propValue = props.getProperty("DstPathList");
-		if (propValue!=null && propValue.length()>0) {
-			for (String dstPath : propValue.split(",")) { vecDstPath.add(dstPath); }
-		}
-		jComboDstPath = new JComboBox(vecDstPath);
-		jComboDstPath.setEditable(true);
+		jCheckSamePath = new JCheckBox("入力と同じ", true);
+		panel.add(jCheckSamePath);
+		jCheckSamePath.addChangeListener(new ChangeListener() { public void stateChanged(ChangeEvent e){
+			jComboDstPath.setEditable(!jCheckSamePath.isSelected());
+			jComboDstPath.setForeground(jCheckSamePath.isSelected()?Color.gray:Color.black);
+			jComboDstPath.repaint();
+		}});
+		jComboDstPath = new JComboBox();
+		jComboDstPath.setEditable(false);
+		jComboDstPath.setForeground(Color.gray);
 		jComboDstPath.setPreferredSize(new Dimension(320, 24));
-		propValue = props.getProperty("DstPath");
-		if (propValue!=null && propValue.length()>0) jComboDstPath.setSelectedItem(propValue);
+		//パスを追加
+		//vecDstPath.add("[入力ファイルと同じ場所]");
+		String propValue = props.getProperty("DstPathList");
+		String dstPath = props.getProperty("DstPath");
+		if (propValue!=null && propValue.length()>0) {
+			for (String listPath : propValue.split(",")) {
+				jComboDstPath.addItem(listPath);
+			}
+		}
+		if (dstPath!=null && !dstPath.equals("")) {
+			jComboDstPath.setSelectedItem(dstPath);
+		}
 		panel.add(jComboDstPath);
 		new DropTarget(jComboDstPath.getEditor().getEditorComponent(), DnDConstants.ACTION_COPY_OR_MOVE, new DropDstPathListener(), true);
+		//選択解除
+		if (!"1".equals(props.getProperty("SamePath"))) jCheckSamePath.setSelected(false);
+		
 		jButtonDstPath = new JButton("選択");
 		jButtonDstPath.setBorder(padding3);
 		jButtonDstPath.setIcon(new ImageIcon(AozoraEpub3Applet.class.getResource("images/dst_path.png")));
@@ -1776,7 +1794,9 @@ public class AozoraEpub3Applet extends JApplet
 		jCheckChapterPattern.setToolTipText("目次抽出パターンを正規表現で指定します。前後の空白とタグを除いた文字列と比較します。");
 		jCheckChapterPattern.setFocusPainted(false);
 		jCheckChapterPattern.setBorder(padding2);
-		jCheckChapterPattern.addChangeListener(new ChangeListener() {public void stateChanged(ChangeEvent e){ jComboChapterPattern.setEditable(jCheckChapterPattern.isSelected()); jComboChapterPattern.repaint(); }});
+		jCheckChapterPattern.addChangeListener(new ChangeListener() {public void stateChanged(ChangeEvent e){
+			jComboChapterPattern.setEditable(jCheckChapterPattern.isSelected()); jComboChapterPattern.repaint();
+		}});
 		panel.add(jCheckChapterPattern);
 		jComboChapterPattern = new JComboBox(new String[]{
 				"^(見出し１|見出し２|見出し３)$",
@@ -2240,6 +2260,8 @@ public class AozoraEpub3Applet extends JApplet
 					if (files.size() > 0) {
 						File file = files.get(0);
 						if (!file.isDirectory()) file = file.getParentFile();
+						jCheckSamePath.setSelected(false);
+						jComboDstPath.setEditable(true);
 						jComboDstPath.setSelectedItem(file.getAbsolutePath());
 						return;
 					}
@@ -2248,6 +2270,8 @@ public class AozoraEpub3Applet extends JApplet
 					String path = (String)transfer.getTransferData(DataFlavor.stringFlavor);
 					if (path.startsWith("file://"))
 						try { path = URLDecoder.decode(path.substring(0, path.indexOf('\n')-1).substring(7).trim(),"UTF-8"); } catch (UnsupportedEncodingException e1) { }
+					jCheckSamePath.setSelected(false);
+					jComboDstPath.setEditable(true);
 					jComboDstPath.setSelectedItem(path);
 					return;
 				}
@@ -2270,7 +2294,9 @@ public class AozoraEpub3Applet extends JApplet
 		public void actionPerformed(ActionEvent e)
 		{
 			File path = currentPath;
-			File selectedPath = new File((String)jComboDstPath.getEditor().getItem());
+			String dstPath = jComboDstPath.getEditor().getItem().toString();
+			if (dstPath.equals("")) dstPath = jComboDstPath.getSelectedItem().toString();
+			File selectedPath = new File(dstPath);
 			if (selectedPath.isDirectory()) path = selectedPath;
 			else if (selectedPath.isFile()) path = selectedPath.getParentFile();
 			JFileChooser fileChooser = new JFileChooser(path);
@@ -2281,6 +2307,8 @@ public class AozoraEpub3Applet extends JApplet
 			switch (state) {
 			case JFileChooser.APPROVE_OPTION:
 				String pathString = fileChooser.getSelectedFile().getAbsolutePath();
+				jCheckSamePath.setSelected(false);
+				jComboDstPath.setEditable(true);
 				jComboDstPath.setSelectedItem(pathString);
 			}
 		}
@@ -2609,6 +2637,7 @@ public class AozoraEpub3Applet extends JApplet
 		//パス指定がなければ終了
 		if (this.jComboDstPath.getSelectedIndex() == 0) return;
 		String dstPath = this.jComboDstPath.getEditor().getItem().toString().trim();
+		if (dstPath.equals("")) dstPath = this.jComboDstPath.getSelectedItem().toString().trim();
 		if (dstPath.equals("")) return;
 		
 		int count = Math.min(10, this.jComboDstPath.getItemCount());
@@ -2648,7 +2677,7 @@ public class AozoraEpub3Applet extends JApplet
 		
 		//共通パラメータ取得
 		//出力先取得
-		if (jComboDstPath.getSelectedIndex() == 0) {
+		if (jCheckSamePath.isSelected()) {
 			//出力先指定があればそれを設定
 			if (dstPath != null) currentPath = dstPath;
 			//入力先がキャッシュファイルでなければ設定
@@ -3087,7 +3116,7 @@ public class AozoraEpub3Applet extends JApplet
 		//Kindleチェック
 		File kindlegen = null;
 		writer.setIsKindle(false);
-		if (outExt.endsWith(".mobi")) {
+		if (outExt.startsWith(".mobi")) {
 			kindlegen = new File(this.jarPath+"kindlegen.exe");
 			if (!kindlegen.isFile()) {
 				kindlegen = new File(this.jarPath+"kindlegen");
@@ -3100,7 +3129,6 @@ public class AozoraEpub3Applet extends JApplet
 				LogAppender.println("変換処理をキャンセルしました");
 				return;
 			}
-			outExt = outExt.replaceFirst("\\.mobi$", ".epub");
 			writer.setIsKindle(true);
 		}
 		
@@ -3173,26 +3201,29 @@ public class AozoraEpub3Applet extends JApplet
 		boolean overWrite = this.jCheckOverWrite.isSelected();
 		
 		//出力ファイル
-		File outFile = AozoraEpub3.getOutFile(srcFile, dstPath, bookInfo, autoFileName, outExt);
+		File outFile = null;
 		
 		//Kindleは一旦tmpファイルに出力
 		File outFileOrg = null;
 		if (kindlegen != null) {
+			outFile = AozoraEpub3.getOutFile(srcFile, dstPath, bookInfo, autoFileName, ".epub");
 			File mobiFile = new File(outFile.getAbsolutePath().substring(0, outFile.getAbsolutePath().length()-4)+"mobi");
-			if (!overWrite &&  mobiFile.exists()) {
+			if (!overWrite && (mobiFile.exists() || (outExt.endsWith(".epub") && outFile.exists()))) {
 				LogAppender.println("変換中止: "+srcFile.getAbsolutePath());
-				LogAppender.println("ファイルが存在します: "+outFile.getAbsolutePath());
+				if (mobiFile.exists()) LogAppender.println("ファイルが存在します: "+mobiFile.getAbsolutePath());
+				else LogAppender.println("ファイルが存在します: "+outFile.getAbsolutePath());
 				return;
 			}
 			outFileOrg = outFile;
 			try {
 				outFile = File.createTempFile("kindle", ".epub", outFile.getParentFile());
-				outFile.deleteOnExit();
+				if (!outExt.endsWith(".epub")) outFile.deleteOnExit();
 			} catch (IOException e) {
 				outFile = outFileOrg;
 				outFileOrg = null;
 			}
 		} else {
+			outFile = AozoraEpub3.getOutFile(srcFile, dstPath, bookInfo, autoFileName, outExt);
 			//上書き確認
 			if (!overWrite &&  outFile.exists()) {
 				LogAppender.println("変換中止: "+srcFile.getAbsolutePath());
@@ -3265,16 +3296,20 @@ public class AozoraEpub3Applet extends JApplet
 				if (convertCanceled) {
 					LogAppender.println("\n"+msg+"\nkindlegenの変換を中断しました");
 				} else {
-					//mobiリネーム
 					if (outFileOrg != null) {
+						//mobiリネーム
 						File mobiTmpFile = new File(outFile.getAbsolutePath().substring(0, outFile.getAbsolutePath().length()-4)+"mobi");
 						File mobiFile = new File(outFileOrg.getAbsolutePath().substring(0, outFileOrg.getAbsolutePath().length()-4)+"mobi");
 						if (mobiFile.exists()) mobiFile.delete();
 						mobiTmpFile.renameTo(mobiFile);
-						outFile.delete();
-						outFile = mobiFile;
+						if (outExt.endsWith(".epub")) {
+							//epubリネーム
+							outFile.renameTo(outFileOrg);
+						} else {
+							outFile.delete();
+						}
+						LogAppender.println("\n"+msg+"\nkindlegen変換完了 ["+(((System.currentTimeMillis()-time)/100)/10f)+"s] -> "+mobiFile.getName());
 					}
-					LogAppender.println("\n"+msg+"\nkindlegen変換完了 ["+(((System.currentTimeMillis()-time)/100)/10f)+"s] -> "+outFile.getName());
 				}
 			}
 		} catch (Exception e) {
@@ -3373,9 +3408,9 @@ public class AozoraEpub3Applet extends JApplet
 	void startConvertWorker(Vector<File> vecFiles, Vector<String> vecUrlString, File dstPath)
 	{
 		//出力先が指定されていない
-		if (jComboDstPath.getSelectedIndex() == 0 && dstPath == null) {
+		if (jCheckSamePath.isSelected() && dstPath == null) {
 			dstPathChooser.actionPerformed(null);
-			if (jComboDstPath.getSelectedIndex() == 0) {
+			if (jCheckSamePath.isSelected()) {
 				LogAppender.println("変換処理を中止しました");
 				return;
 			}
@@ -4039,26 +4074,25 @@ public class AozoraEpub3Applet extends JApplet
 			this.props.setProperty("ProfileList", propList.toString());
 		} catch (Exception e) { e.printStackTrace(); }
 		//出力先と履歴保存
-		if (this.jComboDstPath.getSelectedIndex() == 0) this.props.setProperty("DstPath","");
-		else {
-			try {
-				String dstPath = this.jComboDstPath.getEditor().getItem().toString().trim();
-				this.props.setProperty("DstPath", ""+dstPath);
-				//履歴
-				String dstPathList = this.props.getProperty("DstPathList");
-				if (dstPathList == null) dstPathList = dstPath;
-				else {
-					//最大10件
-					dstPathList = dstPath;
-					int count = Math.min(10, this.jComboDstPath.getItemCount());
-					for (int i=1; i<count; i++) {
-						String item = (String)this.jComboDstPath.getItemAt(i);
-						if (!dstPath.equals(item)) dstPathList += ","+item;
-					}
+		try {
+			this.props.setProperty("SamePath", this.jCheckSamePath.isSelected()?"1":"");
+			String dstPath = this.jComboDstPath.getEditor().getItem().toString().trim();
+			if (dstPath.equals("")) dstPath = this.jComboDstPath.getSelectedItem().toString().trim();
+			this.props.setProperty("DstPath", ""+dstPath);
+			//履歴
+			String dstPathList = this.props.getProperty("DstPathList");
+			if (dstPathList == null) dstPathList = dstPath;
+			else {
+				//最大10件
+				dstPathList = dstPath;
+				int count = Math.min(10, this.jComboDstPath.getItemCount());
+				for (int i=0; i<count; i++) {
+					String item = (String)this.jComboDstPath.getItemAt(i);
+					if (!dstPath.equals(item)) dstPathList += ","+item;
 				}
-				this.props.setProperty("DstPathList", dstPathList);
-			} catch (Exception e) { e.printStackTrace(); }
-		}
+			}
+			this.props.setProperty("DstPathList", dstPathList);
+		} catch (Exception e) { e.printStackTrace(); }
 		this.props.setProperty("LastDir", this.currentPath==null?"":this.currentPath.getAbsolutePath());
 		
 		//アプレットの設定をPropertiesに反映

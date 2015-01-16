@@ -2341,17 +2341,16 @@ public class AozoraEpub3Converter
 				
 				//ひらがな/カタカナ＋濁点/半濁点
 				if (i+1<ch.length && (ch[i+1]=='゛' || ch[i+1]=='ﾞ' || ch[i+1]=='゜' || ch[i+1]=='ﾟ')) {
-					if ('ぁ' <= ch[i] && ch[i] <= 'ん' || 'ぁ' <= ch[i] && ch[i] <= 'ヶ' ) {
-						buf.append(chukiMap.get("縦中横")[0]);
-						buf.append(" ");
+					if ('ぁ' <= ch[i] && ch[i] <= 'ん' || 'ぁ' <= ch[i] && ch[i] <= 'ヶ' || ch[i]=='〻') {
+						buf.append("<span class=\"dakuten\">");
 						buf.append(ch[i]);
-						//半角文字で追加
+						buf.append("<span>");
 						if (ch[i+1]=='゛' || ch[i+1]=='ﾞ') {
-							buf.append("ﾞ");
+							buf.append("゛");
 						} else {
-							buf.append("ﾟ");
+							buf.append("゜");
 						}
-						buf.append(chukiMap.get("縦中横終わり")[0]);
+						buf.append("</span></span>");
 						i++;
 						continue;
 					}

@@ -12,19 +12,19 @@ a:active { color: #C00; background: transparent; }
 a:link img, a:visited img { border-style: none; }
 
 span.img {
-/*clear: both;*/
+clear: both;
 display: inline-block;
 }
 span.img.ft {
 display: inline;
 float: left;
-/*clear: left;*/
+clear: left;
 padding-bottom: 0.5em;
 }
 span.img.fb {
 display: inline;
 float: right;
-/*clear: right;*/
+clear: right;
 padding-top: 0.5em;
 }
 span.img.fw img {
@@ -66,6 +66,20 @@ padding: 0.25em;
 border: 1px dashed #000;
 margin: 0.25em;
 padding: 0.25em;
+}
+
+/* 濁点がつく文字 */
+.dakuten {
+display:inline-block;
+position:relative;	
+}
+/* 濁点 */
+.dakuten span {
+position:absolute;
+top:-.8em; left:.1em;
+}
+.kindle .dakuten span {
+top:0; left:0.8em;
 }
 
 /* 圏点 */

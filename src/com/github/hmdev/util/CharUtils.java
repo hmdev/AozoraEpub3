@@ -114,6 +114,8 @@ public class CharUtils
 	static public boolean isKanji(char[] ch, int i)
 	{
 		switch (ch[i]) {
+		case '゛':
+			return (i>0 && ch[i-1]=='〻');
 		case 'ノ': case 'カ': case 'ケ': case 'ヵ': case 'ヶ':
 			//漢字の間にある場合だけ漢字扱い
 			if (i==0 || i+1==ch.length) return false;
