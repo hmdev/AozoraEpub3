@@ -3324,6 +3324,23 @@ public class AozoraEpub3Applet extends JApplet
 	 * @param vecUrlString 青空文庫テキストのzipまたは対応サイトのリンクURL */
 	private void convertWeb(Vector<String> vecUrlString, File dstPath) throws IOException
 	{
+		//出力先取得
+		dstPath = new File(jComboDstPath.getEditor().getItem().toString());
+		if (!dstPath.isDirectory()) {
+			String dstPathName = dstPath.getAbsolutePath();
+			if (dstPathName.length() > 70) dstPathName = dstPathName.substring(0, 32)+" ... "+dstPathName.substring(dstPathName.length()-32);
+			int ret = JOptionPane.showConfirmDialog(jConfirmDialog, "出力先がありません\n"+dstPathName+"\nにフォルダを作成しますか？", "出力先確認", JOptionPane.YES_NO_OPTION);
+			if (ret == JOptionPane.YES_OPTION) {
+				//フォルダ作成
+				dstPath.mkdirs();
+			} else {
+				LogAppender.println("変換処理を中止しました");
+				return;
+			}
+		}
+		//jComboDstPathに出力先履歴保存
+		this.addDstPath();
+		
 		for (String urlString : vecUrlString) {
 			//URL変換 の最後が .zip .txtz .rar
 			String ext = urlString.substring(urlString.lastIndexOf('.')+1).toLowerCase();
@@ -3331,8 +3348,9 @@ public class AozoraEpub3Applet extends JApplet
 				
 				String urlPath = urlString.substring(urlString.indexOf("//")+2).replaceAll("\\?\\*\\&\\|\\<\\>\"\\\\", "_");
 				//青空zipのURLをキャッシュして変換
-				//出力先 URLと同じパス
-				File srcFile = new File(cachePath.getAbsolutePath()+"/"+urlPath);
+				//出力先 出力パスに保存
+				File srcFile = new File(dstPath+"/"+new File(urlPath).getName());
+				LogAppender.println("出力先にダウンロードします : "+srcFile.getCanonicalPath());
 				srcFile.getParentFile().mkdirs();
 				//ダウンロード
 				BufferedInputStream bis = new BufferedInputStream(new URL(urlString).openStream(), 8192);
@@ -3407,7 +3425,7 @@ public class AozoraEpub3Applet extends JApplet
 	/** 別スレッド実行用SwingWorkerを実行 */
 	void startConvertWorker(Vector<File> vecFiles, Vector<String> vecUrlString, File dstPath)
 	{
-		//出力先が指定されていない
+		//出力先が指定されていない場合は選択させる
 		if (jCheckSamePath.isSelected() && dstPath == null) {
 			dstPathChooser.actionPerformed(null);
 			if (jCheckSamePath.isSelected()) {
