@@ -1342,6 +1342,7 @@ public class AozoraEpub3Converter
 	
 	/** 前方参照注記をインライン注記に変換
 	 * 重複等の法則が変則すぎるのでバッファを利用
+	 * 注記文字変換は2回目に行う
 	 * 前にルビがあって｜で始まる場合は｜の前に追加 */
 	String replaceChukiSufTag(String line)
 	{
@@ -1358,7 +1359,6 @@ public class AozoraEpub3Converter
 			//target = target.replaceAll("《[^》]+》", "");
 			String chuki = m.group(2);
 			String[] tags = sufChukiMap.get(chuki);
-			int targetLength = target.length();
 			int chukiTagStart = m.start();
 			int chukiTagEnd = m.end();
 			
@@ -1371,6 +1371,36 @@ public class AozoraEpub3Converter
 				chukiTagStart += ruby.length();
 				chukiTagEnd += ruby.length();
 			}
+			
+			if (tags != null) {
+				
+				//置換済みの文字列で注記追加位置を探す
+				int targetStart = this.getTargetStart(buf, chukiTagStart, chOffset, CharUtils.removeRuby(target).length());
+				
+				//後ろタグ置換
+				buf.delete(chukiTagStart+chOffset, chukiTagEnd+chOffset);
+				buf.insert(chukiTagStart+chOffset, "［＃"+tags[1]+"］");
+				//前タグinsert
+				buf.insert(targetStart, "［＃"+tags[0]+"］");
+				
+				chOffset += tags[0].length() + tags[1].length() +6 - (chukiTagEnd-chukiTagStart);
+				
+			}
+		} while (m.find());
+		
+		//注記タグ等を再度変換
+		line = buf.toString();
+		m = chukiSufPattern.matcher(line);
+		//マッチしなければそのまま返却
+		if (!m.find()) return line;
+		chOffset = 0;
+		do {
+			String target = m.group(1);
+			String chuki = m.group(2);
+			String[] tags = sufChukiMap.get(chuki);
+			int targetLength = target.length();
+			int chukiTagStart = m.start();
+			int chukiTagEnd = m.end();
 			
 			if (tags == null) {
 				if (chuki.endsWith("の注記付き終わり")) {
@@ -1418,19 +1448,7 @@ public class AozoraEpub3Converter
 					buf.insert(targetStart, "｜");
 					chOffset += targetLength+3 - (chukiTagEnd-chukiTagStart);
 				}
-				continue;
 			}
-			
-			//置換済みの文字列で注記追加位置を探す
-			int targetStart = this.getTargetStart(buf, chukiTagStart, chOffset, CharUtils.removeRuby(target).length());
-			
-			//後ろタグ置換
-			buf.delete(chukiTagStart+chOffset, chukiTagEnd+chOffset);
-			buf.insert(chukiTagStart+chOffset, "［＃"+tags[1]+"］");
-			//前タグinsert
-			buf.insert(targetStart, "［＃"+tags[0]+"］");
-			
-			chOffset += tags[0].length() + tags[1].length() +6 - (chukiTagEnd-chukiTagStart);
 		} while (m.find());
 		
 		//置換後文字列を返却
