@@ -2634,26 +2634,24 @@ public class AozoraEpub3Applet extends JApplet
 	/** 変換実行時出力先リストの先頭に追加または移動 */
 	protected void addDstPath()
 	{
-		//パス指定がなければ終了
-		if (this.jComboDstPath.getSelectedIndex() == 0) return;
 		String dstPath = this.jComboDstPath.getEditor().getItem().toString().trim();
 		if (dstPath.equals("") && jComboDstPath.getSelectedItem() != null) dstPath = this.jComboDstPath.getSelectedItem().toString().trim();
 		if (dstPath.equals("")) return;
 		
 		int count = Math.min(10, this.jComboDstPath.getItemCount());
-		for (int i=1; i<count; i++) {
+		for (int i=0; i<count; i++) {
 			String item = (String)this.jComboDstPath.getItemAt(i);
 			if (dstPath.equals(item)) {
 				//先頭に移動して終了
 				this.jComboDstPath.removeItemAt(i);
-				this.jComboDstPath.insertItemAt(item, 1);
-				this.jComboDstPath.setSelectedIndex(1);
+				this.jComboDstPath.addItem(item);
+				this.jComboDstPath.setSelectedIndex(0);
 				return;
 			}
 		}
 		//ファイルがあれば先頭に追加
-		this.jComboDstPath.insertItemAt(dstPath, 1);
-		this.jComboDstPath.setSelectedIndex(1);
+		this.jComboDstPath.addItem(dstPath);
+		this.jComboDstPath.setSelectedIndex(0);
 	}
 	
 	////////////////////////////////////////////////////////////////
