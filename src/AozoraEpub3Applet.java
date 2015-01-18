@@ -484,7 +484,7 @@ public class AozoraEpub3Applet extends JApplet
 		panel.add(panelV);
 		//上
 		jButtonProfileUp = new JButton(new ImageIcon(AozoraEpub3Applet.class.getResource("images/spin_up.png")));
-		jButtonProfileUp.setToolTipText("選択中のプロファイルを上に移動します");
+		jButtonProfileUp.setToolTipText("選択中のプロファイルを選択リスト内で上に移動します");
 		jButtonProfileUp.setBorder(padding2);
 		jButtonProfileUp.setFocusPainted(false);
 		jButtonProfileUp.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent arg0) {
@@ -500,7 +500,7 @@ public class AozoraEpub3Applet extends JApplet
 		panelV.add(jButtonProfileUp);
 		//下
 		jButtonProfileDown = new JButton(new ImageIcon(AozoraEpub3Applet.class.getResource("images/spin_down.png")));
-		jButtonProfileDown.setToolTipText("選択中のプロファイルを下に移動します");
+		jButtonProfileDown.setToolTipText("選択中のプロファイルを選択リスト内で下に移動します");
 		jButtonProfileDown.setBorder(padding2);
 		jButtonProfileDown.setFocusPainted(false);
 		jButtonProfileDown.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent arg0) {
@@ -525,7 +525,7 @@ public class AozoraEpub3Applet extends JApplet
 		panel.add(jButtonProfileCreate);
 		//編集
 		jButtonProfileEdit = new JButton(new ImageIcon(AozoraEpub3Applet.class.getResource("images/edit.png")));
-		jButtonProfileEdit.setToolTipText("選択中のプロファイルを編集・削除します");
+		jButtonProfileEdit.setToolTipText("選択中のプロファイルを名称変更・削除します");
 		jButtonProfileEdit.setBorder(padding3);
 		jButtonProfileEdit.setFocusPainted(false);
 		jButtonProfileEdit.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent arg0) {
@@ -558,7 +558,7 @@ public class AozoraEpub3Applet extends JApplet
 			}
 		}
 		jButtonPreset = new JButton("端末設定", new ImageIcon(AozoraEpub3Applet.class.getResource("images/viewer.png")));
-		jButtonPreset.setToolTipText("端末に合わせた画面サイズと最低限必要な設定を反映します");
+		jButtonPreset.setToolTipText("端末に合わせた画面サイズと機種依存の最低限の設定を反映します");
 		jButtonPreset.setBorder(padding3);
 		jButtonPreset.setFocusPainted(false);
 		jButtonPreset.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent arg0) {
@@ -626,7 +626,7 @@ public class AozoraEpub3Applet extends JApplet
 		panel.add(label);
 		
 		jTextMaxCoverLine = new JTextField("10");
-		jTextMaxCoverLine.setToolTipText("先頭の挿絵を利用する行数 0なら制限なし");
+		jTextMaxCoverLine.setToolTipText("先頭の挿絵に利用する画像注記を取得する最大行数 0なら制限なし");
 		jTextMaxCoverLine.setHorizontalAlignment(JTextField.RIGHT);
 		jTextMaxCoverLine.setMinimumSize(text4);
 		jTextMaxCoverLine.setMaximumSize(text4);
@@ -660,7 +660,7 @@ public class AozoraEpub3Applet extends JApplet
 		jButtonCover.addActionListener(new CoverChooserListener(this));
 		panel.add(jButtonCover);
 		jCheckCoverHistory = new JCheckBox("表紙履歴利用", true);
-		jCheckCoverHistory.setToolTipText("前回の変換(またはスキップ)で設定した表紙を利用します");
+		jCheckCoverHistory.setToolTipText("前回の変換(またはスキップ)で設定した表紙を利用します ※履歴は再起動時に初期化されます");
 		jCheckCoverHistory.setFocusPainted(false);
 		panel.add(jCheckCoverHistory);
 		
@@ -679,14 +679,14 @@ public class AozoraEpub3Applet extends JApplet
 		panel.add(jCheckCoverPage);
 		//左右中央
 		jCheckTitlePage = new JCheckBox("表題", true);
-		jCheckTitlePage.setToolTipText("表題を単独のページで出力します。チェック無し時はスタイルのみ変更して出力します");
+		jCheckTitlePage.setToolTipText("表題を単独のページで出力します。チェック無し時は表題等は出力されません");
 		jCheckTitlePage.setFocusPainted(false);
 		panel.add(jCheckTitlePage);
 		label = new JLabel("(");
 		panel.add(label);
 		buttonGroup = new ButtonGroup();
 		jRadioTitleNormal = new JRadioButton("本文内 ", true);
-		jRadioTitleNormal.setToolTipText("別ページ処理せずに本文の順番で文字サイズのみ変更して出力します");
+		jRadioTitleNormal.setToolTipText("別ページ処理せずに本文中に表題等を出力します。 目次は表題前に出力されます");
 		jRadioTitleNormal.setBorder(padding0);
 		jRadioTitleNormal.setIconTextGap(1);
 		panel.add(jRadioTitleNormal);
@@ -741,6 +741,7 @@ public class AozoraEpub3Applet extends JApplet
 		label = new JLabel("拡張子: ");
 		panel.add(label);
 		jComboExt = new JComboBox(new String[]{".epub", ".kepub.epub", ".mobi", ".mobi+.epub"});
+		jComboExt.setToolTipText("出力するファイルの拡張子を選択します。 mobi出力時はKindlegenが必要になります");
 		jComboExt.setEditable(true);
 		jComboExt.setMaximumSize(new Dimension(110, 24));
 		jComboExt.setPreferredSize(new Dimension(110, 24));
@@ -774,6 +775,7 @@ public class AozoraEpub3Applet extends JApplet
 		label = new JLabel("出力先: ");
 		panel.add(label);
 		jCheckSamePath = new JCheckBox("入力と同じ", true);
+		jCheckSamePath.setToolTipText("入力ファイルと同じ場所に出力します");
 		panel.add(jCheckSamePath);
 		jCheckSamePath.addChangeListener(new ChangeListener() { public void stateChanged(ChangeEvent e){
 			jComboDstPath.setEditable(!jCheckSamePath.isSelected());
@@ -781,6 +783,7 @@ public class AozoraEpub3Applet extends JApplet
 			jComboDstPath.repaint();
 		}});
 		jComboDstPath = new JComboBox();
+		jComboDstPath.setToolTipText("出力先を指定します。変換時に履歴に追加されます。フォルダのドロップでも設定できます");
 		jComboDstPath.setEditable(false);
 		jComboDstPath.setForeground(Color.gray);
 		jComboDstPath.setPreferredSize(new Dimension(260, 24));
@@ -837,7 +840,7 @@ public class AozoraEpub3Applet extends JApplet
 		label.setBorder(padding0);
 		panel1.add(label);
 		jComboEncType = new JComboBox(new String[]{"MS932", "UTF-8"});
-		jComboEncType.setToolTipText("入力ファイルのテキストファイルの文字コード 青空文庫の標準はMS932(SJIS) 外字等変換済テキストはUTF-8を選択");
+		jComboEncType.setToolTipText("入力ファイルのテキストファイルの文字コード。青空文庫の標準はMS932(SJIS)です");
 		jComboEncType.setFocusable(false);
 		jComboEncType.setPreferredSize(new Dimension(100, 22));
 		panel1.add(jComboEncType);
@@ -2644,13 +2647,13 @@ public class AozoraEpub3Applet extends JApplet
 			if (dstPath.equals(item)) {
 				//先頭に移動して終了
 				this.jComboDstPath.removeItemAt(i);
-				this.jComboDstPath.addItem(item);
+				this.jComboDstPath.insertItemAt(item, 0);
 				this.jComboDstPath.setSelectedIndex(0);
 				return;
 			}
 		}
 		//ファイルがあれば先頭に追加
-		this.jComboDstPath.addItem(dstPath);
+		this.jComboDstPath.insertItemAt(dstPath, 0);
 		this.jComboDstPath.setSelectedIndex(0);
 	}
 	
@@ -3302,6 +3305,7 @@ public class AozoraEpub3Applet extends JApplet
 						mobiTmpFile.renameTo(mobiFile);
 						if (outExt.endsWith(".epub")) {
 							//epubリネーム
+							if (outFileOrg.exists()) outFileOrg.delete();
 							outFile.renameTo(outFileOrg);
 						} else {
 							outFile.delete();

@@ -74,7 +74,7 @@
 		<item id="nav" properties="nav" href="xhtml/nav.xhtml" media-type="application/xhtml+xml"/>
 
 #if (${bookInfo.InsertCoverPage})
-#if ($svgImage)
+#if ($svgImage && ${bookInfo.ImageOnly})
 		<item id="cover-page" href="xhtml/cover.xhtml" media-type="application/xhtml+xml" properties="svg"/>
 #else
 		<item id="cover-page" href="xhtml/cover.xhtml" media-type="application/xhtml+xml"/>
@@ -84,7 +84,7 @@
 		<item id="title-page" href="xhtml/title.xhtml" media-type="application/xhtml+xml"/>
 #end
 
-#if ($svgImage)
+#if ($svgImage && ${bookInfo.ImageOnly})
 #foreach(${sectionInfo} in ${sections})
 		<item id="sec${sectionInfo.SectionId}" href="xhtml/${sectionInfo.SectionId}.xhtml" media-type="application/xhtml+xml" properties="svg"/>
 #end
