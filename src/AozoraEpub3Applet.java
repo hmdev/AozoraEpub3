@@ -783,7 +783,7 @@ public class AozoraEpub3Applet extends JApplet
 		jComboDstPath = new JComboBox();
 		jComboDstPath.setEditable(false);
 		jComboDstPath.setForeground(Color.gray);
-		jComboDstPath.setPreferredSize(new Dimension(320, 24));
+		jComboDstPath.setPreferredSize(new Dimension(260, 24));
 		//パスを追加
 		//vecDstPath.add("[入力ファイルと同じ場所]");
 		String propValue = props.getProperty("DstPathList");
@@ -799,7 +799,7 @@ public class AozoraEpub3Applet extends JApplet
 		panel.add(jComboDstPath);
 		new DropTarget(jComboDstPath.getEditor().getEditorComponent(), DnDConstants.ACTION_COPY_OR_MOVE, new DropDstPathListener(), true);
 		//選択解除
-		if (!"1".equals(props.getProperty("SamePath"))) jCheckSamePath.setSelected(false);
+		if ("".equals(props.getProperty("SamePath"))) jCheckSamePath.setSelected(false);
 		
 		jButtonDstPath = new JButton("選択");
 		jButtonDstPath.setBorder(padding3);
@@ -2294,8 +2294,8 @@ public class AozoraEpub3Applet extends JApplet
 		public void actionPerformed(ActionEvent e)
 		{
 			File path = currentPath;
-			String dstPath = jComboDstPath.getEditor().getItem().toString();
-			if (dstPath.equals("")) dstPath = jComboDstPath.getSelectedItem().toString();
+			String dstPath = jComboDstPath.getEditor().getItem().toString().trim();
+			if (dstPath.equals("") && jComboDstPath.getSelectedItem() != null) dstPath = jComboDstPath.getSelectedItem().toString().trim();
 			File selectedPath = new File(dstPath);
 			if (selectedPath.isDirectory()) path = selectedPath;
 			else if (selectedPath.isFile()) path = selectedPath.getParentFile();
@@ -2637,7 +2637,7 @@ public class AozoraEpub3Applet extends JApplet
 		//パス指定がなければ終了
 		if (this.jComboDstPath.getSelectedIndex() == 0) return;
 		String dstPath = this.jComboDstPath.getEditor().getItem().toString().trim();
-		if (dstPath.equals("")) dstPath = this.jComboDstPath.getSelectedItem().toString().trim();
+		if (dstPath.equals("") && jComboDstPath.getSelectedItem() != null) dstPath = this.jComboDstPath.getSelectedItem().toString().trim();
 		if (dstPath.equals("")) return;
 		
 		int count = Math.min(10, this.jComboDstPath.getItemCount());
@@ -4095,7 +4095,7 @@ public class AozoraEpub3Applet extends JApplet
 		try {
 			this.props.setProperty("SamePath", this.jCheckSamePath.isSelected()?"1":"");
 			String dstPath = this.jComboDstPath.getEditor().getItem().toString().trim();
-			if (dstPath.equals("")) dstPath = this.jComboDstPath.getSelectedItem().toString().trim();
+			if (dstPath.equals("") && jComboDstPath.getSelectedItem() != null) dstPath = this.jComboDstPath.getSelectedItem().toString().trim();
 			this.props.setProperty("DstPath", ""+dstPath);
 			//履歴
 			String dstPathList = this.props.getProperty("DstPathList");
