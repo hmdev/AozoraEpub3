@@ -3,11 +3,11 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="ja" lang="ja">
 <head>
 #if (${bookInfo.Vertical})
-<link rel="stylesheet" type="text/css" href="../css/vertical_font.css"/>
+<link rel="stylesheet" type="text/css" href="../css/vertical_text.css"/>
 <link rel="stylesheet" type="text/css" href="../css/vertical_middle.css"/>
 <link rel="stylesheet" type="text/css" href="../css/vertical.css"/>
 #else
-<link rel="stylesheet" type="text/css" href="../css/horizontal_font.css"/>
+<link rel="stylesheet" type="text/css" href="../css/horizontal_text.css"/>
 <link rel="stylesheet" type="text/css" href="../css/horizontal_middle.css"/>
 <link rel="stylesheet" type="text/css" href="../css/horizontal.css"/>
 #end

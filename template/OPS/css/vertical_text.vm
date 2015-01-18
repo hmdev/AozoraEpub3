@@ -1,0 +1,45 @@
+@charset "utf-8";
+@namespace "http://www.w3.org/1999/xhtml";
+
+/** 縦書き テキスト用スタイル */
+@page {
+margin: ${pageMargin[0]} ${pageMargin[1]} ${pageMargin[2]} ${pageMargin[3]};
+}
+
+html {
+writing-mode: vertical-rl;
+-webkit-writing-mode: vertical-rl;
+-epub-writing-mode: vertical-rl;
+-epub-line-break: strict;
+line-break: strict;	
+-epub-word-break: normal;
+word-break: normal;
+margin: 0;
+padding: 0;
+}
+body {
+margin: ${bodyMargin[0]} ${bodyMargin[1]} ${bodyMargin[2]} ${bodyMargin[3]};
+padding: 0;
+display: block;
+color: #000;
+font-size: ${fontSize}%;
+line-height: ${lineHeight}em;
+vertical-align: baseline;
+}
+body.kindle {
+line-height: ${lineHeight}em;
+}
+
+/** フォント */
+body {
+font-family: "@ＭＳ 明朝", "@MS Mincho", "ヒラギノ明朝 ProN W3", "HiraMinProN-W3", serif, sans-serif;
+}
+#if (${boldUseGothic})
+body .b,
+#end
+body .gtc {
+font-family: '@ＭＳ ゴシック','@MS Gothic',sans-serif;
+}
+
+.b, .gtc { font-weight: bold; }
+.i { font-style: italic; }

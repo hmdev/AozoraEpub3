@@ -8,31 +8,13 @@ margin: 0 0 0 0;
 }
 
 html {
-writing-mode: horizontal-tb;
--webkit-writing-mode: horizontal-tb;
--epub-writing-mode: horizontal-tb;
--epub-line-break: strict;
-line-break: strict;	
--epub-word-break: normal;
-word-break: normal;
-margin: 0;
-padding: 0;
 width:100%;
 height:100%;
 }
 body {
-margin: 0;
-padding: 0 .5em;
-display: block;
-color: #000;
-font-size: 1em;
-line-height: 1.75;
 vertical-align: baseline;
 width:100%;
 height:100%;
-}
-body.kindle {
-line-height: 1.5;
 }
 
 table {

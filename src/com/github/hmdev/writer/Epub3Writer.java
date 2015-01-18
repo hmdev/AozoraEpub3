@@ -68,6 +68,15 @@ public class Epub3Writer
 	/** フォントファイル格納パス */
 	final static String FONTS_PATH = "fonts/";
 	
+	/** 縦書きcss */
+	final static String VERTICAL_TEXT_CSS = "vertical_text.css";
+	/** 縦書きcss Velocityテンプレート */
+	final static String VERTICAL_TEXT_CSS_VM = "vertical_text.vm";
+	/** 横書きcss */
+	final static String HORIZONTAL_TEXT_CSS = "horizontal_text.css";
+	/** 横書きcss Velocityテンプレート */
+	final static String HORIZONTAL_TEXT_CSS_VM = "horizontal_text.vm";
+	
 	/** xhtmlヘッダVelocityテンプレート */
 	final static String XHTML_HEADER_VM = "xhtml_header.vm";
 	/** xhtmlフッタVelocityテンプレート */
@@ -106,18 +115,18 @@ public class Epub3Writer
 	/** コピーのみのファイル */
 	final static String[] TEMPLATE_FILE_NAMES_VERTICAL = new String[]{
 		"META-INF/container.xml",
-		OPS_PATH+CSS_PATH+"vertical_text.css",
+		//OPS_PATH+CSS_PATH+"vertical_text.css",
 		OPS_PATH+CSS_PATH+"vertical_middle.css",
 		OPS_PATH+CSS_PATH+"vertical_image.css",
-		OPS_PATH+CSS_PATH+"vertical_font.css",
+		//OPS_PATH+CSS_PATH+"vertical_font.css",
 		OPS_PATH+CSS_PATH+"vertical.css"
 	};
 	final static String[] TEMPLATE_FILE_NAMES_HORIZONTAL = new String[]{
 		"META-INF/container.xml",
-		OPS_PATH+CSS_PATH+"horizontal_text.css",
+		//OPS_PATH+CSS_PATH+"horizontal_text.css",
 		OPS_PATH+CSS_PATH+"horizontal_middle.css",
 		OPS_PATH+CSS_PATH+"horizontal_image.css",
-		OPS_PATH+CSS_PATH+"horizontal_font.css",
+		//OPS_PATH+CSS_PATH+"horizontal_font.css",
 		OPS_PATH+CSS_PATH+"horizontal.css"
 	};
 	String[] getTemplateFiles()
@@ -198,6 +207,17 @@ public class Epub3Writer
 	
 	/** 拡張子に.mobiが選択されていてkindlegenがある場合 */
 	boolean isKindle = false;
+	
+	/** page余白 単位含む */
+	String[] pageMargin = {"0", "0", "0", "0"};
+	/** body余白 */
+	String[] bodyMargin = {"0", "0", "0", "0"};
+	/** 行の高さ em */
+	float lineHeight;
+	/** 文字サイズ % */
+	int fontSize = 100;
+	/** boldをゴシックで表示 */
+	boolean boldUseGothic = true;
 	
 	////////////////////////////////
 	/** 出力先ePubのZipストリーム ConverterからのnextSection呼び出しで利用 */
@@ -317,6 +337,15 @@ public class Epub3Writer
 		this.ncxNest = ncxNest;
 	}
 	
+	public void setStyles(String[] pageMargin, String[] bodyMargin, float lineHeight, int fontSize, boolean boldUseGothic)
+	{
+		this.pageMargin = pageMargin;
+		this.bodyMargin = bodyMargin;
+		this.lineHeight = lineHeight;
+		this.fontSize = fontSize;
+		this.boldUseGothic = boldUseGothic;
+	}
+	
 	/** 処理を中止 */
 	public void cancel()
 	{
@@ -401,6 +430,13 @@ public class Epub3Writer
 		//SVG画像出力
 		if (this.isSvgImage) velocityContext.put("svgImage", true);
 		
+		//スタイル
+		velocityContext.put("pageMargin", this.pageMargin);
+		velocityContext.put("bodyMargin", this.bodyMargin);
+		velocityContext.put("lineHeight", this.lineHeight);
+		velocityContext.put("fontSize", this.fontSize);
+		velocityContext.put("boldUseGothic", this.boldUseGothic);
+		
 		//出力先ePubのZipストリーム生成
 		zos = new ZipArchiveOutputStream(new BufferedOutputStream(new FileOutputStream(epubFile)));
 		//mimetypeは非圧縮
@@ -432,6 +468,21 @@ public class Epub3Writer
 		
 		//zip出力用Writer
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"));
+		
+		//スタイルのcssを格納
+		if (bookInfo.vertical) {
+			zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+CSS_PATH+VERTICAL_TEXT_CSS));
+			bw = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"));
+			Velocity.mergeTemplate(templatePath+OPS_PATH+CSS_PATH+VERTICAL_TEXT_CSS_VM, "UTF-8", velocityContext, bw);
+			bw.flush();
+			zos.closeArchiveEntry();
+		} else {
+			zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+CSS_PATH+HORIZONTAL_TEXT_CSS));
+			bw = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"));
+			Velocity.mergeTemplate(templatePath+OPS_PATH+CSS_PATH+HORIZONTAL_TEXT_CSS_VM, "UTF-8", velocityContext, bw);
+			bw.flush();
+			zos.closeArchiveEntry();
+		}
 		
 		//本文を出力
 		this.writeSections(converter, src, bw, srcFile, srcExt, zos);
