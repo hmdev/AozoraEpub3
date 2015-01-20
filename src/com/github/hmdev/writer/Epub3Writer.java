@@ -118,7 +118,7 @@ public class Epub3Writer
 		//OPS_PATH+CSS_PATH+"vertical_text.css",
 		OPS_PATH+CSS_PATH+"vertical_middle.css",
 		OPS_PATH+CSS_PATH+"vertical_image.css",
-		//OPS_PATH+CSS_PATH+"vertical_font.css",
+		OPS_PATH+CSS_PATH+"vertical_font.css",
 		OPS_PATH+CSS_PATH+"vertical.css"
 	};
 	final static String[] TEMPLATE_FILE_NAMES_HORIZONTAL = new String[]{
@@ -126,7 +126,7 @@ public class Epub3Writer
 		//OPS_PATH+CSS_PATH+"horizontal_text.css",
 		OPS_PATH+CSS_PATH+"horizontal_middle.css",
 		OPS_PATH+CSS_PATH+"horizontal_image.css",
-		//OPS_PATH+CSS_PATH+"horizontal_font.css",
+		OPS_PATH+CSS_PATH+"horizontal_font.css",
 		OPS_PATH+CSS_PATH+"horizontal.css"
 	};
 	String[] getTemplateFiles()

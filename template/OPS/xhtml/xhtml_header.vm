@@ -7,23 +7,23 @@
 #elseif (${bookInfo.Vertical})
 #if (${sectionInfo.ImagePage})
 	<link rel="stylesheet" type="text/css" href="../css/vertical_image.css"/>
-#elseif (${sectionInfo.Middle} || ${sectionInfo.Bottom})
-	<link rel="stylesheet" type="text/css" href="../css/vertical_text.css"/>
-	<link rel="stylesheet" type="text/css" href="../css/vertical_middle.css"/>
-	<link rel="stylesheet" type="text/css" href="../css/vertical.css"/>
 #else
+#if (${sectionInfo.Middle} || ${sectionInfo.Bottom})
+	<link rel="stylesheet" type="text/css" href="../css/vertical_middle.css"/>
+#end
 	<link rel="stylesheet" type="text/css" href="../css/vertical_text.css"/>
+	<link rel="stylesheet" type="text/css" href="../css/vertical_font.css"/>
 	<link rel="stylesheet" type="text/css" href="../css/vertical.css"/>
 #end
 #else
 #if (${sectionInfo.ImagePage})
 	<link rel="stylesheet" type="text/css" href="../css/horizontal_image.css"/>
-#elseif (${sectionInfo.Middle})
-	<link rel="stylesheet" type="text/css" href="../css/horizontal_text.css"/>
-	<link rel="stylesheet" type="text/css" href="../css/horizontal_middle.css"/>
-	<link rel="stylesheet" type="text/css" href="../css/horizontal.css"/>
 #else
+#if (${sectionInfo.Middle})
+	<link rel="stylesheet" type="text/css" href="../css/horizontal_middle.css"/>
+#end
 	<link rel="stylesheet" type="text/css" href="../css/horizontal_text.css"/>
+	<link rel="stylesheet" type="text/css" href="../css/horizontal_font.css"/>
 	<link rel="stylesheet" type="text/css" href="../css/horizontal.css"/>
 #end
 #end
@@ -45,8 +45,6 @@ min-height: ${sectionInfo.ImageHeightPercent}%;
 <body class="fit_h">
 #elseif (${kindle})
 <body class="kindle">
-#elseif (${bookInfo.koboFull})
-<body class="kobofull">
 #else
 <body>
 #end

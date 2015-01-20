@@ -1,7 +1,7 @@
 @charset "utf-8";
 @namespace "http://www.w3.org/1999/xhtml";
 
-/** 縦書きフォント変更 Reader用 T1/G1/T2用
+/** 縦書きフォント変更 Sony Reader用
  ファイル名を vertical_font.css に変更すると有効
  READER/fonts/ の下にフォントファイルをコピーしてsrc:urlのフォントをコピーしたファイル名に変更
  フォントファイルが無い場合は標準フォントが利用される */
@@ -12,10 +12,3 @@ src: url(res:///ebook/fonts/../../mnt/sdcard/fonts/Dfpaburi.ttc);
 body {
 font-family: "CustomFont", "@ＭＳ 明朝", "@MS Mincho", "ヒラギノ明朝 ProN W3", "HiraMinProN-W3", serif, sans-serif;
 }
-
-.gtc, .b {
-font-family: '@ＭＳ ゴシック','@MS Gothic',sans-serif !important;
-}
-
-.b, .gtc { font-weight: bold; }
-.i { font-style: italic; }

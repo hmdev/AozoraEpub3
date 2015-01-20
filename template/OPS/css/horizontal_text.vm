@@ -7,6 +7,8 @@ margin: ${pageMargin[0]} ${pageMargin[1]} ${pageMargin[2]} ${pageMargin[3]};
 }
 
 html {
+margin: ${bodyMargin[0]} ${bodyMargin[1]} ${bodyMargin[2]} ${bodyMargin[3]};
+padding: 0;
 writing-mode: horizontal-tb;
 -webkit-writing-mode: horizontal-tb;
 -epub-writing-mode: horizontal-tb;
@@ -14,12 +16,9 @@ writing-mode: horizontal-tb;
 line-break: strict;	
 -epub-word-break: normal;
 word-break: normal;
-margin: 0;
-padding: 0;
 }
-
 body {
-margin: ${bodyMargin[0]} ${bodyMargin[1]} ${bodyMargin[2]} ${bodyMargin[3]};
+margin: 0;
 padding: 0;
 display: block;
 color: #000;
@@ -32,14 +31,11 @@ body.kindle {
 line-height: ${lineHeight}em;
 }
 
-/** フォント */
-body {
-font-family: "ＭＳ 明朝", "MS Mincho", "ヒラギノ明朝 ProN W3", "HiraMinProN-W3", serif, sans-serif;
-}
+/** 太字、ゴシック */
 #if (${boldUseGothic})
-body .b,
+.b,
 #end
-body .gtc {
+.gtc {
 font-family: '@ＭＳ ゴシック','@MS Gothic',sans-serif;
 }
 

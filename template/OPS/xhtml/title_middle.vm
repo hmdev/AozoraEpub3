@@ -4,10 +4,12 @@
 <head>
 #if (${bookInfo.Vertical})
 <link rel="stylesheet" type="text/css" href="../css/vertical_text.css"/>
+<link rel="stylesheet" type="text/css" href="../css/vertical_font.css"/>
 <link rel="stylesheet" type="text/css" href="../css/vertical_middle.css"/>
 <link rel="stylesheet" type="text/css" href="../css/vertical.css"/>
 #else
 <link rel="stylesheet" type="text/css" href="../css/horizontal_text.css"/>
+<link rel="stylesheet" type="text/css" href="../css/horizontal_font.css"/>
 <link rel="stylesheet" type="text/css" href="../css/horizontal_middle.css"/>
 <link rel="stylesheet" type="text/css" href="../css/horizontal.css"/>
 #end

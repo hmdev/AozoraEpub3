@@ -6,19 +6,14 @@
 /* 上右下左 */
 margin: 0 0 0 0;
 width:100%;
-height:100%;
 }
 
 html {
-margin: 0;
-padding: 0;
 width:100%;
-height:100%;
 }
 body {
 vertical-align: middle;
 width:100%;
-height:100%;
 }
 
 table {

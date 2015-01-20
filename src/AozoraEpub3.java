@@ -185,6 +185,27 @@ public class AozoraEpub3
 			//目次階層化設定
 			epub3Writer.setTocParam("1".equals(props.getProperty("NavNest")), "1".equals(props.getProperty("NcxNest")));
 			
+			//スタイル設定
+			String[] pageMargin = {};
+			try { pageMargin = props.getProperty("PageMargin").split(","); } catch (Exception e) {}
+			if (pageMargin.length != 4) pageMargin = new String[]{"0", "0", "0", "0"};
+			else {
+				String pageMarginUnit = props.getProperty("PageMarginUnit");
+				for (int i=0; i<4; i++) { pageMargin[i] += pageMarginUnit; }
+			}
+			String[] bodyMargin = {};
+			try { bodyMargin = props.getProperty("BodyMargin").split(","); } catch (Exception e) {}
+			if (bodyMargin.length != 4) bodyMargin = new String[]{"0", "0", "0", "0"};
+			else {
+				String bodyMarginUnit = props.getProperty("BodyMarginUnit");
+				for (int i=0; i<4; i++) { bodyMargin[i] += bodyMarginUnit; }
+			}
+			float lineHeight = 1.8f; try { lineHeight = Float.parseFloat(props.getProperty("LineHeight")); } catch (Exception e) {}
+			int fontSize = 100; try { fontSize = Integer.parseInt(props.getProperty("FontSize")); } catch (Exception e) {}
+			boolean boldUseGothic = "1".equals(props.getProperty("BoldUseGothic"));
+			epub3Writer.setStyles(pageMargin, bodyMargin, lineHeight, fontSize, boldUseGothic);
+			
+			
 			//自動改ページ
 			int forcePageBreakSize = 0;
 			int forcePageBreakEmpty = 0;

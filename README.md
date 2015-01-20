@@ -3,10 +3,10 @@ AozoraEpub3
 
 説明
 ------------
-青空文庫の注記入りテキストファイルをePub3ファイルに変換するツールです。
-・青空文庫txtのテキスト+画像ファイル(またはzip)をePub3に変換
-・Web小説のHTMLを取得して青空文庫txt形式で保存してからePub3に変換
-・画像zip/rarをePub3に変換
+青空文庫の注記入りテキストファイルをePub3ファイルに変換するツールです。  
+・青空文庫txtのテキスト+画像ファイル(またはzip)をePub3に変換  
+・Web小説のHTMLを取得して青空文庫txt形式で保存してからePub3に変換  
+・画像zip/rarをePub3に変換  
 が可能です。
 
 
@@ -33,9 +33,9 @@ AozoraEpub3
 
 動作環境
 ------------
-Java 7 / Java 8 の動作環境 ( http://www.java.com/ja/ )
+Java 7 / Java 8 の動作環境 ( http://www.java.com/ja/ )  
 
-WindowsXP以降 Ubuntu MacOSX で動作確認済
+WindowsXP以降 Ubuntu MacOSX で動作確認済  
 
 
 使い方
@@ -262,8 +262,7 @@ WindowsXP以降 Ubuntu MacOSX で動作確認済
  chuki_tag.txt 参照
 
 *機種別の対応状況  
-  横組みはKoboのみ対応  
-  横書きはKoboとKindleのみ対応 (横書き内の字下げ等の注記はうまく出ないかも)  
+  横組みはKindleは非対応  
 
 #### 例外的にプログラム処理しているもの
 - ページの左右中央  
@@ -276,8 +275,8 @@ WindowsXP以降 Ubuntu MacOSX で動作確認済
 - 画像 (キャプション、サイズ指定は未対応)  
     ［＃説明（ファイル名.拡張子）］  
     &lt;img src="ファイル名"/&gt;  
-- 横組み・縦中横内の自動縦中横の抑止
-- 割り注の改行追加
+- 横組み・縦中横内の自動縦中横の抑止  
+- 割り注の改行追加  
 - 底本： で改ページ (直前に改ページがない場合)  
 
 対応している外字と特殊文字
