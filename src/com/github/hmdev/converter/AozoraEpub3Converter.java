@@ -2716,12 +2716,18 @@ public class AozoraEpub3Converter
 			//見出し用のID設定
 			if (chapterLineInfo != null) {
 				chapterId = "kobo."+this.lineIdNum+"."+(idIdx++);
-				//IDのみ出力
-				out.write("<span id=\""+chapterId+"\"></span>");
-				this.pageByteSize += (chapterId.length() + 19);
+				if (line.startsWith("<")) {
+					//タグがあるのでIDを設定
+					line = line.replaceFirst("(<[\\d|\\w]+)", "$1 id=\""+chapterId+"\"");
+				} else {
+					//タグでなければ一文字目をspanに入れる
+					out.write("<span id=\""+chapterId+"\">"+line.charAt(0)+"</span>");
+					this.pageByteSize += (chapterId.length() + 20);
+					line = line.substring(1);
+				}
 			}
 		} else {
-			//改行用のp出力 見出しなら強制ID出力
+			//改行用のp出力 見出しなら強制ID出力 koboの栞用IDに利用可能なkobo.のIDで出力
 			if (this.withMarkId || (chapterLineInfo != null && !chapterLineInfo.pageBreakChapter)) {
 				chapterId = "kobo."+this.lineIdNum+"."+(idIdx++);
 				out.write("<p id=\""+chapterId+"\">");

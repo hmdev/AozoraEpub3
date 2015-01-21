@@ -3,15 +3,19 @@
 
 /** 縦書き用 左右中央 */
 @page {
-/* 上右下左 */
-margin: 0 0 0 0;
+margin-left: 0;
+margin-right: 0;
 width:100%;
 }
 
 html {
+margin-left: 0;
+margin-right: 0;
 width:100%;
 }
 body {
+margin-left: 0;
+margin-right: 0;
 vertical-align: middle;
 width:100%;
 }

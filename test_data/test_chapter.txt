@@ -129,7 +129,6 @@ http://www.aozora.gr.jp/accent_separation.html
 【５】
 〔６〕　○○○○○
 
-［＃改ページ］
 プロローグ
 第１話
 　　１
@@ -145,7 +144,7 @@ http://www.aozora.gr.jp/accent_separation.html
 　本文
 　　３
 　本文
-［＃改ページ］
+
 第１章
 　本文
 第壱篇
@@ -181,7 +180,6 @@ http://www.aozora.gr.jp/accent_separation.html
 幕間
 　本文
 
-［＃改ページ］
 第２章　章タイトル
 　本文
 第Ⅱ篇　章タイトル

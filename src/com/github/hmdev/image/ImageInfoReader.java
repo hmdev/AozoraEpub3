@@ -322,7 +322,7 @@ public class ImageInfoReader
 				InputStream is = null;
 				Archive archive = new Archive(srcFile);
 				try {
-				FileHeader fileHeader = archive.nextFileHeader(); 
+				FileHeader fileHeader = archive.nextFileHeader();
 				while (fileHeader != null) {
 					if (!fileHeader.isDirectory()) {
 						String entryName = fileHeader.getFileNameW();

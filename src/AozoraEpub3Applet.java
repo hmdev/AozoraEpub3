@@ -1844,7 +1844,7 @@ public class AozoraEpub3Applet extends JApplet
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 		panel.setBorder(new NarrowTitledBorder("行の高さ"));
 		tabPanel.add(panel);
-		jComboLineHeight = new JComboBox(new String[]{"1.4", "1.5", "1.6", "1.7", "1.8", "1.9","2"});
+		jComboLineHeight = new JComboBox(new String[]{"1.3", "1.4", "1.5", "1.6", "1.7", "1.8", "1.9", "2.0"});
 		jComboLineHeight.setBorder(padding0);
 		jComboLineHeight.setMaximumSize(combo3);
 		jComboLineHeight.setPreferredSize(combo3);
@@ -1886,10 +1886,11 @@ public class AozoraEpub3Applet extends JApplet
 		////////////////////////////////
 		panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-		panel.setBorder(new NarrowTitledBorder("余白設定 (@page margin)"));
+		panel.setBorder(new NarrowTitledBorder("テキスト余白 (@page margin)"));
 		tabPanel.add(panel);
 		String[] marginLabels = {"上","右","下","左"};
 		jTextPageMargins = new JTextField[4];
+		NumberVerifier numberVerifier0 = new NumberVerifier(0, 0);
 		for (int i=0; i<jTextPageMargins.length; i++) {
 			label = new JLabel(marginLabels[i]+":");
 			label.setBorder(padding2);
@@ -1898,7 +1899,7 @@ public class AozoraEpub3Applet extends JApplet
 			jTextPageMargins[i] = jTextField;
 			jTextField.setHorizontalAlignment(JTextField.RIGHT);
 			jTextField.addFocusListener(new TextSelectFocusListener(jTextField));
-			jTextField.setInputVerifier(new FloatInputVerifier(0, 0));
+			jTextField.setInputVerifier(numberVerifier0);
 			jTextField.setMaximumSize(text3);
 			jTextField.setPreferredSize(text3);
 			panel.add(jTextField);
@@ -1919,7 +1920,7 @@ public class AozoraEpub3Applet extends JApplet
 		////////////////////////////////
 		panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-		panel.setBorder(new NarrowTitledBorder("余白設定 (html margin) Reader用"));
+		panel.setBorder(new NarrowTitledBorder("テキスト余白 (html margin) Reader用"));
 		tabPanel.add(panel);
 		jTextBodyMargins = new JTextField[4];
 		for (int i=0; i<jTextBodyMargins.length; i++) {
@@ -1930,7 +1931,7 @@ public class AozoraEpub3Applet extends JApplet
 			jTextBodyMargins[i] = jTextField;
 			jTextField.setHorizontalAlignment(JTextField.RIGHT);
 			jTextField.addFocusListener(new TextSelectFocusListener(jTextField));
-			jTextField.setInputVerifier(new FloatInputVerifier(0, 0));
+			jTextField.setInputVerifier(numberVerifier0);
 			jTextField.setMaximumSize(text3);
 			jTextField.setPreferredSize(text3);
 			panel.add(jTextField);
@@ -2264,7 +2265,7 @@ public class AozoraEpub3Applet extends JApplet
 		/** 最大値 */
 		float max = Float.MAX_VALUE;
 		
-		NumberFormat format = NumberFormat.getNumberInstance();
+		//NumberFormat format = NumberFormat.getNumberInstance();
 		
 		FloatInputVerifier(float def, float min)
 		{
@@ -2272,6 +2273,52 @@ public class AozoraEpub3Applet extends JApplet
 			this.min = min;
 		}
 		FloatInputVerifier(float def, float min, float max)
+		{
+			this.def = Math.min(Math.max(def, min), max);
+			this.min = min;
+			this.max = max;
+		}
+		@Override
+		public boolean verify(JComponent c)
+		{
+			JTextField textField = (JTextField)c;
+			try{
+				float f = (float)Double.parseDouble(textField.getText());
+				if (f >= this.min && f <= this.max) {
+					textField.setText(Float.toString(f));
+					return true;
+				}
+				if (this.max != Float.MAX_VALUE && f > this.max) {
+					textField.setText(Float.toString(this.max));
+					return true;
+				} else if (f < this.min) {
+					textField.setText(Float.toString(this.min));
+					return true;
+				}
+			} catch (NumberFormatException e) { }
+			textField.setText(Float.toString(this.def));
+			return true;
+		}
+	}
+	
+	/** 小数点以下が0なら表示しない */
+	class NumberVerifier extends InputVerifier
+	{
+		/** 基準値 */
+		float def = 0;
+		/** 最小値 */
+		float min = Float.MIN_VALUE;
+		/** 最大値 */
+		float max = Float.MAX_VALUE;
+		
+		NumberFormat format = NumberFormat.getNumberInstance();
+		
+		NumberVerifier(float def, float min)
+		{
+			this.def = Math.max(def, min);
+			this.min = min;
+		}
+		NumberVerifier(float def, float min, float max)
 		{
 			this.def = Math.min(Math.max(def, min), max);
 			this.min = min;
@@ -2910,7 +2957,7 @@ public class AozoraEpub3Applet extends JApplet
 		for (int i=0; i<bodyMargin.length; i++) {
 			bodyMargin[i] = jTextBodyMargins[i].getText()+bodyMarginUnit;
 		}
-		float lineHeight = 1;
+		float lineHeight = 1.8f;
 		try { lineHeight = Float.parseFloat(jComboLineHeight.getEditor().getItem().toString()); } catch (Exception e) {}
 		int fontSize = 100;
 		try { fontSize = (int)Float.parseFloat(jComboFontSize.getEditor().getItem().toString()); } catch (Exception e) {}
