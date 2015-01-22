@@ -26,17 +26,16 @@ font-size: ${fontSize}%;
 line-height: ${lineHeight}em;
 vertical-align: baseline;
 }
-body.kindle {
-line-height: ${lineHeight}em;
-}
 
 /** 太字、ゴシック */
 #if (${boldUseGothic})
-body .b,
+.b,
 #end
-body .gtc {
+.gtc {
 font-family: '@ＭＳ ゴシック','@MS Gothic',sans-serif;
 }
-
-.b, .gtc { font-weight: bold; }
+#if (${gothicUseBold})
+.gtc,
+#end
+.b { font-weight: bold; }
 .i { font-style: italic; }

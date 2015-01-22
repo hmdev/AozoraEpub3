@@ -203,7 +203,8 @@ public class AozoraEpub3
 			float lineHeight = 1.8f; try { lineHeight = Float.parseFloat(props.getProperty("LineHeight")); } catch (Exception e) {}
 			int fontSize = 100; try { fontSize = Integer.parseInt(props.getProperty("FontSize")); } catch (Exception e) {}
 			boolean boldUseGothic = "1".equals(props.getProperty("BoldUseGothic"));
-			epub3Writer.setStyles(pageMargin, bodyMargin, lineHeight, fontSize, boldUseGothic);
+			boolean gothicUseBold = "1".equals(props.getProperty("gothicUseBold"));
+			epub3Writer.setStyles(pageMargin, bodyMargin, lineHeight, fontSize, boldUseGothic, gothicUseBold);
 			
 			
 			//自動改ページ

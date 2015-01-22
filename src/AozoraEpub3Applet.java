@@ -302,6 +302,7 @@ public class AozoraEpub3Applet extends JApplet
 	JComboBox jComboLineHeight;
 	JComboBox jComboFontSize;
 	JCheckBox jCheckBoldUseGothic;
+	JCheckBox jCheckGothicUseBold;
 	
 	JRadioButton jRadioPageMarginUnit0;
 	JRadioButton jRadioPageMarginUnit1;
@@ -1881,10 +1882,20 @@ public class AozoraEpub3Applet extends JApplet
 		panel.setBorder(new NarrowTitledBorder("太字"));
 		tabPanel.add(panel);
 		jCheckBoldUseGothic = new JCheckBox("太字をゴシック表示", true);
-		jCheckBoldUseGothic.setToolTipText("太字をゴシックフォントで表示します"); 
+		jCheckBoldUseGothic.setToolTipText("太字注記を太字ゴシックで表示します"); 
 		jCheckBoldUseGothic.setFocusPainted(false);
 		jCheckBoldUseGothic.setBorder(padding2);
 		panel.add(jCheckBoldUseGothic);
+		
+		panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		panel.setBorder(new NarrowTitledBorder("ゴシック"));
+		tabPanel.add(panel);
+		jCheckGothicUseBold = new JCheckBox("ゴシックを太字表示", true);
+		jCheckGothicUseBold.setToolTipText("ゴシック体注記を太字ゴシックで表示します"); 
+		jCheckGothicUseBold.setFocusPainted(false);
+		jCheckGothicUseBold.setBorder(padding2);
+		panel.add(jCheckGothicUseBold);
 		
 		////////////////////////////////
 		panel = new JPanel();
@@ -2508,8 +2519,7 @@ public class AozoraEpub3Applet extends JApplet
 		public void actionPerformed(ActionEvent e)
 		{
 			File path = currentPath;
-			String dstPath = jComboDstPath.getEditor().getItem().toString().trim();
-			if (dstPath.equals("") && jComboDstPath.getSelectedItem() != null) dstPath = jComboDstPath.getSelectedItem().toString().trim();
+			String dstPath = jCheckSamePath.isSelected() ? jComboDstPath.getSelectedItem().toString().trim() : jComboDstPath.getEditor().getItem().toString().trim();
 			File selectedPath = new File(dstPath);
 			if (selectedPath.isDirectory()) path = selectedPath;
 			else if (selectedPath.isFile()) path = selectedPath.getParentFile();
@@ -2962,7 +2972,7 @@ public class AozoraEpub3Applet extends JApplet
 		int fontSize = 100;
 		try { fontSize = (int)Float.parseFloat(jComboFontSize.getEditor().getItem().toString()); } catch (Exception e) {}
 		
-		this.epub3Writer.setStyles(pageMargin, bodyMargin, lineHeight, fontSize, jCheckBoldUseGothic.isSelected());
+		this.epub3Writer.setStyles(pageMargin, bodyMargin, lineHeight, fontSize, jCheckBoldUseGothic.isSelected(), jCheckGothicUseBold.isSelected());
 		
 		try {
 			//挿絵なし
@@ -4076,6 +4086,7 @@ public class AozoraEpub3Applet extends JApplet
 		propValue = props.getProperty("FontSize");
 		if (propValue != null && !"".equals(propValue)) jComboFontSize.setSelectedItem(propValue);
 		setPropsSelected(jCheckBoldUseGothic, props, "BoldUseGothic");
+		setPropsSelected(jCheckGothicUseBold, props, "GothicUseBold");
 		
 		////////////////////////////////////////////////////////////////
 		//Web
@@ -4216,6 +4227,7 @@ public class AozoraEpub3Applet extends JApplet
 		props.setProperty("LineHeight", this.jComboLineHeight.getEditor().getItem().toString().trim());
 		props.setProperty("FontSize", this.jComboFontSize.getEditor().getItem().toString().trim());
 		props.setProperty("BoldUseGothic", this.jCheckBoldUseGothic.isSelected()?"1":"");
+		props.setProperty("GothicUseBold", this.jCheckGothicUseBold.isSelected()?"1":"");
 		//Web
 		props.setProperty("WebInterval", this.jTextWebInterval.getText());
 		

@@ -216,8 +216,10 @@ public class Epub3Writer
 	float lineHeight;
 	/** 文字サイズ % */
 	int fontSize = 100;
-	/** boldをゴシックで表示 */
+	/** 太字注記を太字ゴシックで表示 */
 	boolean boldUseGothic = true;
+	/** ゴシック体注記を太字ゴシックで表示 */
+	boolean gothicUseBold = true;
 	
 	////////////////////////////////
 	/** 出力先ePubのZipストリーム ConverterからのnextSection呼び出しで利用 */
@@ -337,13 +339,14 @@ public class Epub3Writer
 		this.ncxNest = ncxNest;
 	}
 	
-	public void setStyles(String[] pageMargin, String[] bodyMargin, float lineHeight, int fontSize, boolean boldUseGothic)
+	public void setStyles(String[] pageMargin, String[] bodyMargin, float lineHeight, int fontSize, boolean boldUseGothic, boolean gothicUseBold)
 	{
 		this.pageMargin = pageMargin;
 		this.bodyMargin = bodyMargin;
 		this.lineHeight = lineHeight;
 		this.fontSize = fontSize;
 		this.boldUseGothic = boldUseGothic;
+		this.gothicUseBold = gothicUseBold;
 	}
 	
 	/** 処理を中止 */
@@ -436,6 +439,7 @@ public class Epub3Writer
 		velocityContext.put("lineHeight", this.lineHeight);
 		velocityContext.put("fontSize", this.fontSize);
 		velocityContext.put("boldUseGothic", this.boldUseGothic);
+		velocityContext.put("gothicUseBold", this.gothicUseBold);
 		
 		//出力先ePubのZipストリーム生成
 		zos = new ZipArchiveOutputStream(new BufferedOutputStream(new FileOutputStream(epubFile)));
