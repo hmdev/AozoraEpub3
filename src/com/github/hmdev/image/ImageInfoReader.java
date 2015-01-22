@@ -229,8 +229,7 @@ public class ImageInfoReader
 				try {
 					imageInfo = ImageInfo.getImageInfo(zis, zis.getCount());
 				} catch (Exception e) {
-					LogAppender.append("[ERROR] 画像が読み込めませんでした: ");
-					LogAppender.println(srcFile.getPath());
+					LogAppender.error("画像が読み込めませんでした: "+srcFile.getPath());
 					e.printStackTrace();
 				}
 				if (imageInfo != null) {
@@ -259,8 +258,7 @@ public class ImageInfoReader
 						is = archive.getInputStream(fileHeader);
 						imageInfo = ImageInfo.getImageInfo(is);
 					} catch (Exception e) {
-						LogAppender.append("[ERROR] 画像が読み込めませんでした: ");
-						LogAppender.println(srcFile.getPath());
+						LogAppender.error("画像が読み込めませんでした: "+srcFile.getPath());
 						e.printStackTrace();
 					} finally {
 						if (is != null) is.close();

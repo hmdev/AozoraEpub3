@@ -850,7 +850,7 @@ public class Epub3Writer
 				if (this.jProgressBar != null) this.jProgressBar.setValue(this.jProgressBar.getValue()+10);
 			} catch (Exception e) {
 				e.printStackTrace();
-				LogAppender.println("[ERROR] 表紙画像取得エラー: "+bookInfo.coverFileName);
+				LogAppender.error("表紙画像取得エラー: "+bookInfo.coverFileName);
 			}
 		}
 		if (this.canceled) return;

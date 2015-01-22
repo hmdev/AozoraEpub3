@@ -102,7 +102,7 @@ public class AozoraEpub3
 				propFileName = commandLine.getOptionValue("i");
 				File file = new File(propFileName);
 				if (file == null || !file.isFile()) {
-					LogAppender.println("[ERROR] -i : ini file not exist. "+file.getAbsolutePath());
+					LogAppender.error("-i : ini file not exist. "+file.getAbsolutePath());
 					return;
 				}
 			}
@@ -110,7 +110,7 @@ public class AozoraEpub3
 			if (commandLine.hasOption("d")) {
 				dstPath = new File(commandLine.getOptionValue("d"));
 				if (dstPath == null || !dstPath.isDirectory()) {
-					LogAppender.println("[ERROR] -d : dst path not exist. "+dstPath.getAbsolutePath());
+					LogAppender.error("-d : dst path not exist. "+dstPath.getAbsolutePath());
 					return;
 				}
 			}
@@ -303,7 +303,7 @@ public class AozoraEpub3
 				LogAppender.println("--------");
 				File srcFile = new File(fileName);
 				if (srcFile == null || !srcFile.isFile()) {
-					LogAppender.println("[ERROR] file not exist. "+srcFile.getAbsolutePath());
+					LogAppender.error("file not exist. "+srcFile.getAbsolutePath());
 					continue;
 				}
 				String ext = srcFile.getName();
@@ -375,7 +375,7 @@ public class AozoraEpub3
 							writer = epub3ImageWriter;
 							
 							if (imageInfoReader.countImageFileInfos() == 0) {
-								LogAppender.println("[ERROR] 画像がありませんでした");
+								LogAppender.error("画像がありませんでした");
 								return;
 							}
 							//名前順で並び替え

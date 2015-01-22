@@ -48,6 +48,12 @@ public class LogAppender
 		LogAppender.append("\n");
 	}
 	
+	static public void error(String msg)
+	{
+		LogAppender.append("[ERROR] ");
+		LogAppender.append(msg);
+		LogAppender.append("\n");
+	}
 	static public void error(int lineNum, String msg, String desc)
 	{
 		LogAppender.append("[ERROR] ");

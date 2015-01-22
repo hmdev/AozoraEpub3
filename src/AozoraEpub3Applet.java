@@ -23,6 +23,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
@@ -76,6 +78,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.TransferHandler;
 import javax.swing.UIDefaults;
@@ -810,7 +813,7 @@ public class AozoraEpub3Applet extends JApplet
 		String dstPath = props.getProperty("DstPath");
 		if (propValue!=null && propValue.length()>0) {
 			for (String listPath : propValue.split(",")) {
-				jComboDstPath.addItem(listPath);
+				if (!"".equals(listPath)) jComboDstPath.addItem(listPath);
 			}
 		}
 		if (dstPath!=null && !dstPath.equals("")) {
@@ -2004,6 +2007,30 @@ public class AozoraEpub3Applet extends JApplet
 		jtxInputMap.setParent(jTextArea.getInputMap());
 		jtxInputMap.put(KeyStroke.getKeyStroke("ctrl V"), "paste-url");
 		jTextArea.setInputMap(JComponent.WHEN_FOCUSED, jtxInputMap);
+		//メニュー
+		JMenuItem jPasteMenu = new JMenuItem("貼り付け");
+		jPasteMenu.setIcon(new ImageIcon(AozoraEpub3Applet.class.getResource("images/paste.png")));
+		jPasteMenu.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent arg0)
+			{
+				Clipboard systemClipboard = getToolkit().getSystemClipboard();
+				handleTextAreaTransfer(systemClipboard.getContents(jTextArea));
+			}
+		});
+		final JPopupMenu jTextPopup = new JPopupMenu();
+		jTextPopup.add(jPasteMenu);
+		jTextArea.addMouseListener(new MouseListener() {
+			public void mouseReleased(MouseEvent e) {}
+			public void mousePressed(MouseEvent e)
+			{
+				if (SwingUtilities.isRightMouseButton(e)) {
+					jTextPopup.show(jTextArea, e.getX(), e.getY());
+				}
+			}
+			public void mouseExited(MouseEvent e) {}
+			public void mouseEntered(MouseEvent e) {}
+			public void mouseClicked(MouseEvent e) {}
+		});
 		
 		lowerPane.add(new JScrollPane(jTextArea));
 		
@@ -2860,33 +2887,6 @@ public class AozoraEpub3Applet extends JApplet
 		
 		convertCanceled = false;
 		
-		//共通パラメータ取得
-		//出力先取得
-		if (jCheckSamePath.isSelected()) {
-			//出力先指定があればそれを設定
-			if (dstPath != null) currentPath = dstPath;
-			//入力先がキャッシュファイルでなければ設定
-			else if (!srcFiles[0].getAbsolutePath().startsWith(cachePath.getAbsolutePath())) currentPath = srcFiles[0].getParentFile();
-			
-		} else {
-			//指定の出力先にする
-			dstPath = new File(jComboDstPath.getEditor().getItem().toString());
-			if (!dstPath.isDirectory()) {
-				String dstPathName = dstPath.getAbsolutePath();
-				if (dstPathName.length() > 70) dstPathName = dstPathName.substring(0, 32)+" ... "+dstPathName.substring(dstPathName.length()-32);
-				int ret = JOptionPane.showConfirmDialog(jConfirmDialog, "出力先がありません\n"+dstPathName+"\nにフォルダを作成しますか？", "出力先確認", JOptionPane.YES_NO_OPTION);
-				if (ret == JOptionPane.YES_OPTION) {
-					//フォルダ作成
-					dstPath.mkdirs();
-				} else {
-					LogAppender.println("変換処理を中止しました");
-					return;
-				}
-			}
-			//jComboDstPathに出力先履歴保存
-			this.addDstPath();
-		}
-		
 		////////////////////////////////////////////////////////////////
 		//Appletのパラメータを取得
 		////////////////////////////////////////////////////////////////
@@ -3141,7 +3141,7 @@ public class AozoraEpub3Applet extends JApplet
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			LogAppender.println("[ERROR] "+e);
+			LogAppender.error(e.getMessage());
 		}
 		
 		//BookInfo取得
@@ -3157,7 +3157,7 @@ public class AozoraEpub3Applet extends JApplet
 				);
 			}
 		} catch (Exception e) {
-			LogAppender.println("[ERROR] ファイルが読み込めませんでした : "+srcFile.getPath());
+			LogAppender.error("ファイルが読み込めませんでした : "+srcFile.getPath());
 			return;
 		}
 		
@@ -3179,7 +3179,7 @@ public class AozoraEpub3Applet extends JApplet
 					writer = this.epub3ImageWriter;
 					
 					if (imageInfoReader.countImageFileInfos() == 0) {
-						LogAppender.println("[ERROR] 画像がありませんでした");
+						LogAppender.error("画像がありませんでした");
 						return;
 					}
 					
@@ -3203,11 +3203,11 @@ public class AozoraEpub3Applet extends JApplet
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			LogAppender.println("[ERROR] "+e);
+			LogAppender.error(e.getMessage());
 		}
 		
 		if (bookInfo == null) {
-			LogAppender.println("[ERROR] 書籍の情報が取得できませんでした");
+			LogAppender.error("書籍の情報が取得できませんでした");
 			return;
 		}
 		
@@ -3528,23 +3528,6 @@ public class AozoraEpub3Applet extends JApplet
 	 * @param vecUrlString 青空文庫テキストのzipまたは対応サイトのリンクURL */
 	private void convertWeb(Vector<String> vecUrlString, File dstPath) throws IOException
 	{
-		//出力先取得
-		dstPath = new File(jComboDstPath.getEditor().getItem().toString());
-		if (!dstPath.isDirectory()) {
-			String dstPathName = dstPath.getAbsolutePath();
-			if (dstPathName.length() > 70) dstPathName = dstPathName.substring(0, 32)+" ... "+dstPathName.substring(dstPathName.length()-32);
-			int ret = JOptionPane.showConfirmDialog(jConfirmDialog, "出力先がありません\n"+dstPathName+"\nにフォルダを作成しますか？", "出力先確認", JOptionPane.YES_NO_OPTION);
-			if (ret == JOptionPane.YES_OPTION) {
-				//フォルダ作成
-				dstPath.mkdirs();
-			} else {
-				LogAppender.println("変換処理を中止しました");
-				return;
-			}
-		}
-		//jComboDstPathに出力先履歴保存
-		this.addDstPath();
-		
 		for (String urlString : vecUrlString) {
 			//URL変換 の最後が .zip .txtz .rar
 			String ext = urlString.substring(urlString.lastIndexOf('.')+1).toLowerCase();
@@ -3626,18 +3609,47 @@ public class AozoraEpub3Applet extends JApplet
 	}
 	
 	////////////////////////////////////////////////////////////////
-	/** 別スレッド実行用SwingWorkerを実行 */
+	/** 別スレッド実行用SwingWorkerを実行
+	 * @param dstPath 出力先 ブラウザからまたはURLペーストの場合はnull */
 	void startConvertWorker(Vector<File> vecFiles, Vector<String> vecUrlString, File dstPath)
 	{
 		//出力先が指定されていない場合は選択させる
-		if (jCheckSamePath.isSelected() && dstPath == null) {
+		if (dstPath == null && jCheckSamePath.isSelected() || !jCheckSamePath.isSelected() && "".equals(jComboDstPath.getEditor().getItem().toString().trim())) {
+			if (dstPath != null) this.currentPath = dstPath;
 			dstPathChooser.actionPerformed(null);
-			if (jCheckSamePath.isSelected()) {
-				LogAppender.println("変換処理を中止しました");
+			if (jCheckSamePath.isSelected() || "".equals(jComboDstPath.getEditor().getItem().toString().trim())) {
+				LogAppender.println("変換処理を中止しました : "+(vecFiles.size()>0?vecFiles.get(0).getAbsoluteFile():vecUrlString.size()>0?vecUrlString.get(0):""));
 				return;
 			}
 		}
-		//キャッシュパス
+		if (!jCheckSamePath.isSelected()) {
+			dstPath = new File(jComboDstPath.getEditor().getItem().toString());
+		}
+		
+		if (!dstPath.isDirectory()) {
+			dstPath = new File(jComboDstPath.getEditor().getItem().toString());
+			String dstPathName = dstPath.getAbsolutePath();
+			if (dstPathName.length() > 70) dstPathName = dstPathName.substring(0, 32)+" ... "+dstPathName.substring(dstPathName.length()-32);
+			int ret = JOptionPane.showConfirmDialog(jConfirmDialog, "出力先がありません\n"+dstPathName+"\nにフォルダを作成しますか？", "出力先確認", JOptionPane.YES_NO_OPTION);
+			if (ret == JOptionPane.YES_OPTION) {
+				//フォルダ作成
+				dstPath.mkdirs();
+				if (!dstPath.isDirectory()) {
+					LogAppender.error("フォルダを作成できませんでした");
+					return;
+				}				
+			} else {
+				LogAppender.error("変換処理を中止しました : "+(vecFiles.size()>0?vecFiles.get(0).getAbsoluteFile():vecUrlString.size()>0?vecUrlString.get(0):""));
+				return;
+			}
+		}
+		
+		//jComboDstPathに出力先履歴保存
+		if (!jCheckSamePath.isSelected()) {
+			this.addDstPath();
+		}
+		
+		//キャッシュパス生成
 		cachePath.mkdir();
 		
 		//web以下に同じ名前のパスがあったらキャッシュ後青空変換
@@ -4067,7 +4079,7 @@ public class AozoraEpub3Applet extends JApplet
 		
 		////////////////////////////////////////////////////////////////
 		//Web
-		setIntText(jTextWebInterval, props, "WebInterval");
+		setFloatText(jTextWebInterval, props, "WebInterval");
 	}
 	
 	/** アプレットの設定状態をpropsに保存 */
@@ -4353,6 +4365,7 @@ public class AozoraEpub3Applet extends JApplet
 					String item = (String)this.jComboDstPath.getItemAt(i);
 					if (!dstPath.equals(item)) dstPathList += ","+item;
 				}
+				if (dstPathList.startsWith(",")) dstPathList = dstPathList.substring(1);
 			}
 			this.props.setProperty("DstPathList", dstPathList);
 		} catch (Exception e) { e.printStackTrace(); }
