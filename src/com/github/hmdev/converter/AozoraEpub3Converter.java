@@ -240,6 +240,11 @@ public class AozoraEpub3Converter
 	/** タグの階層 */
 	int tagLevel = 0;
 	
+	/** 画像の次の行にキャプション指定有り */
+	boolean nextLineIsCaption = false;
+	/** キャプション出力中で画像タグが閉じていないならtrue */
+	boolean inImageTag = false;
+	
 	////////////////////////////////
 	//改ページトリガ ファイル名は入れ替えて利用する
 	/** 改ページ通常 */
@@ -959,6 +964,11 @@ public class AozoraEpub3Converter
 		return null;
 	}
 	
+	/** 画像注記にキャプション付きの指定がある場合true */
+	public boolean hasImageCaption(String chukiTag)
+	{
+		return chukiTag.indexOf("キャプション付き") > 0;
+	}
 	
 	/** 画像注記からファイル名取得
 	 * @param startIdx 画像注記の'（'の位置 */
@@ -1552,9 +1562,7 @@ public class AozoraEpub3Converter
 							//外字の場合 (注記末尾がフラグ文字列になっている)
 							if (chukiTag.endsWith("#GAIJI#］")) {
 								String fileName = writer.getImageFilePath(srcFilePath.trim(), -1);
-								buf.append(chukiMap.get("外字画像開始")[0]);
-								buf.append(fileName);
-								buf.append(chukiMap.get("外字画像終了")[0]);
+								buf.append(String.format(chukiMap.get("外字画像")[0], fileName));
 							}
 						}
 					}
@@ -1581,6 +1589,17 @@ public class AozoraEpub3Converter
 		
 		//外字変換後に前方参照注記変換
 		line = this.replaceChukiSufTag(this.convertGaijiChuki(line, true));
+		
+		//キャプション指定の画像の場合はすぐにキャプションでなければ画像タグを閉じる
+		if (this.nextLineIsCaption) {
+			if (!line.startsWith("［＃キャプション］") && !line.startsWith("［＃ここからキャプション］")) {
+				buf.append(chukiMap.get("画像終わり")[0]);
+				buf.append("\n");
+				this.inImageTag = false;
+			}
+		}
+		
+		this.nextLineIsCaption = false;
 		
 		char[] ch = line.toCharArray();
 		int charStart = 0;
@@ -1779,7 +1798,14 @@ public class AozoraEpub3Converter
 				else if (inWrc && "改行".equals(chukiName)) {
 					hasWrcBR = true;
 				}
-				
+				else if (chukiName.endsWith("キャプション終わり")) {
+					if (this.inImageTag) {
+						buf.append(chukiMap.get("画像終わり")[0]);
+						buf.append("\n");
+						this.inImageTag = false;
+						noBr = true;
+					}
+				}
 				//タグ出力
 				if (!noTagAppend) {
 					buf.append(tags[0]);
@@ -1793,8 +1819,7 @@ public class AozoraEpub3Converter
 				
 			} else {
 				//画像 (訓点 ［＃（ス）］ は . があるかで判断)
-				// <img src="img/filename"/> → <object src="filename"/>
-				// ［＃表紙（表紙.jpg）］［＃（表紙.jpg）］［＃「キャプション」（表紙.jpg、横321×縦123）入る）］
+				// ［＃表紙（表紙.jpg）］［＃（表紙.jpg）］［＃「キャプション」のキャプション付きの図（表紙.jpg、横321×縦123）入る）］
 				// 
 				int imageStartIdx = chukiTag.indexOf('（', 2);
 				if (imageStartIdx > -1) {
@@ -1817,9 +1842,7 @@ public class AozoraEpub3Converter
 								//外字の場合 (注記末尾がフラグ文字列になっている)
 								if (chukiTag.endsWith("#GAIJI#］")) {
 									String fileName = writer.getImageFilePath(srcFilePath.trim(), lineNum);
-									buf.append(chukiMap.get("外字画像開始")[0]);
-									buf.append(fileName);
-									buf.append(chukiMap.get("外字画像終了")[0]);
+									buf.append(String.format(chukiMap.get("外字画像")[0],fileName));
 								} else { 
 									if (noIllust && !writer.isCoverImage()) {
 										LogAppender.info(lineNum, "挿絵なし設定", chukiTag);
@@ -1828,7 +1851,7 @@ public class AozoraEpub3Converter
 										if (dstFileName != null) { //先頭に移動してここで出力しない場合はnull
 											if (bookInfo.isImageSectionLine(lineNum)) noBr = true;
 											//画像注記またはページ出力
-											if (printImageChuki(out, buf, srcFilePath, dstFileName, this.writer.getImagePageType(srcFilePath, this.tagLevel, lineNum))) noBr = true;
+											if (printImageChuki(out, buf, srcFilePath, dstFileName, this.hasImageCaption(chukiTag), lineNum)) noBr = true;
 										}
 									}
 								}
@@ -1851,7 +1874,7 @@ public class AozoraEpub3Converter
 								if (dstFileName != null) { //先頭に移動してここで出力しない場合はnull
 									if (bookInfo.isImageSectionLine(lineNum)) noBr = true;
 									//画像注記またはページ出力
-									if (printImageChuki(out, buf, srcFilePath, dstFileName, this.writer.getImagePageType(srcFilePath, this.tagLevel, lineNum))) noBr = true;
+									if (printImageChuki(out, buf, srcFilePath, dstFileName, this.hasImageCaption(chukiTag), lineNum)) noBr = true;
 								}
 							}
 						}
@@ -1987,7 +2010,7 @@ public class AozoraEpub3Converter
 		
 		//ルビの変換後に自動縦中横 (注記を挟む場合があるので行全体で行う)
 		//バッファを出力
-		this.printLineBuffer(out, this.convertRubyText(buf.toString()), lineNum, noBr);
+		this.printLineBuffer(out, this.convertRubyText(buf.toString()), lineNum, noBr||this.inImageTag);
 		
 		//クリア Kobo 調整中
 		/*if (clearRight && clearLeft) out.append(chukiMap.get("クリア")[0]);
@@ -1995,47 +2018,47 @@ public class AozoraEpub3Converter
 		else if (clearLeft) out.append(chukiMap.get("左クリア")[0]);*/
 	}
 	
-	private boolean printImageChuki(BufferedWriter out, StringBuilder buf, String srcFileName, String dstFileName, int imagePageType) throws IOException
+	/** 画像タグを出力
+	 * @return 単ページ出力ならtrue */
+	private boolean printImageChuki(BufferedWriter out, StringBuilder buf, String srcFileName, String dstFileName, boolean hasCaption, int lineNum) throws IOException
 	{
+		//サイズを取得して画面サイズとの%を指定
+		int imagePageType = this.writer.getImagePageType(srcFileName, this.tagLevel, lineNum);
+		
 		if (imagePageType == PageBreakTrigger.IMAGE_INLINE_W) {
-			buf.append(chukiMap.get("画像開始横")[0]);
-			buf.append(dstFileName);
-			buf.append(chukiMap.get("画像終了")[0]);
+			buf.append(String.format(chukiMap.get("画像横")[0], dstFileName));
 		} else if (imagePageType == PageBreakTrigger.IMAGE_INLINE_H) {
-			buf.append(chukiMap.get("画像開始縦")[0]);
-			buf.append(dstFileName);
-			buf.append(chukiMap.get("画像終了")[0]);
-		} else if (imagePageType == PageBreakTrigger.IMAGE_INLINE_TOP) {
-			buf.append(chukiMap.get("画像開始上")[0]);
-			buf.append(dstFileName);
-			buf.append(chukiMap.get("画像終了")[0]);
-		} else if (imagePageType == PageBreakTrigger.IMAGE_INLINE_BOTTOM) {
-			buf.append(chukiMap.get("画像開始下")[0]);
-			buf.append(dstFileName);
-			buf.append(chukiMap.get("画像終了")[0]);
+			buf.append(String.format(chukiMap.get("画像縦")[0], dstFileName));
 		} else if (imagePageType == PageBreakTrigger.IMAGE_INLINE_TOP_W) {
-			buf.append(chukiMap.get("画像開始上横")[0]);
-			buf.append(dstFileName);
-			buf.append(chukiMap.get("画像終了")[0]);
+			buf.append(String.format(chukiMap.get("画像上横")[0], dstFileName));
 		} else if (imagePageType == PageBreakTrigger.IMAGE_INLINE_BOTTOM_W) {
-			buf.append(chukiMap.get("画像開始下横")[0]);
-			buf.append(dstFileName);
-			buf.append(chukiMap.get("画像終了")[0]);
-			
-		} else if (imagePageType != PageBreakTrigger.IMAGE_PAGE_NONE) {
-			//単一ページ出力 タグの外のみ
-			//改ページの前に文字があれば前のページに出力
-			if (buf.length() > 0) this.printLineBuffer(out, buf, lineNum, true);
-			buf.append(chukiMap.get("画像開始")[0]);
-			buf.append(dstFileName);
-			buf.append(chukiMap.get("画像終了")[0]);
-			//単ページ出力
-			this.printImagePage(out, buf, lineNum, srcFileName, dstFileName, imagePageType);
-			return true;
+			buf.append(String.format(chukiMap.get("画像下横")[0], dstFileName));
 		} else {
-			buf.append(chukiMap.get("画像開始")[0]);
-			buf.append(dstFileName);
-			buf.append(chukiMap.get("画像終了")[0]);
+			//サイズを%で指定
+			double ratio = this.writer.getImageWidthRatio(srcFileName);
+			if (imagePageType == PageBreakTrigger.IMAGE_INLINE_TOP) {
+				buf.append(String.format(chukiMap.get("画像上")[0], ratio, dstFileName));
+			} else if (imagePageType == PageBreakTrigger.IMAGE_INLINE_BOTTOM) {
+				buf.append(String.format(chukiMap.get("画像下")[0], ratio, dstFileName));
+			} else if (imagePageType != PageBreakTrigger.IMAGE_PAGE_NONE) {
+					//単一ページ出力 タグの外のみ
+					//改ページの前に文字があれば前のページに出力
+					if (buf.length() > 0) this.printLineBuffer(out, buf, lineNum, true);
+					buf.append(String.format(chukiMap.get("画像単")[0], dstFileName));
+					buf.append(chukiMap.get("画像終わり")[0]);
+					//単ページ出力
+					this.printImagePage(out, buf, lineNum, srcFileName, dstFileName, imagePageType);
+					return true;
+			} else {
+				buf.append(String.format(chukiMap.get("画像")[0], ratio, dstFileName));
+			}
+		}
+		//キャプショがある場合はタグを閉じない
+		if (hasCaption) {
+			this.inImageTag = true;
+			this.nextLineIsCaption = true;
+		} else {
+			buf.append(chukiMap.get("画像終わり")[0]);
 		}
 		return false;
 	}

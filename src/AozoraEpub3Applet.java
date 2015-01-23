@@ -206,6 +206,7 @@ public class AozoraEpub3Applet extends JApplet
 	JTextField jTextCoverW;
 	JTextField jTextCoverH;
 	
+	//単ページ
 	JTextField jTextSinglePageSizeW;
 	JTextField jTextSinglePageSizeH;
 	JTextField jTextSinglePageWidth;
@@ -218,6 +219,9 @@ public class AozoraEpub3Applet extends JApplet
 	JCheckBox jCheckSvgImage;
 	
 	JComboBox jComboRotateImage;
+	
+	//倍率
+	JTextField jTextImageScale;
 	
 	JCheckBox jCheckImageFloat;
 	JComboBox jComboImageFloatType;
@@ -987,6 +991,24 @@ public class AozoraEpub3Applet extends JApplet
 		
 		
 		////////////////////////////////
+		//画像倍率
+		////////////////////////////////
+		panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		panel.setBorder(new NarrowTitledBorder("画像表示倍率"));
+		tabPanel.add(panel);
+		jTextImageScale = new JTextField("1.0");
+		jTextImageScale.setToolTipText("指定倍率で画像を拡大表示します。画面解像度との比率で幅を%指定します");
+		jTextImageScale.setHorizontalAlignment(JTextField.RIGHT);
+		jTextImageScale.setInputVerifier(new FloatInputVerifier(1, 0.01f, 30));
+		jTextImageScale.setMaximumSize(text4);
+		jTextImageScale.setPreferredSize(text4);
+		jTextImageScale.addFocusListener(new TextSelectFocusListener(jTextImageScale));
+		panel.add(jTextImageScale);
+		label = new JLabel("倍　　　　　");
+		panel.add(label);
+		
+		////////////////////////////////
 		//画像回り込み
 		////////////////////////////////
 		//画像回り込み
@@ -1036,7 +1058,7 @@ public class AozoraEpub3Applet extends JApplet
 		label.setBorder(padding2H);
 		panel.add(label);
 		
-		label = new JLabel("  画像位置");
+		label = new JLabel(" 配置");
 		panel.add(label);
 		jComboImageFloatType = new JComboBox(new String[]{"上/左","下/右"});
 		jComboImageFloatType.setFocusable(false);
@@ -1879,19 +1901,15 @@ public class AozoraEpub3Applet extends JApplet
 		
 		panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-		panel.setBorder(new NarrowTitledBorder("太字"));
+		panel.setBorder(new NarrowTitledBorder("太字ゴシック表示"));
 		tabPanel.add(panel);
-		jCheckBoldUseGothic = new JCheckBox("太字をゴシック表示", true);
+		jCheckBoldUseGothic = new JCheckBox("太字注記", false);
 		jCheckBoldUseGothic.setToolTipText("太字注記を太字ゴシックで表示します"); 
 		jCheckBoldUseGothic.setFocusPainted(false);
 		jCheckBoldUseGothic.setBorder(padding2);
 		panel.add(jCheckBoldUseGothic);
 		
-		panel = new JPanel();
-		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-		panel.setBorder(new NarrowTitledBorder("ゴシック"));
-		tabPanel.add(panel);
-		jCheckGothicUseBold = new JCheckBox("ゴシックを太字表示", true);
+		jCheckGothicUseBold = new JCheckBox("ゴシック体注記", false);
 		jCheckGothicUseBold.setToolTipText("ゴシック体注記を太字ゴシックで表示します"); 
 		jCheckGothicUseBold.setFocusPainted(false);
 		jCheckGothicUseBold.setBorder(padding2);
@@ -2914,6 +2932,8 @@ public class AozoraEpub3Applet extends JApplet
 		int singlePageSizeW = Integer.parseInt(jTextSinglePageSizeW.getText());
 		int singlePageSizeH = Integer.parseInt(jTextSinglePageSizeH.getText());
 		int singlePageWidth = Integer.parseInt(jTextSinglePageWidth.getText());
+		
+		float imageScale = 1.0f; try { imageScale = Float.parseFloat(jTextImageScale.getText()); } catch (Exception e) {}
 		int imageFloatType = 0;
 		int imageFloatW = 0;
 		int imageFloatH = 0;
@@ -2949,10 +2969,10 @@ public class AozoraEpub3Applet extends JApplet
 		
 		this.epub3Writer.setImageParam(dispW, dispH, coverW, coverH, resizeW, resizeH, singlePageSizeW, singlePageSizeH, singlePageWidth,
 				imageSizeType, jCheckFitImage.isSelected(), jCheckSvgImage.isSelected(), rorateAngle,
-				imageFloatType, imageFloatW, imageFloatH, jpegQualty, gamma, autoMarginLimitH, autoMarginLimitV, autoMarginWhiteLevel, autoMarginPadding, autoMarginNombre, autoMarginNombreSize);
+				imageScale, imageFloatType, imageFloatW, imageFloatH, jpegQualty, gamma, autoMarginLimitH, autoMarginLimitV, autoMarginWhiteLevel, autoMarginPadding, autoMarginNombre, autoMarginNombreSize);
 		this.epub3ImageWriter.setImageParam(dispW, dispH, coverW, coverH, resizeW, resizeH, singlePageSizeW, singlePageSizeH, singlePageWidth,
 				imageSizeType, jCheckFitImage.isSelected(), jCheckSvgImage.isSelected(), rorateAngle,
-				imageFloatType, imageFloatW, imageFloatH, jpegQualty, gamma, autoMarginLimitH, autoMarginLimitV, autoMarginWhiteLevel, autoMarginPadding, autoMarginNombre, autoMarginNombreSize);
+				imageScale, imageFloatType, imageFloatW, imageFloatH, jpegQualty, gamma, autoMarginLimitH, autoMarginLimitV, autoMarginWhiteLevel, autoMarginPadding, autoMarginNombre, autoMarginNombreSize);
 		//目次階層化設定
 		this.epub3Writer.setTocParam(jCheckNavNest.isSelected(), jCheckNcxNest.isSelected());
 		
@@ -3961,6 +3981,8 @@ public class AozoraEpub3Applet extends JApplet
 		//SVG画像タグ出力
 		setPropsSelected(jCheckSvgImage, props, "SvgImage");
 		try { jComboRotateImage.setSelectedIndex(Integer.parseInt(props.getProperty("RotateImage"))); } catch (Exception e) {}
+		//画像倍率
+		setFloatText(jTextImageScale, props, "ImageScale");
 		//画像回り込み
 		setPropsSelected(jCheckImageFloat, props, "ImageFloat");
 		setIntText(jTextImageFloatW, props, "ImageFloatW");
@@ -4144,6 +4166,8 @@ public class AozoraEpub3Applet extends JApplet
 		props.setProperty("FitImage", this.jCheckFitImage.isSelected()?"1":"");
 		props.setProperty("SvgImage", this.jCheckSvgImage.isSelected()?"1":"");
 		props.setProperty("RotateImage", ""+this.jComboRotateImage.getSelectedIndex());
+		//画像倍率
+		props.setProperty("ImageScale", this.jTextImageScale.getText());
 		//画像回り込み
 		props.setProperty("ImageFloat", this.jCheckImageFloat.isSelected()?"1":"");
 		props.setProperty("ImageFloatType", ""+this.jComboImageFloatType.getSelectedIndex());

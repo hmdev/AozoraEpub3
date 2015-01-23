@@ -128,9 +128,8 @@ public class Epub3ImageWriter extends Epub3Writer
 					this.printSvgImageSection(srcFilePath);
 				} else {
 					this.startImageSection(srcFilePath);
-					bw.write(converter.getChukiValue("画像開始")[0]);
-					bw.write(fileName);
-					bw.write(converter.getChukiValue("画像終了")[0]);
+					bw.write(String.format(converter.getChukiValue("画像単")[0], fileName));
+					bw.write(converter.getChukiValue("画像終わり")[0]);
 					bw.flush();
 					this.endSection();
 				}

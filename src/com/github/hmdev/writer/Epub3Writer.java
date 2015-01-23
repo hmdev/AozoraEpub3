@@ -149,13 +149,15 @@ public class Epub3Writer
 	/** 最大画素数 10000未満は指定なし */
 	int maxImagePixels = 0;
 	
+	/** 画像拡大表示倍率 */
+	float imageScale = 1;
+	
 	/** 画像回り込み設定 0:なし 1:上 2:下 */
 	int imageFloatType = 0;
 	/** 画像回り込み幅 幅高さが以下なら回り込み */
 	int imageFloatW = 0;
 	/** 画像回り込み高さ 幅高さが以下なら回り込み */
 	int imageFloatH = 0;
-	
 	
 	/** 縦横指定サイズ以上を単ページ化する時の横 */
 	int singlePageSizeW = 400;
@@ -286,7 +288,7 @@ public class Epub3Writer
 			int resizeW, int resizeH,
 			int singlePageSizeW, int singlePageSizeH, int singlePageWidth,
 			int imageSizeType, boolean fitImage, boolean isSvgImage, int rotateAngle,
-			int imageFloatType, int imageFloatW, int imageFloatH,
+			float imageScale, int imageFloatType, int imageFloatW, int imageFloatH,
 			float jpegQuality, float gamma,
 			int autoMarginLimitH, int autoMarginLimitV, int autoMarginWhiteLevel, float autoMarginPadding, int autoMarginNombre, float nombreSize)
 	{
@@ -300,6 +302,7 @@ public class Epub3Writer
 		this.singlePageSizeH = singlePageSizeH;
 		this.singlePageWidth = singlePageWidth;
 		
+		this.imageScale = imageScale;
 		this.imageFloatType = imageFloatType;
 		this.imageFloatW = imageFloatW;
 		this.imageFloatH = imageFloatH;
@@ -1167,22 +1170,25 @@ public class Epub3Writer
 			if (imageInfo == null) imageInfo = this.imageInfoReader.getImageInfo(this.imageInfoReader.correctExt(srcFilePath));
 			
 			if (imageInfo == null) return PageBreakTrigger.IMAGE_PAGE_NONE;
+			
+			float imageWidth = imageInfo.getWidth()*this.imageScale;
+			float imageHeight = imageInfo.getHeight()*this.imageScale;
 			//回り込みサイズ以下
 			if (this.imageFloatType != 0 &&
-				(imageInfo.getWidth() >=64 || imageInfo.getHeight() >= 64) &&
-				imageInfo.getWidth() <= this.imageFloatW && imageInfo.getHeight() <= this.imageFloatH) {
+				(imageWidth >=64 || imageHeight >= 64) &&
+				imageWidth <= this.imageFloatW && imageWidth <= this.imageFloatH) {
 				if (this.imageFloatType==1) {
-					if (imageInfo.getWidth() > dispW) return PageBreakTrigger.IMAGE_INLINE_TOP_W;
+					if (imageWidth > dispW) return PageBreakTrigger.IMAGE_INLINE_TOP_W;
 					return PageBreakTrigger.IMAGE_INLINE_TOP;
 				} else {
-					if (imageInfo.getWidth() > dispW) return PageBreakTrigger.IMAGE_INLINE_BOTTOM_W;
+					if (imageWidth > dispW) return PageBreakTrigger.IMAGE_INLINE_BOTTOM_W;
 					return PageBreakTrigger.IMAGE_INLINE_BOTTOM;
 				}
 			}
 			//タグ外なら単ページ化
-			if (imageInfo.getWidth() >= this.singlePageWidth || imageInfo.getWidth() >= singlePageSizeW && imageInfo.getHeight() >= singlePageSizeH) {
+			if (imageWidth >= this.singlePageWidth || imageWidth >= singlePageSizeW && imageHeight >= singlePageSizeH) {
 				if (tagLevel == 0) {
-					if (imageInfo.getWidth() <= this.dispW && imageInfo.getHeight() < this.dispH) {
+					if (imageWidth <= this.dispW && imageHeight < this.dispH) {
 						//画面より小さい場合
 						if (!this.fitImage) return PageBreakTrigger.IMAGE_PAGE_NOFIT;
 					} else {
@@ -1191,10 +1197,10 @@ public class Epub3Writer
 					}
 					//拡大するか画面より多きい場合
 					//画面より横長
-					if ((double)imageInfo.getWidth()/imageInfo.getHeight() > (double)this.dispW/this.dispH) {
-						if (this.rotateAngle != 0 && this.dispW < this.dispH && imageInfo.getWidth() > imageInfo.getHeight()*1.1) { //縦長画面で110%以上横長
+					if (imageWidth/imageHeight > (double)this.dispW/this.dispH) {
+						if (this.rotateAngle != 0 && this.dispW < this.dispH && imageWidth > imageHeight*1.1) { //縦長画面で110%以上横長
 							imageInfo.rotateAngle = this.rotateAngle;
-							if ((double)imageInfo.getHeight()/imageInfo.getWidth() > (double)dispW/dispH) return PageBreakTrigger.IMAGE_PAGE_W; //回転後画面より横長
+							if (imageHeight/imageWidth > (double)dispW/dispH) return PageBreakTrigger.IMAGE_PAGE_W; //回転後画面より横長
 							return PageBreakTrigger.IMAGE_PAGE_H;
 						} else {
 							return PageBreakTrigger.IMAGE_PAGE_W;
@@ -1202,9 +1208,9 @@ public class Epub3Writer
 					}
 					//画面より縦長
 					else {
-						if (this.rotateAngle != 0 && this.dispW > this.dispH && imageInfo.getWidth()*1.1 < imageInfo.getHeight()) { //横長画面で110%以上縦長
+						if (this.rotateAngle != 0 && this.dispW > this.dispH && imageWidth*1.1 < imageHeight) { //横長画面で110%以上縦長
 							imageInfo.rotateAngle = this.rotateAngle;
-							if ((double)imageInfo.getHeight()/imageInfo.getWidth() > (double)dispW/dispH) return PageBreakTrigger.IMAGE_PAGE_W; //回転後画面より横長
+							if (imageHeight/imageWidth > (double)dispW/dispH) return PageBreakTrigger.IMAGE_PAGE_W; //回転後画面より横長
 							return PageBreakTrigger.IMAGE_PAGE_H;
 						} else {
 							return PageBreakTrigger.IMAGE_PAGE_H;
@@ -1215,17 +1221,33 @@ public class Epub3Writer
 			}
 			
 			//単ページ化も回り込みもない
-			if (imageInfo.getWidth() > dispW) { //横がはみ出している
-				if ((double)imageInfo.getWidth()/imageInfo.getHeight() > (double)dispW/dispH) return PageBreakTrigger.IMAGE_INLINE_W;
+			if (imageWidth > dispW) { //横がはみ出している
+				if (imageWidth/imageHeight > (double)dispW/dispH) return PageBreakTrigger.IMAGE_INLINE_W;
 				else return PageBreakTrigger.IMAGE_INLINE_H; //縦の方が長い
 			}
-			if (imageInfo.getHeight() > dispH) return PageBreakTrigger.IMAGE_INLINE_H; //縦がはみ出している
+			if (imageHeight > dispH) return PageBreakTrigger.IMAGE_INLINE_H; //縦がはみ出している
 			
 			
 		} catch (Exception e) { e.printStackTrace(); }
 		return PageBreakTrigger.IMAGE_PAGE_NONE;
 	}
 	
+	/** 画像の画面内の比率を取得 表示倍率指定反映後 */
+	public double getImageWidthRatio(String srcFilePath)
+	{
+		double ratio = 0;
+		try {
+			ImageInfo imageInfo = this.imageInfoReader.getImageInfo(srcFilePath);
+			if (imageInfo != null) {
+				double wRatio = (double)imageInfo.getWidth()/this.dispW*this.imageScale*100;
+				double hRatio = (double)imageInfo.getHeight()/this.dispH*this.imageScale*100;
+				//縦がはみ出ている場合は調整
+				if (hRatio > 100) wRatio *= 100/hRatio;
+				ratio = wRatio;
+			}
+		} catch (Exception e) { e.printStackTrace(); }
+		return Math.min(100, ratio);
+	}
 	
 	/** Kindleかどうかを設定 Kindleなら例外処理を行う */
 	public void setIsKindle(boolean isKindle)

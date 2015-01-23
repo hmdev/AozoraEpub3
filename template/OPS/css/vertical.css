@@ -14,24 +14,36 @@ a:link img, a:visited img { border-style: none; }
 span.img {
 clear: both;
 display: inline-block;
+max-width: 100%;
+max-height: 100%;
+writing-mode: horizontal-tb;
+-webkit-writing-mode: horizontal-tb;
+-epub-writing-mode: horizontal-tb;
+line-height: 1.2em;
 }
 span.img.ft {
 display: inline;
 float: left;
 clear: left;
-padding-bottom: 0.5em;
+padding-bottom: .5em;
 }
 span.img.fb {
 display: inline;
 float: right;
 clear: right;
-padding-top: 0.5em;
+padding-top: .5em;
 }
 span.img.fw img {
 width: 100%;
 }
 span.img.fh img {
 height: 100%;
+}
+span.img .caption {
+display: block;
+text-align: center;
+font-size: 85%;
+margin-bottom: .5em;
 }
 
 /* floatクリア用 */

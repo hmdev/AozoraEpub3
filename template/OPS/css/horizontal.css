@@ -19,19 +19,25 @@ span.img.ft {
 clear: left;
 display: inline;
 float: left;
-padding-right: 0.5em;
+margin-right: 1em;
 }
 span.img.fb {
 clear: right;
 display: inline;
 float: right;
-padding-left: 0.5em;
+margin-left: 1em;
 }
 span.img.fw img {
 width: 100%;
 }
 span.img.fh img {
 height: 100%;
+}
+span.img .caption {
+display: block;
+text-align: center;
+font-size: 85%;
+line-height: 1.4em;
 }
 
 /* 区切り線 */
