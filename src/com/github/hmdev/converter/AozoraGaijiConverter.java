@@ -13,7 +13,6 @@ import com.github.hmdev.util.LogAppender;
 
 /**
  * 青空文庫注記外字をグリフ・UTF-8・代替文字に変換
- * Licence: Non-commercial use only.
  */
 public class AozoraGaijiConverter
 {

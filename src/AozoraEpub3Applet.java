@@ -110,7 +110,6 @@ import com.github.hmdev.writer.Epub3Writer;
 
 /**
  * 青空文庫テキスト→ePub3変換操作用アプレット
- * Licence: Non-commercial use only.
  */
 public class AozoraEpub3Applet extends JApplet
 {

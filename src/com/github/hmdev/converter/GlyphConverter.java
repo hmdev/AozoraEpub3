@@ -13,7 +13,6 @@ import com.github.hmdev.util.LogAppender;
 /**
  * パラメータファイルで指定されたUTF-8をグリフタグに変換するクラス
  * XMDF変換で利用していてePub3では未使用
- * Licence: Non-commercial use only.
  */
 public class GlyphConverter
 {

@@ -1,7 +1,6 @@
 package com.github.hmdev.util;
 /**
  * 文字変換と判別関連の関数定義クラス
- * Licence: Non-commercial use only.
  */
 public class CharUtils
 {

@@ -2,7 +2,6 @@ package com.github.hmdev.converter;
 /** 第3水準 第4水準JISをUTF-8に変換するためのクラス
  * 半濁点等の連結文字は未対応
  * jisx0213tbl.py から移植
- * Licence: Non-commercial use only.
  * 
 ## Original License:
 ## Copyright (C) 2001 earthian@tama.or.jp, All Rights Reserved.

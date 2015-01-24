@@ -12,7 +12,6 @@ import com.github.hmdev.util.LogAppender;
 
 /**
  * 「基本ラテン文字のみによる拡張ラテン文字Aの分解表記」の変換クラス
- * Licence: Non-commercial use only.
  */
 public class LatinConverter
 {

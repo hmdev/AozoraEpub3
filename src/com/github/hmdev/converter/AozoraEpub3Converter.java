@@ -23,7 +23,6 @@ import com.github.hmdev.writer.Epub3Writer;
 
 /**
  * 青空文庫テキストをePub3形式のXHTMLに変換
- * Licence: Non-commercial use only.
  */
 public class AozoraEpub3Converter
 {

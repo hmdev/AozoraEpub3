@@ -328,3 +328,23 @@ WindowsXP以降 Ubuntu MacOSX で動作確認済
 更新予定と更新履歴
 ------------
 README_Changes.txt 参照
+
+
+ライセンス
+------------
+- ソースコードおよびバイナリ
+GPL v3 ( http://www.gnu.org/licenses/gpl-3.0.html )  
+※ソースコードの流用、改変、再配布を行った場合もGPL v3が適用されます。  
+
+- 作成したデータ
+AozoraEpub3で変換したePubファイルの著作権は入力データと同一になります。  
+ePubファイルの修正や配布は著作権内で自由に行うことができます。  
+
+License
+------------
+- SourceCode and Binaly
+GPL v3 ( http://www.gnu.org/licenses/gpl-3.0.html )  
+
+- Converted Data
+Copyright of converted ePub file will be the same as the input data.  
+modification and distribution of ePub files can be freely carried out in a copyright.  
