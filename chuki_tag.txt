@@ -629,13 +629,16 @@
 ルビ後	</rt></ruby>
 
 #### 画像 String.formatで出力
-##単ページ
-画像単	<span class="img"><img src="%s"/>
-##回り込み 画面サイズ比で幅の%を指定
-画像	<span class="img" style="width:%s%%"><img style="width:100%%" src="%s"/>
-画像上	<span class="img ft" style="width:%s%%"><img style="width:100%%" src="%s"/>
-画像下	<span class="img fb" style="width:%s%%"><img style="width:100%%" src="%s"/>
-##画面サイズよりも大きい cssで100%指定
+##拡大無し
+画像	<span class="img"><img src="%s"/>
+##回り込み
+画像上	<span class="img ft"><img src="%s"/>
+画像下	<span class="img fb"><img src="%s"/>
+##画面サイズ比で幅の%を指定
+画像幅	<span class="img" style="width:%s%%"><img style="width:100%%" src="%s"/>
+画像幅上	<span class="img ft" style="width:%s%%"><img style="width:100%%" src="%s"/>
+画像幅下	<span class="img fb" style="width:%s%%"><img style="width:100%%" src="%s"/>
+##画面サイズよりも大きい 横または縦をcssで100%指定
 画像横	<span class="img fw"><img src="%s"/>
 画像縦	<span class="img fh"><img src="%s"/>
 ##回り込み幅100%

@@ -212,7 +212,6 @@ public class AozoraEpub3Applet extends JApplet
 	JTextField jTextSinglePageWidth;
 	
 	JRadioButton jRadioImageSizeType1;
-	JRadioButton jRadioImageSizeType2;
 	JRadioButton jRadioImageSizeType3;
 	JCheckBox jCheckFitImage;
 	
@@ -221,6 +220,7 @@ public class AozoraEpub3Applet extends JApplet
 	JComboBox jComboRotateImage;
 	
 	//倍率
+	JCheckBox jCheckImageScale;
 	JTextField jTextImageScale;
 	
 	JCheckBox jCheckImageFloat;
@@ -997,31 +997,33 @@ public class AozoraEpub3Applet extends JApplet
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 		panel.setBorder(new NarrowTitledBorder("画像表示倍率"));
 		tabPanel.add(panel);
+		jCheckImageScale = new JCheckBox("有効 ", true);
+		jCheckImageScale.setToolTipText("画面の解像度に合わせて画像の幅を％指定します。画像キャプションがはみ出る場合も指定してください");
+		jCheckImageScale.setFocusPainted(false);
+		jCheckImageScale.setBorder(padding2);
+		jCheckImageScale.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) { jTextImageScale.setEditable(jCheckImageScale.isSelected()); }
+		});
+		panel.add(jCheckImageScale);
 		jTextImageScale = new JTextField("1.0");
-		jTextImageScale.setToolTipText("指定倍率で画像を拡大表示します。画面解像度との比率で幅を%指定します");
+		jTextImageScale.setToolTipText("指定倍率で画像を拡大表示します。64px以下の画像は変更されません");
 		jTextImageScale.setHorizontalAlignment(JTextField.RIGHT);
 		jTextImageScale.setInputVerifier(new FloatInputVerifier(1, 0.01f, 30));
 		jTextImageScale.setMaximumSize(text4);
 		jTextImageScale.setPreferredSize(text4);
 		jTextImageScale.addFocusListener(new TextSelectFocusListener(jTextImageScale));
 		panel.add(jTextImageScale);
-		label = new JLabel("倍　　　　　");
+		label = new JLabel("倍");
 		panel.add(label);
 		
 		////////////////////////////////
 		//画像回り込み
 		////////////////////////////////
 		//画像回り込み
-		panelV = new JPanel();
-		panelV.setLayout(new BoxLayout(panelV, BoxLayout.Y_AXIS));
-		panelV.setBorder(new NarrowTitledBorder("画像回り込み (※単ページ化より優先)"));
-		tabPanel.add(panelV);
-		//上段
 		panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-		panel.setMaximumSize(panelVMaxSize);
-		panel.setBorder(padding4B);
-		panelV.add(panel);
+		panel.setBorder(new NarrowTitledBorder("画像回り込み (※単ページ化より優先)"));
+		tabPanel.add(panel);
 		
 		jCheckImageFloat = new JCheckBox("回り込み有効 ");
 		jCheckImageFloat.setToolTipText("画像の実サイズが指定サイズ以下の画像を回り込み設定します");
@@ -1062,6 +1064,7 @@ public class AozoraEpub3Applet extends JApplet
 		panel.add(label);
 		jComboImageFloatType = new JComboBox(new String[]{"上/左","下/右"});
 		jComboImageFloatType.setFocusable(false);
+		jComboImageFloatType.setBorder(padding0);
 		jComboImageFloatType.setPreferredSize(new Dimension(text4.width+24, 20));
 		panel.add(jComboImageFloatType);
 		
@@ -1124,27 +1127,27 @@ public class AozoraEpub3Applet extends JApplet
 		panel.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
 		panelV.add(panel);
 		
-		label = new JLabel("サイズ指定 (");
+		label = new JLabel("縮小表示 (");
 		label.setBorder(padding2H);
 		panel.add(label);
 		
 		buttonGroup = new ButtonGroup();
-		jRadioImageSizeType1 = new JRadioButton("無し");
+		jRadioImageSizeType1 = new JRadioButton("指定無し");
 		jRadioImageSizeType1.setToolTipText("画像のサイズを指定しません。 端末が自動で縮小します(Kindle, Kobo)");
 		jRadioImageSizeType1.setFocusPainted(false);
 		jRadioImageSizeType1.setBorder(padding2);
 		jRadioImageSizeType1.setIconTextGap(1);
 		panel.add(jRadioImageSizeType1);
 		buttonGroup.add(jRadioImageSizeType1);
-		jRadioImageSizeType2 = new JRadioButton("高さ%", true);
-		/*jRadioImageSizeType2.setToolTipText("画面の縦横比に合せて画像の高さのみ%指定します。画面設定より縦長の端末でははみ出すか縦長に表示されます");
+		/*jRadioImageSizeType2 = new JRadioButton("高さ%", true);
+		jRadioImageSizeType2.setToolTipText("画面の縦横比に合せて画像の高さのみ%指定します。画面設定より縦長の端末でははみ出すか縦長に表示されます");
 		jRadioImageSizeType2.setFocusPainted(false);
 		jRadioImageSizeType2.setBorder(padding2);
 		jRadioImageSizeType2.setIconTextGap(1);
 		panel.add(jRadioImageSizeType2);
 		buttonGroup.add(jRadioImageSizeType2);*/
 		jRadioImageSizeType3 = new JRadioButton("縦横比");
-		jRadioImageSizeType3.setToolTipText("画面の縦横比に合せて幅または高さを100%指定します。横画面で横に伸びる場合があります");
+		jRadioImageSizeType3.setToolTipText("画面の縦横比に合せて幅または高さを100%指定します。画面回転で画像がはみ出す場合があります");
 		jRadioImageSizeType3.setFocusPainted(false);
 		jRadioImageSizeType3.setBorder(padding2);
 		jRadioImageSizeType3.setIconTextGap(1);
@@ -1156,7 +1159,7 @@ public class AozoraEpub3Applet extends JApplet
 		panel.add(label);
 		
 		jCheckFitImage = new JCheckBox("拡大表示", true);
-		jCheckFitImage.setToolTipText("画面サイズより小さい画像を幅高さに合わせて拡大表示します。画面の縦横比に合せて幅または高さを100%で表示します");
+		jCheckFitImage.setToolTipText("画面サイズより小さい画像を幅高さに合わせて拡大表示します。画面回転で画像がはみ出す場合があります");
 		jCheckFitImage.setFocusPainted(false);
 		jCheckFitImage.setBorder(padding2);
 		panel.add(jCheckFitImage);
@@ -1280,6 +1283,7 @@ public class AozoraEpub3Applet extends JApplet
 		jComboRotateImage = new JComboBox(new String[]{"なし","右","左"});
 		jComboRotateImage.setToolTipText("単ページ時画面の縦横比に合わせて画像を回転します");
 		jComboRotateImage.setFocusable(false);
+		jComboRotateImage.setBorder(padding0);
 		jComboRotateImage.setPreferredSize(new Dimension(text4.width+24, 20));
 		panel.add(jComboRotateImage);
 		
@@ -2933,12 +2937,13 @@ public class AozoraEpub3Applet extends JApplet
 		int singlePageSizeH = Integer.parseInt(jTextSinglePageSizeH.getText());
 		int singlePageWidth = Integer.parseInt(jTextSinglePageWidth.getText());
 		
-		float imageScale = 1.0f; try { imageScale = Float.parseFloat(jTextImageScale.getText()); } catch (Exception e) {}
-		int imageFloatType = 0;
+		float imageScale = 0;
+		if (jCheckImageScale.isSelected()) try { imageScale = Float.parseFloat(jTextImageScale.getText()); } catch (Exception e) {}
+		int imageFloatType = 0; //0=無効 1=上 2=下
 		int imageFloatW = 0;
 		int imageFloatH = 0;
 		if (jCheckImageFloat.isSelected()) {
-			imageFloatType =this.jComboImageFloatType.getSelectedIndex()+1;
+			imageFloatType = this.jComboImageFloatType.getSelectedIndex()+1;
 			try { imageFloatW =Integer.parseInt(jTextImageFloatW.getText()); } catch (Exception e) {}
 			try { imageFloatH =Integer.parseInt(jTextImageFloatH.getText()); } catch (Exception e) {}
 		}
@@ -2962,7 +2967,7 @@ public class AozoraEpub3Applet extends JApplet
 		
 		int imageSizeType = SectionInfo.IMAGE_SIZE_TYPE_ASPECT;
 		if (jRadioImageSizeType1.isSelected()) imageSizeType = SectionInfo.IMAGE_SIZE_TYPE_AUTO;
-		else if (jRadioImageSizeType2.isSelected()) imageSizeType = SectionInfo.IMAGE_SIZE_TYPE_HEIGHT;
+		//else if (jRadioImageSizeType2.isSelected()) imageSizeType = SectionInfo.IMAGE_SIZE_TYPE_HEIGHT;
 		
 		//int imageFitType = SectionInfo.IMAGE_SIZE_TYPE_ASPECT;
 		//if (jRadioImageFitType2.isSelected()) imageFitType = SectionInfo.IMAGE_SIZE_TYPE_HEIGHT;
@@ -3973,7 +3978,6 @@ public class AozoraEpub3Applet extends JApplet
 		propValue = props.getProperty("ImageSizeType");
 		if (propValue != null) {
 			jRadioImageSizeType1.setSelected(Integer.toString(SectionInfo.IMAGE_SIZE_TYPE_AUTO).equals(propValue));
-			jRadioImageSizeType2.setSelected(Integer.toString(SectionInfo.IMAGE_SIZE_TYPE_HEIGHT).equals(propValue));
 			jRadioImageSizeType3.setSelected(Integer.toString(SectionInfo.IMAGE_SIZE_TYPE_ASPECT).equals(propValue));
 		}
 		//拡大しない
@@ -3982,6 +3986,7 @@ public class AozoraEpub3Applet extends JApplet
 		setPropsSelected(jCheckSvgImage, props, "SvgImage");
 		try { jComboRotateImage.setSelectedIndex(Integer.parseInt(props.getProperty("RotateImage"))); } catch (Exception e) {}
 		//画像倍率
+		setPropsSelected(jCheckImageScale, props, "ImageScaleChecked");
 		setFloatText(jTextImageScale, props, "ImageScale");
 		//画像回り込み
 		setPropsSelected(jCheckImageFloat, props, "ImageFloat");
@@ -4161,12 +4166,12 @@ public class AozoraEpub3Applet extends JApplet
 		props.setProperty("SinglePageSizeH", this.jTextSinglePageSizeH.getText());
 		props.setProperty("SinglePageWidth", this.jTextSinglePageWidth.getText());
 		
-		props.setProperty("ImageSizeType", ""+(this.jRadioImageSizeType1.isSelected()?SectionInfo.IMAGE_SIZE_TYPE_AUTO:
-			(this.jRadioImageSizeType2.isSelected()?SectionInfo.IMAGE_SIZE_TYPE_HEIGHT:SectionInfo.IMAGE_SIZE_TYPE_ASPECT)));
+		props.setProperty("ImageSizeType", ""+(this.jRadioImageSizeType1.isSelected()?SectionInfo.IMAGE_SIZE_TYPE_AUTO:SectionInfo.IMAGE_SIZE_TYPE_ASPECT));
 		props.setProperty("FitImage", this.jCheckFitImage.isSelected()?"1":"");
 		props.setProperty("SvgImage", this.jCheckSvgImage.isSelected()?"1":"");
 		props.setProperty("RotateImage", ""+this.jComboRotateImage.getSelectedIndex());
 		//画像倍率
+		props.setProperty("ImageScaleChecked", this.jCheckImageScale.isSelected()?"1":"");
 		props.setProperty("ImageScale", this.jTextImageScale.getText());
 		//画像回り込み
 		props.setProperty("ImageFloat", this.jCheckImageFloat.isSelected()?"1":"");

@@ -14,6 +14,17 @@ a:link img, a:visited img { border-style: none; }
 span.img {
 clear: both;
 display: inline-block;
+max-width: 100%;
+max-height: 100%;
+}
+span.img img {
+min-height: 1em;
+}
+.fit_w span.img {
+width: 100%;
+}
+.fit_h span.img {
+height: 100%;
 }
 span.img.ft {
 clear: left;

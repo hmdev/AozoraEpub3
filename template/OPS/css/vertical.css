@@ -21,6 +21,15 @@ writing-mode: horizontal-tb;
 -epub-writing-mode: horizontal-tb;
 line-height: 1.2em;
 }
+span.img img {
+min-width: 1em;
+}
+.fit_w span.img {
+width: 100%;
+}
+.fit_h span.img {
+height: 100%;
+}
 span.img.ft {
 display: inline;
 float: left;
