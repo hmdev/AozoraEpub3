@@ -166,7 +166,7 @@ public class AozoraEpub3Converter
 	/** 外字注記パターン */
 	final static Pattern gaijiChukiPattern = Pattern.compile("(※［＃.+?］)|(〔.+?〕)|(／″?＼)");
 	/** 前方参照注記パターン */
-	final static Pattern chukiSufPattern = Pattern. compile("［＃「([^］]+)」([^］]+?)］" );
+	final static Pattern chukiSufPattern = Pattern. compile("［＃「([^」]+)」([^］]+?)］");
 	
 	/** 先頭注記内側のパターン */
 	final static Pattern chukiLeftPattern = Pattern.compile("^［＃(.+?)］");
@@ -1368,13 +1368,42 @@ public class AozoraEpub3Converter
 	 * 前にルビがあって｜で始まる場合は｜の前に追加 */
 	String replaceChukiSufTag(String line)
 	{
+		//前方参照注記チェック
+		//"［＃「([^」]+)」([^］]+?)］"
 		Matcher m = chukiSufPattern.matcher(line);
+		//前方参照注記でなければそのまま返却
+		if (!m.find()) return line;
 		
-		//マッチしなければそのまま返却
+		//注記内注記があれば除外
+		StringBuilder buf = new StringBuilder();
+		//最初の注記以後は文字判別で入れ子をチェック
+		Matcher mTag = Pattern.compile("((［＃)|］)").matcher(line);
+		int mTagEnd = 0;
+		int innerTagLevel = 0;
+		while (mTag.find()) {
+			//注記前まで出力
+			if (innerTagLevel <= 1) buf.append(line.substring(mTagEnd, mTag.start()));
+			mTagEnd = mTag.end();
+			String tag = mTag.group();
+			if ("］".equals(tag)) {
+				//注記タグを出力
+				if (innerTagLevel <= 1) buf.append(tag);
+				innerTagLevel--;
+			} else {
+				innerTagLevel++;
+				//注記タグを出力
+				if (innerTagLevel <= 1) buf.append(tag);
+			}
+		}
+		//後ろを出力
+		buf.append(line.substring(mTagEnd));
+		line = buf.toString();
+		
+		m = chukiSufPattern.matcher(line);
 		if (!m.find()) return line;
 		
 		int chOffset = 0;
-		StringBuilder buf = new StringBuilder(line);
+		buf = new StringBuilder(line);
 		do {
 			//System.out.println(m.group());
 			String target = m.group(1);
@@ -1424,6 +1453,7 @@ public class AozoraEpub3Converter
 			int chukiTagStart = m.start();
 			int chukiTagEnd = m.end();
 			
+			//前方参照注記ではない
 			if (tags == null) {
 				if (chuki.endsWith("の注記付き終わり")) {
 					//［＃注記付き］○○［＃「××」の注記付き終わり］の例外処理
@@ -1434,13 +1464,12 @@ public class AozoraEpub3Converter
 					chOffset += targetLength+2 - (chukiTagEnd-chukiTagStart);
 				} else if (chuki.endsWith("のルビ") || (chukiRuby && chuki.endsWith("の注記"))) {
 					//ルビに変換 ママは除外
-					if (target.indexOf("」に「") > -1 && target.indexOf("」に「ママ") == -1) {
-						targetLength = target.indexOf('」');
+					if (chuki.startsWith("に「") && !chuki.startsWith("に「ママ")) {
 						//［＃「青空文庫」に「あおぞらぶんこ」のルビ］
 						int targetStart = this.getTargetStart(buf, chukiTagStart, chOffset, targetLength);
 						//後ろタグ置換
 						buf.delete(chukiTagStart+chOffset, chukiTagEnd+chOffset);
-						String rt  =target.substring(target.indexOf('「')+1);
+						String rt = chuki.substring(chuki.indexOf('「')+1, chuki.indexOf('」'));
 						buf.insert(chukiTagStart+chOffset, "《"+rt+"》");
 						//前に ｜ insert
 						buf.insert(targetStart, "｜");
@@ -1451,11 +1480,10 @@ public class AozoraEpub3Converter
 					}
 				} else if (chukiKogaki && chuki.endsWith("の注記")) {
 					//後ろに小書き表示 ママは除外
-					if (target.indexOf("」に「") > -1 && target.indexOf("」に「ママ") == -1) {
-						targetLength = target.indexOf('」');
+					if (chuki.startsWith("に「") && !chuki.startsWith("に「ママ")) {
 						//［＃「青空文庫」に「あおぞらぶんこ」の注記］
 						buf.delete(chukiTagStart+chOffset, chukiTagEnd+chOffset);
-						String kogaki = "［＃小書き］"+target.substring(target.indexOf('「')+1)+"［＃小書き終わり］";
+						String kogaki = "［＃小書き］"+chuki.substring(chuki.indexOf('「')+1, chuki.indexOf('」'))+"［＃小書き終わり］";
 						buf.insert(chukiTagStart+chOffset, kogaki);
 						chOffset += kogaki.length() - (chukiTagEnd-chukiTagStart);
 					}

@@ -27,15 +27,38 @@ public class AozoraEpub3ConverterTest
 	{
 		try {
 			String str;
+			
+			str = converter.replaceChukiSufTag("星状、扇形などの標本図は第一一〇及び一一一頁の一般分類の図［＃「第一一〇及び一一一頁の一般分類の図」は「第32図」を指す。］の中に示してある。");
+			System.out.println(str);
+			Assert.assertEquals(str, "星状、扇形などの標本図は第一一〇及び一一一頁の一般分類の図［＃「第一一〇及び一一一頁の一般分類の図」は「第32図」を指す。］の中に示してある。");
+			str = converter.replaceChukiSufTag("星状、扇形などの標本図は第一一〇及び一一一頁の一般分類の図［＃「第一一〇及び一一一頁の一般分類の図」は「第32［＃「32」は縦中横］図」を指す。］の中に示してある。");
+			System.out.println(str);
+			Assert.assertEquals(str, "星状、扇形などの標本図は第一一〇及び一一一頁の一般分類の図［＃「第一一〇及び一一一頁の一般分類の図」は「第32図」を指す。］の中に示してある。");
+			
+			str = converter.replaceChukiSufTag("第32［＃「32」は縦中横］図［＃「第32［＃「32」は縦中横］図」は太字］");
+			System.out.println(str);
+			Assert.assertEquals(str, "［＃太字］第［＃縦中横］32［＃縦中横終わり］図［＃太字終わり］");
+			
+			str = converter.replaceChukiSufTag(converter.convertGaijiChuki("勝安房守［＃「勝安房守」に「本ト麟太郎※［＃コト、1-2-24］」の注記", true, false));
+			System.out.println(str);
+			Assert.assertEquals(str, "勝安房守［＃「勝安房守」に「本ト麟太郎ヿ」の注記");
+			
+			converter.chukiRuby = true;
+			str = converter.replaceChukiSufTag("［＃５字下げ］第一回　入蔵決心の次第［＃「入蔵決心の次第」に「〔チベット入国の決意〕」の注記］［＃「第一回　入蔵決心の次第」は大見出し］");
+			System.out.println(str);
+			Assert.assertEquals(str, "［＃５字下げ］［＃大見出し］第一回　｜入蔵決心の次第《〔チベット入国の決意〕》［＃大見出し終わり］");
+			converter.chukiRuby = false;
 			converter.chukiKogaki = true;
 			str = converter.replaceChukiSufTag("［＃５字下げ］第一回　入蔵決心の次第［＃「入蔵決心の次第」に「〔チベット入国の決意〕」の注記］［＃「第一回　入蔵決心の次第」は大見出し］");
+			System.out.println(str);
 			Assert.assertEquals(str, "［＃５字下げ］［＃大見出し］第一回　入蔵決心の次第［＃小書き］〔チベット入国の決意〕［＃小書き終わり］［＃大見出し終わり］");
-			//System.out.println(str);
 			
 			str = converter.replaceChukiSufTag("人間は考える｜蘆［＃「人間は考える｜蘆」は太字］《あし》");
+			System.out.println(str);
 			Assert.assertEquals(str, "［＃太字］人間は考える｜蘆《あし》［＃太字終わり］");
 			
 			str = converter.replaceChukiSufTag("　　　あ１［＃「あ１」は中見出し］");
+			System.out.println(str);
 			Assert.assertEquals(str,  "　　　［＃中見出し］あ１［＃中見出し終わり］");
 			
 		} catch (Exception e) {
