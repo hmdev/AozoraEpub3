@@ -39,7 +39,7 @@ public class ImageInfo
 	/** カバー画像ならtrue */
 	boolean isCover;
 	
-	/** 回転角度 */
+	/** 回転角度 右 90 左 -90 */
 	public int rotateAngle = 0;
 	
 	/** 画像の情報を生成

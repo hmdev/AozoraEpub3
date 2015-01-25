@@ -205,6 +205,12 @@ public class AozoraEpub3Applet extends JApplet
 	JTextField jTextCoverW;
 	JTextField jTextCoverH;
 	
+	//回り込み
+	JCheckBox jCheckImageFloat;
+	JComboBox jComboImageFloatType;
+	JTextField jTextImageFloatW;
+	JTextField jTextImageFloatH;
+	
 	//単ページ
 	JTextField jTextSinglePageSizeW;
 	JTextField jTextSinglePageSizeH;
@@ -214,6 +220,10 @@ public class AozoraEpub3Applet extends JApplet
 	JRadioButton jRadioImageSizeType3;
 	JCheckBox jCheckFitImage;
 	
+	//Float指定
+	JCheckBox jCheckImageFloatPage;
+	JCheckBox jCheckImageFloatBlock;
+
 	JCheckBox jCheckSvgImage;
 	
 	JComboBox jComboRotateImage;
@@ -221,11 +231,6 @@ public class AozoraEpub3Applet extends JApplet
 	//倍率
 	JCheckBox jCheckImageScale;
 	JTextField jTextImageScale;
-	
-	JCheckBox jCheckImageFloat;
-	JComboBox jComboImageFloatType;
-	JTextField jTextImageFloatW;
-	JTextField jTextImageFloatH;
 	
 	//画像縮小
 	JCheckBox jCheckResizeW;
@@ -1164,6 +1169,31 @@ public class AozoraEpub3Applet extends JApplet
 		panel.add(jCheckFitImage);
 		buttonGroup = new ButtonGroup();
 		
+		//Float表示
+		panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		panel.setBorder(new NarrowTitledBorder("Float指定 (Readerのみ)"));
+		tabPanel.add(panel);
+		jCheckImageFloatPage = new JCheckBox("単ページ画像");
+		jCheckImageFloatPage.setToolTipText("単ページ対象の画像をfloat表示します。 xhtmlは分割されません");
+		jCheckImageFloatPage.setFocusPainted(false);
+		jCheckImageFloatPage.setBorder(padding2);
+		panel.add(jCheckImageFloatPage);
+		
+		jCheckImageFloatBlock = new JCheckBox("通常画像");
+		jCheckImageFloatBlock.setToolTipText("回り込み、単ページ以外の画像をfloat表示します。 64px以上の画像のみ");
+		jCheckImageFloatBlock.setFocusPainted(false);
+		jCheckImageFloatBlock.setBorder(padding2);
+		panel.add(jCheckImageFloatBlock);
+		
+		////////////////////////////////////////////////////////////////
+		//Tab 画像2
+		////////////////////////////////////////////////////////////////
+		tabPanel = new JPanel();
+		//tabPanel.setLayout(new BoxLayout(tabPanel, BoxLayout.Y_AXIS));
+		tabPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 1, 0));
+		jTabbedPane.addTab("画像2", imageIcon, tabPanel);
+		
 		////////////////////////////////
 		//全画面＋SVG
 		////////////////////////////////
@@ -1176,15 +1206,6 @@ public class AozoraEpub3Applet extends JApplet
 		jCheckSvgImage.setToolTipText("画像のみのzipの場合、固定レイアウト＋SVGタグで出力します");
 		jCheckSvgImage.setBorder(padding2);
 		panel.add(jCheckSvgImage);
-		
-		
-		////////////////////////////////////////////////////////////////
-		//Tab 画像2
-		////////////////////////////////////////////////////////////////
-		tabPanel = new JPanel();
-		//tabPanel.setLayout(new BoxLayout(tabPanel, BoxLayout.Y_AXIS));
-		tabPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 1, 0));
-		jTabbedPane.addTab("画像2", imageIcon, tabPanel);
 		
 		////////////////////////////////
 		//画像調整
@@ -3014,6 +3035,9 @@ public class AozoraEpub3Applet extends JApplet
 			//コメント
 			this.aozoraConverter.setCommentPrint(this.jCheckCommentPrint.isSelected(), this.jCheckCommentConvert.isSelected());
 			
+			//float表示
+			this.aozoraConverter.setImageFloat(this.jCheckImageFloatPage.isSelected(), this.jCheckImageFloatBlock.isSelected());
+			
 			//空行除去
 			int removeEmptyLine = jComboxRemoveEmptyLine.getSelectedIndex();
 			int maxEmptyLine = jComboxMaxEmptyLine.getSelectedIndex();
@@ -3997,6 +4021,9 @@ public class AozoraEpub3Applet extends JApplet
 		setIntText(jTextResizeNumW, props, "ResizeNumW");
 		setPropsSelected(jCheckResizeH, props, "ResizeH");
 		setIntText(jTextResizeNumH, props, "ResizeNumH");
+		//Float表示
+		setPropsSelected(jCheckImageFloatPage, props, "ImageFloatPage");
+		setPropsSelected(jCheckImageFloatBlock, props, "ImageFloatBlock");
 		//Jpeg圧縮率
 		setIntText(jTextJpegQuality, props, "JpegQuality");
 		//ガンマ補正
@@ -4160,15 +4187,9 @@ public class AozoraEpub3Applet extends JApplet
 		//画面サイズ
 		props.setProperty("DispW", this.jTextDispW.getText());
 		props.setProperty("DispH", this.jTextDispH.getText());
-		//画像単ページ
-		props.setProperty("SinglePageSizeW", this.jTextSinglePageSizeW.getText());
-		props.setProperty("SinglePageSizeH", this.jTextSinglePageSizeH.getText());
-		props.setProperty("SinglePageWidth", this.jTextSinglePageWidth.getText());
-		
-		props.setProperty("ImageSizeType", ""+(this.jRadioImageSizeType1.isSelected()?SectionInfo.IMAGE_SIZE_TYPE_AUTO:SectionInfo.IMAGE_SIZE_TYPE_ASPECT));
-		props.setProperty("FitImage", this.jCheckFitImage.isSelected()?"1":"");
-		props.setProperty("SvgImage", this.jCheckSvgImage.isSelected()?"1":"");
-		props.setProperty("RotateImage", ""+this.jComboRotateImage.getSelectedIndex());
+		//表紙
+		props.setProperty("CoverW", this.jTextCoverW.getText());
+		props.setProperty("CoverH", this.jTextCoverH.getText());
 		//画像倍率
 		props.setProperty("ImageScaleChecked", this.jCheckImageScale.isSelected()?"1":"");
 		props.setProperty("ImageScale", this.jTextImageScale.getText());
@@ -4182,12 +4203,18 @@ public class AozoraEpub3Applet extends JApplet
 		props.setProperty("ResizeH", this.jCheckResizeH.isSelected()?"1":"");
 		props.setProperty("ResizeNumW", this.jTextResizeNumW.getText());
 		props.setProperty("ResizeNumH", this.jTextResizeNumH.getText());
-		//props.setProperty("Pixel", this.jCheckPixel.isSelected()?"1":"");
-		//props.setProperty("PixelW", this.jTextPixelW.getText());
-		//props.setProperty("PixelH", this.jTextPixelH.getText());
-		//表紙
-		props.setProperty("CoverW", this.jTextCoverW.getText());
-		props.setProperty("CoverH", this.jTextCoverH.getText());
+		//画像単ページ
+		props.setProperty("SinglePageSizeW", this.jTextSinglePageSizeW.getText());
+		props.setProperty("SinglePageSizeH", this.jTextSinglePageSizeH.getText());
+		props.setProperty("SinglePageWidth", this.jTextSinglePageWidth.getText());
+		
+		props.setProperty("ImageSizeType", ""+(this.jRadioImageSizeType1.isSelected()?SectionInfo.IMAGE_SIZE_TYPE_AUTO:SectionInfo.IMAGE_SIZE_TYPE_ASPECT));
+		props.setProperty("FitImage", this.jCheckFitImage.isSelected()?"1":"");
+		props.setProperty("SvgImage", this.jCheckSvgImage.isSelected()?"1":"");
+		props.setProperty("RotateImage", ""+this.jComboRotateImage.getSelectedIndex());
+		//画像回り込み
+		props.setProperty("ImageFloatPage", this.jCheckImageFloatPage.isSelected()?"1":"");
+		props.setProperty("ImageFloatBlock", this.jCheckImageFloatBlock.isSelected()?"1":"");
 		//JPEG画質
 		props.setProperty("JpegQuality", this.jTextJpegQuality.getText());
 		//ガンマ補正

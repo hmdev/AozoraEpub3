@@ -3,17 +3,22 @@
  */
 package com.github.hmdev.converter;
 
-public class PageBreakTrigger
+public class PageBreakType
 {
+	/** 次のページは画像単ページではない */
 	final static public int IMAGE_PAGE_NONE = 0;
+	/** 単ページ 幅100% */
 	final static public int IMAGE_PAGE_W = 1;
+	/** 単ページ 高さ100% */
 	final static public int IMAGE_PAGE_H = 2;
+	/** 単ページ サイズ変更無し */
 	final static public int IMAGE_PAGE_NOFIT = 5;
+	/** 単ページ サイズに応じて自動調整 未使用？ */
 	final static public int IMAGE_PAGE_AUTO = 10;
 	
-	/** 幅合わせ */
+	/** 幅合わせ 画面サイズよりも大きい場合 */
 	final static public int IMAGE_INLINE_W = 11;
-	/** 高さ合わせ */
+	/** 高さ合わせ 画面サイズよりも大きい場合 */
 	final static public int IMAGE_INLINE_H = 12;
 	
 	/** 回り込み上 */
@@ -25,8 +30,11 @@ public class PageBreakTrigger
 	/** 回り込み下 幅合わせ */
 	final static public int IMAGE_INLINE_BOTTOM_W = 26;
 	
+	/** ページタイプ 通常 */
 	final static public int PAGE_NORMAL = 0;
+	/** ページタイプ 中央寄せ */
 	final static public int PAGE_MIDDLE = 1;
+	/** ページタイプ 下付き */
 	final static public int PAGE_BOTTOM = 2;
 	
 	/** 空のページは無視する */
@@ -48,11 +56,11 @@ public class PageBreakTrigger
 	 * @param ignoreEmptyPage
 	 * @param isMiddle
 	 * @param isImage 	 */
-	public PageBreakTrigger(boolean ignoreEmptyPage, int pageType, int imagePageType)
+	public PageBreakType(boolean ignoreEmptyPage, int pageType, int imagePageType)
 	{
 		this(ignoreEmptyPage, pageType, imagePageType, false);
 	}
-	public PageBreakTrigger(boolean ignoreEmptyPage, int pageType, int imagePageType, boolean noChapter)
+	public PageBreakType(boolean ignoreEmptyPage, int pageType, int imagePageType, boolean noChapter)
 	{
 		super();
 		this.ignoreEmptyPage = ignoreEmptyPage;

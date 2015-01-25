@@ -11,18 +11,22 @@ margin: 0;
 a:active { color: #C00; background: transparent; }
 a:link img, a:visited img { border-style: none; }
 
+/* 画像 */
 span.img {
 clear: both;
 display: inline-block;
 max-width: 100%;
 max-height: 100%;
+line-height: 1.2em;
 }
 span.img img {
 min-height: 1em;
 }
+/* 単ページ横100% */
 .fit_w span.img {
 width: 100%;
 }
+/* 単ページ縦100% */
 .fit_h span.img {
 height: 100%;
 }
@@ -30,19 +34,36 @@ span.img.ft {
 clear: left;
 display: inline;
 float: left;
-margin-right: 1em;
+padding: .5em .5em .5em 0;
 }
 span.img.fb {
 clear: right;
 display: inline;
 float: right;
-margin-left: 1em;
+padding: .5em .5em .5em 0;
 }
 span.img.fw img {
 width: 100%;
 }
 span.img.fh img {
 height: 100%;
+}
+/* 単ページfloat表示 */
+span.img.fpage {
+display: block;
+float: left;
+clear: both;
+width: 100%;
+height: 100%;
+text-align: center;
+vertical-align: center;
+padding-right: 100%;
+}
+/* 画像float表示 */
+span.img.fblk {
+display: block;
+float:left;
+padding: .5em 100% .5em 0;
 }
 span.img .caption {
 display: block;
@@ -165,20 +186,24 @@ border-top-width: 1px;
 }
 
 /* 文字サイズ 大 */
-.font1 { font-size: 110%; }
+.font1, .chap3 { font-size: 110%; }
 .font2 { font-size: 120%; }
-.font3 { font-size: 130%; }
+.font3, .chap2 { font-size: 130%; }
 .font4 { font-size: 140%; }
-.font5 { font-size: 150%; }
+.font5, .chap1 { font-size: 150%; }
 .font6 { font-size: 160%; }
 /* 文字サイズ 小 */
 .font-1 { font-size: 90%; }
-.font-2 { font-size: 80%; }
-.font-3 { font-size: 70%; }
-.font-4 { font-size: 60%; }
-.font-5 { font-size: 50%; }
-.font-6 { font-size: 45%; }
-.kogaki { font-size: 70%; }
+.font-2 { font-size: 83%; }
+.font-3 { font-size: 77%; }
+.font-4, .kogaki { font-size: 70%; }
+.font-5 { font-size: 66%; }
+.font-6 { font-size: 62%; }
+
+/* 見出し*/
+.chap1, .chap2, .chap3 {
+clear: both;
+}
 
 /* 縦中横 */
 

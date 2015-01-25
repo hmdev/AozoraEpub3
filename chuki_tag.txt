@@ -36,20 +36,20 @@
 ページの左下	<div class="btm">	</div>	L
 
 ############# 見出し #############
-ここから大見出し	<div class="font5">		1
+ここから大見出し	<div class="chap1">		1
 ここで大見出し終わり	</div>		1
-ここから中見出し	<div class="font3">		1
+ここから中見出し	<div class="chap2">		1
 ここで中見出し終わり	</div>		1
-ここから小見出し	<div class="font1">		1
+ここから小見出し	<div class="chap3">		1
 ここで小見出し終わり	</div>		1
-見出し	<span class="font5">	</span>
-見出し終わり
-大見出し	<span class="font5">	</span>
-大見出し終わり
-中見出し	<span class="font3">	</span>
-中見出し終わり
-小見出し	<span class="font1">	</span>
-小見出し終わり
+見出し	<div class="chap1">			1
+見出し終わり	</div>		1
+大見出し	<div class="chap1">		1
+大見出し終わり	</div>		1
+中見出し	<div class="chap2">		1
+中見出し終わり	</div>		1
+小見出し	<div class="chap3">		1
+小見出し終わり	</div>		1
 同行大見出し	<span class="font5">
 同行大見出し終わり	</span>
 同行中見出し	<span class="font3">
@@ -568,6 +568,7 @@
 
 ################################################################
 ####内部処理用
+################################################################
 字下げ省略	</div>
 
 ####字下げ折り返し → TODO PatternとFormatにする (演算処理はフラグで切り替え？)
@@ -644,6 +645,15 @@
 ##回り込み幅100%
 画像上横	<span class="img ft fw"><img src="%s"/>
 画像下横	<span class="img fb fw"><img src="%s"/>
+##通常画像のfloat表示
+画像浮	<span class="img fblk"><img src="%s"/>
+画像幅浮	<span class="img fblk" style="width:%s%%"><img style="width:100%%" src="%s"/>
+##単ページのfloat表示 xhtmlを分割せずに単ページ表示 画面サイズ比で幅の%を指定
+画像単浮	<span class="img fpage"><img src="%s"/>
+画像単幅浮	<span class="img fpage"><img style="width:%s;" src="%s"/>
+画像単横浮	<span class="img fpage"><img style="width:100%%;" src="%s"/>
+画像単縦浮	<span class="img fpage"><img style="height:100%%;" src="%s"/>
+
 ##画像終了タグ 下にキャプションがあればその後に出力される
 画像終わり	</span>
 
