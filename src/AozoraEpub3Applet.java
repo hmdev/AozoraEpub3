@@ -713,13 +713,13 @@ public class AozoraEpub3Applet extends JApplet
 		label = new JLabel("(");
 		panel.add(label);
 		buttonGroup = new ButtonGroup();
-		jRadioTitleNormal = new JRadioButton("本文内 ", true);
+		jRadioTitleNormal = new JRadioButton("本文内 ");
 		jRadioTitleNormal.setToolTipText("別ページ処理せずに本文中に表題等を出力します。 目次は表題前に出力されます");
 		jRadioTitleNormal.setBorder(padding0);
 		jRadioTitleNormal.setIconTextGap(1);
 		panel.add(jRadioTitleNormal);
 		buttonGroup.add(jRadioTitleNormal);
-		jRadioTitleMiddle = new JRadioButton("中央 ");
+		jRadioTitleMiddle = new JRadioButton("中央 ", true);
 		jRadioTitleMiddle.setToolTipText("中央寄せの表題ページを出力します");
 		jRadioTitleMiddle.setBorder(padding0);
 		jRadioTitleMiddle.setIconTextGap(1);
@@ -3846,6 +3846,18 @@ public class AozoraEpub3Applet extends JApplet
 		}
 		return button.isSelected();
 	}
+	/** "1"が設定されている場合のみチェックをON nullなら変更しない */
+	private boolean setPropsSelected(JToggleButton button, Properties props, String name, boolean nullSelect)
+	{
+		if (props.containsKey(name)) {
+			boolean selected = "1".equals(props.getProperty(name));
+			button.setSelected(selected);
+			return selected;
+		} else {
+			button.setSelected(nullSelect);
+		}
+		return button.isSelected();
+	}
 	/** int値を設定 null なら設定しない */
 	private void setIntText(JTextField jText, Properties props, String name)
 	{
@@ -4009,7 +4021,7 @@ public class AozoraEpub3Applet extends JApplet
 		setPropsSelected(jCheckSvgImage, props, "SvgImage");
 		try { jComboRotateImage.setSelectedIndex(Integer.parseInt(props.getProperty("RotateImage"))); } catch (Exception e) {}
 		//画像倍率
-		setPropsSelected(jCheckImageScale, props, "ImageScaleChecked");
+		setPropsSelected(jCheckImageScale, props, "ImageScaleChecked", false);
 		setFloatText(jTextImageScale, props, "ImageScale");
 		//画像回り込み
 		setPropsSelected(jCheckImageFloat, props, "ImageFloat");
@@ -4021,9 +4033,9 @@ public class AozoraEpub3Applet extends JApplet
 		setIntText(jTextResizeNumW, props, "ResizeNumW");
 		setPropsSelected(jCheckResizeH, props, "ResizeH");
 		setIntText(jTextResizeNumH, props, "ResizeNumH");
-		//Float表示
-		setPropsSelected(jCheckImageFloatPage, props, "ImageFloatPage");
-		setPropsSelected(jCheckImageFloatBlock, props, "ImageFloatBlock");
+		//Float表示 (デフォルトOFF)
+		setPropsSelected(jCheckImageFloatPage, props, "ImageFloatPage", false);
+		setPropsSelected(jCheckImageFloatBlock, props, "ImageFloatBlock", false);
 		//Jpeg圧縮率
 		setIntText(jTextJpegQuality, props, "JpegQuality");
 		//ガンマ補正

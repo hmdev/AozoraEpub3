@@ -2155,6 +2155,9 @@ public class AozoraEpub3Converter
 					ch[i-1] = '※'; ch[i] = '》';
 				}
 				break;
+			//濁点半濁点の結合文字と半角は全角に変換
+			case '゙': case 'ﾞ': ch[i] = '゛'; break;
+			case '゚': case 'ﾟ': ch[i] = '゜'; break;
 			}
 		}
 		//NULLや非表示文字は除去
@@ -2172,6 +2175,7 @@ public class AozoraEpub3Converter
 			default: buf.append(ch[idx]);
 			}
 		}
+		
 	}
 	
 	/** ルビタグに変換して出力
@@ -2446,13 +2450,34 @@ public class AozoraEpub3Converter
 					break;
 				}
 				
-				//ひらがな/カタカナ＋濁点/半濁点
-				if (i+1<ch.length && (ch[i+1]=='゛' || ch[i+1]=='ﾞ' || ch[i+1]=='゜' || ch[i+1]=='ﾟ')) {
+				//ひらがな/カタカナ＋濁点/半濁点 結合文字も対応
+				if (i+1<ch.length && (ch[i+1]=='゛' || ch[i+1]=='゜')) {
 					if ('ぁ' <= ch[i] && ch[i] <= 'ん' || 'ぁ' <= ch[i] && ch[i] <= 'ヶ' || ch[i]=='〻') {
+						//通常の濁点文字ならその文字で出力
+						if (ch[i+1]=='゛' && ('か' <= ch[i] && ch[i] <= 'と' || 'カ' <= ch[i] && ch[i] <= 'ト')) {
+							ch[i] = (char)((int)ch[i]+(int)'が'-(int)'か');
+							buf.append(ch[i]);
+							i++;
+							continue;
+						}
+						if ('は' <= ch[i] && ch[i] <= 'ほ' || 'ハ' <= ch[i] && ch[i] <= 'ホ') {
+							if (ch[i+1]=='゛') ch[i] = (char)((int)ch[i]+(int)'ば'-(int)'は');
+							else ch[i] = (char)((int)ch[i]+(int)'ぱ'-(int)'は');
+							buf.append(ch[i]);
+							i++;
+							continue;
+						}
+						if ('ウ' == ch[i]) {
+							ch[i] = 'ヴ';
+							buf.append(ch[i]);
+							i++;
+							continue;
+						}
+						//それ以外はspanで重ねる
 						buf.append("<span class=\"dakuten\">");
 						buf.append(ch[i]);
 						buf.append("<span>");
-						if (ch[i+1]=='゛' || ch[i+1]=='ﾞ') {
+						if (ch[i+1]=='゛') {
 							buf.append("゛");
 						} else {
 							buf.append("゜");
