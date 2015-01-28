@@ -120,10 +120,10 @@ position:relative;
 /* 濁点 */
 .dakuten span {
 position:absolute;
-top:-.8em; left:.1em;
+top:-.7em; left:.1em;
 }
 .kindle .dakuten span {
-top:0; left:0.8em;
+top:0; left:0.76em;
 }
 
 /* 圏点 */

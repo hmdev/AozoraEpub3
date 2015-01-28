@@ -1,4 +1,7 @@
 package com.github.hmdev.util;
+
+import java.io.UnsupportedEncodingException;
+
 /**
  * 文字変換と判別関連の関数定義クラス
  */
@@ -80,15 +83,15 @@ public class CharUtils
 		return false;
 	}
 	
-	/** ひらがなかチェック */
+	/** ひらがなかチェック 半角濁点半濁点は全角に変換済 */
 	static public boolean isHiragana(char ch)
 	{
-		return ('ぁ'<=ch && ch<='ん') || 'ゖ'==ch || 'ー'==ch || 'ゝ'==ch || 'ゞ'==ch || 'ヽ'==ch || 'ヾ'==ch || '゛'==ch || 'ﾞ'==ch || '゜'==ch || 'ﾟ'== ch;
+		return ('ぁ'<=ch && ch<='ん') || 'ゖ'==ch || 'ー'==ch || 'ゝ'==ch || 'ゞ'==ch || 'ヽ'==ch || 'ヾ'==ch || '゛'==ch || '゜'==ch;// || 'ﾞ'==ch || 'ﾟ'== ch;
 	}
-	/** カタカナかチェック */
+	/** カタカナかチェック 半角濁点半濁点は全角に変換済 */
 	static public boolean isKatakana(char ch)
 	{
-		return ('ァ'<=ch && ch<='ヶ') || 'ー'==ch || 'ゝ'==ch || 'ゞ'==ch || 'ヽ'==ch || 'ヾ'==ch || '゛'==ch || 'ﾞ'==ch || '゜'==ch || 'ﾟ'== ch;
+		return ('ァ'<=ch && ch<='ヶ') || 'ㇷ'==ch || 'ー'==ch || 'ゝ'==ch || 'ゞ'==ch || 'ヽ'==ch || 'ヾ'==ch || '゛'==ch || '゜'==ch;// || 'ﾞ'==ch || 'ﾟ'== ch;
 	}
 	
 	static public boolean isSpace(String line)

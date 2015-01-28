@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 
+import com.github.hmdev.util.CharUtils;
 import com.github.hmdev.util.LogAppender;
 
 
@@ -16,9 +17,6 @@ import com.github.hmdev.util.LogAppender;
  */
 public class AozoraGaijiConverter
 {
-	/** 第3水準 第4水準 SJISをUTF-8に変換するためのクラス */
-	JisConverter jisConverter;
-	
 	/** 青空文庫注記外字をグリフタグに変換 value=CID */
 	//HashMap<String, String> chukiCidMap = new HashMap<String, String>();
 	
@@ -31,9 +29,6 @@ public class AozoraGaijiConverter
 	public AozoraGaijiConverter(String jarPath) throws IOException
 	{
 		//初期化
-		//外字変換
-		this.jisConverter = new JisConverter();
-		
 		//ファイルチェック取得
 		this.loadChukiFile(new File(jarPath+"chuki_utf.txt"), chukiUtfMap, false);
 		this.loadChukiFile(new File(jarPath+"chuki_alt.txt"), chukiAltMap, true);
@@ -100,46 +95,36 @@ public class AozoraGaijiConverter
 	 * @return 変換したUTF-8文字列 変換できなければnull */
 	public String codeToCharString(String code)
 	{
-		//System.out.println(code);
 		String gaiji = null;
+		try {
 		if (code.startsWith("U+")) {
 			//UTF-32コードを文字列に変換
-			try {
-				int utf8 = Integer.parseInt(code.substring(2), 16);
-				gaiji = utfCodeToCharString(utf8);
-			} catch (Exception e) {}
+			int utf8 = Integer.parseInt(code.substring(2), 16);
+			gaiji = utfCodeToCharString(utf8);
 		} else if (code.startsWith("UCS-")) {
-				//UTF-32コードを文字列に変換
-				try {
-					int utf8 = Integer.parseInt(code.substring(4), 16);
-					gaiji = utfCodeToCharString(utf8);
-				} catch (Exception e) {}
+			//UTF-32コードを文字列に変換
+			int utf8 = Integer.parseInt(code.substring(4), 16);
+			gaiji = utfCodeToCharString(utf8);
 		} else if (code.startsWith("unicode")) {
 			//UTF-32コードを文字列に変換
-			try {
-				int utf8 = Integer.parseInt(code.substring(7), 16);
-				gaiji = utfCodeToCharString(utf8);
-			} catch (Exception e) {}
+			int utf8 = Integer.parseInt(code.substring(7), 16);
+			gaiji = utfCodeToCharString(utf8);
 		} else if (code.startsWith("第3水準") || code.startsWith("第4水準")) {
 			//第3第4水準JISを文字列に変換
-			try {
-				String[] codes = code.substring(4).split("-");
-				int utf8 = jisConverter.toUTF8(Integer.parseInt(codes[0]), Integer.parseInt(codes[1]), Integer.parseInt(codes[2]));
-				gaiji = utfCodeToCharString(utf8);
-			} catch (Exception e) {}
+			String[] codes = code.substring(4).split("-");
+			gaiji = JisConverter.getConverter().toUTF8(Integer.parseInt(codes[0]), Integer.parseInt(codes[1]), Integer.parseInt(codes[2]));
 		} else {
 			//JISコードを文字列に変換
-			try {
-				String[] codes = code.split("-");
-				int utf8 = jisConverter.toUTF8(Integer.parseInt(codes[0]), Integer.parseInt(codes[1]), Integer.parseInt(codes[2]));
-				gaiji = utfCodeToCharString(utf8);
-			} catch (Exception e) {}
+			String[] codes = code.split("-");
+			gaiji = JisConverter.getConverter().toUTF8(Integer.parseInt(codes[0]), Integer.parseInt(codes[1]), Integer.parseInt(codes[2]));
 		}
+		} catch (Exception e) {}
 		return gaiji;
 	}
+	
 	/** UTF-8コードを文字列に変換
 	 * UTF-32の拡張領域は2文字分の文字列になる */
-	private String utfCodeToCharString(int utfCode) throws UnsupportedEncodingException
+	public String utfCodeToCharString(int utfCode) throws UnsupportedEncodingException
 	{
 		if (utfCode == 0) return null;
 		if (utfCode > 0xFFFF) {
@@ -147,6 +132,6 @@ public class AozoraGaijiConverter
 			return new String(b, "UTF-32");
 		}
 		return String.valueOf((char)utfCode);
-		
 	}
+	
 }

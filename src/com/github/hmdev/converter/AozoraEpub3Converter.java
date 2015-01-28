@@ -2452,7 +2452,7 @@ public class AozoraEpub3Converter
 				
 				//ひらがな/カタカナ＋濁点/半濁点 結合文字も対応
 				if (i+1<ch.length && (ch[i+1]=='゛' || ch[i+1]=='゜')) {
-					if ('ぁ' <= ch[i] && ch[i] <= 'ん' || 'ぁ' <= ch[i] && ch[i] <= 'ヶ' || ch[i]=='〻') {
+					if ('ぁ' <= ch[i] && ch[i] <= 'ん' || 'ぁ' <= ch[i] && ch[i] <= 'ヶ' || ch[i]=='ゖ' || ch[i]=='ㇷ' || ch[i]=='〻') {
 						//通常の濁点文字ならその文字で出力
 						if (ch[i+1]=='゛' && ('か' <= ch[i] && ch[i] <= 'と' || 'カ' <= ch[i] && ch[i] <= 'ト')) {
 							ch[i] = (char)((int)ch[i]+(int)'が'-(int)'か');
@@ -2467,7 +2467,7 @@ public class AozoraEpub3Converter
 							i++;
 							continue;
 						}
-						if ('ウ' == ch[i]) {
+						if ('ウ' == ch[i] && ch[i+1]=='゛') {
 							ch[i] = 'ヴ';
 							buf.append(ch[i]);
 							i++;
