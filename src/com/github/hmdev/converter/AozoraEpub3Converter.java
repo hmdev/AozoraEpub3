@@ -219,7 +219,7 @@ public class AozoraEpub3Converter
 	static LatinConverter latinConverter;
 	
 	/** 外字注記タグをUTF-8・グリフタグ・代替文字に変換するクラス */
-	static AozoraGaijiConverter ghukiConverter;
+	static AozoraGaijiConverter gaijiConverter;
 	
 	/** Epub圧縮出力用クラス */
 	Epub3Writer writer;
@@ -286,7 +286,7 @@ public class AozoraEpub3Converter
 		//拡張ラテン変換
 		latinConverter = new LatinConverter(new File(jarPath+"chuki_latin.txt"));
 		
-		ghukiConverter = new AozoraGaijiConverter(jarPath);
+		gaijiConverter = new AozoraGaijiConverter(jarPath);
 		
 		//注記タグ変換
 		File chukiTagFile = new File(jarPath+"chuki_tag.txt");
@@ -1254,7 +1254,7 @@ public class AozoraEpub3Converter
 			if (chuki.charAt(0) == '※') {
 				String[] chukiValues = chuki.substring(3, chuki.length()-1).split("、");
 				//注記文字グリフ or 代替文字変換
-				String gaiji = ghukiConverter.toAlterString(chukiValues[0]);
+				String gaiji = gaijiConverter.toAlterString(chukiValues[0]);
 				//注記内なら注記タグは除外する
 				if (gaiji != null) {
 					if (isInnerChuki(line, m.start())) {
@@ -1263,19 +1263,19 @@ public class AozoraEpub3Converter
 				}
 				//コード変換
 				if (gaiji == null && chukiValues.length > 1) {
-					gaiji = ghukiConverter.codeToCharString(chukiValues[1]);
+					gaiji = gaijiConverter.codeToCharString(chukiValues[1]);
 				}
 				//コード変換
 				if (gaiji == null && chukiValues.length > 2) {
-					gaiji = ghukiConverter.codeToCharString(chukiValues[2]);
+					gaiji = gaijiConverter.codeToCharString(chukiValues[2]);
 				}
 				//コード変換
 				if (gaiji == null && chukiValues.length > 3) {
-					gaiji = ghukiConverter.codeToCharString(chukiValues[3]);
+					gaiji = gaijiConverter.codeToCharString(chukiValues[3]);
 				}
 				//注記名称で変換
 				if (gaiji == null) {
-					gaiji = ghukiConverter.toUtf(chukiValues[0]);
+					gaiji = gaijiConverter.toUtf(chukiValues[0]);
 				}
 				
 				//未サポート外字
@@ -1708,16 +1708,34 @@ public class AozoraEpub3Converter
 			
 			//注記→タグ変換
 			String chukiName = chukiTag.substring(2, chukiTag.length()-1);
+			String[] tags = chukiMap.get(chukiName);
 			
 			if (inWrc && !hasWrcBR && chukiName.endsWith("割り注終わり")) {
+				
+				char wrcChar = 0;
+				if (chukiStart > 0 && (ch[chukiStart-1] == '〕' || ch[chukiStart-1] == '）')) {
+					wrcChar = ch[chukiStart-1];
+				}
+				
 				//半分の位置に改行注記を入れて本文出力
 				if (charStart < chukiStart) {
-					int brPos = charStart+(int)Math.ceil((chukiStart-charStart)/2.0);
+					int brPos = charStart+(int)Math.ceil((chukiStart-charStart-(wrcChar==0?0:1))/2.0);
+					if (ch[brPos] == '、' || ch[brPos] == '。') brPos++;
 					this.convertEscapedText(buf, ch, charStart, brPos);
 					buf.append(chukiMap.get("改行")[0]);
-					this.convertEscapedText(buf, ch, brPos, chukiStart);
+					this.convertEscapedText(buf, ch, brPos, chukiStart-(wrcChar==0?0:1));
 				}
 				inWrc = false;
+				//タグ出力
+				buf.append(tags[0]);
+				if (wrcChar != 0) buf.append(wrcChar);
+				
+				//次へ
+				//注記の後ろを文字開始位置に設定
+				charStart = chukiStart+chukiTag.length();
+				continue;
+				
+				
 			} else {
 				//注記の前まで本文出力
 				if (charStart < chukiStart) {
@@ -1737,7 +1755,6 @@ public class AozoraEpub3Converter
 				}
 			}
 			
-			String[] tags = chukiMap.get(chukiName);
 			if (tags != null) {
 				//タグを出力しないフラグ 字下げや窓見出しエラー用
 				boolean noTagAppend = false;
@@ -1835,6 +1852,12 @@ public class AozoraEpub3Converter
 				else if (chukiName.endsWith("割り注")) {
 					inWrc = true;
 					hasWrcBR = false;
+					//後ろに〔があったら割り注終わりの前と合せて入れ替え
+					int wrcStart = chukiStart+chukiTag.length();
+					if (ch.length > wrcStart && (ch[wrcStart] == '〔' || ch[wrcStart] == '（')) {
+						buf.append(ch[wrcStart]);
+						chukiStart++;
+					}
 				}
 				else if (inWrc && "改行".equals(chukiName)) {
 					hasWrcBR = true;
