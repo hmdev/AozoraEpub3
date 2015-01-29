@@ -8,7 +8,6 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 
-import com.github.hmdev.util.CharUtils;
 import com.github.hmdev.util.LogAppender;
 
 

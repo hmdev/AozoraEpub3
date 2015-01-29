@@ -1,7 +1,5 @@
 package com.github.hmdev.util;
 
-import java.io.UnsupportedEncodingException;
-
 /**
  * 文字変換と判別関連の関数定義クラス
  */
