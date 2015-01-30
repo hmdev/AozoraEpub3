@@ -1671,6 +1671,8 @@ public class AozoraEpub3Converter
 		
 		//割り注タグ内
 		boolean inWrc = false;
+		//割り注開始位置〔〕の外出しチェック用
+		int wrcStart = -1;
 		//割り注タグ内の改行有り
 		boolean hasWrcBR = false;
 		//窓見出し内 行頭のみ
@@ -1717,13 +1719,17 @@ public class AozoraEpub3Converter
 			if (inWrc && !hasWrcBR && chukiName.endsWith("割り注終わり")) {
 				
 				char wrcChar = 0;
-				if (chukiStart > 0 && (ch[chukiStart-1] == '〕' || ch[chukiStart-1] == '）')) {
-					wrcChar = ch[chukiStart-1];
+				if (wrcStart != -1 && chukiStart > 0 && (ch[wrcStart] == '〔' && ch[chukiStart-1] == '〕' || ch[wrcStart] == '（' && ch[chukiStart-1] == '）')) {
+					int wrcEnd = chukiStart+chukiTag.length();
+					if (ch.length <= wrcEnd || ch[wrcEnd] != '）' && ch[wrcEnd] != '〕') {
+						wrcChar = ch[chukiStart-1];
+					}
 				}
 				
 				//半分の位置に改行注記を入れて本文出力
 				if (charStart < chukiStart) {
-					int brPos = charStart+(int)Math.ceil((chukiStart-charStart-(wrcChar==0?0:1))/2.0);
+					//末尾が「。」と「〕」「）」を外に出した場合文字数を縮める
+					int brPos = charStart+(int)Math.ceil((chukiStart-(ch[chukiStart-1]=='。'?1:0)-charStart-(wrcChar==0?0:1))/2.0);
 					if (ch[brPos] == '、' || ch[brPos] == '。') brPos++;
 					this.convertEscapedText(buf, ch, charStart, brPos);
 					buf.append(chukiMap.get("改行")[0]);
@@ -1733,7 +1739,8 @@ public class AozoraEpub3Converter
 				//タグ出力
 				buf.append(tags[0]);
 				if (wrcChar != 0) buf.append(wrcChar);
-				
+				if (wrcStart != -1 && chukiStart - wrcStart > 60) LogAppender.warn(lineNum, "割り注が長すぎです");
+				wrcStart = -1;
 				//次へ
 				//注記の後ろを文字開始位置に設定
 				charStart = chukiStart+chukiTag.length();
@@ -1857,10 +1864,13 @@ public class AozoraEpub3Converter
 					inWrc = true;
 					hasWrcBR = false;
 					//後ろに〔があったら割り注終わりの前と合せて入れ替え
-					int wrcStart = chukiStart+chukiTag.length();
-					if (ch.length > wrcStart && (ch[wrcStart] == '〔' || ch[wrcStart] == '（')) {
-						buf.append(ch[wrcStart]);
-						chukiStart++;
+					int start = chukiStart+chukiTag.length();
+					if (ch.length > start && (ch[start] == '〔' || ch[start] == '（')) {
+						if (chukiStart == 0 || ch[chukiStart-1] != '〔' && ch[chukiStart-1] != '（' ) {
+							buf.append(ch[start]);
+							chukiStart++;
+							wrcStart = start;
+						}
 					}
 				}
 				else if (inWrc && "改行".equals(chukiName)) {
@@ -2182,9 +2192,9 @@ public class AozoraEpub3Converter
 					ch[i-1] = '※'; ch[i] = '》';
 				}
 				break;
-			//濁点半濁点の結合文字と半角は全角に変換
-			case '゙': case 'ﾞ': ch[i] = '゛'; break;
-			case '゚': case 'ﾟ': ch[i] = '゜'; break;
+			//濁点半濁点の結合文字は通常の文字に変換 半角は横書きの場合があるのでそのまま
+			case '゙': ch[i] = '゛'; break;
+			case '゚': ch[i] = '゜'; break;
 			}
 		}
 		//NULLや非表示文字は除去
@@ -2282,7 +2292,7 @@ public class AozoraEpub3Converter
 							if (rubyTopStart-rubyStart >= 30) {
 								//タグは除去 面倒なので文字列で置換
 								if (line.substring(rubyStart, rubyTopStart).replaceAll("<[^>]+>", " ").length() >= 30)
-									LogAppender.warn(lineNum, "ルビが長すぎます");
+									LogAppender.warn(lineNum, "ルビが長すぎです");
 							}
 							//同じ長さで同じ文字なら一文字づつルビを振る
 							if (rubyTopStart-rubyStart == i-rubyTopStart-1 && CharUtils.isSameChars(ch, rubyTopStart+1, i)) {
