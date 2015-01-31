@@ -2050,7 +2050,7 @@ public class AozoraEpub3Applet extends JApplet
 		panel.setBorder(new NarrowTitledBorder("キャッシュ保存パス"));
 		tabPanel.add(panel);
 		jTextCachePath = new JTextField(".cache");
-		jTextCachePath.setToolTipText(label.getToolTipText());
+		jTextCachePath.setToolTipText("キャッシュファイルを保存するパスです。フルパスまたは起動パスからの相対パスを指定します");
 		jTextCachePath.setMaximumSize(text300);
 		jTextCachePath.setPreferredSize(text300);
 		jTextCachePath.addFocusListener(new TextSelectFocusListener(jTextCachePath));
@@ -2582,7 +2582,7 @@ public class AozoraEpub3Applet extends JApplet
 		{
 			File path = new File(jTextCachePath.getText());
 			if (!path.isDirectory()) path = path.getParentFile();
-			if (!path.isDirectory()) path = path.getParentFile();
+			if (path != null && !path.isDirectory()) path = path.getParentFile();
 			JFileChooser fileChooser = new JFileChooser(path);
 			fileChooser.setDialogTitle("キャッシュ出力先を選択");
 			fileChooser.setApproveButtonText("選択");
@@ -2698,14 +2698,17 @@ public class AozoraEpub3Applet extends JApplet
 		@Override
 		public void actionPerformed(ActionEvent e)
 		{
-			String dstPath = jCheckSamePath.isSelected() ? jComboDstPath.getSelectedItem().toString().trim() : jComboDstPath.getEditor().getItem().toString().trim();
-			File path = new File(dstPath);
+			File path = null;
+			String dstPath = null;
+			Object obj = jCheckSamePath.isSelected() ? jComboDstPath.getSelectedItem() : jComboDstPath.getEditor().getItem();
+			if (obj != null) dstPath = obj.toString();
 			//パス修正
-			if ("".equals(dstPath)) path = currentPath;
+			if (dstPath == null || "".equals(dstPath)) path = currentPath;
 			else {
-				if (!path.isDirectory()) path = path.getParentFile();
-				if (!path.isDirectory()) path = path.getParentFile();
-				if (!path.isDirectory()) path = currentPath;
+				path = new File(dstPath);
+				if (path != null && !path.isDirectory()) path = path.getParentFile();
+				if (path != null && !path.isDirectory()) path = path.getParentFile();
+				if (path != null && !path.isDirectory()) path = currentPath;
 			}
 			JFileChooser fileChooser = new JFileChooser(path);
 			fileChooser.setDialogTitle("出力先を選択");
