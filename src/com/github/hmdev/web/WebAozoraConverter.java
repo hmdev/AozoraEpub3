@@ -61,12 +61,27 @@ public class WebAozoraConverter
 	String pageBaseUri;
 	
 	////////////////////////////////
-	//取得間隔 ミリ秒
+	//変換設定
+	/** 取得間隔 ミリ秒 */
 	int interval = 500;
 	
+	/** 未更新時は変換スキップ */
+	boolean convertUpdated = false;
+	
+	/** 追加更新分のみ出力する */
+	boolean convertModifiedOnly = false;
+	/** 再神話から連続した追加更新分のみ出力 */
+	boolean convertModifiedTail = false;
+	/** 更新分に追加で変換する話数 */
+	int beforeChapter = 0;
+	/** この時間前までに取得された追加更新話を変換する */
+	float modifiedExpire = 24;
 	
 	////////////////////////////////
+	//キャンセルリクエストされたらtrue
 	boolean canceled = false;
+	//更新有りフラグ
+	boolean updated = false;
 	
 	////////////////////////////////////////////////////////////////
 	/** fqdnに対応したインスタンスを生成してキャッシュして変換実行 */
@@ -164,14 +179,35 @@ public class WebAozoraConverter
 	{
 		return this.canceled;
 	}
+	public boolean isUpdated()
+	{
+		return this.updated;
+	}
 	
 	////////////////////////////////////////////////////////////////
-	/** 変換実行 */
-	public File convertToAozoraText(String urlString, File cachePath, int interval) throws IOException
+	/** 変換実行
+	 * @param urlString
+	 * @param cachePath
+	 * @param interval
+	 * @param modifiedExpire この時間以内のキャッシュを更新分として扱う
+	 * @param convertUpdated 更新時のみ出力
+	 * @param convertModifiedOnly 追加更新分のみ変換
+	 * @param convertModifiedTail 最新話から連続したもののみ変換
+	 * @param beforeChapter 指定話数のみ変換 0は指定無し
+	 * @return 変換スキップやキャンセルならnullを返す */
+	public File convertToAozoraText(String urlString, File cachePath, int interval, float modifiedExpire,
+		boolean convertUpdated, boolean convertModifiedOnly, boolean convertModifiedTail, int beforeChapter) throws IOException
 	{
 		this.canceled = false;
+		//日付一覧が取得できない場合は常に更新
+		this.updated = true;
 		
 		this.interval = Math.max(500, interval);
+		this.modifiedExpire = Math.max(0, modifiedExpire);
+		this.convertUpdated = convertUpdated;
+		this.convertModifiedOnly = convertModifiedOnly;
+		this.convertModifiedTail = convertModifiedTail;
+		this.beforeChapter = beforeChapter;
 		
 		//末尾の / をリダイレクトで取得
 		urlString = urlString.trim();
@@ -389,14 +425,24 @@ public class WebAozoraConverter
 			
 			if (chapterHrefs.size() > 0) {
 				//全話で更新や追加があるかチェック
-				boolean updated = false;
+				updated = false;
+				//キャッシュを再読込するならtrue
+				boolean reload = false;
 				
-				int i = 0;
+				//追加更新対象の期限 これより大きければ追加更新
+				long expire = System.currentTimeMillis()-(long)(this.modifiedExpire*3600000);
+				//追加更新分のみ出力時に利用
+				HashSet<Integer> modifiedChapterIdx = null;
+				//更新されていない最後の話数 0～
+				int lastNoModifiedChapterIdx = -1;
+				if (this.convertModifiedOnly) {
+					modifiedChapterIdx = new HashSet<Integer>();
+				}
+				
+				int chapterIdx = 0;
 				for (String chapterHref : chapterHrefs) {
 					if (this.canceled) return null;
 					
-					//キャッシュを再読込するならtrue
-					boolean reload = false;
 					//nullでなく含まれなければキャッシュ再読込
 					if (noUpdateUrls != null && !noUpdateUrls.contains(chapterHref)) reload = true;
 					
@@ -412,20 +458,94 @@ public class WebAozoraConverter
 						String chapterPath = CharUtils.escapeUrlToFile(chapterHref.substring(chapterHref.indexOf("//")+2));
 						File chapterCacheFile = new File(cachePath.getAbsolutePath()+"/"+chapterPath+(chapterPath.endsWith("/")?"index.html":""));
 						//hrefsのときは更新分のみurlsに入っている
+						boolean loaded = false;
 						if (reload || !chapterCacheFile.exists()) {
-							LogAppender.append("["+(i+1)+"/"+chapterHrefs.size()+"] "+chapterHref);
+							LogAppender.append("["+(chapterIdx+1)+"/"+chapterHrefs.size()+"] "+chapterHref);
 							try {
 								try { Thread.sleep(this.interval); } catch (InterruptedException e) { }
 								cacheFile(chapterHref, chapterCacheFile, urlString);
 								LogAppender.println(" : Loaded.");
 								//ファイルがロードされたら更新有り
-								updated = true;
+								this.updated = true;
+								loaded = true;
 							} catch (Exception e) {
 								e.printStackTrace();
 								LogAppender.println("htmlファイルが取得できませんでした : "+chapterHref);
 							}
 						}
-						
+						//キャッシュされているファイルが指定時間内なら更新扱い
+						if (!loaded) {
+							if (this.modifiedExpire > 0 && (this.convertModifiedOnly || this.convertUpdated) && chapterCacheFile.lastModified() >= expire) {
+								LogAppender.append("["+(chapterIdx+1)+"/"+chapterHrefs.size()+"] "+chapterHref);
+								LogAppender.println(" : Modified.");
+								this.updated = true;
+							}
+						}
+						//更新分のみ出力時のチェック
+						if (this.convertModifiedOnly) {
+							//ファイルの更新日時で比較
+							if (chapterCacheFile.lastModified() >= expire) {
+								modifiedChapterIdx.add(chapterIdx);
+							} else {
+								if (this.convertModifiedTail) {
+									//最新から連続していない話は除外
+									modifiedChapterIdx.clear();
+								}
+								lastNoModifiedChapterIdx = chapterIdx;
+							}
+						}
+					}
+					chapterIdx++;
+				}
+				//更新が無くて変換もなければ終了
+				if (!this.updated) {
+					LogAppender.append("「"+title+"」");
+					LogAppender.println("の更新はありません");
+					if (this.convertUpdated) return null;
+				}
+				
+				if (this.convertModifiedOnly) {
+					//更新前の話数を追加 昇順で重複もはじく
+					if (this.beforeChapter > 0) {
+						int startIdx = Math.max(0, lastNoModifiedChapterIdx-this.beforeChapter+1);
+						if (modifiedChapterIdx.size() == 0) {
+							//追加分なし
+							int idx = chapterHrefs.size()-1;
+							for (int i=0; i<this.beforeChapter; i++) {
+								modifiedChapterIdx.add(idx--);
+							}
+						} else {
+							//追加分あり
+							for (int i=startIdx; i<=lastNoModifiedChapterIdx; i++) {
+								modifiedChapterIdx.add(i);
+							}
+						}
+					}
+					if (modifiedChapterIdx.size() == 0) {
+						LogAppender.println("追加更新分はありません");
+						this.updated = false;
+						return null;
+					}
+				} else {
+					//最新話数指定
+					if (this.beforeChapter > 0) {
+						int idx = chapterHrefs.size()-1;
+						modifiedChapterIdx = new HashSet<Integer>();
+						for (int i=0; i<this.beforeChapter; i++) {
+							modifiedChapterIdx.add(idx--);
+						}
+					}
+				}
+				
+				//変換実行
+				chapterIdx = 0;
+				for (String chapterHref : chapterHrefs) {
+					if (this.canceled) return null;
+					
+					if (modifiedChapterIdx == null || modifiedChapterIdx.contains(chapterIdx)) {
+						//キャッシュファイル取得
+						String chapterPath = CharUtils.escapeUrlToFile(chapterHref.substring(chapterHref.indexOf("//")+2));
+						File chapterCacheFile = new File(cachePath.getAbsolutePath()+"/"+chapterPath+(chapterPath.endsWith("/")?"index.html":""));
 						//シリーズタイトルを出力
 						Document chapterDoc = Jsoup.parse(chapterCacheFile, null);
 						String chapterTitle = getExtractText(chapterDoc, this.queryMap.get(ExtractId.CONTENT_CHAPTER));
@@ -442,20 +562,36 @@ public class WebAozoraConverter
 						}
 						//更新日時を一覧から取得
 						String postDate = null;
-						if (postDateList != null && postDateList.length > i) {
-							postDate = postDateList[i];
+						if (postDateList != null && postDateList.length > chapterIdx) {
+							postDate = postDateList[chapterIdx];
 						}
 						String subTitle = null;
-						if (subtitles != null && subtitles.size() > i) subTitle = subtitles.get(i);
+						if (subtitles != null && subtitles.size() > chapterIdx) subTitle = subtitles.get(chapterIdx);
 						
 						docToAozoraText(bw, chapterDoc, newChapter, subTitle, postDate);
-						
 					}
-					i++;
+					chapterIdx++;
 				}
-				if (!updated) {
-					LogAppender.append(title);
-					LogAppender.println(" の更新はありません");
+				
+				//出力話数を表示
+				if (modifiedChapterIdx != null) {
+					StringBuilder buf = new StringBuilder();
+					int preIdx = -1;
+					boolean idxConnected = false;
+					//出力話数生成
+					if (buf.length() == 0) buf.append((chapterIdx+1));
+					else {
+						if (preIdx == chapterIdx-1) {
+							idxConnected = true;
+						} else {
+							if (idxConnected) buf.append("-"+(preIdx+1));
+							idxConnected = false;
+							buf.append(","+(chapterIdx));
+						}
+					}
+					preIdx = chapterIdx;
+					if (idxConnected) buf.append("-"+(preIdx+1));
+					LogAppender.println(buf+"話を変換しました");
 				}
 			}
 			//底本にURL追加
