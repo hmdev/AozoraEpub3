@@ -2153,16 +2153,27 @@ public class AozoraEpub3Applet extends JApplet
 		jtxInputMap.put(KeyStroke.getKeyStroke("ctrl V"), "paste-url");
 		jTextArea.setInputMap(JComponent.WHEN_FOCUSED, jtxInputMap);
 		//メニュー
+		JMenuItem jCopyMenu = new JMenuItem("コピー");
+		jCopyMenu.setIcon(new ImageIcon(AozoraEpub3Applet.class.getResource("images/copy.png")));
+		jCopyMenu.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent arg0)
+			{
+				String selected = jTextArea.getSelectedText();
+				if (!"".equals(selected)) {
+					getToolkit().getSystemClipboard().setContents(new StringSelection(selected), null);
+				}
+			}
+		});
 		JMenuItem jPasteMenu = new JMenuItem("貼り付け");
 		jPasteMenu.setIcon(new ImageIcon(AozoraEpub3Applet.class.getResource("images/paste.png")));
 		jPasteMenu.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0)
 			{
-				Clipboard systemClipboard = getToolkit().getSystemClipboard();
-				handleTextAreaTransfer(systemClipboard.getContents(jTextArea));
+				handleTextAreaTransfer(getToolkit().getSystemClipboard().getContents(jTextArea));
 			}
 		});
 		final JPopupMenu jTextPopup = new JPopupMenu();
+		jTextPopup.add(jCopyMenu);
 		jTextPopup.add(jPasteMenu);
 		jTextArea.addMouseListener(new MouseListener() {
 			public void mouseReleased(MouseEvent e) {}
@@ -2866,10 +2877,6 @@ public class AozoraEpub3Applet extends JApplet
 			//LogAppender.println("paste url action");
 			JTextComponent target = getTextComponent(e);
 			if (target != null) {
-				//LogAppender.println("paste url from clipboard");
-				// このあたりはthのpasteaction経由でもいいのだが、
-				// systemclipboardを確実に取れるかどうかわからないので
-				// 確実に取れるように実装しておく
 				Clipboard cb = Toolkit.getDefaultToolkit().getSystemClipboard();
 				TransferHandler th = target.getTransferHandler();
 				th.importData(new TransferHandler.TransferSupport(target, cb.getContents(null)));
