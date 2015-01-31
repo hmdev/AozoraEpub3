@@ -579,17 +579,21 @@ public class WebAozoraConverter
 					int preIdx = -1;
 					boolean idxConnected = false;
 					//出力話数生成
-					if (buf.length() == 0) buf.append((chapterIdx+1));
-					else {
-						if (preIdx == chapterIdx-1) {
-							idxConnected = true;
-						} else {
-							if (idxConnected) buf.append("-"+(preIdx+1));
-							idxConnected = false;
-							buf.append(","+(chapterIdx));
+					for (int idx=0; idx<chapterHrefs.size(); idx++) {
+						if (modifiedChapterIdx.contains(idx)) {
+							if (buf.length() == 0) buf.append((idx+1));
+							else {
+								if (preIdx == idx-1) {
+									idxConnected = true;
+								} else {
+									if (idxConnected) buf.append("-"+(preIdx+1));
+									idxConnected = false;
+									buf.append(","+(idx));
+								}
+							}
+							preIdx = idx;
 						}
 					}
-					preIdx = chapterIdx;
 					if (idxConnected) buf.append("-"+(preIdx+1));
 					LogAppender.println(buf+"話を変換しました");
 				}
