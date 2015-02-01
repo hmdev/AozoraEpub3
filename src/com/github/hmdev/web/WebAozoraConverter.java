@@ -426,8 +426,6 @@ public class WebAozoraConverter
 			if (chapterHrefs.size() > 0) {
 				//全話で更新や追加があるかチェック
 				updated = false;
-				//キャッシュを再読込するならtrue
-				boolean reload = false;
 				
 				//追加更新対象の期限 これより大きければ追加更新
 				long expire = System.currentTimeMillis()-(long)(this.modifiedExpire*3600000);
@@ -443,9 +441,6 @@ public class WebAozoraConverter
 				for (String chapterHref : chapterHrefs) {
 					if (this.canceled) return null;
 					
-					//nullでなく含まれなければキャッシュ再読込
-					if (noUpdateUrls != null && !noUpdateUrls.contains(chapterHref)) reload = true;
-					
 					if (chapterHref != null && chapterHref.length() > 0) {
 						//画像srcをフルパスにするときに使うページのパス
 						this.pageBaseUri = chapterHref;
@@ -459,6 +454,12 @@ public class WebAozoraConverter
 						File chapterCacheFile = new File(cachePath.getAbsolutePath()+"/"+chapterPath+(chapterPath.endsWith("/")?"index.html":""));
 						//hrefsのときは更新分のみurlsに入っている
 						boolean loaded = false;
+						
+						//更新対象ならtrueに変更
+						boolean reload = false;
+						//nullでなく更新無しに含まれなければ再読込
+						if (noUpdateUrls != null && !noUpdateUrls.contains(chapterHref)) reload = true;
+						
 						if (reload || !chapterCacheFile.exists()) {
 							LogAppender.append("["+(chapterIdx+1)+"/"+chapterHrefs.size()+"] "+chapterHref);
 							try {
@@ -595,7 +596,7 @@ public class WebAozoraConverter
 						}
 					}
 					if (idxConnected) buf.append("-"+(preIdx+1));
-					LogAppender.println(buf+"話を変換しました");
+					LogAppender.println(buf+"話を変換します");
 				}
 			}
 			//底本にURL追加
