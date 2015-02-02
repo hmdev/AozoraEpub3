@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -911,13 +912,14 @@ public class JConfirmDialog extends JDialog
 	
 	/** 確認ダイアログを表示
 	 * @param location ダイアログ表示位置 */
-	public void showDialog(String srcFile, String dstPath, String title, String creator, int titleTypeIndex, boolean pubFirst,
+	public void showDialog(File srcFile, String dstPath, String title, String creator, int titleTypeIndex, boolean pubFirst,
 			BookInfo bookInfo, ImageInfoReader imageInfoReader, Point location, int coverW, int coverH)
 	{
 		//zip内テキストファイル名も表示
-		if (bookInfo.textEntryName != null) srcFile += " : "+bookInfo.textEntryName.substring(bookInfo.textEntryName.lastIndexOf('/')+1);
-		this.jTextSrcFileName.setText(srcFile);
-		this.jTextSrcFileName.setToolTipText(srcFile);
+		String srcFileName = srcFile.getName();
+		if (bookInfo.textEntryName != null) srcFileName += " : "+bookInfo.textEntryName.substring(bookInfo.textEntryName.lastIndexOf('/')+1);
+		this.jTextSrcFileName.setText(srcFileName);
+		this.jTextSrcFileName.setToolTipText(srcFileName);
 		//this.jTextSrcFileName.setCaretPosition(0);
 		this.jTextDstFileName.setText(dstPath);
 		this.jTextDstFileName.setToolTipText(dstPath);
@@ -945,6 +947,13 @@ public class JConfirmDialog extends JDialog
 				bookInfo.coverImage = imageInfoReader.getImage(bookInfo.coverImageIndex);
 			} else if (bookInfo.coverImage == null && bookInfo.coverFileName != null) {
 				bookInfo.loadCoverImage(bookInfo.coverFileName);
+			}
+			if (bookInfo.coverImage == null) {
+				String srcPath = srcFile.getParent();
+				File coverFile = new File(srcPath+"/cover.png");
+				if (!coverFile.exists()) coverFile = new File(srcPath+"/cover.jpg");
+				if (!coverFile.exists()) coverFile = new File(srcPath+"/cover.jpeg");
+				if (coverFile.exists()) bookInfo.loadCoverImage(coverFile.getAbsolutePath());
 			}
 		} catch (Exception e) { e.printStackTrace(); }
 		

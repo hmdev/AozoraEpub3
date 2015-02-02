@@ -1581,7 +1581,7 @@ public class AozoraEpub3Applet extends JApplet
 		tabPanel.add(panel);
 		//4バイト文字を変換する
 		jCheckGaiji32 = new JCheckBox("出力する");
-		jCheckGaiji32.setToolTipText("4バイトの文字をそのまま出力します。Kobo等で表示できない場合はチェックを外します");
+		jCheckGaiji32.setToolTipText("u+20000以降の4バイト拡張漢字をそのまま出力します。Kobo等で表示できない場合はチェックを外します");
 		jCheckGaiji32.setFocusPainted(false);
 		jCheckGaiji32.setBorder(padding2);
 		panel.add(jCheckGaiji32);
@@ -3566,7 +3566,7 @@ public class AozoraEpub3Applet extends JApplet
 					jCheckChapterNumOnly.isSelected()||jCheckChapterNumTitle.isSelected()||jCheckChapterNumParen.isSelected()||jCheckChapterNumParenTitle.isSelected(),
 					jCheckChapterPattern.isSelected());
 			this.jConfirmDialog.showDialog(
-				srcFile.getName(),
+				srcFile,
 				(dstPath!=null ? dstPath.getAbsolutePath() : srcFile.getParentFile().getAbsolutePath())+File.separator,
 				title, creator, this.jComboTitle.getSelectedIndex(), jCheckPubFirst.isSelected(),
 				bookInfo, imageInfoReader, this.jFrameParent.getLocation(),
