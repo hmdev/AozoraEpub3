@@ -1301,27 +1301,21 @@ public class AozoraEpub3Converter
 				if (gaiji != null) {
 					int utfCode = AozoraGaijiConverter.toUtfCode(gaiji);
 					if (utfCode > 0xFFFF) {
-						//外字フォントファイルがあれば優先
-						String code = null;
 						File gaijiFile = null;
 						if (gaijiFileMap != null) {
-							code = "u"+Integer.toHexString(utfCode);
-							gaijiFile = gaijiFileMap.get(code);
+							gaijiFile = gaijiFileMap.get("u"+Integer.toHexString(utfCode));
 						}
 						if (gaijiFile != null) {
-							/*writer.addGaijiFont(code, gaijiFile);
-							//外字タグ出力 一旦注記で出力する
-							gaiji = "<span class=\"glyph "+code+"\">〓</span>";
-							if (logged) LogAppender.info(lineNum, "外字フォント利用 ("+gaijiFile.getName()+")", chuki);*/
+							//外字フォントファイルがあれば外字をそのまま出力して後で変換
 						} else {
 							if (!gaiji32) {
 								gaiji = "〓";
 								if (!isInnerChuki(line, m.start())) {
 									gaiji += "［＃行右小書き］（"+chukiValues[0]+"）［＃行右小書き終わり］";
 								}
-								if (logged) LogAppender.info(lineNum, "外字4バイト小書き変換", chuki);
+								if (logged) LogAppender.info(lineNum, "4バイト文字小書き変換", chuki);
 							} else {
-								if (logged) LogAppender.info(lineNum, "外字4バイト文字出力", chuki);
+								if (logged) LogAppender.info(lineNum, "4バイト文字出力", chuki);
 							}
 						}
 					}
@@ -2257,9 +2251,13 @@ public class AozoraEpub3Converter
 						buf.append("</span>");
 						LogAppender.info(lineNum, "外字フォント利用", gaijiFile.getName());
 					} else {
-						//2文字出力
-						buf.append(ch[idx]);
-						buf.append(ch[idx+1]);
+						if (!gaiji32) {
+							buf.append("〓");
+						} else {
+							//4バイト分出力
+							buf.append(ch[idx]);
+							buf.append(ch[idx+1]);
+						}
 					}
 					idx++;
 				} else {
@@ -2271,7 +2269,8 @@ public class AozoraEpub3Converter
 	
 	/** ルビタグに変換して出力
 	 * 特殊文字は※が前についているので※の後ろの文字を利用しルビ内なら開始位置以降の文字をずらす
-	 * ・ルビ （前｜漢字《かんじ》 → 前<ruby><rbase>漢字</rbase><rtop>かんじ</rtop></ruby>）
+	 * ・ルビ （前｜漢字《かんじ》 → 前<ruby>漢字<rt>かんじ</rt></ruby>）
+	 * ・</ruby><ruby> と連続する場合はタグを除去
 	 * @param buf 出力先バッファ
 	 * @param ch ルビ変換前の行文字列 */
 	private StringBuilder convertRubyText(String line) throws IOException
@@ -2289,6 +2288,9 @@ public class AozoraEpub3Converter
 		boolean inRuby = false;
 		//boolean isAlphaRuby = false; //英字へのルビ
 		RubyCharType rubyCharType = RubyCharType.NULL;
+		
+		String rubyStartChuki = chukiMap.get("ルビ開始")[0];
+		String rubyEndChuki = chukiMap.get("ルビ終了")[0];
 		
 		boolean noTcy = false;
 		for (int i=begin; i<end; i++) {
@@ -2350,19 +2352,29 @@ public class AozoraEpub3Converter
 							}
 							//同じ長さで同じ文字なら一文字づつルビを振る
 							if (rubyTopStart-rubyStart == i-rubyTopStart-1 && CharUtils.isSameChars(ch, rubyTopStart+1, i)) {
+								if (buf.indexOf(rubyEndChuki, buf.length()-rubyEndChuki.length()) == -1) {
+									buf.append(rubyStartChuki);
+								} else {
+									buf.setLength(buf.length()-rubyEndChuki.length());
+								}
 								for (int j=0; j<rubyTopStart-rubyStart; j++) {
-									buf.append(chukiMap.get("ルビ前")[0]);
 									convertTcyChar(buf, ch, rubyStart+j, noTcy); //本文
-									buf.append(chukiMap.get("ルビ")[0]);
+									buf.append(chukiMap.get("ルビ前")[0]);
 									convertTcyChar(buf, ch, rubyTopStart+1+j, true);//ルビ
 									buf.append(chukiMap.get("ルビ後")[0]);
 								}
+								buf.append(rubyEndChuki);
 							} else {
-								buf.append(chukiMap.get("ルビ前")[0]);
+								if (buf.indexOf(rubyEndChuki, buf.length()-rubyEndChuki.length()) == -1) {
+									buf.append(rubyStartChuki);
+								} else {
+									buf.setLength(buf.length()-rubyEndChuki.length());
+								}
 								convertTcyText(buf, ch, rubyStart, rubyTopStart, noTcy); //本文
-								buf.append(chukiMap.get("ルビ")[0]);
+								buf.append(chukiMap.get("ルビ前")[0]);
 								convertTcyText(buf, ch, rubyTopStart+1, i, true);//ルビ
 								buf.append(chukiMap.get("ルビ後")[0]);
+								buf.append(rubyEndChuki);
 							}
 						}
 					}
