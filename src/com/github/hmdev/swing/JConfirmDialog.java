@@ -945,15 +945,19 @@ public class JConfirmDialog extends JDialog
 		try {
 			if (bookInfo.coverImageIndex >= 0 && bookInfo.coverImageIndex < imageInfoReader.countImageFileNames()) {
 				bookInfo.coverImage = imageInfoReader.getImage(bookInfo.coverImageIndex);
-			} else if (bookInfo.coverImage == null && bookInfo.coverFileName != null) {
-				bookInfo.loadCoverImage(bookInfo.coverFileName);
 			}
 			if (bookInfo.coverImage == null) {
-				String srcPath = srcFile.getParent();
-				File coverFile = new File(srcPath+"/cover.png");
-				if (!coverFile.exists()) coverFile = new File(srcPath+"/cover.jpg");
-				if (!coverFile.exists()) coverFile = new File(srcPath+"/cover.jpeg");
-				if (coverFile.exists()) bookInfo.loadCoverImage(coverFile.getAbsolutePath());
+				if (bookInfo.coverFileName == null) {
+					String srcPath = srcFile.getParent();
+					File coverFile = new File(srcPath+"/cover.png");
+					if (!coverFile.exists()) coverFile = new File(srcPath+"/cover.jpg");
+					if (!coverFile.exists()) coverFile = new File(srcPath+"/cover.jpeg");
+					if (coverFile.exists()) bookInfo.coverFileName = coverFile.getAbsolutePath();
+				}
+				if (bookInfo.coverFileName != null) {
+					bookInfo.loadCoverImage(bookInfo.coverFileName);
+					bookInfo.coverImageIndex = -1;
+				}
 			}
 		} catch (Exception e) { e.printStackTrace(); }
 		
