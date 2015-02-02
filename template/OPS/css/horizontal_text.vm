@@ -40,3 +40,9 @@ font-family: 'ＭＳ ゴシック','MS Gothic',sans-serif;
 #end
 .b { font-weight: bold; }
 .i { font-style: italic; }
+
+/** 外字フォント */
+#foreach(${gaijiInfo} in ${vecGaijiInfo})
+@font-face {font-family:"${gaijiInfo.ClassName}"; src:url(../gaiji/${gaijiInfo.FileName});}
+.${gaijiInfo.ClassName} {font-family:"${gaijiInfo.ClassName}";}
+#end

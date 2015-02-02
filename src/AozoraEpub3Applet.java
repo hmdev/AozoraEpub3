@@ -1580,8 +1580,8 @@ public class AozoraEpub3Applet extends JApplet
 		panel.setBorder(new NarrowTitledBorder("4バイト文字"));
 		tabPanel.add(panel);
 		//4バイト文字を変換する
-		jCheckGaiji32 = new JCheckBox("変換する");
-		jCheckGaiji32.setToolTipText("Kobo等で4バイト文字より後ろが表示できない場合はチェックを外します");
+		jCheckGaiji32 = new JCheckBox("出力する");
+		jCheckGaiji32.setToolTipText("4バイトの文字をそのまま出力します。Kobo等で表示できない場合はチェックを外します");
 		jCheckGaiji32.setFocusPainted(false);
 		jCheckGaiji32.setBorder(padding2);
 		panel.add(jCheckGaiji32);

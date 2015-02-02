@@ -215,6 +215,8 @@ public class AozoraEpub3Converter
 	/** 文字置換マップ 2文字用 */
 	static HashMap<String, String> replace2Map = null;
 	
+	static HashMap<String, File> gaijiFileMap = null;
+	
 	/** 「基本ラテン文字のみによる拡張ラテン文字Aの分解表記」の変換クラス */
 	static LatinConverter latinConverter;
 	
@@ -386,6 +388,21 @@ public class AozoraEpub3Converter
 				}
 			} finally {
 				src.close();
+			}
+		}
+		
+		//外字フォント一覧取得
+		File gaijiPath = new File(jarPath+"template/OPS/gaiji");
+		if (gaijiPath.isDirectory()) {
+			gaijiFileMap = new HashMap<String, File>();
+			for (File fontFile : gaijiPath.listFiles()) {
+				if (fontFile.isFile()) {
+					String fileName = fontFile.getName().toLowerCase();
+					String ext = fileName.substring(fileName.lastIndexOf(".")+1);
+					if ("ttf".equals(ext)) {
+						gaijiFileMap.put(fileName.substring(0, fileName.length()-ext.length()-1), fontFile);
+					}
+				}
 			}
 		}
 		
@@ -1281,12 +1298,31 @@ public class AozoraEpub3Converter
 				//未サポート外字
 				//if (unsupportGaiji.contains(gaiji)) {
 				//Unicode32文字なら後ろに小書きで注記追加
-				if (gaiji != null && gaiji.getBytes().length ==4) {
-					if (logged) LogAppender.info(lineNum, "外字4バイト", chuki);
-					if (!gaiji32) {
-						gaiji = "〓";
-						if (!isInnerChuki(line, m.start())) {
-							gaiji += "［＃行右小書き］（"+chukiValues[0]+"）［＃行右小書き終わり］";
+				if (gaiji != null) {
+					int utfCode = AozoraGaijiConverter.toUtfCode(gaiji);
+					if (utfCode > 0xFFFF) {
+						//外字フォントファイルがあれば優先
+						String code = null;
+						File gaijiFile = null;
+						if (gaijiFileMap != null) {
+							code = "u"+Integer.toHexString(utfCode);
+							gaijiFile = gaijiFileMap.get(code);
+						}
+						if (gaijiFile != null) {
+							/*writer.addGaijiFont(code, gaijiFile);
+							//外字タグ出力 一旦注記で出力する
+							gaiji = "<span class=\"glyph "+code+"\">〓</span>";
+							if (logged) LogAppender.info(lineNum, "外字フォント利用 ("+gaijiFile.getName()+")", chuki);*/
+						} else {
+							if (!gaiji32) {
+								gaiji = "〓";
+								if (!isInnerChuki(line, m.start())) {
+									gaiji += "［＃行右小書き］（"+chukiValues[0]+"）［＃行右小書き終わり］";
+								}
+								if (logged) LogAppender.info(lineNum, "外字4バイト小書き変換", chuki);
+							} else {
+								if (logged) LogAppender.info(lineNum, "外字4バイト文字出力", chuki);
+							}
 						}
 					}
 				}
@@ -1739,7 +1775,7 @@ public class AozoraEpub3Converter
 				//タグ出力
 				buf.append(tags[0]);
 				if (wrcChar != 0) buf.append(wrcChar);
-				if (wrcStart != -1 && chukiStart - wrcStart > 60) LogAppender.warn(lineNum, "割り注が長すぎです");
+				if (wrcStart != -1 && chukiStart - wrcStart > 60) LogAppender.warn(lineNum, "割り注が長すぎます");
 				wrcStart = -1;
 				//次へ
 				//注記の後ろを文字開始位置に設定
@@ -2086,8 +2122,7 @@ public class AozoraEpub3Converter
 			}
 		}
 		
-		//ルビの変換後に自動縦中横 (注記を挟む場合があるので行全体で行う)
-		//バッファを出力
+		//ルビ変換＋自動縦中横してからバッファを出力
 		this.printLineBuffer(out, this.convertRubyText(buf.toString()), lineNum, noBr||this.inImageTag);
 		
 		//クリア Kobo 調整中
@@ -2209,10 +2244,29 @@ public class AozoraEpub3Converter
 			case '&': buf.append("&amp;"); break;
 			case '<': buf.append("&lt;"); break;
 			case '>': buf.append("&gt;"); break;
-			default: buf.append(ch[idx]);
+			default: 
+				if (idx<end-1 && Character.isHighSurrogate(ch[idx])) {
+					//4バイト文字の1文字目ならフォントタグ出力または2文字出力
+					String code = "u"+Integer.toHexString(Character.toCodePoint(ch[idx], ch[idx+1]));
+					File gaijiFile = gaijiFileMap.get(code);
+					if (gaijiFile != null) {
+						writer.addGaijiFont(code, gaijiFile);
+						//外字タグ出力
+						buf.append("<span class=\"glyph ").append(code).append("\">");
+						buf.append("〓"); //1文字フォント対応文字で出力 
+						buf.append("</span>");
+						LogAppender.info(lineNum, "外字フォント利用", gaijiFile.getName());
+					} else {
+						//2文字出力
+						buf.append(ch[idx]);
+						buf.append(ch[idx+1]);
+					}
+					idx++;
+				} else {
+					buf.append(ch[idx]);
+				}
 			}
 		}
-		
 	}
 	
 	/** ルビタグに変換して出力
@@ -2292,7 +2346,7 @@ public class AozoraEpub3Converter
 							if (rubyTopStart-rubyStart >= 30) {
 								//タグは除去 面倒なので文字列で置換
 								if (line.substring(rubyStart, rubyTopStart).replaceAll("<[^>]+>", " ").length() >= 30)
-									LogAppender.warn(lineNum, "ルビが長すぎです");
+									LogAppender.warn(lineNum, "ルビが長すぎます");
 							}
 							//同じ長さで同じ文字なら一文字づつルビを振る
 							if (rubyTopStart-rubyStart == i-rubyTopStart-1 && CharUtils.isSameChars(ch, rubyTopStart+1, i)) {
@@ -2754,7 +2808,7 @@ public class AozoraEpub3Converter
 	private void printLineBuffer(BufferedWriter out, StringBuilder buf, int lineNum, boolean noBr) throws IOException
 	{
 		String line = buf.toString();
-		int length = line.length();
+		int length = buf.length();
 		//すべて空白は空行にする
 		if (CharUtils.isSpace(line)) { line = ""; length = 0; }
 		

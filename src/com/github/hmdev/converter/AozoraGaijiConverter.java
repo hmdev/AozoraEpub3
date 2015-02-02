@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 
 import com.github.hmdev.util.LogAppender;
@@ -123,7 +124,7 @@ public class AozoraGaijiConverter
 	
 	/** UTF-8コードを文字列に変換
 	 * UTF-32の拡張領域は2文字分の文字列になる */
-	public String utfCodeToCharString(int utfCode) throws UnsupportedEncodingException
+	static public String utfCodeToCharString(int utfCode) throws UnsupportedEncodingException
 	{
 		if (utfCode == 0) return null;
 		if (utfCode > 0xFFFF) {
@@ -131,6 +132,19 @@ public class AozoraGaijiConverter
 			return new String(b, "UTF-32");
 		}
 		return String.valueOf((char)utfCode);
+	}
+	
+	/** UTF-8のバイト配列のコード数値に変換 */
+	static public int toUtfCode(String utfChar)
+	{
+		try {
+			return toUtfCode(utfChar.getBytes("UTF-32"));
+		} catch (UnsupportedEncodingException e) {}
+		return 0;
+	}
+	static public int toUtfCode(byte[] utfBytes)
+	{
+		return ByteBuffer.wrap(utfBytes).getInt();
 	}
 	
 }

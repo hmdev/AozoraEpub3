@@ -40,6 +40,7 @@ import com.github.hmdev.image.ImageUtils;
 import com.github.hmdev.info.BookInfo;
 import com.github.hmdev.info.ChapterInfo;
 import com.github.hmdev.info.ChapterLineInfo;
+import com.github.hmdev.info.GaijiInfo;
 import com.github.hmdev.info.ImageInfo;
 import com.github.hmdev.info.SectionInfo;
 import com.github.hmdev.util.CharUtils;
@@ -67,6 +68,8 @@ public class Epub3Writer
 	
 	/** フォントファイル格納パス */
 	final static String FONTS_PATH = "fonts/";
+	/** 外字フォント格納パス */
+	final static String GAIJI_PATH = "gaiji/";
 	
 	/** 縦書きcss */
 	final static String VERTICAL_TEXT_CSS = "vertical_text.css";
@@ -242,6 +245,11 @@ public class Epub3Writer
 	/** 章の名称を格納(仮) */
 	Vector<ChapterInfo> chapterInfos;
 	
+	/** 外字フォント情報 */
+	Vector<GaijiInfo> vecGaijiInfo;
+	/** 外字フォント重複除去 */
+	HashSet<String> gaijiNameSet;
+	
 	/** 画像情報リスト Velocity埋め込み */
 	Vector<ImageInfo> imageInfos;
 	
@@ -275,6 +283,8 @@ public class Epub3Writer
 		Velocity.init();
 		this.sectionInfos = new Vector<SectionInfo>();
 		this.chapterInfos = new Vector<ChapterInfo>();
+		this.vecGaijiInfo = new Vector<GaijiInfo>();
+		this.gaijiNameSet = new HashSet<String>();
 		this.imageInfos = new Vector<ImageInfo>();
 		this.outImageFileNames = new HashSet<String>();
 	}
@@ -396,6 +406,8 @@ public class Epub3Writer
 		this.imageIndex = 0;
 		this.sectionInfos.clear();
 		this.chapterInfos.clear();
+		this.vecGaijiInfo.clear();
+		this.gaijiNameSet.clear();
 		this.imageInfos.clear();
 		this.outImageFileNames.clear();
 		
@@ -477,7 +489,14 @@ public class Epub3Writer
 		//zip出力用Writer
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"));
 		
-		//スタイルのcssを格納
+		//本文を出力
+		this.writeSections(converter, src, bw, srcFile, srcExt, zos);
+		if (this.canceled) return;
+		
+		//外字のcssを格納
+		velocityContext.put("vecGaijiInfo", this.vecGaijiInfo);
+		
+		//スタイルと外字のcssを格納
 		if (bookInfo.vertical) {
 			zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+CSS_PATH+VERTICAL_TEXT_CSS));
 			bw = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"));
@@ -491,10 +510,6 @@ public class Epub3Writer
 			bw.flush();
 			zos.closeArchiveEntry();
 		}
-		
-		//本文を出力
-		this.writeSections(converter, src, bw, srcFile, srcExt, zos);
-		if (this.canceled) return;
 		
 		//表紙をテンプレート＋メタ情報から生成 先に出力すると外字画像出力で表紙の順番が狂う
 		if (!bookInfo.imageOnly && (bookInfo.titlePageType == BookInfo.TITLE_MIDDLE || bookInfo.titlePageType == BookInfo.TITLE_HORIZONTAL)) {
@@ -811,13 +826,26 @@ public class Epub3Writer
 			File fontsPath = new File(templatePath+OPS_PATH+FONTS_PATH);
 			if (fontsPath.exists()) {
 				for (File fontFile : fontsPath.listFiles()) {
-					String fileName = OPS_PATH+FONTS_PATH+fontFile.getName();
-					zos.putArchiveEntry(new ZipArchiveEntry(fileName));
-					fis = new FileInputStream(new File(templatePath+fileName));
+					String outFileName = OPS_PATH+FONTS_PATH+fontFile.getName();
+					zos.putArchiveEntry(new ZipArchiveEntry(outFileName));
+					fis = new FileInputStream(new File(templatePath+outFileName));
 					IOUtils.copy(fis, zos);
 					fis.close();
 					zos.closeArchiveEntry();
 				}
+			}
+		}
+		
+		//外字ファイル格納
+		for (GaijiInfo gaijiInfo : this.vecGaijiInfo) {
+			File gaijiFile = gaijiInfo.getFile();
+			if (gaijiFile.exists()) {
+				String outFileName = OPS_PATH+GAIJI_PATH+gaijiFile.getName();
+				zos.putArchiveEntry(new ZipArchiveEntry(outFileName));
+				fis = new FileInputStream(new File(templatePath+outFileName));
+				IOUtils.copy(fis, zos);
+				fis.close();
+				zos.closeArchiveEntry();
 			}
 		}
 		
@@ -1100,6 +1128,14 @@ public class Epub3Writer
 		if (this.chapterInfos.size() == 0) return null;
 		return this.chapterInfos.lastElement();
 	}*/
+	
+	/** 外字用フォントを追加 */
+	public void addGaijiFont(String className, File gaijiFile)
+	{
+		if (this.gaijiNameSet.contains(className)) return;
+		this.vecGaijiInfo.add(new GaijiInfo(className, gaijiFile));
+		this.gaijiNameSet.add(className);
+	}
 	
 	/** 連番に変更した画像ファイル名を返却.
 	 * 重複していたら前に出力したときの連番ファイル名を返す

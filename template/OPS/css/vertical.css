@@ -99,6 +99,11 @@ vertical-align: middle;
 width: 1em;
 left: -.2em;
 }
+/* 外字フォント */
+.glyph {
+width: 1em;
+}
+
 /* 罫囲み */
 .border {
 border: 1px solid #000;
