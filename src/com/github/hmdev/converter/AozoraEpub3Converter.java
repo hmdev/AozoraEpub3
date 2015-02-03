@@ -215,7 +215,10 @@ public class AozoraEpub3Converter
 	/** 文字置換マップ 2文字用 */
 	static HashMap<String, String> replace2Map = null;
 	
-	static HashMap<String, File> gaijiFileMap = null;
+	/** U+FFFF以前の文字の外字フォントパス文字列 */
+	static HashMap<Integer, String> utf16FontMap = null;
+	/** U+20000以降の文字の外字フォントパス文字列 */
+	static HashMap<Integer, String> utf32FontMap = null;
 	
 	/** 「基本ラテン文字のみによる拡張ラテン文字Aの分解表記」の変換クラス */
 	static LatinConverter latinConverter;
@@ -392,18 +395,30 @@ public class AozoraEpub3Converter
 		}
 		
 		//外字フォント一覧取得
-		File gaijiPath = new File(jarPath+"template/OPS/gaiji");
+		File gaijiPath = new File(writer.getGaijiTemplatePath());
 		if (gaijiPath.isDirectory()) {
-			gaijiFileMap = new HashMap<String, File>();
+			utf16FontMap = new HashMap<Integer, String>();
+			utf32FontMap = new HashMap<Integer, String>();
+			String subPath = "";
 			for (File fontFile : gaijiPath.listFiles()) {
 				if (fontFile.isFile()) {
 					String fileName = fontFile.getName().toLowerCase();
 					String ext = fileName.substring(fileName.lastIndexOf(".")+1);
-					if ("ttf".equals(ext)) {
-						gaijiFileMap.put(fileName.substring(0, fileName.length()-ext.length()-1), fontFile);
+					if ("ttf".equals(ext) || "ttc".equals(ext) || "otf".equals(ext)) {
+						if (fileName.startsWith("u")){
+							int code = 0;
+							try { code = Integer.valueOf(fileName.substring(1, fileName.length()-ext.length()-1), 16); } catch (Exception e) {}
+							if (code <= 0xFFFF) {
+								utf16FontMap.put(code, subPath+fontFile.getName());
+							} else {
+								utf32FontMap.put(code, subPath+fontFile.getName());
+							}
+						}
 					}
 				}
 			}
+			if (utf16FontMap.size() == 0) utf16FontMap = null;
+			if (utf32FontMap.size() == 0) utf32FontMap = null;
 		}
 		
 		inited = true;
@@ -1301,11 +1316,11 @@ public class AozoraEpub3Converter
 				if (gaiji != null) {
 					int utfCode = AozoraGaijiConverter.toUtfCode(gaiji);
 					if (utfCode > 0xFFFF) {
-						File gaijiFile = null;
-						if (gaijiFileMap != null) {
-							gaijiFile = gaijiFileMap.get("u"+Integer.toHexString(utfCode));
+						String gaijiFileName = null;
+						if (utf32FontMap != null) {
+							gaijiFileName = utf32FontMap.get(utfCode);
 						}
-						if (gaijiFile != null) {
+						if (gaijiFileName != null) {
 							//外字フォントファイルがあれば外字をそのまま出力して後で変換
 						} else {
 							if (!gaiji32) {
@@ -2239,30 +2254,7 @@ public class AozoraEpub3Converter
 			case '<': buf.append("&lt;"); break;
 			case '>': buf.append("&gt;"); break;
 			default: 
-				if (idx<end-1 && Character.isHighSurrogate(ch[idx])) {
-					//4バイト文字の1文字目ならフォントタグ出力または2文字出力
-					String code = "u"+Integer.toHexString(Character.toCodePoint(ch[idx], ch[idx+1]));
-					File gaijiFile = gaijiFileMap.get(code);
-					if (gaijiFile != null) {
-						writer.addGaijiFont(code, gaijiFile);
-						//外字タグ出力
-						buf.append("<span class=\"glyph ").append(code).append("\">");
-						buf.append("〓"); //1文字フォント対応文字で出力 
-						buf.append("</span>");
-						LogAppender.info(lineNum, "外字フォント利用", gaijiFile.getName());
-					} else {
-						if (!gaiji32) {
-							buf.append("〓");
-						} else {
-							//4バイト分出力
-							buf.append(ch[idx]);
-							buf.append(ch[idx+1]);
-						}
-					}
-					idx++;
-				} else {
-					buf.append(ch[idx]);
-				}
+				buf.append(ch[idx]);
 			}
 		}
 	}
@@ -2450,6 +2442,42 @@ public class AozoraEpub3Converter
 	{
 		
 		for (int i=begin; i<end; i++) {
+			int code = 0;
+			String gaijiFileName = null;
+			if (i<end-1 && utf32FontMap != null && Character.isHighSurrogate(ch[i])) {
+				//4バイト文字の1文字目ならフォントタグ出力または2文字出力
+				code = Character.toCodePoint(ch[i], ch[i+1]);
+				gaijiFileName = utf32FontMap.get(code);
+				if (gaijiFileName != null) {
+					File gaijiFile = new File(writer.getGaijiTemplatePath()+gaijiFileName);
+					String className = "u"+Integer.toHexString(code);
+					//フォントファイルを出力対象に追加して外字タグ出力
+					writer.addGaijiFont(className, gaijiFile);
+					buf.append("<span class=\"glyph ").append(className).append("\">〓</span>");
+					LogAppender.info(lineNum, "外字フォント利用", gaijiFile.getName());
+				} else {
+					if (!gaiji32) {
+						buf.append("〓");
+					} else {
+						//縦中横にはしないので4バイト分出力
+						buf.append(ch[i]);
+						buf.append(ch[i+1]);
+					}
+				}
+				i++;
+				continue;
+			} else if (ch[i] <= 0xFFFF && utf16FontMap != null && utf16FontMap.containsKey((int)ch[i])) {
+				//通常文字の外字指定 ほぼすべての文字が対象になるので先にcontainsKeyで判定
+				gaijiFileName = utf16FontMap.get((int)ch[i]);
+				File gaijiFile = new File(writer.getGaijiTemplatePath()+gaijiFileName);
+				String className = "u"+Integer.toHexString(code);
+				//フォントファイルを出力対象に追加して外字タグ出力
+				writer.addGaijiFont(className, gaijiFile);
+				buf.append("<span class=\"glyph ").append(className).append("\">〓</span>");
+				LogAppender.info(lineNum, "外字フォント利用", gaijiFile.getName());
+				continue;
+			}
+			
 			if (this.vertical && !(inYoko || noTcy)) {
 				switch (ch[i]) {
 				case '0': case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9':

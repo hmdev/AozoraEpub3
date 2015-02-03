@@ -1329,4 +1329,11 @@ public class Epub3Writer
 		this.isKindle = isKindle;
 		
 	}
+	
+	/** 外字フォントファイルが格納されているテンプレートパスを取得 */
+	public String getGaijiTemplatePath()
+	{
+		return templatePath+OPS_PATH+GAIJI_PATH;
+	}
+	
 }
