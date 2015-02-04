@@ -72,6 +72,9 @@ public class AozoraEpub3Converter
 	/** 4バイト文字を表示 */
 	boolean gaiji32 = false;
 	
+	/** 漢字用IVSを除外 */
+	boolean removeIVS = false;
+	
 	/** 奥付を別ページ */
 	boolean separateColophon = true;
 	
@@ -219,6 +222,10 @@ public class AozoraEpub3Converter
 	static HashMap<Integer, String> utf16FontMap = null;
 	/** U+20000以降の文字の外字フォントパス文字列 */
 	static HashMap<Integer, String> utf32FontMap = null;
+	/** IVS付きのU+FFFF以前の文字の外字フォントパス文字列 */
+	static HashMap<String, String> ivs16FontMap = null;
+	/** IVS付きのU+20000以降の文字の外字フォントパス文字列 */
+	static HashMap<String, String> ivs32FontMap = null;
 	
 	/** 「基本ラテン文字のみによる拡張ラテン文字Aの分解表記」の変換クラス */
 	static LatinConverter latinConverter;
@@ -399,6 +406,8 @@ public class AozoraEpub3Converter
 		if (gaijiPath.isDirectory()) {
 			utf16FontMap = new HashMap<Integer, String>();
 			utf32FontMap = new HashMap<Integer, String>();
+			ivs16FontMap = new HashMap<String, String>();
+			ivs32FontMap = new HashMap<String, String>();
 			String subPath = "";
 			for (File fontFile : gaijiPath.listFiles()) {
 				if (fontFile.isFile()) {
@@ -406,12 +415,31 @@ public class AozoraEpub3Converter
 					String ext = fileName.substring(fileName.lastIndexOf(".")+1);
 					if ("ttf".equals(ext) || "ttc".equals(ext) || "otf".equals(ext)) {
 						if (fileName.startsWith("u")){
-							int code = 0;
-							try { code = Integer.valueOf(fileName.substring(1, fileName.length()-ext.length()-1), 16); } catch (Exception e) {}
-							if (code <= 0xFFFF) {
-								utf16FontMap.put(code, subPath+fontFile.getName());
+							if (fileName.indexOf("-u") > 0) {
+								String className = fileName.substring(1, fileName.length()-ext.length()-1);
+								String[] strs = className.split("-u");
+								if (strs.length > 2) {
+									LogAppender.warn(-1, "IVS以外の合成フォントは対応しません", fontFile.getName());
+								} else {
+									int[] codes = new int[]{Integer.parseInt(strs[0], 16), Integer.parseInt(strs[1], 16)};
+									if (0xe0100 <= codes[1] && codes[1] <= 0xe01ef) {
+										if (codes[0] < 0xFFFF) {
+											ivs16FontMap.put("u"+className, subPath+fontFile.getName());
+										} else {
+											ivs32FontMap.put("u"+className, subPath+fontFile.getName());
+										}
+									} else {
+										LogAppender.warn(-1, "IVS以外の合成フォントは対応しません", fontFile.getName());
+									}
+								}
 							} else {
-								utf32FontMap.put(code, subPath+fontFile.getName());
+								int code = 0;
+								try { code = Integer.valueOf(fileName.substring(1, fileName.length()-ext.length()-1), 16); } catch (Exception e) {}
+								if (code <= 0xFFFF) {
+									utf16FontMap.put(code, subPath+fontFile.getName());
+								} else {
+									utf32FontMap.put(code, subPath+fontFile.getName());
+								}
 							}
 						}
 					}
@@ -419,6 +447,8 @@ public class AozoraEpub3Converter
 			}
 			if (utf16FontMap.size() == 0) utf16FontMap = null;
 			if (utf32FontMap.size() == 0) utf32FontMap = null;
+			if (ivs16FontMap.size() == 0) ivs16FontMap = null;
+			if (ivs32FontMap.size() == 0) ivs32FontMap = null;
 		}
 		
 		inited = true;
@@ -1329,8 +1359,6 @@ public class AozoraEpub3Converter
 									gaiji += "［＃行右小書き］（"+chukiValues[0]+"）［＃行右小書き終わり］";
 								}
 								if (logged) LogAppender.info(lineNum, "4バイト文字小書き変換", chuki);
-							} else {
-								if (logged) LogAppender.info(lineNum, "4バイト文字出力", chuki);
 							}
 						}
 					}
@@ -2245,10 +2273,12 @@ public class AozoraEpub3Converter
 		for (int idx=begin; idx<end; idx++) {
 			switch (ch[idx]) {
 			case '\0':
+				break;
 			case 0xFE00: case 0xFE01: case 0xFE02: case 0xFE03:
 			case 0xFE04: case 0xFE05: case 0xFE06: case 0xFE07:
 			case 0xFE08: case 0xFE09: case 0xFE0A: case 0xFE0B:
 			case 0xFE0C: case 0xFE0D: case 0xFE0E: case 0xFE0F:
+				LogAppender.info(lineIdNum, "異体字セレクタ("+Integer.toHexString(ch[idx])+")は出力しません");
 				break;
 			case '&': buf.append("&amp;"); break;
 			case '<': buf.append("&lt;"); break;
@@ -2437,40 +2467,149 @@ public class AozoraEpub3Converter
 		return buf.toString();
 	}
 	
-	/** 縦中横変換してbufに出力 */
+	/** 縦中横変換してbufに出力
+	 * 1文字フォントがある場合もここで出力 */
 	private void convertTcyText(StringBuilder buf, char[] ch, int begin, int end, boolean noTcy) throws IOException
 	{
-		
 		for (int i=begin; i<end; i++) {
+			
+			//1文字フォントを出力 文字の次のIVSもチェック
 			int code = 0;
 			String gaijiFileName = null;
-			if (i<end-1 && utf32FontMap != null && Character.isHighSurrogate(ch[i])) {
-				//4バイト文字の1文字目ならフォントタグ出力または2文字出力
-				code = Character.toCodePoint(ch[i], ch[i+1]);
-				gaijiFileName = utf32FontMap.get(code);
-				if (gaijiFileName != null) {
-					File gaijiFile = new File(writer.getGaijiTemplatePath()+gaijiFileName);
-					String className = "u"+Integer.toHexString(code);
-					//フォントファイルを出力対象に追加して外字タグ出力
-					writer.addGaijiFont(className, gaijiFile);
-					buf.append("<span class=\"glyph ").append(className).append("\">〓</span>");
-					LogAppender.info(lineNum, "外字フォント利用", gaijiFile.getName());
-				} else {
+			if (i<end-1 && Character.isHighSurrogate(ch[i])) {
+				//4バイト文字
+				if (utf32FontMap != null || ivs32FontMap != null) {
+					//1文字フォントファイル有り
+					code = Character.toCodePoint(ch[i], ch[i+1]);
+					if (i<end-3 && ch[i+2] == 0xDB40) {
+						//IVS付き
+						if (ivs32FontMap != null) {
+							String className = "u"+Integer.toHexString(code)+"-u"+Integer.toHexString(Character.toCodePoint(ch[i+2], ch[i+3]));
+							gaijiFileName = ivs32FontMap.get(className);
+							if (gaijiFileName != null) {
+								//フォントファイルを出力対象に追加して外字タグ出力
+								File gaijiFile = new File(writer.getGaijiTemplatePath()+gaijiFileName);
+								writer.addGaijiFont(className, gaijiFile);
+								buf.append("<span class=\"glyph ").append(className).append("\">〓</span>");
+								LogAppender.info(lineNum, "外字フォント利用(IVS含む)", gaijiFile.getName());
+								i+=3;
+								continue;
+							}
+						}
+						if (utf32FontMap != null) {
+							//1文字フォントの後ろにIVSがあるかチェック
+							gaijiFileName = utf32FontMap.get(code);
+							if (gaijiFileName != null) {
+								File gaijiFile = new File(writer.getGaijiTemplatePath()+gaijiFileName);
+								String className = "u"+Integer.toHexString(code);
+								//フォントファイルを出力対象に追加して外字タグ出力
+								writer.addGaijiFont(className, gaijiFile);
+								buf.append("<span class=\"glyph ").append(className).append("\">〓</span>");
+								LogAppender.warn(lineNum, "外字フォント利用(IVS除外)", gaijiFile.getName());
+								i+=3;
+								continue;
+							}
+						}
+					}
+					//IVS以外
+					if (utf32FontMap != null) {
+						gaijiFileName = utf32FontMap.get(code);
+						if (gaijiFileName != null) {
+							File gaijiFile = new File(writer.getGaijiTemplatePath()+gaijiFileName);
+							String className = "u"+Integer.toHexString(code);
+							//フォントファイルを出力対象に追加して外字タグ出力
+							writer.addGaijiFont(className, gaijiFile);
+							buf.append("<span class=\"glyph ").append(className).append("\">〓</span>");
+							LogAppender.info(lineNum, "外字フォント利用", gaijiFile.getName());
+							i++;
+							continue;
+						}
+					}
+				}
+				//1文字フォント無し
+				if (i<end-3 && ch[i+2] == 0xDB40) {
+					//4バイト文字とIVSを出力
 					if (!gaiji32) {
+						//4バイト文字を出力しない
 						buf.append("〓");
-					} else {
-						//縦中横にはしないので4バイト分出力
+						i+=3;
+						LogAppender.info(lineNum, "4バイト文字とIVSを除外しました");
+						continue;
+					}
+					if (removeIVS) {
 						buf.append(ch[i]);
 						buf.append(ch[i+1]);
+						LogAppender.info(lineNum, "IVSを除外しました");
+					} else {
+						buf.append(ch[i]);
+						buf.append(ch[i+1]);
+						buf.append(ch[i+2]);
+						buf.append(ch[i+3]);
+						LogAppender.info(lineNum, "IVSを出力します");
 					}
+					i+=3;
+					continue;
+				}
+				///通常の4バイト文字
+				if (!gaiji32) {
+					//4バイト文字を出力しない
+					buf.append("〓");
+				} else {
+					buf.append(ch[i]);
+					buf.append(ch[i+1]);
 				}
 				i++;
 				continue;
-			} else if (ch[i] <= 0xFFFF && utf16FontMap != null && utf16FontMap.containsKey((int)ch[i])) {
+				
+			} else if (i<end-2 && ch[i+1] == 0xDB40) {
+				//2バイト文字でIVS付き
+				if (ivs16FontMap != null) {
+					String className = "u"+Integer.toHexString((int)ch[i])+"-u"+Integer.toHexString(Character.toCodePoint(ch[i+1], ch[i+2]));
+					gaijiFileName = ivs16FontMap.get(className);
+					if (gaijiFileName != null) {
+						//1文字フォント有り
+						File gaijiFile = new File(writer.getGaijiTemplatePath()+gaijiFileName);
+						//フォントファイルを出力対象に追加して外字タグ出力
+						writer.addGaijiFont(className, gaijiFile);
+						buf.append("<span class=\"glyph ").append(className).append("\">〓</span>");
+						LogAppender.info(lineNum, "外字フォント利用(IVS含む)", gaijiFile.getName());
+						i+=2;
+						continue;
+					}
+				}
+				if (utf16FontMap != null && utf16FontMap.containsKey((int)ch[i])) {
+					gaijiFileName = utf16FontMap.get((int)ch[i]);
+					if (gaijiFileName != null) {
+						//1文字フォントの後ろにIVSがある場合
+						File gaijiFile = new File(writer.getGaijiTemplatePath()+gaijiFileName);
+						String className = "u"+Integer.toHexString((int)ch[i]);
+						//フォントファイルを出力対象に追加して外字タグ出力
+						writer.addGaijiFont(className, gaijiFile);
+						buf.append("<span class=\"glyph ").append(className).append("\">〓</span>");
+						LogAppender.warn(lineNum, "外字フォント利用(IVS除外)", gaijiFile.getName());
+						i+=2;
+						continue;
+					}
+				}
+				//2バイト文字とIVSを出力
+				if (removeIVS) {
+					buf.append(ch[i]);
+					LogAppender.info(lineNum, "IVSを除外しました");
+				} else {
+					buf.append(ch[i]);
+					buf.append(ch[i+1]);
+					buf.append(ch[i+2]);
+					LogAppender.info(lineNum, "IVSを出力します");
+				}
+				i+=2;
+				continue;
+			}
+			//IVS無しの1文字フォント
+			if (utf16FontMap != null && utf16FontMap.containsKey((int)ch[i])) {
 				//通常文字の外字指定 ほぼすべての文字が対象になるので先にcontainsKeyで判定
 				gaijiFileName = utf16FontMap.get((int)ch[i]);
 				File gaijiFile = new File(writer.getGaijiTemplatePath()+gaijiFileName);
-				String className = "u"+Integer.toHexString(code);
+				String className = "u"+Integer.toHexString((int)ch[i]);
 				//フォントファイルを出力対象に追加して外字タグ出力
 				writer.addGaijiFont(className, gaijiFile);
 				buf.append("<span class=\"glyph ").append(className).append("\">〓</span>");

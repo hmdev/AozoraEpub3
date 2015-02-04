@@ -110,7 +110,8 @@ public class CharUtils
 	
 	/** 漢字かどうかをチェック
 	 * 4バイト文字のも対応
-	 * 漢字の間の「ノカケヵヶ」も漢字扱い */
+	 * 漢字の間の「ノカケヵヶ」も漢字扱い
+	 * IVS文字 U+e0100-e01efも漢字扱い */
 	static public boolean isKanji(char[] ch, int i)
 	{
 		switch (ch[i]) {
@@ -135,20 +136,23 @@ public class CharUtils
 		}
 		if (0x4E00 <= c && c <= 0x9FFF) return true;//'一' <= ch && ch <= '龠'
 		if (0xF900 <= c && c <= 0xFAFF) return true;//CJK互換漢字
-		//0x20000-0x2A6DF UTF-32({d840,dc00}-{d869,dedf})
-		//0x2A700-0x2B81F UTF-32({d869,df00}-{d86e,dc1f})
-		//0x2F800-0x2FA1F UTF-32({d87e,dc00}-{d87e,de1f})
+		if (0xFE00 <= c && c <= 0xFE0D) return true;//VS1-14
+		//0x20000-0x2A6DF UTF16({d840,dc00}-{d869,dedf})
+		//0x2A700-0x2B81F UTF16({d869,df00}-{d86e,dc1f})
+		//0x2F800-0x2FA1F UTF16({d87e,dc00}-{d87e,de1f})
 		if (pre >= 0) {
+			if (0xDB40 == pre && 0xDD00 <= c && c <= 0xDDEF) return true; //IVS e0100-e01ef
+			if (0xD87E == pre && 0xDc00 <= c && c <= 0xDE1F) return true;
 			int code = pre<<16|c&0xFFFF;
 			if (0xD840DC00 <= code && code <= 0xD869DEDF) return true;
 			if (0xD869DF00 <= code && code <= 0xD86EDC1F) return true;
-			if (0xD87EDc00 <= code && code <= 0xD87EDE1F) return true;
 		}
 		if (suf >= 0) {
+			if (0xDB40 == c && 0xDD00 <= suf && suf <= 0xDDEF) return true; //IVS e0100-e01ef
+			if (0xD87E == c && 0xDc00 <= suf && suf <= 0xDE1F) return true;
 			int code = c<<16|suf&0xFFFF;
 			if (0xD840DC00 <= code && code <= 0xD869DEDF) return true;
 			if (0xD869DF00 <= code && code <= 0xD86EDC1F) return true;
-			if (0xD87EDc00 <= code && code <= 0xD87EDE1F) return true;
 		}
 		return false;
 	}
