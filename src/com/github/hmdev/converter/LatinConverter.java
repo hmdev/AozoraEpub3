@@ -35,7 +35,7 @@ public class LatinConverter
 						String[] values = line.split("\t");
 						char ch = values[1].charAt(0);
 						if (values[0].length() > 0) latinMap.put(values[0], ch);
-						latinCidMap.put(ch, new String[]{values[2], values[3]});
+						if (values.length > 3) latinCidMap.put(ch, new String[]{values[2], values[3]});
 					} catch (Exception e) {
 						LogAppender.error(lineNum, file.getName(), line);
 					}
