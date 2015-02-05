@@ -136,7 +136,7 @@ public class CharUtils
 		}
 		if (0x4E00 <= c && c <= 0x9FFF) return true;//'一' <= ch && ch <= '龠'
 		if (0xF900 <= c && c <= 0xFAFF) return true;//CJK互換漢字
-		if (0xFE00 <= c && c <= 0xFE0D) return true;//VS1-14
+		if (0xFE00 <= c && c <= 0xFE0D) return true;//VS1-14 (15,16は絵文字用なので除外)
 		//0x20000-0x2A6DF UTF16({d840,dc00}-{d869,dedf})
 		//0x2A700-0x2B81F UTF16({d869,df00}-{d86e,dc1f})
 		//0x2F800-0x2FA1F UTF16({d87e,dc00}-{d87e,de1f})

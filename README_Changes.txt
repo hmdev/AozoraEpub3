@@ -56,14 +56,14 @@ Changes
 
 ----
 1.1.0b40 (2015/02/)
-　- 外字用1文字フォント( http://glyphwiki.org/wiki/ )をePubに出力
-　　　template/OPS/gaiji/ に1文字フォントファイル 'u'+Unicode+'.ttf' があり、本文で使われている文字のみ
-　　　IVS付きの文字の1文字フォント置換にも対応
-　　　文字を〓で出力してフォント指定用のspanタグで括る ( <span class="glyph u2496d">〓</span> )
+　- 外字１文字フォント( http://glyphwiki.org/wiki/ )をePubに組み込み
+　　　template/OPS/gaiji/ に1文字フォントファイル 'u'+Unicode+'.ttf' があり本文で使われている文字のみ組み込む
+　　　　文字を〓で出力してフォント指定用のspanタグで括る ( <span class="glyph u2496d">〓</span> )
+　　　IVS付きの文字の1文字フォント置換にも対応(U+FE00-FE0D と U+E0100-E01EF)
 　　　※フォントによっては細かったり上下に空白ができる場合有り → Fontforgeで調整が必要？
-　- 異体字セレクタ(VS U+FE00-FE0D)の除外をログに出力
-　- IVS(U+E0100-E01EF)があればログに出力
 　- IVSの除外設定
+　　　(U+FE00-FE0D と U+E0100-E01EF)を選択
+　　　IVSの出力または除外をログに出力
 　- 表紙画像が無い場合に入力ファイルパスに cover.png|jpg|jpeg のファイルがあれば確認画面で表紙に設定
 　- ルビの終了と開始が連続する場合は </ruby><ruby> タグは追加しない
 1.1.0b39 (2015/02/01)
