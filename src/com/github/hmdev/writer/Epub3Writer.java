@@ -1333,7 +1333,7 @@ public class Epub3Writer
 	/** 外字フォントファイルが格納されているテンプレートパスを取得 */
 	public String getGaijiTemplatePath()
 	{
-		return templatePath+OPS_PATH+GAIJI_PATH;
+		return GAIJI_PATH;
 	}
 	
 }

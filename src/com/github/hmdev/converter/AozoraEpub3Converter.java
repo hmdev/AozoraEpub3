@@ -2499,7 +2499,7 @@ public class AozoraEpub3Converter
 						if (gaijiFileName != null) {
 							//フォントファイルを出力対象に追加して外字タグ出力
 							this.printGlyphFontTag(buf, gaijiFileName, className);
-							LogAppender.info(lineNum, "外字フォント利用(IVS含む)", ""+ch[i]+ch[i+1]+"("+gaijiFileName+")");
+							LogAppender.info(lineNum, "外字フォント利用(異体字)", ""+ch[i]+ch[i+1]+ch[i+2]+ch[i+3]+"("+gaijiFileName+")");
 							i+=3; //IVSの次へ
 							continue;
 						}
@@ -2523,12 +2523,14 @@ public class AozoraEpub3Converter
 						continue;
 					}
 					if (printIVSSSP) {
+						if (this.vertical) buf.append(chukiMap.get("正立")[0]);
 						buf.append(ch[i]);
 						buf.append(ch[i+1]);
 						buf.append(ch[i+2]);
 						buf.append(ch[i+3]);
+						if (this.vertical) buf.append(chukiMap.get("正立終わり")[0]);
 						LogAppender.info(lineNum, "IVSを出力します",
-								""+ch[i]+ch[i+1]+"("+Integer.toHexString(code)+"+"+ivsCode+")");
+								""+ch[i]+ch[i+1]+ch[i+2]+ch[i+3]+"("+Integer.toHexString(code)+"+"+ivsCode+")");
 					} else {
 						buf.append(ch[i]);
 						buf.append(ch[i+1]);
@@ -2546,7 +2548,7 @@ public class AozoraEpub3Converter
 						if (gaijiFileName != null) {
 							//フォントファイルを出力対象に追加して外字タグ出力
 							this.printGlyphFontTag(buf, gaijiFileName, className);
-							LogAppender.info(lineNum, "外字フォント利用(IVS含む)", ""+ch[i]+ch[i+1]+"("+gaijiFileName+")");
+							LogAppender.info(lineNum, "外字フォント利用(異体字)", ""+ch[i]+ch[i+1]+ch[i+2]+"("+gaijiFileName+")");
 							i+=2; //IVSの次へ
 							continue;
 						}
@@ -2560,11 +2562,13 @@ public class AozoraEpub3Converter
 						continue;
 					}
 					if (printIVSBMP) {
+						if (this.vertical) buf.append(chukiMap.get("正立")[0]);
 						buf.append(ch[i]);
 						buf.append(ch[i+1]);
 						buf.append(ch[i+2]);
+						if (this.vertical) buf.append(chukiMap.get("正立終わり")[0]);
 						LogAppender.info(lineNum, "IVSを出力します",
-								""+ch[i]+ch[i+1]+"("+Integer.toHexString(code)+"+"+(Integer.toHexString(ch[i+2]))+")");
+								""+ch[i]+ch[i+1]+ch[i+2]+"("+Integer.toHexString(code)+"+"+(Integer.toHexString(ch[i+2]))+")");
 					} else {
 						buf.append(ch[i]);
 						buf.append(ch[i+1]);
@@ -2609,7 +2613,7 @@ public class AozoraEpub3Converter
 					gaijiFileName = ivs16FontMap.get(className);
 					if (gaijiFileName != null) {
 						this.printGlyphFontTag(buf, gaijiFileName, className);
-						LogAppender.info(lineNum, "外字フォント利用(IVS含む)", ""+ch[i]+"("+gaijiFileName+")");
+						LogAppender.info(lineNum, "外字フォント利用(異体字)", ""+ch[i]+"("+gaijiFileName+")");
 						i+=2; //IVSの次へ
 						continue;
 					}
@@ -2625,9 +2629,11 @@ public class AozoraEpub3Converter
 				}
 				//2バイト文字とIVSを出力
 				if (printIVSSSP) {
+					if (this.vertical) buf.append(chukiMap.get("正立")[0]);
 					buf.append(ch[i]);
 					buf.append(ch[i+1]);
 					buf.append(ch[i+2]);
+					if (this.vertical) buf.append(chukiMap.get("正立終わり")[0]);
 					LogAppender.info(lineNum, "IVSを出力します",
 							ch[i]+"("+Integer.toHexString(ch[i])+"+"+ivsCode+")");
 				} else {
@@ -2645,7 +2651,7 @@ public class AozoraEpub3Converter
 					gaijiFileName = ivs32FontMap.get(className);
 					if (gaijiFileName != null) {
 						this.printGlyphFontTag(buf, gaijiFileName, className);
-						LogAppender.info(lineNum, "外字フォント利用(IVS含む)", ""+ch[i]+"("+gaijiFileName+")");
+						LogAppender.info(lineNum, "外字フォント利用(異体字)", ""+ch[i]+"("+gaijiFileName+")");
 						i+=1; //IVSの次へ
 						continue;
 					}
@@ -2946,9 +2952,12 @@ public class AozoraEpub3Converter
 			case '”': buf.append("〟"); break;
 			//case '〝': ch[i] = '“'; break;
 			//case '〟': ch[i] = '”'; break;
-			case '―': buf.append("─"); break;
-			//ローマ数字等 Readerで正立にする
-			//その他右回転する記号: ¶⇔⇒≡√∇∂∃∠⊥⌒∽∝∫∬∮∑∟⊿≠≦≧∈∋⊆⊇⊂⊃∧∨↑↓→←
+			case '―': buf.append("─"); break; //コード違いのダッシュ
+			//ローマ数字等 Readerは修正されたけど一応残す
+			//正立しない文字: ¶⇔⇒≡√∇∂∃∠⊥⌒∽∝∫∬∮∑∟⊿≠≦≧∈∋⊆⊇⊂⊃∧∨↑↓→←∀
+			//正立しない文字を正立指定
+			case '÷': case '±': case '∞': case '∴': case '∵':
+			//正立する文字 Reader最新ファームで直った
 			case 'Ⅰ': case 'Ⅱ': case 'Ⅲ': case 'Ⅳ': case 'Ⅴ': case 'Ⅵ': case 'Ⅶ': case 'Ⅷ': case 'Ⅸ': case 'Ⅹ': case 'Ⅺ': case 'Ⅻ':
 			case 'ⅰ': case 'ⅱ': case 'ⅲ': case 'ⅳ': case 'ⅴ': case 'ⅵ': case 'ⅶ': case 'ⅷ': case 'ⅸ': case 'ⅹ': case 'ⅺ': case 'ⅻ':
 			case '⓪': case '①': case '②': case '③': case '④': case '⑤': case '⑥': case '⑦': case '⑧': case '⑨': case '⑩':
@@ -2958,7 +2967,6 @@ public class AozoraEpub3Converter
 			case '㊶': case '㊷': case '㊸': case '㊹': case '㊺': case '㊻': case '㊼': case '㊽': case '㊾': case '㊿':
 			case '△': case '▽': case '▲': case '▼': case '☆': case '★':
 			case '♂': case '♀': case '♪': case '♭': case '§': case '†': case '‡': 
-			case '÷': case '±': case '∀': case '∞': case '∴': case '∵':
 			case '‼': case '⁇': case '⁉': case '⁈':
 			case '©': case '®': case '⁑': case '⁂':
 			case '◐': case '◑': case '◒': case '◓': case '▷': case '▶': case '◁': case '◀':
@@ -2969,9 +2977,9 @@ public class AozoraEpub3Converter
 			case 'ℵ': case 'ℏ': case '℧':
 				//縦中横の中でなければタグで括る
 				if (!(inYoko || noTcy)) {
-					buf.append(chukiMap.get("縦中横")[0]);
+					buf.append(chukiMap.get("正立")[0]);
 					buf.append(ch[idx]);
-					buf.append(chukiMap.get("縦中横終わり")[0]);
+					buf.append(chukiMap.get("正立終わり")[0]);
 				} else {
 					buf.append(ch[idx]);
 				}

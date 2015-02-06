@@ -192,6 +192,10 @@
 縦中横	<span class="tcy"><span>
 縦中横終わり	</span></span>
 
+####横に寝る文字を正立で表示 青空文庫注記仕様外
+正立	<span class="upr">
+正立終わり	</span>
+
 ####割り注
 ここから割り注	<span class="wrc">
 ここで割り注終わり	</span>

@@ -247,6 +247,13 @@ text-combine: horizontal;
 -epub-text-combine: horizontal;
 }
 
+/* 正立 */
+.upr {
+text-orientation: upright;
+-webkit-text-orientation: upright;
+-epub-text-orientation: upright;
+}
+
 /* ルビ内改行無し (Kindleで縦中横でずれるため) */
 .kindle ruby {
 white-space: nowrap;
