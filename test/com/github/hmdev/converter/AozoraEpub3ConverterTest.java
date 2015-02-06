@@ -23,6 +23,27 @@ public class AozoraEpub3ConverterTest
 	}
 	
 	@Test
+	public void testConvertGaijiChuki()
+	{
+		try {
+			String str;
+			str = converter.convertGaijiChuki("※［＃U+845b］U+845b", true, true);
+			System.out.println(str);
+			str = converter.convertGaijiChuki("※［＃u+845b-e0100］u+845b-e0100", true, true);
+			System.out.println(str);
+			str = converter.convertGaijiChuki("※［＃U+845b-U+e0100］U+845b-U+ue0100", true, true);
+			System.out.println(str);
+			str = converter.convertGaijiChuki("※［＃「葛の異体字」、U+845b-e0100］「葛の異体字」、U+845b-e0100", true, true);
+			System.out.println(str);
+			str = converter.convertGaijiChuki("※［＃「葛の異体字」、u+845b-u+e0100］「葛の異体字」、u+845b-u+e0100", true, true);
+			System.out.println(str);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
 	public void testReplaceChukiSufTag()
 	{
 		try {

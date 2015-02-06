@@ -842,7 +842,7 @@ public class Epub3Writer
 			if (gaijiFile.exists()) {
 				String outFileName = OPS_PATH+GAIJI_PATH+gaijiFile.getName();
 				zos.putArchiveEntry(new ZipArchiveEntry(outFileName));
-				fis = new FileInputStream(new File(templatePath+outFileName));
+				fis = new FileInputStream(gaijiFile);
 				IOUtils.copy(fis, zos);
 				fis.close();
 				zos.closeArchiveEntry();
@@ -960,6 +960,8 @@ public class Epub3Writer
 		//エラーがなければ100%
 		if (this.jProgressBar != null) this.jProgressBar.setValue(this.jProgressBar.getMaximum());
 		
+		} catch (Exception e) {
+			e.printStackTrace();
 		} finally {
 			//ePub3出力ファイルを閉じる
 			if (zos != null) zos.close();
@@ -1331,7 +1333,7 @@ public class Epub3Writer
 	}
 	
 	/** 外字フォントファイルが格納されているテンプレートパスを取得 */
-	public String getGaijiTemplatePath()
+	public String getGaijiFontPath()
 	{
 		return GAIJI_PATH;
 	}

@@ -95,31 +95,36 @@ public class AozoraGaijiConverter
 	 * @return 変換したUTF-8文字列 変換できなければnull */
 	public String codeToCharString(String code)
 	{
-		String gaiji = null;
 		try {
-		if (code.startsWith("U+")) {
+		if (code.startsWith("U+") || code.startsWith("u+")) {
 			//UTF-32コードを文字列に変換
-			int utf8 = Integer.parseInt(code.substring(2), 16);
-			gaiji = utfCodeToCharString(utf8);
+			//IVSがある場合は U+845B-U+E0100 または U+845B-E0100
+			int idx = code.indexOf("-");
+			if (idx == -1) {
+				return utfCodeToCharString(Integer.parseInt(code.substring(2), 16));
+			} else {
+				String ivs = code.substring(idx+1);
+				if (ivs.startsWith("U+") || ivs.startsWith("u+")) ivs = ivs.substring(2);
+				return utfCodeToCharString(Integer.parseInt(code.substring(2, idx), 16))
+						+utfCodeToCharString(Integer.parseInt(ivs, 16));
+			}
 		} else if (code.startsWith("UCS-")) {
 			//UTF-32コードを文字列に変換
-			int utf8 = Integer.parseInt(code.substring(4), 16);
-			gaiji = utfCodeToCharString(utf8);
+			return utfCodeToCharString(Integer.parseInt(code.substring(4), 16));
 		} else if (code.startsWith("unicode")) {
 			//UTF-32コードを文字列に変換
-			int utf8 = Integer.parseInt(code.substring(7), 16);
-			gaiji = utfCodeToCharString(utf8);
+			return utfCodeToCharString(Integer.parseInt(code.substring(7), 16));
 		} else if (code.startsWith("第3水準") || code.startsWith("第4水準")) {
 			//第3第4水準JISを文字列に変換
 			String[] codes = code.substring(4).split("-");
-			gaiji = JisConverter.getConverter().toUTF8(Integer.parseInt(codes[0]), Integer.parseInt(codes[1]), Integer.parseInt(codes[2]));
+			return JisConverter.getConverter().toUTF8(Integer.parseInt(codes[0]), Integer.parseInt(codes[1]), Integer.parseInt(codes[2]));
 		} else {
 			//JISコードを文字列に変換
 			String[] codes = code.split("-");
-			gaiji = JisConverter.getConverter().toUTF8(Integer.parseInt(codes[0]), Integer.parseInt(codes[1]), Integer.parseInt(codes[2]));
+			return JisConverter.getConverter().toUTF8(Integer.parseInt(codes[0]), Integer.parseInt(codes[1]), Integer.parseInt(codes[2]));
 		}
 		} catch (Exception e) {}
-		return gaiji;
+		return null;
 	}
 	
 	/** UTF-8コードを文字列に変換

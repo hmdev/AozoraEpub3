@@ -404,7 +404,7 @@ public class AozoraEpub3Converter
 		}
 		
 		//外字フォント一覧取得
-		File gaijiPath = new File(writer.getGaijiTemplatePath());
+		File gaijiPath = new File(writer.getGaijiFontPath());
 		if (gaijiPath.isDirectory()) {
 			utf16FontMap = new HashMap<Integer, String>();
 			utf32FontMap = new HashMap<Integer, String>();
@@ -1316,7 +1316,18 @@ public class AozoraEpub3Converter
 			
 			//外字はUTF-8に変換してそのまま継続
 			if (chuki.charAt(0) == '※') {
-				String[] chukiValues = chuki.substring(3, chuki.length()-1).split("、");
+				String chukiInner = chuki.substring(3, chuki.length()-1);
+				//U+のコードのみの注記
+				if (chukiInner.startsWith("U+") || chukiInner.startsWith("u+")) {
+					String gaiji = gaijiConverter.codeToCharString(chukiInner);
+					if (gaiji != null) {
+						buf.append(gaiji);
+						begin = chukiStart+chuki.length();
+						continue;
+					}
+				}
+				//、の後ろにコードがある場合
+				String[] chukiValues = chukiInner.split("、");
 				//注記文字グリフ or 代替文字変換
 				String gaiji = gaijiConverter.toAlterString(chukiValues[0]);
 				//注記内なら注記タグは除外する
@@ -1341,60 +1352,41 @@ public class AozoraEpub3Converter
 				if (gaiji == null) {
 					gaiji = gaijiConverter.toUtf(chukiValues[0]);
 				}
-				
-				//未サポート外字
-				//if (unsupportGaiji.contains(gaiji)) {
-				//Unicode32文字なら後ろに小書きで注記追加
+				//外字注記変換をログに出力
 				if (gaiji != null) {
-					int utfCode = AozoraGaijiConverter.toUtfCode(gaiji);
-					if (utfCode > 0xFFFF) {
-						String gaijiFileName = null;
-						if (utf32FontMap != null) {
-							gaijiFileName = utf32FontMap.get(utfCode);
-						}
-						if (gaijiFileName != null) {
-							//外字フォントファイルがあれば外字をそのまま出力して後で変換
-						} else {
-							if (!gaiji32) {
-								gaiji = "〓";
-								if (!isInnerChuki(line, m.start())) {
-									gaiji += "［＃行右小書き］（"+chukiValues[0]+"）［＃行右小書き終わり］";
-								}
-								if (logged) LogAppender.info(lineNum, "4バイト文字小書き変換", chuki);
-							}
+					if (logged) LogAppender.info(lineNum, "外字注記を変換", chuki+" → U+"+Integer.toHexString(AozoraGaijiConverter.toUtfCode(gaiji)));
+					if (gaiji.length() == 1 && escape) {
+						//特殊文字は 前に※をつけて文字出力時に例外処理
+						switch (gaiji.charAt(0)) {
+						//case '※': buf.append('※'); break;
+						case '》': buf.append('※'); break;
+						case '《': buf.append('※'); break;
+						case '｜': buf.append('※'); break;
+						case '＃': buf.append('※'); break;
 						}
 					}
+					buf.append(gaiji);
+					begin = chukiStart+chuki.length();
+					continue;
 				}
+				
 				//変換不可 画像指定付き外字なら画像注記に変更
-				if (gaiji == null) {
-					if (isInnerChuki(line, m.start())) {
-						gaiji = "〓";
+				if (isInnerChuki(line, m.start())) {
+					gaiji = "〓";
+				} else {
+					//画像指定外字
+					int imageStartIdx = chuki.indexOf('（', 2);
+					if (imageStartIdx > -1 && chuki.indexOf('.', 2) != -1) {
+						//※を消して画像注記に変更
+						gaiji = chuki.substring(1, chuki.length()-1)+"#GAIJI#］";
+						if (logged) LogAppender.info(lineNum, "外字画像利用", chuki);
 					} else {
-						//画像指定外字
-						int imageStartIdx = chuki.indexOf('（', 2);
-						if (imageStartIdx > -1 && chuki.indexOf('.', 2) != -1) {
-							//※を消して画像注記に変更
-							gaiji = chuki.substring(1, chuki.length()-1)+"#GAIJI#］";
-							if (logged) LogAppender.info(lineNum, "外字画像利用", chuki);
-						} else {
-							//画像以外
-							if (logged) LogAppender.info(lineNum, "外字未変換", chuki);
-							gaiji = "〓［＃行右小書き］（"+chukiValues[0]+"）［＃行右小書き終わり］";
-						}
-					}
-				}
-				else if (gaiji.length() == 1 && escape) {
-					//特殊文字は 前に※をつけて文字出力時に例外処理
-					switch (gaiji.charAt(0)) {
-					//case '※': buf.append('※'); break;
-					case '》': buf.append('※'); break;
-					case '《': buf.append('※'); break;
-					case '｜': buf.append('※'); break;
-					case '＃': buf.append('※'); break;
+						//画像以外
+						if (logged) LogAppender.info(lineNum, "外字未変換", chuki);
+						gaiji = "〓［＃行右小書き］（"+chukiValues[0]+"）［＃行右小書き終わり］";
 					}
 				}
 				buf.append(gaiji);
-				//System.out.println(chuki+" : "+gaiji);
 				
 			} else if (chuki.charAt(0) == '〔') {
 				//拡張ラテン文字変換
@@ -2472,7 +2464,7 @@ public class AozoraEpub3Converter
 	/** １文字フォント用タグを出力 */
 	private void printGlyphFontTag(StringBuilder buf, String gaijiFileName, String className)
 	{
-		File gaijiFile = new File(writer.getGaijiTemplatePath()+gaijiFileName);
+		File gaijiFile = new File(writer.getGaijiFontPath()+gaijiFileName);
 		writer.addGaijiFont(className, gaijiFile);
 		buf.append("<span class=\"glyph ").append(className).append("\">〓</span>");
 	}
