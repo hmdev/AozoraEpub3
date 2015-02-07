@@ -1354,7 +1354,7 @@ public class AozoraEpub3Converter
 				}
 				//外字注記変換をログに出力
 				if (gaiji != null) {
-					if (logged) LogAppender.info(lineNum, "外字注記を変換", chuki+" → U+"+Integer.toHexString(AozoraGaijiConverter.toUtfCode(gaiji)));
+					//if (logged) LogAppender.info(lineNum, "外字注記", chuki+" → U+"+Integer.toHexString(AozoraGaijiConverter.toUtfCode(gaiji)));
 					if (gaiji.length() == 1 && escape) {
 						//特殊文字は 前に※をつけて文字出力時に例外処理
 						switch (gaiji.charAt(0)) {
@@ -2289,7 +2289,7 @@ public class AozoraEpub3Converter
 	 * ・</ruby><ruby> と連続する場合はタグを除去
 	 * @param buf 出力先バッファ
 	 * @param ch ルビ変換前の行文字列 */
-	private StringBuilder convertRubyText(String line) throws IOException
+	StringBuilder convertRubyText(String line) throws IOException
 	{
 		StringBuilder buf = new StringBuilder();
 		char[] ch = line.toCharArray();
@@ -2316,46 +2316,28 @@ public class AozoraEpub3Converter
 			else if (noTcy && noTcyEnd.contains(i)) noTcy = false;
 			
 			switch (ch[i]) {
-			case '※':
-				//外字変換処理でルビ文字と注記になる可能性のある文字が※でエスケープされている (※《 ※》 ※｜ ※＃)
-				//ルビ自動判別中は次の文字が漢字でもアルファベットでもないのでルビ対象がとして出力される
-				//ルビ内で変換した場合はルビ開始位置の文字を１文字ずらす
-				if (i+1 != end) {
-					switch (ch[i+1]) {
-					case '》':
-					case '《':
-					case '｜':
-					case '＃':
-						if (rubyStart > -1) {
-							for (int j=i-1; j>=rubyStart; j--) {
-								ch[j+1] = ch[j];
-							}
-							rubyStart++;
-							if (rubyTopStart > -1) rubyTopStart++;
-							i++;
-							continue;
-						} else {
-							i++;
-						}
-					}
+			case '｜':
+				//エスケープ文字なら処理しない
+				if (i == 0 || ch[i-1] != '※') {
+					//前まで出力
+					if (rubyStart != -1) convertTcyText(buf, ch, rubyStart, i, noTcy);
+					rubyStart = i + 1;
+					inRuby = true;
 				}
 				break;
-			case '｜':
-				//前まで出力
-				if (rubyStart != -1) convertTcyText(buf, ch, rubyStart, i, noTcy);
-				rubyStart = i + 1;
-				inRuby = true;
-				break;
 			case '《':
-				inRuby = true;
-				rubyTopStart = i;
+				//エスケープ文字なら処理しない
+				if (i == 0 || ch[i-1] != '※') {
+					inRuby = true;
+					rubyTopStart = i;
+				}
 				break;
 			}
 			
 			// ルビ内ならルビの最後でrubyタグ出力
 			if (inRuby) {
-				// ルビ終わり
-				if (ch[i] == '》') {
+				// ルビ終わり エスケープ文字なら処理しない
+				if (ch[i] == '》' && (i == 0 || ch[i-1] != '※')) {
 					if (rubyStart != -1 && rubyTopStart != -1) {
 						if (noRuby) 
 							convertTcyText(buf, ch, rubyStart, rubyTopStart, noTcy); //本文
@@ -2374,9 +2356,9 @@ public class AozoraEpub3Converter
 									buf.setLength(buf.length()-rubyEndChuki.length());
 								}
 								for (int j=0; j<rubyTopStart-rubyStart; j++) {
-									convertTcyChar(buf, ch, rubyStart+j, noTcy); //本文
+									convertReplacedChar(buf, ch, rubyStart+j, noTcy); //本文
 									buf.append(chukiMap.get("ルビ前")[0]);
-									convertTcyChar(buf, ch, rubyTopStart+1+j, true);//ルビ
+									convertReplacedChar(buf, ch, rubyTopStart+1+j, true);//ルビ
 									buf.append(chukiMap.get("ルビ後")[0]);
 								}
 								buf.append(rubyEndChuki);
@@ -2440,7 +2422,7 @@ public class AozoraEpub3Converter
 					}
 					// ルビ中でなく漢字、半角以外は出力 数字と!?は英字扱いになっている
 					else {
-						convertTcyChar(buf, ch, i, noTcy); rubyCharType = RubyCharType.NULL;
+						convertReplacedChar(buf, ch, i, noTcy); rubyCharType = RubyCharType.NULL;
 					}
 				}
 			}
@@ -2792,7 +2774,7 @@ public class AozoraEpub3Converter
 				
 				//ひらがな/カタカナ＋濁点/半濁点 結合文字も対応
 				if (i+1<ch.length && (ch[i+1]=='゛' || ch[i+1]=='゜')) {
-					if ('ぁ' <= ch[i] && ch[i] <= 'ん' || 'ぁ' <= ch[i] && ch[i] <= 'ヶ' || ch[i]=='ゖ' || ch[i]=='ㇷ' || ch[i]=='〻') {
+					if ('ぁ' <= ch[i] && ch[i] <= 'ん' || 'ぁ' <= ch[i] && ch[i] <= 'ヶ' || ch[i]=='ゖ' || ch[i]=='ㇷ' || ch[i]=='ー' || ch[i]=='〻') {
 						//通常の濁点文字ならその文字で出力
 						if (ch[i+1]=='゛' && ('か' <= ch[i] && ch[i] <= 'と' || 'カ' <= ch[i] && ch[i] <= 'ト')) {
 							ch[i] = (char)((int)ch[i]+(int)'が'-(int)'か');
@@ -2834,7 +2816,7 @@ public class AozoraEpub3Converter
 				//}
 			}
 			//自動縦中横で出力していたらcontinueしていてここは実行されない
-			convertTcyChar(buf, ch, i, noTcy);
+			convertReplacedChar(buf, ch, i, noTcy);
 		}
 	}
 	
@@ -2883,7 +2865,7 @@ public class AozoraEpub3Converter
 	
 	/** 出力バッファに文字出力 
 	 * < と > と & は &lt; &gt; &amp; に置換 */
-	private void convertTcyChar(StringBuilder buf, char[] ch, int idx, boolean noTcy) throws IOException
+	private void convertReplacedChar(StringBuilder buf, char[] ch, int idx, boolean noTcy) throws IOException
 	{
 		//NULL文字なら何も出力しない
 		if (ch[idx] == '\0') return;
@@ -2892,6 +2874,20 @@ public class AozoraEpub3Converter
 		//if (str != null) out.write(str);
 		//else out.write(ch);
 		int length = buf.length();
+		
+		//エスケープ文字を変換
+		if (idx > 0) {
+		switch (ch[idx]) {
+			case '》':
+			case '《':
+			case '｜':
+			case '＃':
+				if (ch[idx-1] == '※') {
+					buf.setLength(length-1);//1文字削除
+				}
+			}
+		}
+		
 		if (replaceMap != null) {
 			String replaced = replaceMap.get(ch[idx]);
 			//置換して終了
@@ -2947,9 +2943,9 @@ public class AozoraEpub3Converter
 			case '―': buf.append("─"); break; //コード違いのダッシュ
 			//ローマ数字等 Readerは修正されたけど一応残す
 			//正立しない文字: ¶⇔⇒≡√∇∂∃∠⊥⌒∽∝∫∬∮∑∟⊿≠≦≧∈∋⊆⊇⊂⊃∧∨↑↓→←∀
-			//正立しない文字を正立指定
+			//正立フラグで調整
 			case '÷': case '±': case '∞': case '∴': case '∵':
-			//正立する文字 Reader最新ファームで直った
+			//正立する文字 Reader最新ファームでは修正された
 			case 'Ⅰ': case 'Ⅱ': case 'Ⅲ': case 'Ⅳ': case 'Ⅴ': case 'Ⅵ': case 'Ⅶ': case 'Ⅷ': case 'Ⅸ': case 'Ⅹ': case 'Ⅺ': case 'Ⅻ':
 			case 'ⅰ': case 'ⅱ': case 'ⅲ': case 'ⅳ': case 'ⅴ': case 'ⅵ': case 'ⅶ': case 'ⅷ': case 'ⅸ': case 'ⅹ': case 'ⅺ': case 'ⅻ':
 			case '⓪': case '①': case '②': case '③': case '④': case '⑤': case '⑥': case '⑦': case '⑧': case '⑨': case '⑩':

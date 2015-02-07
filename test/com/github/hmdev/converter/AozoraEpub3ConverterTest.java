@@ -23,10 +23,29 @@ public class AozoraEpub3ConverterTest
 	}
 	
 	@Test
+	public void convertRubyText()
+	{
+		try {
+			converter.vertical = true;
+			StringBuilder buf;
+			buf = converter.convertRubyText("※《29※》");
+			System.out.println(buf);
+			buf = converter.convertRubyText("※※＃※》");
+			System.out.println(buf);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
 	public void testConvertGaijiChuki()
 	{
 		try {
 			String str;
+			str = converter.convertGaijiChuki("｜※［＃縦線］縦線※［＃縦線］《※［＃縦線］たてせん※［＃縦線］》", true, true);
+			System.out.println(str);
+			
 			str = converter.convertGaijiChuki("※［＃U+845b］U+845b", true, true);
 			System.out.println(str);
 			str = converter.convertGaijiChuki("※［＃u+845b-e0100］u+845b-e0100", true, true);
