@@ -69,13 +69,13 @@ public class AozoraEpub3Converter
 	/** 改ページ後を目次に追加 */
 	boolean chapterSection = true;
 	
-	/** 4バイト文字を表示 */
-	boolean gaiji32 = false;
+	/** 濁点出力 0=そのまま 1=重ねる 2=フォント利用 */
+	int dakutenType = 1;
 	
 	/** 漢字用IVS(U+FE00-FE0F)を出力 */
-	boolean printIVSBMP = false;
+	boolean printIvsBMP = false;
 	/** 漢字用IVS(U+E0100-E01EF)を出力 */
-	boolean printIVSSSP = true;
+	boolean printIvsSSP = true;
 	
 	/** 奥付を別ページ */
 	boolean separateColophon = true;
@@ -484,11 +484,13 @@ public class AozoraEpub3Converter
 		this.autoYokoNum3 = autoYokoNum3;
 		this.autoYokoEQ1 = autoYokoEQ1;
 	}
-	/**  4バイト文字変換を設定
-	 * @param gaiji32 4バイト文字変換するならtrue */
-	public void setGaiji32(boolean gaiji32)
+	/** 文字出力設定
+	 * @param dakuten 濁点出力設定 0=そのまま 1=重ねる 2=フォント利用 */
+	public void setCharOutput(int dakutenType, boolean printIvsBMP, boolean printIvsSSP)
 	{
-		this.gaiji32 = gaiji32;
+		this.dakutenType = dakutenType;
+		this.printIvsBMP = printIvsBMP;
+		this.printIvsSSP = printIvsSSP;
 	}
 	
 	/** コメント行内出力設定 */
@@ -2268,12 +2270,6 @@ public class AozoraEpub3Converter
 			switch (ch[idx]) {
 			case '\0':
 				break;
-			/*case 0xFE00: case 0xFE01: case 0xFE02: case 0xFE03:
-			case 0xFE04: case 0xFE05: case 0xFE06: case 0xFE07:
-			case 0xFE08: case 0xFE09: case 0xFE0A: case 0xFE0B:
-			case 0xFE0C: case 0xFE0D: case 0xFE0E: case 0xFE0F:
-				LogAppender.info(lineIdNum, "異体字セレクタ("+Integer.toHexString(ch[idx])+")は出力しません");
-				break;*/
 			case '&': buf.append("&amp;"); break;
 			case '<': buf.append("&lt;"); break;
 			case '>': buf.append("&gt;"); break;
@@ -2473,7 +2469,7 @@ public class AozoraEpub3Converter
 						if (gaijiFileName != null) {
 							//フォントファイルを出力対象に追加して外字タグ出力
 							this.printGlyphFontTag(buf, gaijiFileName, className);
-							LogAppender.info(lineNum, "外字フォント利用(異体字)", ""+ch[i]+ch[i+1]+ch[i+2]+ch[i+3]+"("+gaijiFileName+")");
+							LogAppender.info(lineNum, "外字フォント利用(IVS含む)", ""+ch[i]+ch[i+1]+ch[i+2]+ch[i+3]+"("+gaijiFileName+")");
 							i+=3; //IVSの次へ
 							continue;
 						}
@@ -2489,14 +2485,14 @@ public class AozoraEpub3Converter
 						}
 					}
 					//4バイト文字とIVSを出力
-					if (!gaiji32) {
+					/*if (!gaiji32) {
 						//4バイト文字を出力しない
 						buf.append("〓");
 						i+=3; //IVSの次へ
 						LogAppender.info(lineNum, "4バイト文字とIVSを除外", "-"+ch[i]+ch[i+1]+"("+Integer.toHexString(code)+"+"+ivsCode+")");
 						continue;
-					}
-					if (printIVSSSP) {
+					}*/
+					if (printIvsSSP) {
 						if (this.vertical) buf.append(chukiMap.get("正立")[0]);
 						buf.append(ch[i]);
 						buf.append(ch[i+1]);
@@ -2508,7 +2504,7 @@ public class AozoraEpub3Converter
 					} else {
 						buf.append(ch[i]);
 						buf.append(ch[i+1]);
-						LogAppender.info(lineNum, "IVSを除外",
+						LogAppender.info(lineNum, "IVS除外",
 								""+ch[i]+ch[i+1]+"("+Integer.toHexString(code)+") -"+ivsCode);
 					}
 					i+=3; //IVSの次へ
@@ -2522,20 +2518,20 @@ public class AozoraEpub3Converter
 						if (gaijiFileName != null) {
 							//フォントファイルを出力対象に追加して外字タグ出力
 							this.printGlyphFontTag(buf, gaijiFileName, className);
-							LogAppender.info(lineNum, "外字フォント利用(異体字)", ""+ch[i]+ch[i+1]+ch[i+2]+"("+gaijiFileName+")");
+							LogAppender.info(lineNum, "外字フォント利用(IVS含む)", ""+ch[i]+ch[i+1]+ch[i+2]+"("+gaijiFileName+")");
 							i+=2; //IVSの次へ
 							continue;
 						}
 					}
 					//4バイト文字とIVSを出力
-					if (!gaiji32) {
+					/*if (!gaiji32) {
 						//4バイト文字を出力しない
 						buf.append("〓");
 						i+=2; //IVSの次へ
 						LogAppender.info(lineNum, "4バイト文字とIVSを除外", "-"+ch[i]+ch[i+1]+"("+Integer.toHexString(code)+"+"+(Integer.toHexString(ch[i+2]))+")");
 						continue;
-					}
-					if (printIVSBMP) {
+					}*/
+					if (printIvsBMP) {
 						if (this.vertical) buf.append(chukiMap.get("正立")[0]);
 						buf.append(ch[i]);
 						buf.append(ch[i+1]);
@@ -2546,7 +2542,7 @@ public class AozoraEpub3Converter
 					} else {
 						buf.append(ch[i]);
 						buf.append(ch[i+1]);
-						LogAppender.info(lineNum, "IVSを除外",
+						LogAppender.info(lineNum, "IVS除外",
 								""+ch[i]+ch[i+1]+"("+Integer.toHexString(code)+") -"+(Integer.toHexString(ch[i+2]))+")");
 					}
 					i+=2; //IVSの次へ
@@ -2563,14 +2559,14 @@ public class AozoraEpub3Converter
 					}
 				}
 				//通常の4バイト文字
-				if (!gaiji32) {
+				/*if (!gaiji32) {
 					//4バイト文字を出力しない
 					buf.append("〓");
-				} else {
+				} else {*/
 					buf.append(ch[i]);
 					buf.append(ch[i+1]);
 					LogAppender.info(lineNum, "拡張漢字出力", ""+ch[i]+ch[i+1]+"("+Integer.toHexString(code)+")");
-				}
+				/*}*/
 				i++; //次の文字へ
 				continue;
 				
@@ -2587,7 +2583,7 @@ public class AozoraEpub3Converter
 					gaijiFileName = ivs16FontMap.get(className);
 					if (gaijiFileName != null) {
 						this.printGlyphFontTag(buf, gaijiFileName, className);
-						LogAppender.info(lineNum, "外字フォント利用(異体字)", ""+ch[i]+"("+gaijiFileName+")");
+						LogAppender.info(lineNum, "外字フォント利用(IVS含む)", ""+ch[i]+"("+gaijiFileName+")");
 						i+=2; //IVSの次へ
 						continue;
 					}
@@ -2602,7 +2598,7 @@ public class AozoraEpub3Converter
 					}
 				}
 				//2バイト文字とIVSを出力
-				if (printIVSSSP) {
+				if (printIvsSSP) {
 					if (this.vertical) buf.append(chukiMap.get("正立")[0]);
 					buf.append(ch[i]);
 					buf.append(ch[i+1]);
@@ -2612,7 +2608,7 @@ public class AozoraEpub3Converter
 							ch[i]+"("+Integer.toHexString(ch[i])+"+"+ivsCode+")");
 				} else {
 					buf.append(ch[i]);
-					LogAppender.info(lineNum, "IVSを除外",
+					LogAppender.info(lineNum, "IVS除外",
 							ch[i]+"("+Integer.toHexString(ch[i])+") -"+ivsCode);
 				}
 				i+=2; //IVSの次へ
@@ -2625,7 +2621,7 @@ public class AozoraEpub3Converter
 					gaijiFileName = ivs32FontMap.get(className);
 					if (gaijiFileName != null) {
 						this.printGlyphFontTag(buf, gaijiFileName, className);
-						LogAppender.info(lineNum, "外字フォント利用(異体字)", ""+ch[i]+"("+gaijiFileName+")");
+						LogAppender.info(lineNum, "外字フォント利用(IVS含む)", ""+ch[i]+"("+gaijiFileName+")");
 						i+=1; //IVSの次へ
 						continue;
 					}
@@ -2643,13 +2639,13 @@ public class AozoraEpub3Converter
 				}
 				
 				//2バイト文字とIVSを出力
-				if (printIVSBMP) {
+				if (printIvsBMP) {
 					buf.append(ch[i]);
 					buf.append(ch[i+2]);
 					LogAppender.info(lineNum, "IVSを出力します", ch[i]+"("+Integer.toHexString(ch[i])+"+"+Integer.toHexString(ch[i+1])+")");
 				} else {
 					buf.append(ch[i]);
-					LogAppender.info(lineNum, "IVSを除外",  ch[i]+"("+Integer.toHexString(ch[i])+") -"+Integer.toHexString(ch[i+1]));
+					LogAppender.info(lineNum, "IVS除外",  ch[i]+"("+Integer.toHexString(ch[i])+") -"+Integer.toHexString(ch[i+1]));
 				}
 				i++; //IVSの次へ
 				continue;
@@ -2777,14 +2773,14 @@ public class AozoraEpub3Converter
 					if ('ぁ' <= ch[i] && ch[i] <= 'ん' || 'ぁ' <= ch[i] && ch[i] <= 'ヶ' || ch[i]=='ゖ' || ch[i]=='ㇷ' || ch[i]=='ー' || ch[i]=='〻') {
 						//通常の濁点文字ならその文字で出力
 						if (ch[i+1]=='゛' && ('か' <= ch[i] && ch[i] <= 'と' || 'カ' <= ch[i] && ch[i] <= 'ト')) {
-							ch[i] = (char)((int)ch[i]+(int)'が'-(int)'か');
+							ch[i] = (char)((int)ch[i]+1);
 							buf.append(ch[i]);
 							i++;
 							continue;
 						}
 						if ('は' <= ch[i] && ch[i] <= 'ほ' || 'ハ' <= ch[i] && ch[i] <= 'ホ') {
-							if (ch[i+1]=='゛') ch[i] = (char)((int)ch[i]+(int)'ば'-(int)'は');
-							else ch[i] = (char)((int)ch[i]+(int)'ぱ'-(int)'は');
+							if (ch[i+1]=='゛') ch[i] = (char)((int)ch[i]+1);
+							else ch[i] = (char)((int)ch[i]+2);
 							buf.append(ch[i]);
 							i++;
 							continue;
@@ -2795,18 +2791,22 @@ public class AozoraEpub3Converter
 							i++;
 							continue;
 						}
-						//それ以外はspanで重ねる
-						buf.append("<span class=\"dakuten\">");
-						buf.append(ch[i]);
-						buf.append("<span>");
-						if (ch[i+1]=='゛') {
-							buf.append("゛");
-						} else {
-							buf.append("゜");
+						//濁点をspanで重ねて表示
+						if (this.dakutenType == 1) {
+							buf.append("<span class=\"dakuten\">");
+							buf.append(ch[i]);
+							buf.append("<span>");
+							if (ch[i+1]=='゛') {
+								buf.append("゛");
+							} else {
+								buf.append("゜");
+							}
+							buf.append("</span></span>");
+							i++;
+							continue;
 						}
-						buf.append("</span></span>");
-						i++;
-						continue;
+						//フォントを利用
+						
 					}
 				}
 				

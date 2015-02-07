@@ -131,7 +131,7 @@ public class AozoraEpub3
 				try { titlePage =Integer.parseInt(props.getProperty("TitlePage")); } catch (Exception e) {}
 			}
 			boolean withMarkId = "1".equals(props.getProperty("MarkId"));
-			boolean gaiji32 = "1".equals(props.getProperty("Gaiji32"));
+			//boolean gaiji32 = "1".equals(props.getProperty("Gaiji32"));
 			boolean commentPrint = "1".equals(props.getProperty("CommentPrint"));
 			boolean commentConvert = "1".equals(props.getProperty("CommentConvert"));
 			boolean autoYoko = "1".equals(props.getProperty("AutoYoko"));
@@ -280,8 +280,12 @@ public class AozoraEpub3
 			aozoraConverter.setWithMarkId(withMarkId);
 			//変換オプション設定
 			aozoraConverter.setAutoYoko(autoYoko, autoYokoNum1, autoYokoNum3, autoYokoEQ1);
-			//4バイト文字出力
-			aozoraConverter.setGaiji32(gaiji32);
+			//文字出力設定
+			int dakutenType = 0; try { dakutenType = Integer.parseInt(props.getProperty("DakutenType")); } catch (Exception e) {}
+			boolean printIvsBMP = "1".equals(props.getProperty("IvsBMP"));
+			boolean printIvsSSP = "1".equals(props.getProperty("IvsSSP"));
+			
+			aozoraConverter.setCharOutput(dakutenType, printIvsBMP, printIvsSSP);
 			//全角スペースの禁則
 			aozoraConverter.setSpaceHyphenation(spaceHyp);
 			//コメント
