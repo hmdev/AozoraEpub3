@@ -29,7 +29,8 @@ public class AozoraGaijiConverter
 	public AozoraGaijiConverter(String jarPath) throws IOException
 	{
 		//初期化
-		//ファイルチェック取得
+		//ファイルチェック取得 IVS優先
+		this.loadChukiFile(new File(jarPath+"chuki_ivs.txt"), chukiUtfMap, false);
 		this.loadChukiFile(new File(jarPath+"chuki_utf.txt"), chukiUtfMap, false);
 		this.loadChukiFile(new File(jarPath+"chuki_alt.txt"), chukiAltMap, true);
 	}
@@ -43,7 +44,6 @@ public class AozoraGaijiConverter
 		int lineNum = 0;
 		try {
 			while ((line = src.readLine()) != null) {
-				lineNum++;
 				if (line.length() > 0 && line.charAt(0)!='#') {
 					try {
 						String[] values = line.split("\t");
@@ -53,14 +53,17 @@ public class AozoraGaijiConverter
 							if (end == -1) end = values[1].length()-1;
 							String chuki = values[1].substring(3, end);
 							//System.out.println(chuki+" , "+values[valueIdx]);
-							chukiMap.put(chuki, values[0]);
+							if (chukiMap.containsKey(chuki)) LogAppender.warn(lineNum, "外字注記定義重複", chuki);
+							else chukiMap.put(chuki, values[0]);
 						} else {
-							chukiMap.put(values[1], values[0]);
+							if (chukiMap.containsKey(values[1])) LogAppender.warn(lineNum, "外字注記定義重複", values[1]);
+							else chukiMap.put(values[1], values[0]);
 						}
 					} catch (Exception e) {
 						LogAppender.error(lineNum, srcFile.getName(), line);
 					}
 				}
+				lineNum++;
 			}
 		} finally {
 			src.close();

@@ -2201,11 +2201,12 @@ public class AozoraEpub3Applet extends JApplet
 		jTextArea.setBorder(new LineBorder(Color.white, 3));
 		//new DropTarget(jTextArea, DnDConstants.ACTION_COPY_OR_MOVE, new DropListener(), true);
 		jTextArea.setTransferHandler(new TextAreaTransferHandler("text"));
-		// create paste-url action
+		jTextArea.getActionMap().put("copy-text", new CopyTextAction());
 		jTextArea.getActionMap().put("paste-url", new PasteUrlAction());
 		// create new inputmap locally
 		InputMap jtxInputMap = new InputMap();
 		jtxInputMap.setParent(jTextArea.getInputMap());
+		jtxInputMap.put(KeyStroke.getKeyStroke("ctrl C"), "copy-text");
 		jtxInputMap.put(KeyStroke.getKeyStroke("ctrl V"), "paste-url");
 		jTextArea.setInputMap(JComponent.WHEN_FOCUSED, jtxInputMap);
 		//メニュー
@@ -2926,19 +2927,34 @@ public class AozoraEpub3Applet extends JApplet
 		}
 	}*/
 	
-	/** TextAreaをペーストに対応させるTextAction */
+	/** TextAreaの選択文字をコピーするTextAction */
+	@SuppressWarnings("serial")
+	class CopyTextAction extends TextAction
+	{
+		CopyTextAction() { super("copy-text"); }
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			JTextComponent target = getTextComponent(e);
+			if (target != null) {
+				String selected = target.getSelectedText();
+				if (!"".equals(selected)) {
+					getToolkit().getSystemClipboard().setContents(new StringSelection(selected), null);
+				}
+			}
+		}
+	}
+	/** TextAreaにペーストするTextAction */
 	@SuppressWarnings("serial")
 	class PasteUrlAction extends TextAction
 	{
 		PasteUrlAction() { super("paste-url"); }
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			//LogAppender.println("paste url action");
 			JTextComponent target = getTextComponent(e);
 			if (target != null) {
-				Clipboard cb = Toolkit.getDefaultToolkit().getSystemClipboard();
-				TransferHandler th = target.getTransferHandler();
-				th.importData(new TransferHandler.TransferSupport(target, cb.getContents(null)));
+				target.getTransferHandler().importData(
+					new TransferHandler.TransferSupport(target, Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null))
+				);
 			}
 		}
 	}
@@ -4587,7 +4603,7 @@ public class AozoraEpub3Applet extends JApplet
 		//文字
 		props.setProperty("DakutenType", this.jRadioDakutenType0.isSelected()?"0":"1");
 		props.setProperty("IvsBMP", this.jCheckIvsBMP.isSelected()?"1":"");
-		props.setProperty("IvsSSP", this.jCheckIvsBMP.isSelected()?"1":"");
+		props.setProperty("IvsSSP", this.jCheckIvsSSP.isSelected()?"1":"");
 		
 		//Web
 		props.setProperty("WebInterval", this.jTextWebInterval.getText());
