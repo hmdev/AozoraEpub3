@@ -84,12 +84,20 @@ public class CharUtils
 	/** ひらがなかチェック 半角濁点半濁点は全角に変換済 */
 	static public boolean isHiragana(char ch)
 	{
-		return ('ぁ'<=ch && ch<='ん') || 'ゖ'==ch || 'ー'==ch || 'ゝ'==ch || 'ゞ'==ch || 'ヽ'==ch || 'ヾ'==ch || '゛'==ch || '゜'==ch;// || 'ﾞ'==ch || 'ﾟ'== ch;
+		return ('ぁ'<=ch && ch<='ん') || 'ゕ'==ch || 'ゖ'==ch || 'ー'==ch || 'ゝ'==ch || 'ゞ'==ch || 'ヽ'==ch || 'ヾ'==ch || '゛'==ch || '゜'==ch;// || 'ﾞ'==ch || 'ﾟ'== ch;
 	}
 	/** カタカナかチェック 半角濁点半濁点は全角に変換済 */
 	static public boolean isKatakana(char ch)
 	{
-		return ('ァ'<=ch && ch<='ヶ') || 'ㇷ'==ch || 'ー'==ch || 'ゝ'==ch || 'ゞ'==ch || 'ヽ'==ch || 'ヾ'==ch || '゛'==ch || '゜'==ch;// || 'ﾞ'==ch || 'ﾟ'== ch;
+		if ('ァ'<=ch && ch<='ヶ') return true;
+		switch (ch) {
+		case 'ァ': case 'ィ': case 'ゥ': case 'ェ': case 'ォ': case 'ヵ': case 'ㇰ': case 'ヶ': case 'ㇱ': case 'ㇲ': case 'ッ': case 'ㇳ': case 'ㇴ':
+		case 'ㇵ': case 'ㇶ': case 'ㇷ': case 'ㇸ': case 'ㇹ': case 'ㇺ': case 'ャ': case 'ュ': case 'ョ': case 'ㇻ': case 'ㇼ': case 'ㇽ': case 'ㇾ': case 'ㇿ': case 'ヮ':
+		case 'ー': case 'ゝ': case 'ゞ': case 'ヽ': case 'ヾ': case '゛': case '゜':
+		//case 'ﾞ': case 'ﾟ':
+			return true;
+		}
+		return false;
 	}
 	
 	static public boolean isSpace(String line)

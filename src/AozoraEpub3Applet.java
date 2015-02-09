@@ -322,6 +322,7 @@ public class AozoraEpub3Applet extends JApplet
 	//文字
 	JRadioButton jRadioDakutenType0;
 	JRadioButton jRadioDakutenType1;
+	JRadioButton jRadioDakutenType2;
 	JCheckBox jCheckIvsBMP;
 	JCheckBox jCheckIvsSSP;
 	
@@ -402,7 +403,7 @@ public class AozoraEpub3Applet extends JApplet
 	public void init()
 	{
 		super.init();
-		this.setSize(new Dimension(600, 400));
+		this.setSize(new Dimension(520, 460));
 		
 		//パス関連初期化
 		//this.jarPath = getClass().getClassLoader().getResource("").getFile();
@@ -2049,11 +2050,17 @@ public class AozoraEpub3Applet extends JApplet
 		panel.add(jRadioDakutenType0);
 		group.add(jRadioDakutenType0);
 		jRadioDakutenType1 = new JRadioButton("重ねる", true);
-		jRadioDakutenType1.setToolTipText("Reader,Kobo,Kindle以外はずれる場合があります"); 
+		jRadioDakutenType1.setToolTipText("Reader,Kobo,Kindle以外はずれる場合があります。ルビ内はそのまま出力します"); 
 		jRadioDakutenType1.setBorder(padding2);
 		jRadioDakutenType1.setFocusPainted(false);
 		panel.add(jRadioDakutenType1);
 		group.add(jRadioDakutenType1);
+		jRadioDakutenType2 = new JRadioButton("フォント", true);
+		jRadioDakutenType2.setToolTipText("一文字フォントを利用します。端末によっては太字斜体表示できません"); 
+		jRadioDakutenType2.setBorder(padding2);
+		jRadioDakutenType2.setFocusPainted(false);
+		panel.add(jRadioDakutenType2);
+		group.add(jRadioDakutenType2);
 		
 		panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
@@ -2064,7 +2071,7 @@ public class AozoraEpub3Applet extends JApplet
 		jCheckIvsBMP.setFocusPainted(false);
 		jCheckIvsBMP.setBorder(padding2);
 		panel.add(jCheckIvsBMP);
-		jCheckIvsSSP = new JCheckBox("漢字用(U+E0100-E010EF)", false);
+		jCheckIvsSSP = new JCheckBox("漢字用(U+E0100-E01EF)", false);
 		jCheckIvsSSP.setToolTipText("漢字用のIVSを出力します"); 
 		jCheckIvsSSP.setFocusPainted(false);
 		jCheckIvsSSP.setBorder(padding2);
@@ -3238,7 +3245,7 @@ public class AozoraEpub3Applet extends JApplet
 		int fontSize = 100;
 		try { fontSize = (int)Float.parseFloat(jComboFontSize.getEditor().getItem().toString()); } catch (Exception e) {}
 		
-		int dakutenType = jRadioDakutenType0.isSelected() ? 0 : 1;
+		int dakutenType = jRadioDakutenType0.isSelected() ? 0 : (jRadioDakutenType1.isSelected() ? 1 : 2);
 		
 		this.epub3Writer.setStyles(pageMargin, bodyMargin, lineHeight, fontSize, jCheckBoldUseGothic.isSelected(), jCheckGothicUseBold.isSelected());
 		
@@ -4446,6 +4453,7 @@ public class AozoraEpub3Applet extends JApplet
 		if (propValue != null) {
 			jRadioDakutenType0.setSelected("0".equals(propValue));
 			jRadioDakutenType1.setSelected("1".equals(propValue));
+			jRadioDakutenType2.setSelected("2".equals(propValue));
 		}
 		setPropsSelected(jCheckIvsBMP, props, "IvsBMP");
 		setPropsSelected(jCheckIvsSSP, props, "IvsSSP");
@@ -4601,7 +4609,7 @@ public class AozoraEpub3Applet extends JApplet
 		props.setProperty("BoldUseGothic", this.jCheckBoldUseGothic.isSelected()?"1":"");
 		props.setProperty("GothicUseBold", this.jCheckGothicUseBold.isSelected()?"1":"");
 		//文字
-		props.setProperty("DakutenType", this.jRadioDakutenType0.isSelected()?"0":"1");
+		props.setProperty("DakutenType", this.jRadioDakutenType0.isSelected()?"0":(this.jRadioDakutenType1.isSelected()?"1":"2"));
 		props.setProperty("IvsBMP", this.jCheckIvsBMP.isSelected()?"1":"");
 		props.setProperty("IvsSSP", this.jCheckIvsSSP.isSelected()?"1":"");
 		

@@ -102,6 +102,9 @@ left: -.2em;
 /* 外字フォント */
 .glyph {
 width: 1em;
+text-orientation: upright;
+-webkit-text-orientation: upright;
+-epub-text-orientation: upright;
 }
 
 /* 罫囲み */

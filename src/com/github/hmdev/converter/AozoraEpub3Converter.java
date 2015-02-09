@@ -2440,12 +2440,12 @@ public class AozoraEpub3Converter
 	}
 	
 	/** １文字フォント用タグを出力 */
-	private boolean printGlyphFontTag(StringBuilder buf, String gaijiFileName, String className)
+	private boolean printGlyphFontTag(StringBuilder buf, String gaijiFileName, String className, char baseChar)
 	{
 		File gaijiFile = new File(writer.getGaijiFontPath()+gaijiFileName);
 		if (!gaijiFile.isFile()) return false;
 		writer.addGaijiFont(className, gaijiFile);
-		buf.append("<span class=\"glyph ").append(className).append("\">〓</span>");
+		buf.append("<span class=\"glyph ").append(className).append("\">").append(baseChar).append("</span>");
 		return true;
 	}
 	
@@ -2470,7 +2470,7 @@ public class AozoraEpub3Converter
 						gaijiFileName = ivs32FontMap.get(className);
 						if (gaijiFileName != null) {
 							//フォントファイルを出力対象に追加して外字タグ出力
-							if (this.printGlyphFontTag(buf, gaijiFileName, className)) {
+							if (this.printGlyphFontTag(buf, gaijiFileName, className, '〓')) {
 								LogAppender.info(lineNum, "外字フォント利用(IVS含む)", ""+ch[i]+ch[i+1]+ch[i+2]+ch[i+3]+"("+gaijiFileName+")");
 								i+=3; //IVSの次へ
 								continue;
@@ -2481,7 +2481,7 @@ public class AozoraEpub3Converter
 						//1文字フォントの後ろにIVSがあるかチェック
 						gaijiFileName = utf32FontMap.get(code);
 						if (gaijiFileName != null) {
-							if (this.printGlyphFontTag(buf, gaijiFileName, "u"+Integer.toHexString(code))) {
+							if (this.printGlyphFontTag(buf, gaijiFileName, "u"+Integer.toHexString(code), '〓')) {
 								LogAppender.warn(lineNum, "外字フォント利用(IVS除外)", ""+ch[i]+ch[i+1]+"("+gaijiFileName+") -"+ivsCode);
 								i+=3; //IVSの次へ
 								continue;
@@ -2521,7 +2521,7 @@ public class AozoraEpub3Converter
 						gaijiFileName = ivs32FontMap.get(className);
 						if (gaijiFileName != null) {
 							//フォントファイルを出力対象に追加して外字タグ出力
-							if (this.printGlyphFontTag(buf, gaijiFileName, className)) {
+							if (this.printGlyphFontTag(buf, gaijiFileName, className, '〓')) {
 								LogAppender.info(lineNum, "外字フォント利用(IVS含む)", ""+ch[i]+ch[i+1]+ch[i+2]+"("+gaijiFileName+")");
 								i+=2; //IVSの次へ
 								continue;
@@ -2557,7 +2557,7 @@ public class AozoraEpub3Converter
 				if (utf32FontMap != null) {
 					gaijiFileName = utf32FontMap.get(code);
 					if (gaijiFileName != null) {
-						if (this.printGlyphFontTag(buf, gaijiFileName, "u"+Integer.toHexString(code))) {
+						if (this.printGlyphFontTag(buf, gaijiFileName, "u"+Integer.toHexString(code), '〓')) {
 							LogAppender.info(lineNum, "外字フォント利用", ""+ch[i]+ch[i+1]+"("+gaijiFileName+")");
 							i++; //次の文字へ
 							continue;
@@ -2588,7 +2588,7 @@ public class AozoraEpub3Converter
 					String className = "u"+Integer.toHexString((int)ch[i])+"-u"+ivsCode;
 					gaijiFileName = ivs16FontMap.get(className);
 					if (gaijiFileName != null) {
-						if (this.printGlyphFontTag(buf, gaijiFileName, className)) {
+						if (this.printGlyphFontTag(buf, gaijiFileName, className, '〓')) {
 							LogAppender.info(lineNum, "外字フォント利用(IVS含む)", ""+ch[i]+ch[i+1]+ch[i+2]+"("+gaijiFileName+")");
 							i+=2; //IVSの次へ
 							continue;
@@ -2598,7 +2598,7 @@ public class AozoraEpub3Converter
 				if (utf16FontMap != null && utf16FontMap.containsKey((int)ch[i])) {
 					gaijiFileName = utf16FontMap.get((int)ch[i]);
 					if (gaijiFileName != null) {
-						if (this.printGlyphFontTag(buf, gaijiFileName, "u"+Integer.toHexString((int)ch[i]))) {
+						if (this.printGlyphFontTag(buf, gaijiFileName, "u"+Integer.toHexString((int)ch[i]), '〓')) {
 							LogAppender.warn(lineNum, "外字フォント利用(IVS除外)", ""+ch[i]+"("+gaijiFileName+") -"+ivsCode);
 							i+=2; //IVSの次へ
 							continue;
@@ -2628,7 +2628,7 @@ public class AozoraEpub3Converter
 					String className = "u"+Integer.toHexString(ch[i])+"-u"+Integer.toHexString(ch[i+1]);
 					gaijiFileName = ivs32FontMap.get(className);
 					if (gaijiFileName != null) {
-						if (this.printGlyphFontTag(buf, gaijiFileName, className)) {
+						if (this.printGlyphFontTag(buf, gaijiFileName, className, '〓')) {
 							LogAppender.info(lineNum, "外字フォント利用(IVS含む)", ""+ch[i]+"("+gaijiFileName+")");
 							i++; //IVSの次へ
 							continue;
@@ -2639,7 +2639,7 @@ public class AozoraEpub3Converter
 				if (utf16FontMap != null && utf16FontMap.containsKey((int)ch[i])) {
 					gaijiFileName = utf16FontMap.get((int)ch[i]);
 					if (gaijiFileName != null) {
-						if (this.printGlyphFontTag(buf, gaijiFileName, "u"+Integer.toHexString((int)ch[i]))) {
+						if (this.printGlyphFontTag(buf, gaijiFileName, "u"+Integer.toHexString((int)ch[i]), '〓')) {
 							LogAppender.info(lineNum, "外字フォント利用(IVS除外)", ""+ch[i]+"("+gaijiFileName+") -"+Integer.toHexString(ch[i+1]));
 							i++; //IVSの次へ
 							continue;
@@ -2665,7 +2665,7 @@ public class AozoraEpub3Converter
 				//通常文字の外字指定 ほぼすべての文字が対象になるので先にcontainsKeyで判定
 				gaijiFileName = utf16FontMap.get((int)ch[i]);
 				if (gaijiFileName != null) {
-					if (this.printGlyphFontTag(buf, gaijiFileName, "u"+Integer.toHexString((int)ch[i]))) {
+					if (this.printGlyphFontTag(buf, gaijiFileName, "u"+Integer.toHexString((int)ch[i]), '〓')) {
 						LogAppender.info(lineNum, "外字フォント利用", ""+ch[i]+"("+gaijiFileName+")");
 						//次の文字へ
 						continue;
@@ -2777,46 +2777,55 @@ public class AozoraEpub3Converter
 					}
 					break;
 				}
-				
+			}
+			
+			if (this.vertical) {
 				//ひらがな/カタカナ＋濁点/半濁点 結合文字も対応
 				if (i+1<ch.length && (ch[i+1]=='゛' || ch[i+1]=='゜')) {
-					if ('ぁ' <= ch[i] && ch[i] <= 'ん' || 'ぁ' <= ch[i] && ch[i] <= 'ヶ' || ch[i]=='ゖ' || ch[i]=='ㇷ' || ch[i]=='ー' || ch[i]=='〻') {
+					if (CharUtils.isHiragana(ch[i]) || CharUtils.isKatakana(ch[i]) || ch[i]=='〻') {
 						//通常の濁点文字ならその文字で出力
-						if (ch[i+1]=='゛' && ('か' <= ch[i] && ch[i] <= 'と' || 'カ' <= ch[i] && ch[i] <= 'ト')) {
-							ch[i] = (char)((int)ch[i]+1);
-							buf.append(ch[i]);
-							i++;
-							continue;
+						if (ch[i+1]=='゛') {
+							if ('ッ' != ch[i] && ('か' <= ch[i] && ch[i] <= 'と' || 'カ' <= ch[i] && ch[i] <= 'ト')) {
+								ch[i] = (char)((int)ch[i]+1);
+								buf.append(ch[i]);
+								i++;
+								continue;
+							}
+							if ('ウ' == ch[i]) { buf.append('ヴ'); i++; continue; }
+							if ('ワ' == ch[i]) { buf.append('ヷ'); i++; continue; }
+							if ('ヲ' == ch[i]) { buf.append('ヺ'); i++; continue; }
+							if ('う' == ch[i]) { buf.append('ゔ'); i++; continue; }
+							if ('ゝ' == ch[i]) { buf.append('ゞ'); i++; continue; }
+							if ('ヽ' == ch[i]) { buf.append('ヾ'); i++; continue; }
 						}
 						if ('は' <= ch[i] && ch[i] <= 'ほ' || 'ハ' <= ch[i] && ch[i] <= 'ホ') {
-							if (ch[i+1]=='゛') ch[i] = (char)((int)ch[i]+1);
-							else ch[i] = (char)((int)ch[i]+2);
-							buf.append(ch[i]);
+							if (ch[i+1]=='゛') buf.append((char)((int)ch[i]+1));
+							else buf.append((char)((int)ch[i]+2));
 							i++;
 							continue;
 						}
-						if ('ウ' == ch[i] && ch[i+1]=='゛') {
-							ch[i] = 'ヴ';
-							buf.append(ch[i]);
-							i++;
-							continue;
-						}
-						//濁点をspanで重ねて表示
-						if (this.dakutenType == 1) {
+						if (this.dakutenType == 1 && !(inYoko || noTcy)) {
+							//濁点をspanで重ねて表示 ルビ内無効
 							buf.append("<span class=\"dakuten\">");
 							buf.append(ch[i]);
 							buf.append("<span>");
-							if (ch[i+1]=='゛') {
-								buf.append("゛");
-							} else {
-								buf.append("゜");
-							}
+							if (ch[i+1]=='゛') buf.append("゛");
+							else buf.append("゜");
 							buf.append("</span></span>");
 							i++;
 							continue;
+						} else if (this.dakutenType == 2) {
+							//1文字フォントで出力
+							String className = "u"+Integer.toHexString(ch[i]);
+							if (ch[i+1]=='゛') className += "-u3099";
+							else className += "-u309a";
+							//if (this.printGlyphFontTag(buf, "dakuten/"+className+".ttf", className, '〓')) {
+							if (this.printGlyphFontTag(buf, "dakuten/"+className+".ttf", className, ch[i])) {
+								LogAppender.info(lineNum, "濁点フォント利用", ""+ch[i]+ch[i+1]);
+								i++;
+								continue;
+							}
 						}
-						//フォントを利用
-						
 					}
 				}
 				
