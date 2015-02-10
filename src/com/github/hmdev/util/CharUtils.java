@@ -84,7 +84,9 @@ public class CharUtils
 	/** ひらがなかチェック 半角濁点半濁点は全角に変換済 */
 	static public boolean isHiragana(char ch)
 	{
-		return ('ぁ'<=ch && ch<='ん') || 'ゕ'==ch || 'ゖ'==ch || 'ー'==ch || 'ゝ'==ch || 'ゞ'==ch || 'ヽ'==ch || 'ヾ'==ch || '゛'==ch || '゜'==ch;// || 'ﾞ'==ch || 'ﾟ'== ch;
+		return ('ぁ'<=ch && ch<='ん') || 'ゕ'==ch || 'ゖ'==ch || 'ー'==ch || 'ゝ'==ch || 'ゞ'==ch || 'ヽ'==ch || 'ヾ'==ch || '゛'==ch || '゜'==ch
+				|| 'ι'==ch; //濁点処理用の例外
+				// || 'ﾞ'==ch || 'ﾟ'== ch;
 	}
 	/** カタカナかチェック 半角濁点半濁点は全角に変換済 */
 	static public boolean isKatakana(char ch)
@@ -123,7 +125,8 @@ public class CharUtils
 	static public boolean isKanji(char[] ch, int i)
 	{
 		switch (ch[i]) {
-		case '゛':
+		case '゛': case '゜':
+			//二の字点は濁点付きも漢字
 			return (i>0 && ch[i-1]=='〻');
 		case 'ノ': case 'カ': case 'ケ': case 'ヵ': case 'ヶ':
 			//漢字の間にある場合だけ漢字扱い

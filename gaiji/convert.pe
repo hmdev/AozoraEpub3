@@ -1,0 +1,26 @@
+#!/usr/local/bin/fontforge
+## Revise 1-character font from http://glyphwiki.org/
+## d:\fontforge-cygwin\cygwin\bin\fontforge.exe -script "d:\git\AozoraEpub3\gaiji\convert.pe" "d:\git\AozoraEpub3\gaiji" *.ttf
+
+output = $argv[1]
+i=2
+while (i < $argc)
+	filename = $argv[i]
+	Print(filename);
+	Open(filename);
+	ClearHints();
+	Select(0u0020);
+	Cut();
+	Select(0u3000);
+	Cut();
+	Select(0u3013);
+	CopyFgToBg();
+	ClearInstrs();
+	UnlinkReference();
+	ExpandStroke(6,1,1,0,1)
+	CorrectDirection();
+	RoundToInt();
+	SetFontHasVerticalMetrics(1);
+	Generate(output+"/"+filename);
+	i = i+1
+endloop

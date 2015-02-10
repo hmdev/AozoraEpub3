@@ -1523,7 +1523,7 @@ public class AozoraEpub3Applet extends JApplet
 		jCheckAutoYoko.setToolTipText("半角の2文字の数字、2～3文字の!?を縦中横で表示します。(前後に半角が無い場合)");
 		jCheckAutoYoko.setBorder(padding2);
 		panel.add(jCheckAutoYoko);
-		label = new JLabel("数字(");
+		label = new JLabel("+数字(");
 		label.setBorder(padding0);
 		panel.add(label);
 		//半角数字1文字縦書き
@@ -1538,7 +1538,7 @@ public class AozoraEpub3Applet extends JApplet
 		jCheckAutoYokoNum3.setIconTextGap(1);
 		jCheckAutoYokoNum3.setBorder(padding2);
 		panel.add(jCheckAutoYokoNum3);
-		label = new JLabel(") ");
+		label = new JLabel(") +");
 		label.setBorder(padding0);
 		panel.add(label);
 		//!? 1文字
