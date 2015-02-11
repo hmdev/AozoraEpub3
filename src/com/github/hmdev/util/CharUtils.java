@@ -1,5 +1,8 @@
 package com.github.hmdev.util;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * 文字変換と判別関連の関数定義クラス
  */
@@ -138,9 +141,9 @@ public class CharUtils
 	/** カタカナ以外の漢字チェック */
 	static private boolean _isKanji(char[] ch, int i)
 	{
-		char pre = i==0?(char)-1:ch[i-1];
-		char c = ch[i];
-		char suf = i+1>=ch.length?(char)-1:ch[i+1];
+		int pre = i==0?-1:ch[i-1];
+		int c = ch[i];
+		int suf = i+1>=ch.length?-1:ch[i+1];
 		switch (c) {
 		case '〓': case '〆': case '々': case '〻':
 			return true;
@@ -204,17 +207,30 @@ public class CharUtils
 	 * @prram 記号文字を短縮する */
 	static public String getChapterName(String line, int maxLength, boolean reduce)
 	{
-		String name = line.replaceAll("［＃.+?］", "").replaceAll("<[^>]+>", "")//注記とタグ除去
+		String name = line.replaceAll("［＃.+?］", "")//注記除去
 				.replaceAll("※(《|》|［|］|〔|〕|〔|〕|〔|〕|｜)", "$1") //エスケープ文字から※除外
-				.replaceFirst("^[\t| |　]+", "").replaceFirst("[\t| |　]+$","") //前後の不要な文字所除去
-				.replaceAll("〳〵", "く").replaceAll("〴〵", "ぐ").replaceAll("〻", "々");
-				//printLineBuffer内だと以下の変換が必要
-				/*.replaceAll("<span class=\"fullsp\"> </span>", "　").replaceAll(String.valueOf((char)(0x2000))+(char)(0x2000), "　")
-				.replaceAll("<rt>[^<]+</rt>", "")*/
+				.replaceAll("\t", " ").replaceFirst("^[ |　]+", "").replaceFirst("[ |　]+$",""); //前後の不要な文字所除去
 		if (reduce) name = name.replaceAll("(=|＝|-|―|─)+", "$1");//連続する記号は1つに
+		//タグはimgとaを削除
+		name = removeTag(name, null, "img|a", "a");
 		if (maxLength == 0) return name;
 		return name.length()>maxLength ? name.substring(0, maxLength)+"..." : name;
 	}
+	
+	/** 指定されたタグを削除
+	 * @param single 単独または開始タグ 属性無し
+	 * @param open 開始タグ 属性値有り
+	 * @param close 終了タグ */
+	static String removeTag(String str, String single, String open, String close)
+	{
+		if (str.indexOf('<') == -1) return str;
+		
+		if (single != null) str = Pattern.compile("< *("+single+") */? *>", Pattern.CASE_INSENSITIVE).matcher(str).replaceAll("");
+		if (open != null) str = Pattern.compile("< *("+open+") [^>]*>", Pattern.CASE_INSENSITIVE).matcher(str).replaceAll("");
+		if (close != null) str = Pattern.compile("< */ *("+close+")(>| [^>]*>)", Pattern.CASE_INSENSITIVE).matcher(str).replaceAll("");
+		return str;
+	}
+	
 	static public String getChapterName(String line, int maxLength)
 	{
 		return getChapterName(line, maxLength, true);
@@ -239,15 +255,8 @@ public class CharUtils
 	/*public static void main(String[] args)
 	{
 		try {
-			//漢字チェック
-			int utf32Code = 0x2B73F;
-			byte[] b = new byte[]{0, (byte)(utf32Code>>16), (byte)(utf32Code>>8), (byte)(utf32Code)};
-			String s = "あ"+new String(b, "UTF-32")+"漢あああ";
-			System.out.println(Integer.toHexString(s.charAt(0))+","+Integer.toHexString(s.charAt(1)));
-			int length = s.length();
-			for (int i=0; i<length; i++) {
-				System.out.println(isKanji(i==0?(char)-1:s.charAt(i-1), s.charAt(i), i+1<length?s.charAt(i+1):(char)-1));
-			}
+			System.out.println(removeTag("あ<IMG>あ<IMG1>あ<img src=\"\"/>い<A>い<A1>い<AB>う<ab href=\"\">うう<a href=\"\">え<br>え<br/>え</a>お</ab>おお", "br", "img|a", "a"));
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

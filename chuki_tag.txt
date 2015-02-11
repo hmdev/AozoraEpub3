@@ -123,8 +123,40 @@
 蛇の目傍点	<span class="double-circle">		2
 蛇の目傍点終わり	</span>		3
 
-左に傍点	<span class="left_sesame">		2
+ばつ傍点	<span class="x-dot">		2
+ばつ傍点終わり	</span>		3
+×傍点	<span class="x-dot">		2
+×傍点終わり	</span>		3
+
+左に傍点	<span class="left_emp sesame">		2
 左に傍点終わり	</span>		3
+
+左に白ゴマ傍点	<span class="left_emp open_sesame">		2
+左に白ゴマ傍点終わり	</span>		3
+
+左に丸傍点	<span class="left_emp dot">		2
+左に丸傍点終わり	</span>		3
+
+左に白丸傍点	<span class="left_emp open_dot">		2
+左に白丸傍点終わり	</span>		3
+
+左に黒三角傍点	<span class="left_emp triangle">		2
+左に黒三角傍点終わり	</span>		3
+
+左に白三角傍点	<span class="left_emp open_triangle">		2
+左に白三角傍点終わり	</span>		3
+
+左に二重丸傍点	<span class="left_emp open_double-circle">		2
+左に二重丸傍点終わり	</span>		3
+
+左に蛇の目傍点	<span class="left_emp double-circle">		2
+左に蛇の目傍点終わり	</span>		3
+
+左にばつ傍点	<span class="left_emp x-dot">		2
+左にばつ傍点終わり	</span>		3
+左に×傍点	<span class="left_emp x-dot">		2
+左に×傍点終わり	</span>		3
+
 
 ####傍線 (すべて傍線と同じ表現)
 傍線	<span class="underline">

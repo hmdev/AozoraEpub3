@@ -49,6 +49,14 @@ Changes
 　　　外字用１文字フォントの利用
 
 ----
+1.1.0b41 (2015/02/)
+　- 外字注記一覧を更新 ( http://kanji-database.sourceforge.net/aozora/gaiji.html 利用)
+　- 濁点半濁点を１文字フォントで出力
+　　ベースの文字は〓ではなく元の文字 (あ゛→<span class="glyph u3042-u3099">あ</span>)
+　　フォントはglyphwikiから取得し、fontforgeで崩れ修正とウェイト調整
+　　フォントファイルは gaiji/dakuten に配置
+　- 「ばつ傍点」「×傍点」「左に～傍点」の注記に対応 → ※ばつ傍点があるとDigitalEditions3は強制終了する
+　- 目次の <～> は img a タグのみ除去
 1.1.0b40 (2015/02/08)
 　- 濁点半濁点文字出力設定 (スタイルタブに追加)
 　- IVSの出力設定 (スタイルタブに追加)

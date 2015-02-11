@@ -153,12 +153,14 @@ text-emphasis-style: open triangle;
 -webkit-text-emphasis-style: open triangle;
 -epub-text-emphasis-style: open triangle;
 }
-span.left_sesame {
-text-emphasis-style: sesame;
+span.x-dot {
+text-emphasis-style: '×';
+-webkit-text-emphasis-style: '×';
+-epub-text-emphasis-style: '×';
+}
+span.left_emp {
 text-emphasis-position: under;
--webkit-text-emphasis-style: sesame;
 -webkit-text-emphasis-position: under;
--epub-text-emphasis-style: sesame;
 -epub-text-emphasis-position: under;
 }
 

@@ -124,8 +124,11 @@ padding: 0.25em;
 .dakuten {
 display:inline-block;
 position:relative;	
+text-orientation: upright;
+-webkit-text-orientation: upright;
+-epub-text-orientation: upright;
 }
-/* 濁点 */
+/* 濁点半濁点文字 kindleは位置が異なる */
 .dakuten span {
 position:absolute;
 top:-.7em; left:.1em;
@@ -185,12 +188,14 @@ text-emphasis-style: open triangle;
 -webkit-text-emphasis-style: open triangle;
 -epub-text-emphasis-style: open triangle;
 }
-span.left_sesame {
-text-emphasis-style: sesame;
+span.x-dot {
+text-emphasis-style: '×';
+-webkit-text-emphasis-style: '×';
+-epub-text-emphasis-style: '×';
+}
+span.left_emp {
 text-emphasis-position: under;
--webkit-text-emphasis-style: sesame;
 -webkit-text-emphasis-position: under;
--epub-text-emphasis-style: sesame;
 -epub-text-emphasis-position: under;
 }
 
