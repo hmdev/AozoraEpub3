@@ -30,14 +30,14 @@ public class AozoraGaijiConverter
 	{
 		//初期化
 		//ファイルチェック取得 IVS優先
-		this.loadChukiFile(new File(jarPath+"chuki_ivs.txt"), chukiUtfMap, false);
-		this.loadChukiFile(new File(jarPath+"chuki_utf.txt"), chukiUtfMap, false);
-		this.loadChukiFile(new File(jarPath+"chuki_alt.txt"), chukiAltMap, true);
+		this.loadChukiFile(new File(jarPath+"chuki_ivs.txt"), chukiUtfMap);
+		this.loadChukiFile(new File(jarPath+"chuki_utf.txt"), chukiUtfMap);
+		this.loadChukiFile(new File(jarPath+"chuki_alt.txt"), chukiAltMap);
 	}
 	
 	/** 注記変換ファイル読み込み 
 	 * @throws IOException */
-	private void loadChukiFile(File srcFile, HashMap<String, String> chukiMap, boolean hasChukiTag) throws IOException
+	private void loadChukiFile(File srcFile, HashMap<String, String> chukiMap) throws IOException
 	{
 		BufferedReader src = new BufferedReader(new InputStreamReader(new FileInputStream(srcFile), "UTF-8"));
 		String line;
@@ -46,19 +46,26 @@ public class AozoraGaijiConverter
 			while ((line = src.readLine()) != null) {
 				if (line.length() > 0 && line.charAt(0)!='#') {
 					try {
-						String[] values = line.split("\t");
-						//System.out.println(values[chukiIdx]+" , "+values[valueIdx]);
-						if (hasChukiTag) {
-							int end = values[1].indexOf('、');
-							if (end == -1) end = values[1].length()-1;
-							String chuki = values[1].substring(3, end);
-							//System.out.println(chuki+" , "+values[valueIdx]);
-							if (chukiMap.containsKey(chuki)) LogAppender.warn(lineNum, "外字注記定義重複", chuki);
-							else chukiMap.put(chuki, values[0]);
-						} else {
-							if (chukiMap.containsKey(values[1])) LogAppender.warn(lineNum, "外字注記定義重複", values[1]);
-							else chukiMap.put(values[1], values[0]);
-						}
+						int charStart = line.indexOf('\t');
+						if (charStart == -1) continue;
+						charStart = line.indexOf('\t', charStart+1);
+						if (charStart == -1) continue;
+						charStart++;
+						int chukiStart = line.indexOf('\t', charStart);
+						if (chukiStart == -1) continue;
+						chukiStart++;
+						if (!line.startsWith("※［＃", chukiStart)) continue;
+						int chukiEnd = line.indexOf('\t', chukiStart);
+						int chukiCode = line.indexOf('、', chukiStart);
+						if (chukiCode != -1 && line.charAt(chukiCode+1) == '「') chukiCode = line.indexOf('、', chukiCode+1);//注記内に、がある
+						if (chukiCode != -1 && (chukiEnd == -1 || chukiCode < chukiEnd)) chukiEnd = chukiCode+1;
+						if (chukiEnd == -1) chukiEnd = line.length();
+						
+						String utfChar = line.substring(charStart, chukiStart-1);
+						String chuki = line.substring(chukiStart+3, chukiEnd-1);
+						if (chukiMap.containsKey(chuki)) LogAppender.warn(lineNum, "外字注記定義重複", chuki);
+						else chukiMap.put(chuki, utfChar);
+						
 					} catch (Exception e) {
 						LogAppender.error(lineNum, srcFile.getName(), line);
 					}

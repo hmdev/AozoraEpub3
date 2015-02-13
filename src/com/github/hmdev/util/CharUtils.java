@@ -190,11 +190,43 @@ public class CharUtils
 		return text.replaceAll("［＃.+?］", "").replaceAll("<[^>]+>", "");
 	}
 	
-	/** ルビを除去 特殊文字はエスケープされている */
+	/** ルビを除去 特殊文字のエスケープ文字が含まれる */
 	static public String removeRuby(String text)
 	{
-		return text.replaceAll("([^※])《.*?[^※]》", "$1").replaceFirst("^｜", "").replaceAll("([^※])｜", "$1");
+		StringBuilder buf = new StringBuilder();
+		char[] ch = text.toCharArray();
+		boolean inRuby = false;
+		for (int i=0; i<ch.length; i++) {
+			if (inRuby) {
+				if (ch[i] == '》' && !CharUtils.isEscapedChar(ch, i)) inRuby = false;
+			} else {
+				switch (ch[i]) {
+				case '｜':
+					if (CharUtils.isEscapedChar(ch, i)) buf.append(ch[i]); 
+					break;
+				case '《':
+					if (CharUtils.isEscapedChar(ch, i)) buf.append(ch[i]);
+					else inRuby = true;
+					break;
+				default:
+					if (!inRuby) buf.append(ch[i]);
+				}
+			}
+		}
+		return buf.toString();
 	}
+	
+	/** 文字がエスケープされた特殊文字ならtrue */
+	static public boolean isEscapedChar(char[] ch, int idx)
+	{
+		boolean escaped = false;
+		for (int i=idx-1; i >= 0; i--) {
+			if (ch[i] == '※') escaped = !escaped;
+			else return escaped;
+		}
+		return escaped;
+	}
+	
 	
 	/** HTML特殊文字をエスケープ */
 	static public String escapeHtml(String text)
@@ -208,19 +240,24 @@ public class CharUtils
 	static public String getChapterName(String line, int maxLength, boolean reduce)
 	{
 		String name = line.replaceAll("［＃.+?］", "")//注記除去
-				.replaceAll("※(《|》|［|］|〔|〕|〔|〕|〔|〕|｜)", "$1") //エスケープ文字から※除外
+				.replaceAll("※(※|《|》|［|］|〔|〕|〔|〕|〔|〕|｜)", "$1") //エスケープ文字から※除外
 				.replaceAll("\t", " ").replaceFirst("^[ |　]+", "").replaceFirst("[ |　]+$",""); //前後の不要な文字所除去
 		if (reduce) name = name.replaceAll("(=|＝|-|―|─)+", "$1");//連続する記号は1つに
 		//タグはimgとaを削除
-		name = removeTag(name, null, "img|a", "a");
+		name = chapterTagOpenPattern.matcher(name).replaceAll("");
+		name = chapterTagClosePattern.matcher(name).replaceAll("");
+		
 		if (maxLength == 0) return name;
 		return name.length()>maxLength ? name.substring(0, maxLength)+"..." : name;
 	}
+	/** imgとaタグ除去用のパターン */
+	static Pattern chapterTagOpenPattern = Pattern.compile("< *(img|a) [^>]*>", Pattern.CASE_INSENSITIVE);
+	static Pattern chapterTagClosePattern = Pattern.compile("< */ *(img|a)(>| [^>]*>)", Pattern.CASE_INSENSITIVE);
 	
 	/** 指定されたタグを削除
-	 * @param single 単独または開始タグ 属性無し
-	 * @param open 開始タグ 属性値有り
-	 * @param close 終了タグ */
+	 * @param single 単独または開始タグ 属性無し 複数のタグは|でOR条件を指定
+	 * @param open 開始タグ 属性値有り 複数のタグは|でOR条件を指定
+	 * @param close 終了タグ 複数のタグは|でOR条件を指定 */
 	static String removeTag(String str, String single, String open, String close)
 	{
 		if (str.indexOf('<') == -1) return str;

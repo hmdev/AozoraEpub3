@@ -382,7 +382,7 @@ ePubファイルの修正や配布は入力データの著作権内で自由に�
 
 License
 ------------
-- SourceCode and Binaly  
+- SourceCode and Binary  
 GPL v3 ( http://www.gnu.org/licenses/gpl-3.0.html )  
 
 - Converted Data  

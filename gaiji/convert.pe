@@ -10,14 +10,14 @@ while (i < $argc)
 	Open(filename);
 	ClearHints();
 	Select(0u0020);
-	Cut();
+	Clear();
 	Select(0u3000);
-	Cut();
+	Clear();
 	Select(0u3013);
 	CopyFgToBg();
 	ClearInstrs();
 	UnlinkReference();
-	ExpandStroke(6,1,1,0,1)
+	ExpandStroke(6,0,1,0,1)
 	CorrectDirection();
 	RoundToInt();
 	SetFontHasVerticalMetrics(1);

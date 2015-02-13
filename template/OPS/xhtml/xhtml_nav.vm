@@ -20,6 +20,11 @@ li a {text-decoration:none; border-right-width:1px; border-right-style:solid; pa
 	-webkit-text-combine: horizontal;
 	-epub-text-combine: horizontal;
 }
+.upr {
+text-orientation: upright;
+-webkit-text-orientation: upright;
+-epub-text-orientation: upright;
+}
 #else
 @page {margin:.5em 0 0 .5em;}
 html {

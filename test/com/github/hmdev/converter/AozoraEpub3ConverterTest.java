@@ -23,7 +23,20 @@ public class AozoraEpub3ConverterTest
 	}
 	
 	@Test
-	public void convertRubyText()
+	public void testConvertTextLineToEpub3()
+	{
+		try {
+			String str;
+			str = converter.convertTitleLineToEpub3(converter.convertGaijiChuki("｜ルビ※［＃米印］《るび》※［＃米印］※［＃始め二重山括弧］※［＃終わり二重山括弧］", true, true));
+			System.out.println(str);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	
+	@Test
+	public void testConvertRubyText()
 	{
 		try {
 			converter.vertical = true;
