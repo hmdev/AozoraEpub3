@@ -1161,8 +1161,8 @@ public class Epub3Writer
 				srcImageFileName = altImageFileName;
 			}
 		}
+		this.imageIndex++; //0001から開始 (本文内の順番に合せるため、ファイルが無くてもカウント)
 		if (imageInfo != null) {
-			this.imageIndex++; //0001から開始 (本文内の順番に合せる用で同じ画像は出力しない)
 			String imageId = imageInfo.getId();
 			//画像は未だ出力されていない
 			if (imageId == null) {
