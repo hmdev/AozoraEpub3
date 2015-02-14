@@ -81,6 +81,13 @@ public class AozoraEpub3ConverterTest
 		try {
 			String str;
 			
+			str = converter.replaceChukiSufTag(converter.convertGaijiChuki("※［＃始め二重山括弧］１［＃「※［＃米印］※［＃始め二重山括弧］１」は中見出し］",true, false));
+			System.out.println(str);
+			
+			str = converter.replaceChukiSufTag(converter.convertGaijiChuki("　　　　　　あ※［＃米印］※［＃始め二重山括弧］１［＃「あ※［＃米印］※［＃始め二重山括弧］１」は中見出し］",true, false));
+			System.out.println(str);
+			Assert.assertEquals(str,  "　　　　　　［＃中見出し］あ※※※《１［＃中見出し終わり］");
+			
 			str = converter.replaceChukiSufTag("星状、扇形などの標本図は第一一〇及び一一一頁の一般分類の図［＃「第一一〇及び一一一頁の一般分類の図」は「第32図」を指す。］の中に示してある。");
 			System.out.println(str);
 			Assert.assertEquals(str, "星状、扇形などの標本図は第一一〇及び一一一頁の一般分類の図［＃「第一一〇及び一一一頁の一般分類の図」は「第32図」を指す。］の中に示してある。");

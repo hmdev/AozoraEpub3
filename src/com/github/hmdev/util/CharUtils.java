@@ -1,6 +1,5 @@
 package com.github.hmdev.util;
 
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -190,7 +189,7 @@ public class CharUtils
 		return text.replaceAll("［＃.+?］", "").replaceAll("<[^>]+>", "");
 	}
 	
-	/** ルビを除去 特殊文字のエスケープ文字が含まれる */
+	/** ルビを除去 特殊文字のエスケープ文字 ※※ ※《 ※》 等が含まれる */
 	static public String removeRuby(String text)
 	{
 		StringBuilder buf = new StringBuilder();
@@ -222,6 +221,16 @@ public class CharUtils
 		boolean escaped = false;
 		for (int i=idx-1; i >= 0; i--) {
 			if (ch[i] == '※') escaped = !escaped;
+			else return escaped;
+		}
+		return escaped;
+	}
+	/** 文字がエスケープされた特殊文字ならtrue */
+	static public boolean isEscapedChar(StringBuilder ch, int idx)
+	{
+		boolean escaped = false;
+		for (int i=idx-1; i >= 0; i--) {
+			if (ch.charAt(i) == '※') escaped = !escaped;
 			else return escaped;
 		}
 		return escaped;

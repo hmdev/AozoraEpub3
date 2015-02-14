@@ -1564,16 +1564,6 @@ public class AozoraEpub3Converter
 						buf.insert(chukiTagStart+chOffset, kogaki);
 						chOffset += kogaki.length() - (chukiTagEnd-chukiTagStart);
 					}
-				} else if (chuki.endsWith("に×傍点")) {
-					int targetStart = this.getTargetStart(buf, chukiTagStart, chOffset, targetLength);
-					//後ろタグ置換
-					buf.delete(chukiTagStart+chOffset, chukiTagEnd+chOffset);
-					buf.insert(chukiTagStart+chOffset, "》");
-					for (int i=0; i<targetLength; i++) buf.insert(chukiTagStart+chOffset, "×");
-					buf.insert(chukiTagStart+chOffset, "《");
-					//前に ｜ insert
-					buf.insert(targetStart, "｜");
-					chOffset += targetLength+3 - (chukiTagEnd-chukiTagStart);
 				}
 			}
 		} while (m.find());
@@ -1588,16 +1578,16 @@ public class AozoraEpub3Converter
 		int idx = chukiTagStart-1+chOffset;
 		boolean hasRuby = false;
 		int length = 0;
-		//間にあるタグをスタック
+		//間にあるルビと注記タグは除外 ※※※》等のエスケープをチェックする
 		while (targetLength > length && idx >= 0) {
 			switch (buf.charAt(idx)) {
-			case '※':
-			case '｜':
-				break;
 			case '》':
 				idx--;
 				//エスケープ文字
-				if (buf.charAt(idx) == '※') break;
+				if (CharUtils.isEscapedChar(buf, idx)) {
+					length++;
+					break;
+				}
 				while (idx >= 0 && buf.charAt(idx) != '《' && (idx >0 && buf.charAt(idx-1) != '※')) {
 					idx--;
 				}
@@ -1606,9 +1596,18 @@ public class AozoraEpub3Converter
 			case '］':
 				idx--;
 				//エスケープ文字
-				if (buf.charAt(idx) == '※') break;
+				if (CharUtils.isEscapedChar(buf, idx)) {
+					length++;
+					break;
+				}
 				while (idx >= 0 && buf.charAt(idx) != '［' && (idx >0 && buf.charAt(idx-1) != '※')) {
 					idx--;
+				}
+				break;
+			case '｜':
+				//エスケープ文字
+				if (CharUtils.isEscapedChar(buf, idx)) {
+					length++;
 				}
 				break;
 			default:
@@ -2351,7 +2350,7 @@ public class AozoraEpub3Converter
 			// ルビ内ならルビの最後でrubyタグ出力
 			if (inRuby) {
 				// ルビ終わり エスケープ文字なら処理しない
-				if (ch[i] == '》' && (i == 0 || ch[i-1] != '※')) {
+				if (ch[i] == '》' && !CharUtils.isEscapedChar(ch, i)) {
 					if (rubyStart != -1 && rubyTopStart != -1) {
 						if (noRuby) 
 							convertTcyText(buf, ch, rubyStart, rubyTopStart, noTcy); //本文
