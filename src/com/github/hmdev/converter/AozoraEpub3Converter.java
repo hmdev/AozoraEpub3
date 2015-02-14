@@ -1588,7 +1588,7 @@ public class AozoraEpub3Converter
 					length++;
 					break;
 				}
-				while (idx >= 0 && buf.charAt(idx) != '《' && (idx >0 && buf.charAt(idx-1) != '※')) {
+				while (idx >= 0 && buf.charAt(idx) != '《' && !CharUtils.isEscapedChar(buf, idx)) {
 					idx--;
 				}
 				hasRuby = true;
@@ -1600,7 +1600,7 @@ public class AozoraEpub3Converter
 					length++;
 					break;
 				}
-				while (idx >= 0 && buf.charAt(idx) != '［' && (idx >0 && buf.charAt(idx-1) != '※')) {
+				while (idx >= 0 && buf.charAt(idx) != '［' && !CharUtils.isEscapedChar(buf, idx)) {
 					idx--;
 				}
 				break;
@@ -2009,7 +2009,7 @@ public class AozoraEpub3Converter
 									//}
 								} else { 
 									if (noIllust && !writer.isCoverImage()) {
-										LogAppender.info(lineNum, "挿絵なし設定", chukiTag);
+										LogAppender.info(lineNum, "挿絵除外", chukiTag);
 									} else {
 										String dstFileName = writer.getImageFilePath(srcFilePath, lineNum);
 										if (dstFileName != null) { //先頭に移動してここで出力しない場合はnull
@@ -2024,7 +2024,7 @@ public class AozoraEpub3Converter
 					}
 				} else if (lowerChukiTag.startsWith("<img")) {
 					if (noIllust && !writer.isCoverImage()) {
-						LogAppender.info(lineNum, "挿絵なし設定", chukiTag);
+						LogAppender.info(lineNum, "挿絵除外", chukiTag);
 					} else {
 						//ダミー出力時は画像注記は無視
 						if (!noImage) {
@@ -2251,9 +2251,24 @@ public class AozoraEpub3Converter
 		return false;
 	}
 	
-	/** 注記以外の部分を<>&のエスケープと《》置換した文字列を出力バッファに出力 ルビ変換前に呼び出す */
+	/** 注記で分割された文字列単位でエスケープ処理を行う
+	 * <>&のエスケープと《》置換、IVSや不正な文字を除去して文字列を出力バッファに出力
+	 * ルビ変換前に呼び出す */
 	private void convertEscapedText(StringBuilder buf, char[] ch, int begin, int end) throws IOException
 	{
+		//先頭にあるIVSは除去
+		switch (ch[begin]) {
+		case 0xDB40:
+			begin+=2;
+			LogAppender.warn(lineNum, "先頭にあるIVSを除去します");
+			break;
+		case 0xFE00: case 0xFE01: case 0xFE02: case 0xFE03: case 0xFE04: case 0xFE05: case 0xFE06: case 0xFE07:
+		case 0xFE08: case 0xFE09: case 0xFE0A: case 0xFE0B: case 0xFE0C: case 0xFE0D: case 0xFE0E: case 0xFE0F:
+			begin++;
+			LogAppender.warn(lineNum, "先頭にあるIVSを除去します");
+			break;
+		}
+		
 		//事前に《,》の代替文字をエスケープ済※《,※》 に変換
 		for (int i=begin+1; i<end; i++) {
 			switch (ch[i]) {
@@ -2282,7 +2297,7 @@ public class AozoraEpub3Converter
 			case '゚': ch[i] = '゜'; break;
 			}
 		}
-		//NULLや非表示文字は除去
+		//NULLは除去
 		for (int idx=begin; idx<end; idx++) {
 			switch (ch[idx]) {
 			case '\0':
@@ -2297,7 +2312,7 @@ public class AozoraEpub3Converter
 	}
 	
 	/** ルビタグに変換して出力
-	 * 特殊文字は※が前についているので※の後ろの文字を利用しルビ内なら開始位置以降の文字をずらす
+	 * 特殊文字は※が前についているので※｜※《※》はルビ処理しない
 	 * ・ルビ （前｜漢字《かんじ》 → 前<ruby>漢字<rt>かんじ</rt></ruby>）
 	 * ・</ruby><ruby> と連続する場合はタグを除去
 	 * @param buf 出力先バッファ
@@ -2950,7 +2965,7 @@ public class AozoraEpub3Converter
 		//エスケープ文字を出力
 		if (escaped) {
 			buf.append(ch[idx]);
-			ch[idx] = '\0'; //※※の場合の対策
+			ch[idx] = '　'; //※※の場合の対策
 			return;
 		}
 		
