@@ -46,6 +46,13 @@ public class AozoraEpub3ConverterTest
 			buf = converter.convertRubyText("※※＃※》");
 			System.out.println(buf);
 			
+			buf = converter.convertRubyText("｜※｜縦線《たてせん》※｜");
+			System.out.println(buf);
+			Assert.assertEquals(buf.toString(), "<ruby>｜縦線<rt>たてせん</rt></ruby>｜");
+			buf = converter.convertRubyText("※｜縦線《たてせん》※｜");
+			System.out.println(buf);
+			Assert.assertEquals(buf.toString(), "｜<ruby>縦線<rt>たてせん</rt></ruby>｜");
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -58,17 +65,23 @@ public class AozoraEpub3ConverterTest
 			String str;
 			str = converter.convertGaijiChuki("｜※［＃縦線］縦線※［＃縦線］《※［＃縦線］たてせん※［＃縦線］》", true, true);
 			System.out.println(str);
+			Assert.assertEquals(str, "｜※｜縦線※｜《※｜たてせん※｜》");
 			
 			str = converter.convertGaijiChuki("※［＃U+845b］U+845b", true, true);
 			System.out.println(str);
+			Assert.assertEquals(str, "葛U+845b");
 			str = converter.convertGaijiChuki("※［＃u+845b-e0100］u+845b-e0100", true, true);
 			System.out.println(str);
+			Assert.assertEquals(str, "葛󠄀u+845b-e0100");
 			str = converter.convertGaijiChuki("※［＃U+845b-U+e0100］U+845b-U+ue0100", true, true);
 			System.out.println(str);
+			Assert.assertEquals(str, "葛󠄀U+845b-U+ue0100");
 			str = converter.convertGaijiChuki("※［＃「葛の異体字」、U+845b-e0100］「葛の異体字」、U+845b-e0100", true, true);
 			System.out.println(str);
+			Assert.assertEquals(str, "葛󠄀「葛の異体字」、U+845b-e0100");
 			str = converter.convertGaijiChuki("※［＃「葛の異体字」、u+845b-u+e0100］「葛の異体字」、u+845b-u+e0100", true, true);
 			System.out.println(str);
+			Assert.assertEquals(str, "葛󠄀「葛の異体字」、u+845b-u+e0100");
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -80,6 +93,9 @@ public class AozoraEpub3ConverterTest
 	{
 		try {
 			String str;
+			
+			str = converter.replaceChukiSufTag(converter.convertGaijiChuki("蕎麦《そば》の延びたのと、人間の間《ま》が抜けたのは由来たのもしくないもんだよ」と薬味《やくみ》をツユ［＃「ツユ」に傍点］の中へ入れて無茶苦茶に掻《か》き廻わす。「君そんなに山葵《わさび》を入れると辛《か》らいぜ」と主人は心配そうに注意した。「蕎麦はツユ［＃「ツユ」に傍点］と山葵で食うもんだあね。君は蕎麦が嫌いなんだろう」「僕は饂飩《うどん》が好きだ」「饂飩は馬子《まご》が食うもんだ。蕎麦の味を解しない人ほど気の毒な事はない」と云いながら杉箸《すぎばし》をむざと突き込んで出来るだけ多くの分量を二寸ばかりの高さにしゃくい上げた。「奥さん蕎麦を食うにもいろいろ流儀がありますがね。初心《しょしん》の者に限って、無暗《むやみ》にツユ［＃「ツユ」に傍点］を着けて、そうして口の内でくちゃくちゃやっていますね。あれじゃ蕎麦の味はないですよ。何でも、こう、一《ひ》としゃくいに引っ掛けてね」と云いつつ箸を上げると、長い奴が勢揃《せいぞろ》いをして一尺ばかり空中に釣るし上げられる。迷亭先生もう善かろうと思って下を見ると、まだ十二三本の尾が蒸籠の底を離れないで簀垂《すだ》れの上に纏綿《てんめん》している。「こいつは長いな、どうです奥さん、この長さ加減は」とまた奥さんに相の手を要求する。奥さんは「長いものでございますね」とさも感心したらしい返事をする。「この長い奴へツユ［＃「ツユ」に傍点］を三分一《さんぶいち》つけて、一口に飲んでしまうんだね。噛《か》んじゃいけない。噛んじゃ蕎麦の味がなくなる。つるつると咽喉《のど》を滑《すべ》り込むところがねうちだよ」と思い切って箸《はし》を高く上げると蕎麦はようやくの事で地を離れた。左手《ゆんで》に受ける茶碗の中へ、箸を少しずつ落して、尻尾の先からだんだんに浸《ひた》すと、アーキミジスの理論によって、蕎麦の浸《つか》った分量だけツユ［＃「ツユ」に傍点］の嵩《かさ》が増してくる。ところが茶碗の中には元からツユ［＃「ツユ」に傍点］が八分目｜這入《はい》っているから、迷亭の箸にかかった蕎麦の四半分《しはんぶん》も浸《つか》らない先に茶碗はツユで一杯になってしまった。迷亭の箸は茶碗を去《さ》る五寸の上に至ってぴたりと留まったきりしばらく動かない。動かないのも無理はない。少しでも卸《おろ》せばツユ［＃「ツユ」に傍点］が溢《こぼ》れるばかりである。",true, false));
+			System.out.println(str);
 			
 			str = converter.replaceChukiSufTag(converter.convertGaijiChuki("※［＃始め二重山括弧］１［＃「※［＃米印］※［＃始め二重山括弧］１」は中見出し］",true, false));
 			System.out.println(str);

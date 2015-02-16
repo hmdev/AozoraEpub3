@@ -1490,11 +1490,11 @@ public class AozoraEpub3Converter
 			int chukiTagEnd = m.end();
 			
 			//後ろにルビがあったら前に移動して位置を調整
-			if (chukiTagEnd < buf.length() && buf.charAt(chukiTagEnd) == '《') {
-				int rubyEnd = buf.indexOf("》", chukiTagEnd+2);
-				String ruby = buf.substring(chukiTagEnd, rubyEnd+1);
-				buf.delete(chukiTagEnd, rubyEnd+1);
-				buf.insert(chukiTagStart, ruby);
+			if (chukiTagEnd < line.length() && buf.charAt(chukiTagEnd+chOffset) == '《') {
+				int rubyEnd = buf.indexOf("》", chukiTagEnd+chOffset+2);
+				String ruby = buf.substring(chukiTagEnd+chOffset, rubyEnd+1+chOffset);
+				buf.delete(chukiTagEnd+chOffset, rubyEnd+1+chOffset);
+				buf.insert(chukiTagStart+chOffset, ruby);
 				chukiTagStart += ruby.length();
 				chukiTagEnd += ruby.length();
 				LogAppender.warn(lineNum, "ルビが注記の後ろにあります", ruby);
