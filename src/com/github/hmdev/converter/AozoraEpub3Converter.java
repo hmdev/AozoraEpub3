@@ -170,8 +170,10 @@ public class AozoraEpub3Converter
 	final static Pattern chukiPattern = Pattern.compile("(［＃.+?］)|(<.+?>)");
 	/** 外字注記パターン */
 	final static Pattern gaijiChukiPattern = Pattern.compile("(※［＃.+?］)|(〔.+?〕)|(／″?＼)");
-	/** 前方参照注記パターン */
-	final static Pattern chukiSufPattern = Pattern. compile("［＃「([^」]+)」([^］]+?)］");
+	/** 前方参照注記パターン ［＃「○○」は～］ 注記内に注記があったら途中までしかマッチしないので外字変換と除外処理をしておく */
+	final static Pattern chukiSufPattern = Pattern. compile("［＃「([^］]+)」([^」|^］]+)］");
+	/** 前方参照注記パターン2 ［＃「○○」に「～」の注記］ */
+	final static Pattern chukiSufPattern2 = Pattern. compile("［＃「([^］]+)」([^」|^］]*「[^」|^］]+」[^」|^］]*)］");
 	
 	/** 先頭注記内側のパターン */
 	final static Pattern chukiLeftPattern = Pattern.compile("^［＃(.+?)］");
@@ -1441,11 +1443,8 @@ public class AozoraEpub3Converter
 	 * 前にルビがあって｜で始まる場合は｜の前に追加 */
 	String replaceChukiSufTag(String line)
 	{
-		//前方参照注記チェック
-		//"［＃「([^」]+)」([^］]+?)］"
-		Matcher m = chukiSufPattern.matcher(line);
-		//前方参照注記でなければそのまま返却
-		if (!m.find()) return line;
+		//前方参照注記がなければそのまま返却
+		if (line.indexOf("［＃「") == -1) return line;
 		
 		//注記内注記があれば除外
 		StringBuilder buf = new StringBuilder();
@@ -1475,7 +1474,8 @@ public class AozoraEpub3Converter
 		buf.append(line.substring(mTagEnd));
 		line = buf.toString();
 		
-		m = chukiSufPattern.matcher(line);
+		//"［＃「([^］]+)」([^」|^］]+)］"
+		Matcher m = chukiSufPattern.matcher(line);
 		if (!m.find()) return line;
 		
 		int chOffset = 0;
@@ -1492,16 +1492,22 @@ public class AozoraEpub3Converter
 			//後ろにルビがあったら前に移動して位置を調整
 			if (chukiTagEnd < line.length() && buf.charAt(chukiTagEnd+chOffset) == '《') {
 				int rubyEnd = buf.indexOf("》", chukiTagEnd+chOffset+2);
-				String ruby = buf.substring(chukiTagEnd+chOffset, rubyEnd+1+chOffset);
-				buf.delete(chukiTagEnd+chOffset, rubyEnd+1+chOffset);
+				String ruby = buf.substring(chukiTagEnd+chOffset, rubyEnd+1);
+				buf.delete(chukiTagEnd+chOffset, rubyEnd+1);
 				buf.insert(chukiTagStart+chOffset, ruby);
 				chukiTagStart += ruby.length();
 				chukiTagEnd += ruby.length();
 				LogAppender.warn(lineNum, "ルビが注記の後ろにあります", ruby);
 			}
 			
-			if (tags != null) {
-				
+			if (chuki.endsWith("の注記付き終わり")) {
+				//［＃注記付き］○○［＃「××」の注記付き終わり］の例外処理
+				//［＃注記付き］は通常の注記変換時に｜に置換される
+				//ルビに置換 (開始タグはchuki_tag.txtで変換)
+				buf.delete(chukiTagStart+chOffset, chukiTagEnd+chOffset);
+				buf.insert(chukiTagStart+chOffset, "《"+target+"》");
+				chOffset += target.length()+2 - (chukiTagEnd-chukiTagStart);
+			} else if (tags != null) {
 				//置換済みの文字列で注記追加位置を探す
 				int targetStart = this.getTargetStart(buf, chukiTagStart, chOffset, CharUtils.removeRuby(target).length());
 				
@@ -1518,7 +1524,8 @@ public class AozoraEpub3Converter
 		
 		//注記タグ等を再度変換
 		line = buf.toString();
-		m = chukiSufPattern.matcher(line);
+		//「」が2つある注記 「○○」に「××」の注記
+		m = chukiSufPattern2.matcher(line);
 		//マッチしなければそのまま返却
 		if (!m.find()) return line;
 		chOffset = 0;
@@ -1532,14 +1539,7 @@ public class AozoraEpub3Converter
 			
 			//前方参照注記ではない
 			if (tags == null) {
-				if (chuki.endsWith("の注記付き終わり")) {
-					//［＃注記付き］○○［＃「××」の注記付き終わり］の例外処理
-					//［＃左に（はパターンにマッチしないので処理されない
-					//ルビに置換 (開始タグはchuki_tag.txtで変換)
-					buf.delete(chukiTagStart+chOffset, chukiTagEnd+chOffset);
-					buf.insert(chukiTagStart+chOffset, "《"+target+"》");
-					chOffset += targetLength+2 - (chukiTagEnd-chukiTagStart);
-				} else if (chuki.endsWith("のルビ") || (chukiRuby && chuki.endsWith("の注記"))) {
+				if (chuki.endsWith("のルビ") || (chukiRuby && chuki.endsWith("の注記"))) {
 					//ルビに変換 ママは除外
 					if (chuki.startsWith("に「") && !chuki.startsWith("に「ママ")) {
 						//［＃「青空文庫」に「あおぞらぶんこ」のルビ］
