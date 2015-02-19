@@ -115,10 +115,6 @@ public class AozoraEpub3ConverterTest
 			System.out.println(str);
 			Assert.assertEquals(str, "［＃太字］第［＃縦中横］32［＃縦中横終わり］図［＃太字終わり］");
 			
-			str = converter.replaceChukiSufTag(converter.convertGaijiChuki("勝安房守［＃「勝安房守」に「本ト麟太郎※［＃コト、1-2-24］」の注記", true, false));
-			System.out.println(str);
-			Assert.assertEquals(str, "勝安房守［＃「勝安房守」に「本ト麟太郎ヿ」の注記");
-			
 			str = converter.replaceChukiSufTag("人間は考える｜蘆［＃「人間は考える｜蘆」は太字］《あし》人間は考える｜蘆［＃「考える｜蘆」は太字］《あし》");
 			System.out.println(str);
 			Assert.assertEquals(str, "［＃太字］人間は考える｜蘆《あし》［＃太字終わり］人間は［＃太字］考える｜蘆《あし》［＃太字終わり］");
@@ -127,9 +123,15 @@ public class AozoraEpub3ConverterTest
 			System.out.println(str);
 			Assert.assertEquals(str, "　　　［＃中見出し］あ１［＃中見出し終わり］");
 			
+			//2重の「「」」
 			str = converter.replaceChukiSufTag("テスト「夕陽新聞」年極購読者に限る［＃「「夕陽新聞」年極購読者に限る」は太字］");
 			System.out.println(str);
 			Assert.assertEquals(str, "テスト［＃太字］「夕陽新聞」年極購読者に限る［＃太字終わり］");
+			
+			//注記 変換しない
+			str = converter.replaceChukiSufTag(converter.convertGaijiChuki("勝安房守［＃「勝安房守」に「本ト麟太郎※［＃コト、1-2-24］」の注記］", true, false));
+			System.out.println(str);
+			Assert.assertEquals(str, "勝安房守［＃「勝安房守」に「本ト麟太郎ヿ」の注記］");
 			
 			//注記 ルビに変換
 			converter.chukiRuby = true;
@@ -137,9 +139,17 @@ public class AozoraEpub3ConverterTest
 			System.out.println(str);
 			Assert.assertEquals(str, "［＃５字下げ］［＃大見出し］第一回　｜入蔵決心の次第《〔チベット入国の決意〕》［＃大見出し終わり］");
 			
-			str = converter.replaceChukiSufTag("［＃注記付き］○○［＃「××」の注記付き終わり］");
+			//［＃注記付き］はあとで ｜ に変換される
+			str = converter.replaceChukiSufTag(converter.convertGaijiChuki("［＃注記付き］○○［＃「××※［＃米印］」の注記付き終わり］", true, false));
 			System.out.println(str);
-			Assert.assertEquals(str, "［＃注記付き］○○《××》");
+			Assert.assertEquals(str, "｜○○《××※※》");
+			str = converter.replaceChukiSufTag(converter.convertGaijiChuki("［＃注記付き］勝安房守［＃「本ト麟太郎※［＃コト、1-2-24］」の注記付き終わり］あああ［＃注記付き］○○［＃「××※［＃米印］」の注記付き終わり］", true, false));
+			System.out.println(str);
+			Assert.assertEquals(str, "｜勝安房守《本ト麟太郎ヿ》あああ｜○○《××※※》");
+			
+			str = converter.replaceChukiSufTag("青空文庫［＃「文庫」に「ぶんこ」のルビ］");
+			System.out.println(str);
+			Assert.assertEquals(str, "青空｜文庫《ぶんこ》");
 			
 			//左にルビ
 			str = converter.replaceChukiSufTag("青空文庫《あおぞらぶんこ》［＃「青空文庫」の左に「aozora bunko」のルビ］");
@@ -152,7 +162,6 @@ public class AozoraEpub3ConverterTest
 			str = converter.replaceChukiSufTag("［＃５字下げ］第一回　入蔵決心の次第［＃「入蔵決心の次第」に「〔チベット入国の決意〕」の注記］［＃「第一回　入蔵決心の次第」は大見出し］");
 			System.out.println(str);
 			Assert.assertEquals(str, "［＃５字下げ］［＃大見出し］第一回　入蔵決心の次第［＃小書き］〔チベット入国の決意〕［＃小書き終わり］［＃大見出し終わり］");
-			
 			
 		} catch (Exception e) {
 			e.printStackTrace();

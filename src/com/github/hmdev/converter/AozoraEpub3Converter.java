@@ -172,7 +172,7 @@ public class AozoraEpub3Converter
 	final static Pattern gaijiChukiPattern = Pattern.compile("(※［＃.+?］)|(〔.+?〕)|(／″?＼)");
 	/** 前方参照注記パターン ［＃「○○」は～］ 注記内に注記があったら途中までしかマッチしないので外字変換と除外処理をしておく */
 	final static Pattern chukiSufPattern = Pattern. compile("［＃「([^］]+)」([^」|^］]+)］");
-	/** 前方参照注記パターン2 ［＃「○○」に「～」の注記］ */
+	/** 前方参照注記パターン2 ［＃「○○」に「××」の注記］ */
 	final static Pattern chukiSufPattern2 = Pattern. compile("［＃「([^］]+)」([^」|^］]*「[^」|^］]+」[^」|^］]*)］");
 	
 	/** 先頭注記内側のパターン */
@@ -1502,10 +1502,15 @@ public class AozoraEpub3Converter
 			
 			if (chuki.endsWith("の注記付き終わり")) {
 				//［＃注記付き］○○［＃「××」の注記付き終わり］の例外処理
-				//［＃注記付き］は通常の注記変換時に｜に置換される
-				//ルビに置換 (開始タグはchuki_tag.txtで変換)
 				buf.delete(chukiTagStart+chOffset, chukiTagEnd+chOffset);
 				buf.insert(chukiTagStart+chOffset, "《"+target+"》");
+				//前にある［＃注記付き］を｜に置換
+				int start = buf.lastIndexOf("［＃注記付き］", chukiTagStart+chOffset);
+				if (start != -1) {
+					buf.delete(start+1, start+7);
+					buf.setCharAt(start, '｜');
+					chOffset -= 6;
+				}
 				chOffset += target.length()+2 - (chukiTagEnd-chukiTagStart);
 			} else if (tags != null) {
 				//置換済みの文字列で注記追加位置を探す
@@ -2536,12 +2541,12 @@ public class AozoraEpub3Converter
 						buf.append(ch[i+3]);
 						if (this.vertical) buf.append(chukiMap.get("正立終わり")[0]);
 						LogAppender.info(lineNum, "拡張漢字＋IVSを出力します",
-								""+ch[i]+ch[i+1]+ch[i+2]+ch[i+3]+"("+Integer.toHexString(code)+"+"+ivsCode+")");
+								""+ch[i]+ch[i+1]+ch[i+2]+ch[i+3]+"(u+"+Integer.toHexString(code)+"+"+ivsCode+")");
 					} else {
 						buf.append(ch[i]);
 						buf.append(ch[i+1]);
 						LogAppender.info(lineNum, "拡張漢字出力(IVS除外)",
-								""+ch[i]+ch[i+1]+"("+Integer.toHexString(code)+") -"+ivsCode);
+								""+ch[i]+ch[i+1]+"(u+"+Integer.toHexString(code)+") -"+ivsCode);
 					}
 					i+=3; //IVSの次へ
 					continue;
@@ -2575,12 +2580,12 @@ public class AozoraEpub3Converter
 						buf.append(ch[i+2]);
 						if (this.vertical) buf.append(chukiMap.get("正立終わり")[0]);
 						LogAppender.info(lineNum, "拡張漢字＋IVSを出力します",
-								""+ch[i]+ch[i+1]+ch[i+2]+"("+Integer.toHexString(code)+"+"+(Integer.toHexString(ch[i+2]))+")");
+								""+ch[i]+ch[i+1]+ch[i+2]+"(u+"+Integer.toHexString(code)+"+"+(Integer.toHexString(ch[i+2]))+")");
 					} else {
 						buf.append(ch[i]);
 						buf.append(ch[i+1]);
 						LogAppender.info(lineNum, "拡張漢字出力(IVS除外)",
-								""+ch[i]+ch[i+1]+"("+Integer.toHexString(code)+") -"+(Integer.toHexString(ch[i+2]))+")");
+								""+ch[i]+ch[i+1]+"(u+"+Integer.toHexString(code)+") -"+(Integer.toHexString(ch[i+2]))+")");
 					}
 					i+=2; //IVSの次へ
 					continue;
@@ -2603,7 +2608,7 @@ public class AozoraEpub3Converter
 				} else {*/
 					buf.append(ch[i]);
 					buf.append(ch[i+1]);
-					LogAppender.info(lineNum, "拡張漢字出力", ""+ch[i]+ch[i+1]+"("+Integer.toHexString(code)+")");
+					LogAppender.info(lineNum, "拡張漢字出力", ""+ch[i]+ch[i+1]+"(u+"+Integer.toHexString(code)+")");
 				/*}*/
 				i++; //次の文字へ
 				continue;
@@ -2645,11 +2650,11 @@ public class AozoraEpub3Converter
 					buf.append(ch[i+2]);
 					if (this.vertical) buf.append(chukiMap.get("正立終わり")[0]);
 					LogAppender.info(lineNum, "IVSを出力します",
-							""+ch[i]+ch[i+1]+ch[i+2]+"("+Integer.toHexString(ch[i])+"+"+ivsCode+")");
+							""+ch[i]+ch[i+1]+ch[i+2]+"(u+"+Integer.toHexString(ch[i])+"+"+ivsCode+")");
 				} else {
 					buf.append(ch[i]);
 					LogAppender.info(lineNum, "IVS除外",
-							ch[i]+"("+Integer.toHexString(ch[i])+") -"+ivsCode);
+							ch[i]+"(u+"+Integer.toHexString(ch[i])+") -"+ivsCode);
 				}
 				i+=2; //IVSの次へ
 				continue;
@@ -2683,10 +2688,10 @@ public class AozoraEpub3Converter
 				if (printIvsBMP) {
 					buf.append(ch[i]);
 					buf.append(ch[i+1]);
-					LogAppender.info(lineNum, "IVSを出力します", ""+ch[i]+ch[i+1]+"("+Integer.toHexString(ch[i])+"+"+Integer.toHexString(ch[i+1])+")");
+					LogAppender.info(lineNum, "IVSを出力します", ""+ch[i]+ch[i+1]+"(u+"+Integer.toHexString(ch[i])+"+"+Integer.toHexString(ch[i+1])+")");
 				} else {
 					buf.append(ch[i]);
-					LogAppender.info(lineNum, "IVS除外",  ch[i]+"("+Integer.toHexString(ch[i])+") -"+Integer.toHexString(ch[i+1]));
+					LogAppender.info(lineNum, "IVS除外",  ch[i]+"(u+"+Integer.toHexString(ch[i])+") -"+Integer.toHexString(ch[i+1]));
 				}
 				i++; //IVSの次へ
 				continue;
