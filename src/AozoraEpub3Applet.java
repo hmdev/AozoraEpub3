@@ -3355,6 +3355,7 @@ public class AozoraEpub3Applet extends JApplet
 		//zipならzip内のテキストを検索
 		int txtCount = 1;
 		boolean imageOnly = false;
+		LogAppender.append("------ ");
 		if("zip".equals(ext) || "txtz".equals(ext)) { 
 			try {
 				txtCount = AozoraEpub3.countZipText(srcFile);
@@ -3372,6 +3373,7 @@ public class AozoraEpub3Applet extends JApplet
 		} else if ("cbz".equals(ext)) {
 			imageOnly = true;
 		} else if ("txt".equals(ext)) {
+			LogAppender.println();
 		}
 		if (this.convertCanceled){
 			LogAppender.println("変換処理を中止しました : "+srcFile.getAbsolutePath());

@@ -103,6 +103,7 @@ public class Epub3ImageWriter extends Epub3Writer
 						is.close();
 					}
 				}
+				if (this.canceled) return;
 			}
 			} finally { archive.close(); }
 		} else {
@@ -113,6 +114,7 @@ public class Epub3ImageWriter extends Epub3Writer
 				//アーカイブ内のサブフォルダは除外
 				String srcImageFileName = entry.getName().substring(archivePathLength);
 				this.writeArchiveImage(srcImageFileName, zis);
+				if (this.canceled) return;
 			}
 			} finally { zis.close(); }
 		}
@@ -135,6 +137,7 @@ public class Epub3ImageWriter extends Epub3Writer
 				}
 			}
 			if (this.jProgressBar != null) this.jProgressBar.setValue(this.jProgressBar.getValue()+1);
+			if (this.canceled) return;
 		}
 	}
 	
