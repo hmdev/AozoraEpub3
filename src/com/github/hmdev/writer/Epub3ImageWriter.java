@@ -94,7 +94,7 @@ public class Epub3ImageWriter extends Epub3Writer
 					String entryName = fileHeader.getFileNameW();
 					if (entryName.length() == 0) entryName = fileHeader.getFileNameString();
 					entryName = entryName.replace('\\', '/');
-					//アーカイブ内のサブフォルダは除外してテキストからのパスにする
+					//アーカイブ内のサブフォルダは除外
 					String srcImageFileName = entryName.substring(archivePathLength);
 					InputStream is = archive.getInputStream(fileHeader);
 					try {
@@ -110,7 +110,7 @@ public class Epub3ImageWriter extends Epub3Writer
 			try {
 			ArchiveEntry entry;
 			while( (entry = zis.getNextZipEntry()) != null ) {
-				//アーカイブ内のサブフォルダは除外してテキストからのパスにする
+				//アーカイブ内のサブフォルダは除外
 				String srcImageFileName = entry.getName().substring(archivePathLength);
 				this.writeArchiveImage(srcImageFileName, zis);
 			}

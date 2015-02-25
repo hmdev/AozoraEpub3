@@ -963,8 +963,12 @@ public class Epub3Writer
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
+			try {
 			//ePub3出力ファイルを閉じる
 			if (zos != null) zos.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 			//メンバ変数解放
 			this.velocityContext = null;
 			this.bookInfo = null;
@@ -991,9 +995,9 @@ public class Epub3Writer
 					}
 				}
 				zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+IMAGES_PATH+imageInfo.getOutFileName()));
-				//Zipからの直接読み込みは失敗するので一旦バイト配列にする
+				//Zip,Rarからの直接読み込みは失敗するので一旦バイト配列にする
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
-				IOUtils.copy(is, baos);
+				IOUtils.copy(new BufferedInputStream(is, 16384), baos);
 				byte[] bytes = baos.toByteArray();
 				baos.close();
 				ByteArrayInputStream bais = new ByteArrayInputStream(bytes);

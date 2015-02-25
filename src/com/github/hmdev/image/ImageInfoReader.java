@@ -2,6 +2,8 @@ package com.github.hmdev.image;
 
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -220,8 +222,11 @@ public class ImageInfoReader
 	public void loadZipImageInfos(File srcFile, boolean addFileName) throws IOException
 	{
 		ZipArchiveInputStream zis = new ZipArchiveInputStream(new BufferedInputStream(new FileInputStream(srcFile), 65536), "MS932", false);
+		try {
 		ArchiveEntry entry;
+		int idx = 0;
 		while ((entry = zis.getNextEntry()) != null) {
+			if (idx++ % 10 == 0) LogAppender.append(".");
 			String entryName = entry.getName();
 			String lowerName = entryName.toLowerCase();
 			if (lowerName.endsWith(".png") || lowerName.endsWith(".jpg") || lowerName.endsWith(".jpeg") || lowerName.endsWith(".gif")) {
@@ -238,14 +243,19 @@ public class ImageInfoReader
 				}
 			}
 		}
-		zis.close();
+		} finally {
+			LogAppender.println();
+			zis.close();
+		}
 	}
 	/** rar内の画像情報をすべて読み込み */
 	public void loadRarImageInfos(File srcFile, boolean addFileName) throws IOException, RarException
 	{
 		Archive archive = new Archive(srcFile);
 		try {
+		int idx = 0;
 		for (FileHeader fileHeader : archive.getFileHeaders()) {
+			if (idx++ % 10 == 0) LogAppender.append(".");
 			if (!fileHeader.isDirectory()) {
 				String entryName = fileHeader.getFileNameW();
 				if (entryName.length() == 0) entryName = fileHeader.getFileNameString();
@@ -255,22 +265,31 @@ public class ImageInfoReader
 					ImageInfo imageInfo = null;
 					InputStream is = null;
 					try {
-						is = archive.getInputStream(fileHeader);
+						//読めない場合があるので一旦バイト配列に読み込み
+						ByteArrayOutputStream baos = new ByteArrayOutputStream();
+						archive.extractFile(fileHeader, baos);
+						baos.close();
+						is = new ByteArrayInputStream(baos.toByteArray());
 						imageInfo = ImageInfo.getImageInfo(is);
+						if (imageInfo != null) {
+							this.imageFileInfos.put(entryName, imageInfo);
+							if (addFileName) this.addImageFileName(entryName);
+						} else {
+							LogAppender.println();
+							LogAppender.error("画像が読み込めませんでした: "+entryName);
+						}
 					} catch (Exception e) {
-						LogAppender.error("画像が読み込めませんでした: "+srcFile.getPath());
+						LogAppender.println();
+						LogAppender.error("画像が読み込めませんでした: "+entryName);
 						e.printStackTrace();
 					} finally {
 						if (is != null) is.close();
-					}
-					if (imageInfo != null) {
-						this.imageFileInfos.put(entryName, imageInfo);
-						if (addFileName) this.addImageFileName(entryName);
 					}
 				}
 			}
 		}
 		} finally {
+			LogAppender.println();
 			archive.close();
 		}
 	}

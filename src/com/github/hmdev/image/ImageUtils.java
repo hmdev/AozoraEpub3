@@ -45,6 +45,11 @@ public class ImageUtils
 	public static final int NOMBRE_BOTTOM = 2;
 	public static final int NOMBRE_TOPBOTTOM = 3;
 	
+	/** png出力用 */
+	static ImageWriter pngImageWriter;
+	/** jpeg出力用 */
+	static ImageWriter jpegImageWriter;
+	
 	/** 4bitグレースケール時のRGB階調カラーモデル取得 */
 	static ColorModel getGray16ColorModel()
 	{
@@ -400,22 +405,17 @@ public class ImageUtils
 			pngEncoder.encode(srcImage, zos);
 			*/
 			//ImageIO.write(srcImage, "PNG", zos);
-			Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName(ext);
-			ImageWriter imageWriter = writers.next();
-			//jai-imageioのpngの挙動がおかしいのでインストールされていても使わない
-			if (writers.hasNext() && imageWriter.getClass().getName().endsWith("CLibPNGImageWriter")) imageWriter = writers.next();
+			ImageWriter imageWriter = getPngImageWriter();
 			imageWriter.setOutput(ImageIO.createImageOutputStream(zos));
 			imageWriter.write(srcImage);
 		} else if ("jpeg".equals(ext) || "jpg".equals(ext)) {
-			Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName(ext);
-			ImageWriter imageWriter = writers.next();
+			ImageWriter imageWriter = getJpegImageWriter();
 			imageWriter.setOutput(ImageIO.createImageOutputStream(zos));
 			ImageWriteParam iwp = imageWriter.getDefaultWriteParam();
 			if (iwp.canWriteCompressed()) {
 				try {
 					iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-					if (ext.charAt(0) == 'j') iwp.setCompressionQuality(jpegQuality);
-					//else if ("png".equals(ext)) iwp.setCompressionQuality(0);
+					iwp.setCompressionQuality(jpegQuality);
 					imageWriter.write(null, new IIOImage(srcImage, null, null), iwp);
 				} catch (Exception e) { e.printStackTrace(); }
 			} else {
@@ -425,6 +425,24 @@ public class ImageUtils
 			ImageIO.write(srcImage, ext, zos);
 		}
 		zos.flush();
+	}
+	
+	static private ImageWriter getPngImageWriter()
+	{
+		if (pngImageWriter != null) return pngImageWriter;
+		Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName("png");
+		pngImageWriter = writers.next();
+		//jai-imageioのpngの挙動がおかしいのでインストールされていても使わない
+		if (writers.hasNext() && pngImageWriter.getClass().getName().endsWith("CLibPNGImageWriter")) pngImageWriter = writers.next();
+		return pngImageWriter;
+	}
+	
+	static private ImageWriter getJpegImageWriter()
+	{
+		if (jpegImageWriter!= null) return jpegImageWriter;
+		Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName("jpg");
+		jpegImageWriter = writers.next();
+		return jpegImageWriter;
 	}
 	
 	/** 余白の画素数取得  左右のみずれ調整

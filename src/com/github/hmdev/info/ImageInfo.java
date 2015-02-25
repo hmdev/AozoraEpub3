@@ -67,11 +67,15 @@ public class ImageInfo
 	{
 		return getImageInfo(is, -1);
 	}
+	
+	
+	
 	/** 画像ストリームから画像情報を生成
 	 * @param zipIndex Zipファイルの場合はエントリの位置 (再読込や読み飛ばし時のファイル名比較の省略用)
 	 * @throws IOException */
 	static public ImageInfo getImageInfo(InputStream is, int zipIndex) throws IOException
 	{
+		ImageInfo imageInfo = null;
 		ImageInputStream iis = ImageIO.createImageInputStream(is);
 		Iterator<ImageReader> readers = ImageIO.getImageReaders(iis);
 		if (readers.hasNext()) {
@@ -79,9 +83,10 @@ public class ImageInfo
 			if (readers.hasNext() && reader.getClass().getName().endsWith("CLibPNGImageReader")) readers.next();
 			reader.setInput(iis);
 			String ext = reader.getFormatName();
-			return new ImageInfo(ext, reader.getWidth(0), reader.getHeight(0), zipIndex);
+			imageInfo = new ImageInfo(ext, reader.getWidth(0), reader.getHeight(0), zipIndex);
+			reader.dispose();
 		}
-		return null;
+		return imageInfo;
 	}
 	
 	static public ImageInfo getImageInfo(String ext, BufferedImage image, int zipIndex) throws IOException

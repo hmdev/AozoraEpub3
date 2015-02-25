@@ -3356,7 +3356,6 @@ public class AozoraEpub3Applet extends JApplet
 		int txtCount = 1;
 		boolean imageOnly = false;
 		if("zip".equals(ext) || "txtz".equals(ext)) { 
-			LogAppender.println("--------");
 			try {
 				txtCount = AozoraEpub3.countZipText(srcFile);
 			} catch (Exception e) {
@@ -3364,7 +3363,6 @@ public class AozoraEpub3Applet extends JApplet
 			}
 			if (txtCount == 0) { txtCount = 1; imageOnly = true; }
 		} else if ("rar".equals(ext)) {
-			LogAppender.println("--------");
 			try {
 				txtCount = AozoraEpub3.countRarText(srcFile);
 			} catch (Exception e) {
@@ -3372,10 +3370,8 @@ public class AozoraEpub3Applet extends JApplet
 			}
 			if (txtCount == 0) { txtCount = 1; imageOnly = true; }
 		} else if ("cbz".equals(ext)) {
-			LogAppender.println("--------");
 			imageOnly = true;
 		} else if ("txt".equals(ext)) {
-			LogAppender.println("--------");
 		}
 		if (this.convertCanceled){
 			LogAppender.println("変換処理を中止しました : "+srcFile.getAbsolutePath());
@@ -3403,7 +3399,6 @@ public class AozoraEpub3Applet extends JApplet
 	 */
 	private void convertFile(File srcFile, File dstPath, String ext, int txtIdx, boolean imageOnly)
 	{
-		if (txtIdx > 0) LogAppender.println("--------");
 		//パラメータ設定
 		if (!"txt".equals(ext) && !"txtz".equals(ext) && !"zip".equals(ext) && !"cbz".equals(ext) && !"rar".equals(ext) ) {
 			if (!"png".equals(ext) && !"jpg".equals(ext) && !"jpeg".equals(ext) && !"gif".equals(ext)) {
