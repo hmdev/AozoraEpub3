@@ -1704,7 +1704,7 @@ public class AozoraEpub3Converter
 	 * @param out 出力先Writer
 	 * @param line 変換前の行文字列
 	 * @param noBr 改行を出力しない */
-	private void convertTextLineToEpub3(BufferedWriter out, String line, int lineNum, boolean noBr, boolean noImage) throws IOException
+	void convertTextLineToEpub3(BufferedWriter out, String line, int lineNum, boolean noBr, boolean noImage) throws IOException
 	{
 		StringBuilder buf = new StringBuilder();
 		
@@ -1995,6 +1995,18 @@ public class AozoraEpub3Converter
 								LogAppender.error(lineNum, "注記エラー", chukiTag);
 							} else {
 								srcFilePath = srcFilePath.trim();
+								//外字のすぐ後ろがルビならルビ開始文字をチェックしてなければ外字の前に｜をつける(1文字のみ対応)
+								if (ch.length-1 > chukiStart+chukiTag.length() && ch[chukiStart+chukiTag.length()] == '《') {
+									boolean hasRubyStart = false;
+									for (int i=chukiStart-1; i>=0; i--) {
+										if (ch[i] == '｜') { hasRubyStart = true; i = -1; }
+										else if (ch[i] == '》') i = -1;
+									}
+									if (!hasRubyStart) {
+										if (!chukiTag.endsWith("#GAIJI#］")) LogAppender.info(lineNum, "画像にルビ", srcFilePath);
+										buf.append('｜');
+									}
+								}
 								//外字の場合 (注記末尾がフラグ文字列になっている)
 								if (chukiTag.endsWith("#GAIJI#］")) {
 									//String ext = srcFilePath.substring(srcFilePath.lastIndexOf('.')+1).toLowerCase();

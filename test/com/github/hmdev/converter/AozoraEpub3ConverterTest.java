@@ -1,10 +1,13 @@
 package com.github.hmdev.converter;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.StringWriter;
 
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.github.hmdev.info.BookInfo;
 import com.github.hmdev.writer.Epub3Writer;
 
 public class AozoraEpub3ConverterTest
@@ -17,8 +20,22 @@ public class AozoraEpub3ConverterTest
 		Epub3Writer writer = new Epub3Writer("");
 		try {
 			converter = new AozoraEpub3Converter(writer, "");
+			converter.writer = new TestEpub3Writer("");
+			converter.bookInfo = new BookInfo(null);
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+	}
+	
+	class TestEpub3Writer extends Epub3Writer
+	{
+		public TestEpub3Writer(String templatePath)
+		{
+			super(templatePath);
+		}
+		public String getImageFilePath(String srcImageFileName, int lineNum) throws IOException
+		{
+			return "test.png";
 		}
 	}
 	
@@ -29,11 +46,51 @@ public class AozoraEpub3ConverterTest
 			String str;
 			str = converter.convertTitleLineToEpub3(converter.convertGaijiChuki("｜ルビ※［＃米印］《るび》※［＃米印］※［＃始め二重山括弧］※［＃終わり二重山括弧］", true, true));
 			System.out.println(str);
+			
+			StringWriter sw = new StringWriter();
+			BufferedWriter bw = new BufferedWriter(sw);
+			String line = converter.convertGaijiChuki("外字の後のルビ※［＃（外字.tif）］《がいじ》", true, true);
+			System.out.println(line);
+			converter.convertTextLineToEpub3(bw, line, 0, false, false);
+			bw.close();
+			System.out.println(sw.toString());
+			
+			sw = new StringWriter();
+			bw = new BufferedWriter(sw);
+			line = converter.convertGaijiChuki("外字の後の｜ルビ※［＃（外字.tif）］《がいじ》", true, true);
+			System.out.println(line);
+			converter.convertTextLineToEpub3(bw, line, 0, false, false);
+			bw.close();
+			System.out.println(sw.toString());
+			
+			sw = new StringWriter();
+			bw = new BufferedWriter(sw);
+			line = converter.convertGaijiChuki("※［＃（外字.tif）］《がいじ》", true, true);
+			System.out.println(line);
+			converter.convertTextLineToEpub3(bw, line, 0, false, false);
+			bw.close();
+			System.out.println(sw.toString());
+			
+			sw = new StringWriter();
+			bw = new BufferedWriter(sw);
+			line = converter.convertGaijiChuki("外字の後の｜ルビ《るび》※［＃（外字.tif）］《るび》", true, true);
+			System.out.println(line);
+			converter.convertTextLineToEpub3(bw, line, 0, false, false);
+			bw.close();
+			System.out.println(sw.toString());
+			
+			sw = new StringWriter();
+			bw = new BufferedWriter(sw);
+			line = converter.convertGaijiChuki("その上方に※［＃逆三角形と三角形が向き合っている形（fig1317_26.png、横26×縦59）入る］《デアボロ》", true, true);
+			System.out.println(line);
+			converter.convertTextLineToEpub3(bw, line, 0, false, false);
+			bw.close();
+			System.out.println(sw.toString());
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-
 	
 	@Test
 	public void testConvertRubyText()

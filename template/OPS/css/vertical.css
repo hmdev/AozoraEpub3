@@ -297,6 +297,7 @@ display: inline-block;
 text-orientation: sideways-right;
 -webkit-text-orientation: sideways-right;
 -epub-text-orientation: sideways-right;
+vertical-align: bottom;
 }
 
 /* 横書き */
