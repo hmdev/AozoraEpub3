@@ -23,7 +23,7 @@ padding: 0;
 display: block;
 color: #000;
 font-size: ${fontSize}%;
-line-height: ${lineHeight}em;
+line-height: ${lineHeight};
 vertical-align: baseline;
 }
 

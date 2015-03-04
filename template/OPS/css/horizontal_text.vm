@@ -22,9 +22,8 @@ margin: 0;
 padding: 0;
 display: block;
 color: #000;
-border: none;
 font-size: ${fontSize}%;
-line-height: ${lineHeight}em;
+line-height: ${lineHeight};
 vertical-align: baseline;
 }
 
