@@ -3899,8 +3899,6 @@ public class AozoraEpub3Applet extends JApplet
 				jComboEncType.setSelectedItem("UTF-8");
 				int titleTypeIdx = jComboTitle.getSelectedIndex();
 				jComboTitle.setSelectedIndex(0);
-				Object coverItem = jComboCover.getSelectedItem();
-				jComboCover.setSelectedIndex(1);
 				boolean checkUseFileName = jCheckUseFileName.isSelected();
 				jCheckUseFileName.setSelected(false);
 				//コメント出力
@@ -3915,7 +3913,6 @@ public class AozoraEpub3Applet extends JApplet
 				//設定を戻す
 				jComboEncType.setSelectedItem(encType);
 				jComboTitle.setSelectedIndex(titleTypeIdx);
-				jComboCover.setSelectedItem(coverItem);
 				jCheckUseFileName.setSelected(checkUseFileName);
 				jCheckCommentPrint.setSelected(commentPrint);
 				jCheckCommentConvert.setSelected(commentConvert);
