@@ -42,14 +42,15 @@
 ここで中見出し終わり	</div>		1
 ここから小見出し	<div class="chap3">		1
 ここで小見出し終わり	</div>		1
-見出し	<div class="chap1">			1
-見出し終わり	</div>		1
-大見出し	<div class="chap1">		1
-大見出し終わり	</div>		1
-中見出し	<div class="chap2">		1
-中見出し終わり	</div>		1
-小見出し	<div class="chap3">		1
-小見出し終わり	</div>		1
+###見出し注記は自動で閉じる(見出し終わり注記ではタグは定義しない)
+見出し	<div class="chap1">	</div>		1
+見出し終わり			1
+大見出し	<div class="chap1">	</div>	1
+大見出し終わり			1
+中見出し	<div class="chap2">	</div>	1
+中見出し終わり			1
+小見出し	<div class="chap3">	</div>	1
+小見出し終わり			1
 同行大見出し	<span class="font5">
 同行大見出し終わり	</span>
 同行中見出し	<span class="font3">
