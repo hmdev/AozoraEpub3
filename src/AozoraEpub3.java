@@ -31,7 +31,7 @@ import com.github.junrar.rarfile.FileHeader;
 /** コマンドライン実行用mainとePub3変換関数 */
 public class AozoraEpub3
 {
-	public static final String VERSION = "1.1.0b44";
+	public static final String VERSION = "1.1.0b45";
 	
 	/** コマンドライン実行用 */
 	public static void main(String args[])
@@ -634,8 +634,8 @@ public class AozoraEpub3
 	{
 		String baseFileName = srcFile.getPath();
 		baseFileName = baseFileName.substring(0, baseFileName.lastIndexOf('.')+1);
-		for (String ext : new String[]{"png","jpg","jpeg","PNG","JPG","JPEG"}) {
-			String coverFileName = baseFileName+ext;
+		for (String ext : new String[]{"png","jpg","jpeg","PNG","JPG","JPEG","Png","Jpg","Jpeg"}) {
+			String coverFileName = baseFileName+ext; 
 			if (new File(coverFileName).exists()) return coverFileName;
 		}
 		return null;

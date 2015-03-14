@@ -2812,12 +2812,14 @@ public class AozoraEpub3Applet extends JApplet
 				
 				Vector<File> vecFiles = new Vector<File>();
 				Vector<String> vecUrlString = null;
+				Vector<File> vecUrlSrcFile = null;
 				File dstPath = null;
 				try {
 				for (File file : fileChooser.getSelectedFiles()) {
 					if (file.getName().toLowerCase().endsWith(".url")) {
 						if (vecUrlString == null) vecUrlString = new Vector<String>();
 						vecUrlString.add(readInternetShortCut(file));
+						vecUrlSrcFile.add(file);
 						dstPath = file.getParentFile();
 					} else {
 						vecFiles.add(file);
@@ -2827,7 +2829,7 @@ public class AozoraEpub3Applet extends JApplet
 					e1.printStackTrace();
 				}
 				
-				startConvertWorker(vecFiles, vecUrlString, dstPath);
+				startConvertWorker(vecFiles, vecUrlString, vecUrlSrcFile, dstPath);
 			}
 		}
 	}
@@ -3021,6 +3023,8 @@ public class AozoraEpub3Applet extends JApplet
 			Vector<File> vecFiles = new Vector<File>();
 			//Web変換対象URLを格納
 			Vector<String> vecUrlString = new Vector<String>();
+			//ショートカットファイルを格納(同名の表紙取得に利用)
+			Vector<File> vecUrlSrcFile = new Vector<File>();
 			File dstPath = null;
 			
 			if (transfer.isDataFlavorSupported(DataFlavor.stringFlavor)) {
@@ -3044,6 +3048,7 @@ public class AozoraEpub3Applet extends JApplet
 									String urlLine = readInternetShortCut(file);
 									if (urlLine != null && urlLine.startsWith("http://")) {
 										vecUrlString.add(urlLine);
+										vecUrlSrcFile.add(file);
 									}
 								} else {
 									vecFiles.add(file);
@@ -3062,6 +3067,7 @@ public class AozoraEpub3Applet extends JApplet
 								if (urlLine.startsWith("http://")) {
 									//Webから取得で処置
 									vecUrlString.add(urlLine);
+									vecUrlSrcFile.add(null);
 								} else if (urlLine.endsWith(".txt")) {
 									File file = new File(urlLine);
 									if (file.isFile()) {
@@ -3083,10 +3089,10 @@ public class AozoraEpub3Applet extends JApplet
 						if (file.exists()) {
 							if (dstPath == null && !isCacheFile(file)) dstPath = file.getParentFile();
 							if (file.getName().toLowerCase().endsWith(".url")) {
-								if (vecUrlString == null) vecUrlString = new Vector<String>();
 								String urlLine = readInternetShortCut(file);
 								if (urlLine != null && urlLine.startsWith("http://")) {
 									vecUrlString.add(urlLine);
+									vecUrlSrcFile.add(file);
 								}
 							} else {
 								vecFiles.add(file);
@@ -3099,7 +3105,7 @@ public class AozoraEpub3Applet extends JApplet
 			//何も変換しなければfalse
 			if (vecFiles.size() == 0 && vecUrlString.size() == 0) return false;
 			//変換実行
-			startConvertWorker(vecFiles, vecUrlString, dstPath);
+			startConvertWorker(vecFiles, vecUrlString, vecUrlSrcFile, dstPath);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -3821,10 +3827,14 @@ public class AozoraEpub3Applet extends JApplet
 	}
 	
 	/** Web変換
-	 * @param vecUrlString 青空文庫テキストのzipまたは対応サイトのリンクURL */
-	private void convertWeb(Vector<String> vecUrlString, File dstPath) throws IOException
+	 * @param vecUrlString 青空文庫テキストのzipまたは対応サイトのリンクURL
+	 * @param vecUrlSrcFile ショートカットファイルのURLならファイルが指定されている */
+	private void convertWeb(Vector<String> vecUrlString, Vector<File> vecUrlSrcFile, File dstPath) throws IOException
 	{
-		for (String urlString : vecUrlString) {
+		for (int i=0; i<vecUrlString.size(); i++) {
+			String urlString = vecUrlString.get(i);
+			File urSrcFile = null;
+			if (vecUrlSrcFile != null && vecUrlSrcFile.size() > i) urSrcFile = vecUrlSrcFile.get(i);
 			//URL変換 の最後が .zip .txtz .rar
 			String ext = urlString.substring(urlString.lastIndexOf('.')+1).toLowerCase();
 			if (ext.equals("zip") || ext.equals("txtz") || ext.equals("rar")) {
@@ -3907,6 +3917,16 @@ public class AozoraEpub3Applet extends JApplet
 				boolean commentConvert = jCheckCommentConvert.isSelected();
 				jCheckCommentConvert.setSelected(true);
 				
+				//表紙画像はconverted.pngで保存される 指定がない場合はそれを利用する
+				Object coverItem = jComboCover.getSelectedItem();
+				//入力ファイルと同じ表紙の指定の場合 ショートカットファイルのパスにファイルがあればファイルパスを指定に変更
+				if (jComboCover.getSelectedIndex() == 1 && urSrcFile != null) {
+					String coverFileName = AozoraEpub3.getSameCoverFileName(urSrcFile);
+					jComboCover.setSelectedItem(coverFileName);
+				}
+				//同名のファイルが無い場合はconverted.pngを利用する設定に変更
+				if (jComboCover.getSelectedIndex() == 0 || jComboCover.getSelectedIndex() == 1) jComboCover.setSelectedIndex(1);
+				
 				//変換処理実行
 				convertFiles(new File[]{srcFile}, dstPath);
 				
@@ -3916,6 +3936,7 @@ public class AozoraEpub3Applet extends JApplet
 				jCheckUseFileName.setSelected(checkUseFileName);
 				jCheckCommentPrint.setSelected(commentPrint);
 				jCheckCommentConvert.setSelected(commentConvert);
+				jComboCover.setSelectedItem(coverItem);
 				
 			} catch (Exception e) {
 				e.printStackTrace(); LogAppender.println("エラーが発生しました : "+e.getMessage());
@@ -3942,7 +3963,7 @@ public class AozoraEpub3Applet extends JApplet
 	////////////////////////////////////////////////////////////////
 	/** 別スレッド実行用SwingWorkerを実行
 	 * @param dstPath 出力先 ブラウザからまたはURLペーストの場合はnull */
-	void startConvertWorker(Vector<File> vecFiles, Vector<String> vecUrlString, File dstPath)
+	void startConvertWorker(Vector<File> vecFiles, Vector<String> vecUrlString, Vector<File> vecUrlSrcFile, File dstPath)
 	{
 		//出力先が指定されていない場合は選択させる
 		if (dstPath == null && jCheckSamePath.isSelected() || !jCheckSamePath.isSelected() && "".equals(jComboDstPath.getEditor().getItem().toString().trim())) {
@@ -3983,7 +4004,7 @@ public class AozoraEpub3Applet extends JApplet
 		this.cachePath = this.getCachePath();
 		
 		//web以下に同じ名前のパスがあったらキャッシュ後青空変換
-		ConvertWorker convertWorker = new ConvertWorker(vecFiles, vecUrlString, dstPath);
+		ConvertWorker convertWorker = new ConvertWorker(vecFiles, vecUrlString, vecUrlSrcFile, dstPath);
 		convertWorker.execute();
 	}
 	
@@ -3996,16 +4017,19 @@ public class AozoraEpub3Applet extends JApplet
 		Vector<File> vecFiles;
 		/** 変換対象URL */
 		Vector<String> vecUrlString;
+		/** ショートカットファイル */
+		Vector<File> vecUrlSrcFile;
 		
 		File dstPath = null;
 		
 		/** @param dstPath ショートカットファイルなら同じ場所出力用に指定 */
-		public ConvertWorker(Vector<File> vecFiles, Vector<String> vecUrlString, File dstPath)
+		public ConvertWorker(Vector<File> vecFiles, Vector<String> vecUrlString, Vector<File> vecUrlSrcFile, File dstPath)
 		{
 			this.applet = getApplet();
 			
 			this.vecFiles = vecFiles;
 			this.vecUrlString = vecUrlString;
+			this.vecUrlSrcFile = vecUrlSrcFile;
 			
 			this.dstPath = dstPath;
 		}
@@ -4022,7 +4046,7 @@ public class AozoraEpub3Applet extends JApplet
 					this.applet.convertFiles(vecFiles, dstPath);
 				}
 				if (vecUrlString != null && vecUrlString.size() >0) {
-					this.applet.convertWeb(vecUrlString, dstPath);
+					this.applet.convertWeb(vecUrlString, vecUrlSrcFile, dstPath);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -4706,7 +4730,7 @@ public class AozoraEpub3Applet extends JApplet
 			if (vecFiles.size() > 0) {
 				File[] files = new File[vecFiles.size()];
 				for (int i=0; i<files.length; i++) files[i] = vecFiles.get(i);
-				applet.startConvertWorker(vecFiles, null, null);
+				applet.startConvertWorker(vecFiles, null, null, null);
 			}
 		}
 		
