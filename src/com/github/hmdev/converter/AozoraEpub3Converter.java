@@ -1977,6 +1977,7 @@ public class AozoraEpub3Converter
 						int blength = 0;
 						boolean hasBr = false;
 						boolean inChuki = false;
+						boolean inRuby = false;
 						for (int i=start; i<end; i++) {
 							if (inChuki) {
 								if (ch[i]=='］') inChuki = false;
@@ -1987,6 +1988,10 @@ public class AozoraEpub3Converter
 								}
 								inChuki = true;
 								i++;
+							} else if (inRuby) {
+								if (ch[i]=='》') inRuby = false;
+							} else if (i < end-1 && ch[i]=='《') {
+								inRuby = true;
 							} else {
 								if (CharUtils.isHalf(ch[i])) blength++;
 								else blength+=2;
@@ -1996,12 +2001,17 @@ public class AozoraEpub3Converter
 							int half = (int)Math.ceil(blength/2.0);
 							blength = 0;
 							inChuki = false;
+							inRuby = false;
 							for (int i=start; i<end; i++) {
 								if (inChuki) {
 									if (ch[i]=='］') inChuki = false;
 								} else if (i < end-1 && ch[i]=='［' && ch[i+1]=='＃') {
 									inChuki = true;
 									i++;
+								} else if (inRuby) {
+									if (ch[i]=='》') inRuby = false;
+								} else if (i < end-1 && ch[i]=='《') {
+									inRuby = true;
 								} else {
 									if (blength >= half) {
 										wrcBrPos = i;
