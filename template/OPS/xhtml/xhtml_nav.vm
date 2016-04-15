@@ -54,7 +54,7 @@ nav#landmarks { display:none; }
 			<li><a epub:type="toc" href="nav.xhtml">目次</a></li>
 #end
 #if (${title_page})
-			<li><a epub:type="title-page" href="title.xhtml">扉</a></li>
+			<li><a epub:type="titlepage" href="title.xhtml">扉</a></li>
 #end
 #foreach(${sectionInfo} in ${sections})
 			<li><a epub:type="bodymatter" href="${sectionInfo.SectionId}.xhtml">本文</a></li>
