@@ -70,7 +70,7 @@ public class WebAozoraConverter
 	
 	/** 追加更新分のみ出力する */
 	boolean convertModifiedOnly = false;
-	/** 再神話から連続した追加更新分のみ出力 */
+	/** 最新話から連続した追加更新分のみ出力 */
 	boolean convertModifiedTail = false;
 	/** 更新分に追加で変換する話数 */
 	int beforeChapter = 0;
@@ -1146,6 +1146,8 @@ public class WebAozoraConverter
 		cacheFile.getParentFile().mkdirs();
 		//ダウンロード
 		URLConnection conn = new URL(urlString).openConnection();
+		ExtractInfo[] cookie = this.queryMap.get(ExtractId.COOKIE);
+		if (cookie != null && cookie.length > 0) conn.setRequestProperty("Cookie", cookie[0].query);
 		if (referer != null) conn.setRequestProperty("Referer", referer);
 		conn.setConnectTimeout(10000);//10秒
 		BufferedInputStream bis = new BufferedInputStream(conn.getInputStream(), 8192);

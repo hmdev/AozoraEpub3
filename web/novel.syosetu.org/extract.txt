@@ -32,13 +32,13 @@ SUBTITLE_LIST	#maind .ss td a
 ## 各話 Chapter 先頭の章のみ大見出しで出力
 #CONTENT_CHAPTER	
 ## 各話 タイトル 中見出しで出力
-CONTENT_SUBTITLE	#maind .ss font:1
+CONTENT_SUBTITLE	#maind .ss font-size:1
 
 ## 各話 本文
 CONTENT_ARTICLE	#maind .ss:0
 
 ## 本文抽出開始 このタグの次から
-CONTENT_ARTICLE_START	#maind .ss font:1
+CONTENT_ARTICLE_START	#maind .ss font-size:1
 
 ## 本文抽出終了 このタグの前まで
 CONTENT_ARTICLE_END	#maind .ss div:-2

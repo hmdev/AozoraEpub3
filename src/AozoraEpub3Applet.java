@@ -3046,7 +3046,7 @@ public class AozoraEpub3Applet extends JApplet
 								if (dstPath == null && !isCacheFile(file)) dstPath = file.getParentFile();
 								if (file.getName().toLowerCase().endsWith(".url")) {
 									String urlLine = readInternetShortCut(file);
-									if (urlLine != null && urlLine.startsWith("http://")) {
+									if (urlLine != null && (urlLine.startsWith("http://") || urlLine.startsWith("https://"))) {
 										vecUrlString.add(urlLine);
 										vecUrlSrcFile.add(file);
 									}
@@ -3064,7 +3064,7 @@ public class AozoraEpub3Applet extends JApplet
 						String[] urlLines = urlString.split("\n| ");
 						for (String urlLine : urlLines) {
 							if (urlLine != null) {
-								if (urlLine.startsWith("http://")) {
+								if (urlLine.startsWith("http://") || urlLine.startsWith("https://")) {
 									//Webから取得で処置
 									vecUrlString.add(urlLine);
 									vecUrlSrcFile.add(null);
@@ -3090,7 +3090,7 @@ public class AozoraEpub3Applet extends JApplet
 							if (dstPath == null && !isCacheFile(file)) dstPath = file.getParentFile();
 							if (file.getName().toLowerCase().endsWith(".url")) {
 								String urlLine = readInternetShortCut(file);
-								if (urlLine != null && urlLine.startsWith("http://")) {
+								if (urlLine != null && (urlLine.startsWith("http://") || urlLine.startsWith("https://"))) {
 									vecUrlString.add(urlLine);
 									vecUrlSrcFile.add(file);
 								}

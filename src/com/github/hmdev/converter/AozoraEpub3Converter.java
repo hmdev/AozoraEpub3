@@ -1735,7 +1735,7 @@ public class AozoraEpub3Converter
 		//行頭インデント 先頭が「『―（以外 半角空白は除去
 		if (this.forceIndent && ch.length > charStart+1) {
 			switch (ch[charStart]) {
-			case '　': case '「': case '『':  case '（': case '“': case '〝': case '〈': case '【': case '〔': case '［': case '※':
+			case '　': case '「': case '『':  case '（': case '”': case '〈': case '【': case '〔': case '［': case '※':
 				break;
 			case ' ': case ' ':
 				char c1 = ch[charStart+1];
@@ -2022,8 +2022,8 @@ public class AozoraEpub3Converter
 								}
 							}
 							//改行位置を取得 、。は禁則処理する
-							//wrcBrPos = start + (int)Math.ceil((end-start)/2.0);
-							if (ch[wrcBrPos] == '、' || ch[wrcBrPos] == '。') wrcBrPos++;
+							if (wrcBrPos > 0 && wrcBrPos < ch.length &&
+								ch[wrcBrPos] == '、' || ch[wrcBrPos] == '。') wrcBrPos++;
 						}
 					}
 				}

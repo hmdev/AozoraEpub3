@@ -130,10 +130,11 @@ public class CharUtils
 		case '゛': case '゜':
 			//二の字点は濁点付きも漢字
 			return (i>0 && ch[i-1]=='〻');
-		case 'ノ': case 'カ': case 'ケ': case 'ヵ': case 'ヶ':
+		/*case 'ノ': case 'カ': case 'ケ': case 'ヵ': case 'ヶ':
 			//漢字の間にある場合だけ漢字扱い
 			if (i==0 || i+1==ch.length) return false;
 			return _isKanji(ch, i-1) && _isKanji(ch, i+1);
+		*/
 		}
 		return _isKanji(ch, i);
 	}
