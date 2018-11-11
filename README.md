@@ -227,7 +227,7 @@ WindowsXP以降 Ubuntu MacOSX で動作確認済
 
 使い方 CUI
 ------------
-####コマンドラインからの実行
+#### コマンドラインからの実行
 　Usage: java -cp AozoraEpub3.jar AozoraEpub3 \[-options] input_files(txt,zip)  
 
 **オプション**  
