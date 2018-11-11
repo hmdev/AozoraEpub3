@@ -26,7 +26,7 @@ public class LogAppender
 			jTextArea.append(log);
 			jTextArea.setCaretPosition(jTextArea.getDocument().getLength());
 		}
-		else System.out.print(log);
+		System.out.print(log);
 	}
 	
 	static public void printStaclTrace(Exception e)

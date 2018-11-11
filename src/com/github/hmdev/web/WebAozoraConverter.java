@@ -929,6 +929,9 @@ public class WebAozoraConverter
 		int idx = src.indexOf("//");
 		if (idx > 0) {
 			imagePath = CharUtils.escapeUrlToFile(src.substring(idx+2));
+		} else if(idx == 0 && src.indexOf("mitemin") != 0) { // なろう様 changes to new image provider
+			src = "https:" + src;
+			imagePath = CharUtils.escapeUrlToFile(src);
 		} else if (src.charAt(0) == '/') {
 			imagePath = "_"+CharUtils.escapeUrlToFile(src);
 			src = this.baseUri+src;
@@ -943,6 +946,7 @@ public class WebAozoraConverter
 		
 		File imageFile = new File(this.dstPath+"images/"+imagePath);
 		
+		LogAppender.append("画像を取得してみます：" + src);
 		try {
 			if (imageOutFile != null) {
 				if (imageOutFile.exists()) imageOutFile.delete();
@@ -954,6 +958,8 @@ public class WebAozoraConverter
 			e.printStackTrace();
 			LogAppender.println("画像が取得できませんでした : "+src);
 		}
+		LogAppender.println(" - 完了みたいです。");
+		
 		if (bw != null) {
 			bw.append("［＃挿絵（");
 			bw.append("images/"+imagePath);
