@@ -109,6 +109,10 @@ public class ImageUtils
 				image.createGraphics().drawRenderedImage(ri, NO_TRANSFORM);
 			} catch (Exception e) {
 				image = ImageIO.read(is);
+			} catch (NoClassDefFoundError e) {
+				// OpenJDKではcom.sun.image.codec.jpegがなくてエラーになるので
+				// それをキャッチする
+				image = ImageIO.read(is);
 			}
 		} else {
 			image = ImageIO.read(is);
