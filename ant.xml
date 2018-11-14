@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="create_run_jar" name="Create Runnable Jar for Project AozoraEpub3 with libraries in sub-folder">
+    <!--this file was created by Eclipse Runnable JAR Export Wizard-->
+    <!--ANT 1.7 is required                                        -->
+    <!--define folder properties-->
+    <property name="dir.buildfile" value="."/>
+    <property name="dir.workspace" value="${dir.buildfile}/.."/>
+    <property name="dir.jarfile" value="C:/Users/user/Desktop"/>
+    <target name="create_run_jar">
+        <jar destfile="${dir.jarfile}/AozoraEPUB3.jar">
+            <manifest>
+                <attribute name="Main-Class" value="AozoraEpub3Applet"/>
+                <attribute name="Class-Path" value=". lib/commons-cli-1.2.jar lib/commons-collections-3.2.1.jar lib/commons-compress-1.0.jar lib/commons-lang-2.4.jar lib/commons-logging-api-1.0.4.jar lib/jai_codec.jar lib/jai_core.jar lib/jsoup-1.7.1.jar lib/junrar-0.7.jar lib/velocity-1.7.jar"/>
+            </manifest>
+            <fileset dir="${dir.buildfile}/bin"/>
+        </jar>
+        <delete dir="${dir.jarfile}/lib"/>
+        <mkdir dir="${dir.jarfile}/lib"/>
+        <copy file="${dir.buildfile}/lib/commons-cli-1.2.jar" todir="${dir.jarfile}/lib"/>
+        <copy file="${dir.buildfile}/lib/commons-collections-3.2.1.jar" todir="${dir.jarfile}/lib"/>
+        <copy file="${dir.buildfile}/lib/commons-compress-1.0.jar" todir="${dir.jarfile}/lib"/>
+        <copy file="${dir.buildfile}/lib/commons-lang-2.4.jar" todir="${dir.jarfile}/lib"/>
+        <copy file="${dir.buildfile}/lib/commons-logging-api-1.0.4.jar" todir="${dir.jarfile}/lib"/>
+        <copy file="${dir.buildfile}/lib/jai_codec.jar" todir="${dir.jarfile}/lib"/>
+        <copy file="${dir.buildfile}/lib/jai_core.jar" todir="${dir.jarfile}/lib"/>
+        <copy file="${dir.buildfile}/lib/jsoup-1.7.1.jar" todir="${dir.jarfile}/lib"/>
+        <copy file="${dir.buildfile}/lib/junrar-0.7.jar" todir="${dir.jarfile}/lib"/>
+        <copy file="${dir.buildfile}/lib/velocity-1.7.jar" todir="${dir.jarfile}/lib"/>
+    </target>
+</project>
