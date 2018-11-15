@@ -5,9 +5,9 @@
     <!--define folder properties-->
     <property name="dir.buildfile" value="."/>
     <property name="dir.workspace" value="${dir.buildfile}/.."/>
-    <property name="dir.jarfile" value="C:/Users/user/Desktop"/>
+    <property name="dir.jarfile" value="C:/Users/user/Desktop/AozoraEpub3-1.1.0b47Q/"/>
     <target name="create_run_jar">
-        <jar destfile="${dir.jarfile}/AozoraEPUB3.jar">
+        <jar destfile="${dir.jarfile}/AozoraEpub3.jar">
             <manifest>
                 <attribute name="Main-Class" value="AozoraEpub3Applet"/>
                 <attribute name="Class-Path" value=". lib/commons-cli-1.2.jar lib/commons-collections-3.2.1.jar lib/commons-compress-1.0.jar lib/commons-lang-2.4.jar lib/commons-logging-api-1.0.4.jar lib/jai_codec.jar lib/jai_core.jar lib/jsoup-1.7.1.jar lib/junrar-0.7.jar lib/velocity-1.7.jar"/>
@@ -26,5 +26,315 @@
         <copy file="${dir.buildfile}/lib/jsoup-1.7.1.jar" todir="${dir.jarfile}/lib"/>
         <copy file="${dir.buildfile}/lib/junrar-0.7.jar" todir="${dir.jarfile}/lib"/>
         <copy file="${dir.buildfile}/lib/velocity-1.7.jar" todir="${dir.jarfile}/lib"/>
+        <copy file="${dir.buildfile}/lib/LICENSE/commons.txt" todir="${dir.jarfile}/lib/LICENSE"/>
+        <copy file="${dir.buildfile}/lib/LICENSE/jai.txt" todir="${dir.jarfile}/lib/LICENSE"/>
+        <copy file="${dir.buildfile}/lib/LICENSE/jsoup.txt" todir="${dir.jarfile}/lib/LICENSE"/>
+        <copy file="${dir.buildfile}/lib/LICENSE/junrar.txt" todir="${dir.jarfile}/lib/LICENSE"/>
+        <copy file="${dir.buildfile}/lib/LICENSE/velocity.txt" todir="${dir.jarfile}/lib/LICENSE"/>
+
+        <delete dir="${dir.jarfile}/gaiji"/>
+        <mkdir dir="${dir.jarfile}/gaiji"/>
+        <mkdir dir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/convert.pe" todir="${dir.jarfile}/gaiji"/>
+        <copy file="${dir.buildfile}/gaiji/README.txt" todir="${dir.jarfile}/gaiji"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u303b-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3041-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3041-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3042-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3042-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3043-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3043-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3044-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3044-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3045-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3045-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3046-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3047-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3047-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3048-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3048-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3049-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3049-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u304a-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u304a-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u304b-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u304d-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u304f-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3051-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3053-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3055-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3057-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3059-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u305b-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u305d-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u305f-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3061-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3063-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3063-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3064-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3066-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3068-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u306a-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u306a-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u306b-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u306b-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u306c-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u306c-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u306d-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u306d-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u306e-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u306e-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u307e-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u307e-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u307f-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u307f-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3080-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3080-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3081-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3081-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3082-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3082-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3083-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3083-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3084-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3084-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3085-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3085-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3086-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3086-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3087-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3087-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3088-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3088-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3089-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3089-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u308a-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u308a-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u308b-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u308b-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u308c-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u308c-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u308d-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u308d-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u308e-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u308e-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u308f-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u308f-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3090-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3090-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3091-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3091-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3092-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3092-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3093-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3093-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3095-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3095-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3096-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3096-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u309d-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30a1-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30a1-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30a2-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30a2-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30a3-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30a3-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30a4-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30a4-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30a5-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30a5-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30a6-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30a7-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30a7-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30a8-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30a8-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30a9-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30a9-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30aa-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30aa-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30ab-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30ad-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30af-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30b1-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30b3-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30b5-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30b7-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30b9-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30bb-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30bd-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30bf-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30c1-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30c3-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30c3-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30c4-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30c6-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30c8-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30ca-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30ca-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30cb-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30cb-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30cc-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30cc-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30cd-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30cd-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30ce-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30ce-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30de-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30de-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30df-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30df-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30e0-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30e0-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30e1-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30e1-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30e2-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30e2-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30e3-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30e3-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30e4-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30e4-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30e5-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30e5-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30e6-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30e6-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30e7-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30e7-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30e8-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30e8-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30e9-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30e9-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30ea-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30ea-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30eb-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30eb-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30ec-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30ec-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30ed-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30ed-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30ee-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30ee-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30ef-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30f0-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30f1-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30f2-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30f3-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30f3-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30f5-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30f5-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30f6-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30f6-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30fc-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30fc-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u30fd-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u31f0-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u31f0-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u31f1-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u31f1-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u31f2-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u31f2-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u31f3-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u31f3-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u31f4-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u31f4-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u31f5-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u31f5-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u31f6-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u31f6-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u31f7-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u31f7-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u31f8-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u31f8-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u31f9-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u31f9-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u31fa-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u31fa-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u31fb-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u31fb-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u31fc-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u31fc-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u31fd-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u31fd-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u31fe-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u31fe-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u31ff-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u31ff-u309a.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+        <copy file="${dir.buildfile}/gaiji/dakuten/u3b9-u3099.ttf" todir="${dir.jarfile}/gaiji/dakuten"/>
+
+        <delete dir="${dir.jarfile}/presets"/>
+        <mkdir dir="${dir.jarfile}/presets"/>
+        <copy file="${dir.buildfile}/presets/kindle_pw.ini" todir="${dir.jarfile}/presets"/>
+        <copy file="${dir.buildfile}/presets/kobo__full.ini" todir="${dir.jarfile}/presets"/>
+        <copy file="${dir.buildfile}/presets/kobo_glo.ini" todir="${dir.jarfile}/presets"/>
+        <copy file="${dir.buildfile}/presets/kobo_touch.ini" todir="${dir.jarfile}/presets"/>
+        <copy file="${dir.buildfile}/presets/reader_t3.ini" todir="${dir.jarfile}/presets"/>
+        <copy file="${dir.buildfile}/presets/reader.ini" todir="${dir.jarfile}/presets"/>
+
+        <delete dir="${dir.jarfile}/template"/>
+        <mkdir dir="${dir.jarfile}/template"/>
+        <mkdir dir="${dir.jarfile}/template/fonts"/>
+            <mkdir dir="${dir.jarfile}/template/images"/>
+        <copy file="${dir.buildfile}/template/mimetype" todir="${dir.jarfile}/template/"/>
+
+        <mkdir dir="${dir.jarfile}/template/META-INF"/>
+        <copy file="${dir.buildfile}/template/META-INF/container.xml" todir="${dir.jarfile}/template/META-INF"/>
+
+    	<mkdir dir="${dir.jarfile}/template/OPS"/>
+        <copy file="${dir.buildfile}/template/OPS/package.vm" todir="${dir.jarfile}/template/OPS"/>
+        <copy file="${dir.buildfile}/template/OPS/toc.ncx.vm" todir="${dir.jarfile}/template/OPS"/>
+
+    	<mkdir dir="${dir.jarfile}/template/OPS/css"/>
+        <copy file="${dir.buildfile}/template/OPS/css/horizontal.css" todir="${dir.jarfile}/template/OPS/css"/>
+        <copy file="${dir.buildfile}/template/OPS/css/horizontal_font.css" todir="${dir.jarfile}/template/OPS/css"/>
+        <copy file="${dir.buildfile}/template/OPS/css/horizontal_image.css" todir="${dir.jarfile}/template/OPS/css"/>
+        <copy file="${dir.buildfile}/template/OPS/css/horizontal_middle.css" todir="${dir.jarfile}/template/OPS/css"/>
+        <copy file="${dir.buildfile}/template/OPS/css/horizontal_text.vm" todir="${dir.jarfile}/template/OPS/css"/>
+        <copy file="${dir.buildfile}/template/OPS/css/kindle_image.css" todir="${dir.jarfile}/template/OPS/css"/>
+        <copy file="${dir.buildfile}/template/OPS/css/svg_image.css" todir="${dir.jarfile}/template/OPS/css"/>
+        <copy file="${dir.buildfile}/template/OPS/css/vertical.css" todir="${dir.jarfile}/template/OPS/css"/>
+        <copy file="${dir.buildfile}/template/OPS/css/vertical_font.css" todir="${dir.jarfile}/template/OPS/css"/>
+        <copy file="${dir.buildfile}/template/OPS/css/vertical_image.css" todir="${dir.jarfile}/template/OPS/css"/>
+        <copy file="${dir.buildfile}/template/OPS/css/vertical_middle.css" todir="${dir.jarfile}/template/OPS/css"/>
+        <copy file="${dir.buildfile}/template/OPS/css/vertical_text.vm" todir="${dir.jarfile}/template/OPS/css"/>
+
+    	<mkdir dir="${dir.jarfile}/template/OPS/css_custom"/>
+        <copy file="${dir.buildfile}/template/OPS/css_custom/horizontal_font_reader.css" todir="${dir.jarfile}/template/OPS/css_custom"/>
+        <copy file="${dir.buildfile}/template/OPS/css_custom/horizontal_font_sample.css" todir="${dir.jarfile}/template/OPS/css_custom"/>
+        <copy file="${dir.buildfile}/template/OPS/css_custom/vertical_font_reader.css" todir="${dir.jarfile}/template/OPS/css_custom"/>
+        <copy file="${dir.buildfile}/template/OPS/css_custom/vertical_font_sample.css" todir="${dir.jarfile}/template/OPS/css_custom"/>
+
+    	<mkdir dir="${dir.jarfile}/template/OPS/xhtml"/>
+        <copy file="${dir.buildfile}/template/OPS/xhtml/cover.vm" todir="${dir.jarfile}/template/OPS/xhtml/"/>
+        <copy file="${dir.buildfile}/template/OPS/xhtml/svg_image.vm" todir="${dir.jarfile}/template/OPS/xhtml/"/>
+        <copy file="${dir.buildfile}/template/OPS/xhtml/title_horizontal.vm" todir="${dir.jarfile}/template/OPS/xhtml/"/>
+        <copy file="${dir.buildfile}/template/OPS/xhtml/title_middle.vm" todir="${dir.jarfile}/template/OPS/xhtml/"/>
+        <copy file="${dir.buildfile}/template/OPS/xhtml/xhtml_footer.vm" todir="${dir.jarfile}/template/OPS/xhtml/"/>
+        <copy file="${dir.buildfile}/template/OPS/xhtml/xhtml_header.vm" todir="${dir.jarfile}/template/OPS/xhtml/"/>
+        <copy file="${dir.buildfile}/template/OPS/xhtml/xhtml_nav.vm" todir="${dir.jarfile}/template/OPS/xhtml/"/>
+
+        <delete dir="${dir.jarfile}/web"/>
+        <mkdir dir="${dir.jarfile}/web"/>
+        <copy file="${dir.buildfile}/web/extract_sample.txt" todir="${dir.jarfile}/web/"/>
+        <copy file="${dir.buildfile}/web/2.novelist.jp/extract.txt" todir="${dir.jarfile}/web/2.novelist.jp/"/>
+        <copy file="${dir.buildfile}/web/ncode.syosetu.com/extract.txt" todir="${dir.jarfile}/web/ncode.syosetu.com"/>
+        <copy file="${dir.buildfile}/web/novel.fc2.com/extract.txt" todir="${dir.jarfile}/web/novel.fc2.com"/>
+        <copy file="${dir.buildfile}/web/novel.syosetu.org/extract.txt" todir="${dir.jarfile}/web/novel.syosetu.org"/>
+        <copy file="${dir.buildfile}/web/novel18.syosetu.com/extract.txt" todir="${dir.jarfile}/web/novel18.syosetu.com"/>
+        <copy file="${dir.buildfile}/web/novelist.jp/extract.txt" todir="${dir.jarfile}/web/novelist.jp"/>
+        <copy file="${dir.buildfile}/web/www.akatsuki-novels.com/extract.txt" todir="${dir.jarfile}/web/www.akatsuki-novels.com"/>
+        <copy file="${dir.buildfile}/web/www.dnovels.net/extract.txt" todir="${dir.jarfile}/web/www.dnovels.net"/>
+        <copy file="${dir.buildfile}/web/www.mai-net.net/extract.txt" todir="${dir.jarfile}/web/www.mai-net.net"/>
+        <copy file="${dir.buildfile}/web/www.newvel.jp/extract.txt" todir="${dir.jarfile}/web/www.newvel.jp"/>
+
+         <copy file="${dir.buildfile}/AozoraEpub3.ico" todir="${dir.jarfile}"/>
+         <copy file="${dir.buildfile}/chuki_alt.txt" todir="${dir.jarfile}"/>
+         <copy file="${dir.buildfile}/chuki_ivs.txt" todir="${dir.jarfile}"/>
+         <copy file="${dir.buildfile}/chuki_latin.txt" todir="${dir.jarfile}"/>
+         <copy file="${dir.buildfile}/chuki_tag.txt" todir="${dir.jarfile}"/>
+         <copy file="${dir.buildfile}/chuki_tag_suf.txt" todir="${dir.jarfile}"/>
+         <copy file="${dir.buildfile}/chuki_utf.txt" todir="${dir.jarfile}"/>
+         <copy file="${dir.buildfile}/LICENSE.txt" todir="${dir.jarfile}"/>
+         <copy file="${dir.buildfile}/README.md" todir="${dir.jarfile}"/>
+         <copy file="${dir.buildfile}/README_Changes.txt" todir="${dir.jarfile}"/>
+         <copy file="${dir.buildfile}/replace_sample.txt" todir="${dir.jarfile}"/>
     </target>
 </project>
