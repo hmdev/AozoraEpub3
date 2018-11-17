@@ -31,8 +31,8 @@ import com.github.junrar.rarfile.FileHeader;
 /** コマンドライン実行用mainとePub3変換関数 */
 public class AozoraEpub3
 {
-	public static final String VERSION = "1.1.0b46";
-	
+	public static final String VERSION = "1.1.0b48Q";
+
 	/** コマンドライン実行用 */
 	public static void main(String args[])
 	{
@@ -43,21 +43,21 @@ public class AozoraEpub3
 		else jarPath = jarPath.substring(0, jarPath.lastIndexOf(File.separator)+1);
 		//this.cachePath = new File(jarPath+".cache");
 		//this.webConfigPath = new File(jarPath+"web");
-		
+
 		/** ePub3出力クラス */
 		Epub3Writer epub3Writer;
 		/** ePub3画像出力クラス */
 		Epub3ImageWriter epub3ImageWriter;
-		
+
 		/** 設定ファイル */
 		Properties props;
 		/** 設定ファイル名 */
 		String propFileName = "AozoraEpub3.ini";
 		/** 出力先パス */
 		File dstPath = null;
-		
+
 		String helpMsg = "AozoraEpub3 [-options] input_files(txt,zip,cbz)\nversion : "+VERSION;
-		
+
 		try {
 			//コマンドライン オプション設定
 			Options options = new Options();
@@ -91,7 +91,7 @@ public class AozoraEpub3
 				new HelpFormatter().printHelp(helpMsg, options);
 				return;
 			}
-			
+
 			//ヘルプ出力
 			if (commandLine.hasOption('h') ) {
 				new HelpFormatter().printHelp(helpMsg, options);
@@ -117,13 +117,13 @@ public class AozoraEpub3
 			//ePub出力クラス初期化
 			epub3Writer = new Epub3Writer(jarPath+"template/");
 			epub3ImageWriter = new Epub3ImageWriter(jarPath+"template/");
-			
+
 			//propsから読み込み
 			props = new Properties();
 			try { props.load(new FileInputStream(propFileName)); } catch (Exception e) { }
-			
+
 			int titleIndex = 0; //try { titleIndex = Integer.parseInt(props.getProperty("TitleType")); } catch (Exception e) {}//表題
-			
+
 			//コマンドラインオプション以外
 			boolean coverPage = "1".equals(props.getProperty("CoverPage"));//表紙追加
 			int titlePage = BookInfo.TITLE_NONE;
@@ -144,7 +144,7 @@ public class AozoraEpub3
 			boolean coverPageToc = "1".equals(props.getProperty("CoverPageToc"));
 			int removeEmptyLine = 0; try { removeEmptyLine = Integer.parseInt(props.getProperty("RemoveEmptyLine")); } catch (Exception e) {}
 			int maxEmptyLine = 0; try { maxEmptyLine = Integer.parseInt(props.getProperty("MaxEmptyLine")); } catch (Exception e) {}
-			
+
 			//画面サイズと画像リサイズ
 			int dispW = 600; try { dispW =Integer.parseInt(props.getProperty("DispW")); } catch (Exception e) {}
 			int dispH = 800; try { dispH =Integer.parseInt(props.getProperty("DispH")); } catch (Exception e) {}
@@ -176,7 +176,7 @@ public class AozoraEpub3
 				try { autoMarginLimitV = Integer.parseInt(props.getProperty("AutoMarginLimitV")); } catch (Exception e) {}
 				try { autoMarginWhiteLevel = Integer.parseInt(props.getProperty("AutoMarginWhiteLevel")); } catch (Exception e) {}
 				try { autoMarginPadding = Float.parseFloat(props.getProperty("AutoMarginPadding")); } catch (Exception e) {}
-				try { autoMarginNombre = Integer.parseInt(props.getProperty("AutoMarginNombre")); } catch (Exception e) {} 
+				try { autoMarginNombre = Integer.parseInt(props.getProperty("AutoMarginNombre")); } catch (Exception e) {}
 				try { autoMarginPadding = Float.parseFloat(props.getProperty("AutoMarginNombreSize")); } catch (Exception e) {}
 			 }
 			epub3Writer.setImageParam(dispW, dispH, coverW, coverH, resizeW, resizeH, singlePageSizeW, singlePageSizeH, singlePageWidth, imageSizeType, fitImage, svgImage, rotateImage,
@@ -185,7 +185,7 @@ public class AozoraEpub3
 					imageScale, imageFloatType, imageFloatW, imageFloatH, jpegQualty, gamma, autoMarginLimitH, autoMarginLimitV, autoMarginWhiteLevel, autoMarginPadding, autoMarginNombre, nobreSize);
 			//目次階層化設定
 			epub3Writer.setTocParam("1".equals(props.getProperty("NavNest")), "1".equals(props.getProperty("NcxNest")));
-			
+
 			//スタイル設定
 			String[] pageMargin = {};
 			try { pageMargin = props.getProperty("PageMargin").split(","); } catch (Exception e) {}
@@ -206,8 +206,8 @@ public class AozoraEpub3
 			boolean boldUseGothic = "1".equals(props.getProperty("BoldUseGothic"));
 			boolean gothicUseBold = "1".equals(props.getProperty("gothicUseBold"));
 			epub3Writer.setStyles(pageMargin, bodyMargin, lineHeight, fontSize, boldUseGothic, gothicUseBold);
-			
-			
+
+
 			//自動改ページ
 			int forcePageBreakSize = 0;
 			int forcePageBreakEmpty = 0;
@@ -242,7 +242,7 @@ public class AozoraEpub3
 			boolean chapterNumParen = "1".equals(props.getProperty("ChapterNumParen"));
 			boolean chapterNumParenTitle = "1".equals(props.getProperty("hapterNumParenTitle"));
 			String chapterPattern = ""; if ("1".equals(props.getProperty("ChapterPattern"))) chapterPattern = props.getProperty("ChapterPatternText");
-			
+
 			//オプション指定を反映
 			boolean useFileName = false;//表題に入力ファイル名利用
 			String coverFileName = null;
@@ -275,7 +275,7 @@ public class AozoraEpub3
 			//変換クラス生成とパラメータ設定
 			AozoraEpub3Converter  aozoraConverter = new AozoraEpub3Converter(epub3Writer, jarPath);
 			//挿絵なし
-			aozoraConverter.setNoIllust("1".equals(props.getProperty("NoIllust"))); 
+			aozoraConverter.setNoIllust("1".equals(props.getProperty("NoIllust")));
 			//栞用span出力
 			aozoraConverter.setWithMarkId(withMarkId);
 			//変換オプション設定
@@ -284,15 +284,15 @@ public class AozoraEpub3
 			int dakutenType = 0; try { dakutenType = Integer.parseInt(props.getProperty("DakutenType")); } catch (Exception e) {}
 			boolean printIvsBMP = "1".equals(props.getProperty("IvsBMP"));
 			boolean printIvsSSP = "1".equals(props.getProperty("IvsSSP"));
-			
+
 			aozoraConverter.setCharOutput(dakutenType, printIvsBMP, printIvsSSP);
 			//全角スペースの禁則
 			aozoraConverter.setSpaceHyphenation(spaceHyp);
 			//コメント
 			aozoraConverter.setCommentPrint(commentPrint, commentConvert);
-			
+
 			aozoraConverter.setRemoveEmptyLine(removeEmptyLine, maxEmptyLine);
-			
+
 			//強制改ページ
 			aozoraConverter.setForcePageBreak(forcePageBreakSize, forcePageBreakEmpty, forcePageBreakEmptySize, forcePageBreakChapter, forcePageBreakChapterSize);
 			//目次設定
@@ -301,7 +301,7 @@ public class AozoraEpub3
 					chapterName,
 					chapterNumOnly, chapterNumTitle, chapterNumParen, chapterNumParenTitle,
 					chapterPattern);
-			
+
 			////////////////////////////////
 			//各ファイルを変換処理
 			////////////////////////////////
@@ -314,7 +314,7 @@ public class AozoraEpub3
 				}
 				String ext = srcFile.getName();
 				ext = ext.substring(ext.lastIndexOf('.')+1).toLowerCase();
-				
+
 				int coverImageIndex = -1;
 				if (coverFileName != null) {
 					if ("0".equals(coverFileName)) {
@@ -324,19 +324,19 @@ public class AozoraEpub3
 						coverFileName = AozoraEpub3.getSameCoverFileName(srcFile); //入力ファイルと同じ名前+.jpg/.png
 					}
 				}
-				
+
 				//zipならzip内のテキストを検索
 				int txtCount = 1;
 				boolean imageOnly = false;
 				boolean isFile = "txt".equals(ext);
-				if("zip".equals(ext) || "txtz".equals(ext)) { 
+				if("zip".equals(ext) || "txtz".equals(ext)) {
 					try {
 						txtCount = AozoraEpub3.countZipText(srcFile);
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
 					if (txtCount == 0) { txtCount = 1; imageOnly = true; }
-				} else if("rar".equals(ext)) { 
+				} else if("rar".equals(ext)) {
 					try {
 						txtCount = AozoraEpub3.countRarText(srcFile);
 					} catch (IOException e) {
@@ -348,7 +348,7 @@ public class AozoraEpub3
 				}
 				for (int txtIdx=0; txtIdx<txtCount; txtIdx++) {
 					ImageInfoReader imageInfoReader = new ImageInfoReader(isFile, srcFile);
-					
+
 					BookInfo bookInfo = null;
 					if (!imageOnly) {
 						bookInfo = AozoraEpub3.getBookInfo(srcFile, ext, txtIdx, imageInfoReader, aozoraConverter, encType, BookInfo.TitleType.indexOf(titleIndex), false);
@@ -364,7 +364,7 @@ public class AozoraEpub3
 					if (!bookInfo.insertTitleToc && bookInfo.titleLine >= 0) {
 						bookInfo.removeChapterLineInfo(bookInfo.titleLine);
 					}
-					
+
 					Epub3Writer writer = epub3Writer;
 					if (!isFile) {
 						if ("rar".equals(ext)) {
@@ -379,7 +379,7 @@ public class AozoraEpub3
 							bookInfo.imageOnly = true;
 							//Writerを画像出力用派生クラスに入れ替え
 							writer = epub3ImageWriter;
-							
+
 							if (imageInfoReader.countImageFileInfos() == 0) {
 								LogAppender.error("画像がありませんでした");
 								return;
@@ -398,7 +398,7 @@ public class AozoraEpub3
 							}
 						} catch (Exception e) {}
 					}
-					
+
 					//表紙設定
 					bookInfo.insertCoverPageToc = coverPageToc;
 					bookInfo.insertCoverPage = coverPage;
@@ -414,7 +414,7 @@ public class AozoraEpub3
 						}
 					}
 					bookInfo.coverFileName = coverFileName;
-					
+
 					String[] titleCreator = BookInfo.getFileTitleCreator(srcFile.getName());
 					if (titleCreator != null) {
 						if (useFileName) {
@@ -426,7 +426,7 @@ public class AozoraEpub3
 							if (bookInfo.creator == null || bookInfo.creator.length() == 0) bookInfo.creator = titleCreator[1]==null?"":titleCreator[1];
 						}
 					}
-					
+
 					File outFile = getOutFile(srcFile, dstPath, bookInfo, autoFileName, outExt);
 					AozoraEpub3.convertFile(
 							srcFile, ext, outFile,
@@ -438,7 +438,7 @@ public class AozoraEpub3
 			e.printStackTrace();
 		}
 	}
-	
+
 	/** 出力ファイルを生成 */
 	static File getOutFile(File srcFile, File dstPath, BookInfo bookInfo, boolean autoFileName, String outExt)
 	{
@@ -463,10 +463,10 @@ public class AozoraEpub3
 		File outFile = new File(outFileName + outExt);
 		//書き込み許可設定
 		outFile.setWritable(true);
-		
+
 		return outFile;
 	}
-	
+
 	/** 前処理で一度読み込んでタイトル等の情報を取得 */
 	static public BookInfo getBookInfo(File srcFile, String ext, int txtIdx, ImageInfoReader imageInfoReader, AozoraEpub3Converter aozoraConverter,
 			String encType, BookInfo.TitleType titleType, boolean pubFirst)
@@ -475,14 +475,14 @@ public class AozoraEpub3
 			String[] textEntryName = new String[1];
 			InputStream is = AozoraEpub3.getTextInputStream(srcFile, ext, imageInfoReader, textEntryName, txtIdx);
 			if (is == null) return null;
-			
+
 			//タイトル、画像注記、左右中央注記、目次取得
 			BufferedReader src = new BufferedReader(new InputStreamReader(is, (String)encType));
 			BookInfo bookInfo = aozoraConverter.getBookInfo(srcFile, src, imageInfoReader, titleType, pubFirst);
 			is.close();
 			bookInfo.textEntryName = textEntryName[0];
 			return bookInfo;
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			LogAppender.append("エラーが発生しました : ");
@@ -490,7 +490,7 @@ public class AozoraEpub3
 		}
 		return null;
 	}
-	
+
 	/** ファイルを変換
 	 * @param srcFile 変換するファイル
 	 * @param dstPath 出力先パス */
@@ -501,34 +501,34 @@ public class AozoraEpub3
 			long time = System.currentTimeMillis();
 			LogAppender.append("変換開始 : ");
 			LogAppender.println(srcFile.getPath());
-			
+
 			//入力Stream再オープン
 			BufferedReader src = null;
 			if (!bookInfo.imageOnly) {
 				src = new BufferedReader(new InputStreamReader(getTextInputStream(srcFile, ext, null, null, txtIdx), encType));
 			}
-			
+
 			//ePub書き出し srcは中でクローズされる
 			epubWriter.write(aozoraConverter, src, srcFile, ext, outFile, bookInfo, imageInfoReader);
-			
+
 			LogAppender.append("変換完了["+(((System.currentTimeMillis()-time)/100)/10f)+"s] : ");
 			LogAppender.println(outFile.getPath());
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			LogAppender.println("エラーが発生しました : "+e.getMessage());
 			//LogAppender.printStaclTrace(e);
 		}
 	}
-	
+
 	/** 入力ファイルからStreamオープン
-	 * 
+	 *
 	 * @param srcFile
 	 * @param ext
 	 * @param imageInfoReader
 	 * @param txtIdx テキストファイルのZip内の位置
 	 * @return テキストファイルのストリーム (close()は呼び出し側ですること)
-	 * @throws RarException 
+	 * @throws RarException
 	 */
 	static public InputStream getTextInputStream(File srcFile, String ext, ImageInfoReader imageInfoReader, String[] textEntryName, int txtIdx) throws IOException, RarException
 	{
@@ -590,7 +590,7 @@ public class AozoraEpub3
 		}
 		return null;
 	}
-	
+
 	/** Zipファイル内のテキストファイルの数を取得 */
 	static public int countZipText(File zipFile) throws IOException
 	{
@@ -607,7 +607,7 @@ public class AozoraEpub3
 		}
 		return txtCount;
 	}
-	
+
 	/** Ripファイル内のテキストファイルの数を取得 */
 	static public int countRarText(File rarFile) throws IOException, RarException
 	{
@@ -615,7 +615,7 @@ public class AozoraEpub3
 		Archive archive = new Archive(rarFile);
 		try {
 			for (FileHeader fileHeader : archive.getFileHeaders()) {
-				if (!fileHeader.isDirectory()) { 
+				if (!fileHeader.isDirectory()) {
 					String entryName = fileHeader.getFileNameW();
 					if (entryName.length() == 0) entryName = fileHeader.getFileNameString();
 					entryName = entryName.replace('\\', '/');
@@ -627,7 +627,7 @@ public class AozoraEpub3
 		}
 		return txtCount;
 	}
-	
+
 	/** 入力ファイルと同じ名前の画像を取得
 	 * png, jpg, jpegの順で探す  */
 	static public String getSameCoverFileName(File srcFile)
@@ -635,7 +635,7 @@ public class AozoraEpub3
 		String baseFileName = srcFile.getPath();
 		baseFileName = baseFileName.substring(0, baseFileName.lastIndexOf('.')+1);
 		for (String ext : new String[]{"png","jpg","jpeg","PNG","JPG","JPEG","Png","Jpg","Jpeg"}) {
-			String coverFileName = baseFileName+ext; 
+			String coverFileName = baseFileName+ext;
 			if (new File(coverFileName).exists()) return coverFileName;
 		}
 		return null;
