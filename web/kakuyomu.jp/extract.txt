@@ -1,0 +1,32 @@
+################################
+### カクヨム
+### https://kakuyomu.jp/works/
+################################
+
+## 変換対象URLパターン
+##PAGE_REGEX		.*/\d+/episodes/\d+/$
+
+################################
+##一覧ページの抽出設定
+## タイトル
+TITLE	#workTitle a:0
+## 著者
+AUTHOR	#workAuthor-activityName a:0
+## 説明
+DESCRIPTION	#catchphrase-body:0
+
+################
+## 各話へのリンク
+HREF	.widget-toc-items a
+##HREF	a	\/\d*\/episodes\/\d*
+##一覧に記載されている各話の更新日時
+SUB_UPDATE	.widget-toc-episode-datePublished
+
+################################
+###各話の抽出設定
+
+## 各話 Chapter 先頭の章のみ大見出しで出力
+CONTENT_CHAPTER	.widget-episodeTitle:0
+
+## 各話 本文
+CONTENT_ARTICLE	.widget-episodeBody
