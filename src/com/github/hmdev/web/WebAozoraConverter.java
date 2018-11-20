@@ -856,7 +856,11 @@ public class WebAozoraConverter
 					bw.append("［＃ここから太字］");
 					_printNode(bw, node); //子を出力
 					bw.append("［＃ここで太字終わり］");
-				} else if ("sup".equals(elem.tagName())) {
+				} else if ("em".equals(elem.tagName())) {
+					bw.append("［＃丸傍点］");
+					_printNode(bw, node); //子を出力
+					bw.append("［＃丸傍点終わり］");
+				}else if ("sup".equals(elem.tagName())) {
 					bw.append("［＃上付き小文字］");
 					_printNode(bw, node); //子を出力
 					bw.append("［＃上付き小文字終わり］");
