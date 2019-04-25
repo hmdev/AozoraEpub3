@@ -37,7 +37,7 @@
 #else
 <body>
 #end
-<table class="middle"><tr><td>
+<div class="middle">
 
 #if (${PUBLISHER})
 	<div class="publisher">${PUBLISHER}</div>
@@ -71,7 +71,7 @@
 	<div class="subcreator btm pb2">${SUBCREATOR}</div>
 #end
 
-</td></tr></table>
+</div>
 #if (${kindle})
 </div></div>
 #end

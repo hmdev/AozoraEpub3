@@ -52,7 +52,7 @@ min-height: ${sectionInfo.ImageHeightPercent}%;
 #if (${kindle})
 <div class="kindle_outer"><div class="kindle_inner">
 #end
-<table class="middle"><tr><td>
+<div class="middle">
 #end
 #if (${sectionInfo.Bottom})
 #if (${kindle})
