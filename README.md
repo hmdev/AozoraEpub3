@@ -41,8 +41,8 @@ OpenJDK 11 (LTS)、HotSpot、OS、Install JREを選んでインストール。
 
 動作環境
 ------------
-Java 7 / Java 8 の動作環境 ( http://www.java.com/ja/ )
-
+Java 8 以降の動作環境 ( http://www.java.com/ja/ )
+AdoptOpenJDK（https://adoptopenjdk.net/releases.html）
 
 WindowsXP以降 Ubuntu MacOSX で動作確認済
 
