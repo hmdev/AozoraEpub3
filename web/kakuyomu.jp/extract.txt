@@ -13,7 +13,7 @@ TITLE	#workTitle a:0
 ## 著者
 AUTHOR	#workAuthor-activityName a:0
 ## 説明
-DESCRIPTION	#catchphrase-body:0
+DESCRIPTION	#introduction:0
 
 ################
 ## 各話へのリンク

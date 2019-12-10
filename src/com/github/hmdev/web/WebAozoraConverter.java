@@ -243,6 +243,12 @@ public class WebAozoraConverter
 		}*/
 
 		String urlParentPath = urlFilePath;
+		//kakuyomu用のアドレス修正
+		if(urlFilePath.indexOf("kakuyomu")!= -1) {
+			urlFilePath +="/";
+			LogAppender.println("kakuyomuのURL修正");
+		}
+
 		boolean isPath = false;
 		if (urlFilePath.endsWith("/")) { isPath = true; urlFilePath += "index.html"; }
 		else urlParentPath = urlFilePath.substring(0, urlFilePath.lastIndexOf('/')+1);

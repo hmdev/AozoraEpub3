@@ -5,7 +5,7 @@
     <!--define folder properties-->
     <property name="dir.buildfile" value="."/>
     <property name="dir.workspace" value="${dir.buildfile}/.."/>
-    <property name="dir.jarfile" value="C:/Users/user/Desktop/AozoraEpub3-1.1.0b50Q/"/>
+    <property name="dir.jarfile" value="C:/Users/user/Desktop/AozoraEpub3-1.1.0b51Q/"/>
     <target name="create_run_jar">
         <jar destfile="${dir.jarfile}/AozoraEpub3.jar">
             <manifest>
@@ -262,6 +262,7 @@
 
         <delete dir="${dir.jarfile}/presets"/>
         <mkdir dir="${dir.jarfile}/presets"/>
+        <copy file="${dir.buildfile}/presets/kindle_fire.ini" todir="${dir.jarfile}/presets"/>
         <copy file="${dir.buildfile}/presets/kindle_pw.ini" todir="${dir.jarfile}/presets"/>
         <copy file="${dir.buildfile}/presets/kobo__full.ini" todir="${dir.jarfile}/presets"/>
         <copy file="${dir.buildfile}/presets/kobo_glo.ini" todir="${dir.jarfile}/presets"/>
@@ -315,6 +316,7 @@
         <mkdir dir="${dir.jarfile}/web"/>
         <copy file="${dir.buildfile}/web/extract_sample.txt" todir="${dir.jarfile}/web/"/>
         <copy file="${dir.buildfile}/web/2.novelist.jp/extract.txt" todir="${dir.jarfile}/web/2.novelist.jp/"/>
+        <copy file="${dir.buildfile}/web/kakuyomu.jp/extract.txt" todir="${dir.jarfile}/web/kakuyomu.jp/"/>
         <copy file="${dir.buildfile}/web/ncode.syosetu.com/extract.txt" todir="${dir.jarfile}/web/ncode.syosetu.com"/>
         <copy file="${dir.buildfile}/web/novel.fc2.com/extract.txt" todir="${dir.jarfile}/web/novel.fc2.com"/>
         <copy file="${dir.buildfile}/web/novel.syosetu.org/extract.txt" todir="${dir.jarfile}/web/novel.syosetu.org"/>
