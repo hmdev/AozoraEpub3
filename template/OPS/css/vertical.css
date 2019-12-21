@@ -123,7 +123,7 @@ padding: 0.25em;
 /* 濁点がつく文字 */
 .dakuten {
 display:inline-block;
-position:relative;	
+position:relative;
 text-orientation: upright;
 -webkit-text-orientation: upright;
 -epub-text-orientation: upright;
@@ -323,36 +323,68 @@ font-size: 0.66em;
 div.center, div.center p { text-align: center; }
 
 /* 字下げ */
-div.pt1 { margin-top: 1em; }
-div.pt2 { margin-top: 2em; }
-div.pt3 { margin-top: 3em; }
-div.pt4 { margin-top: 4em; }
-div.pt5 { margin-top: 5em; }
-div.pt6 { margin-top: 6em; }
-div.pt7 { margin-top: 7em; }
-div.pt8 { margin-top: 8em; }
-div.pt9 { margin-top: 9em; }
-div.pt10 { margin-top: 10em; }
-div.pt11 { margin-top: 11em; }
-div.pt12 { margin-top: 12em; }
-div.pt13 { margin-top: 13em; }
-div.pt14 { margin-top: 14em; }
-div.pt15 { margin-top: 15em; }
-div.pt16 { margin-top: 16em; }
-div.pt17 { margin-top: 17em; }
-div.pt18 { margin-top: 18em; }
-div.pt19 { margin-top: 19em; }
-div.pt20 { margin-top: 20em; }
-div.pt21 { margin-top: 21em; }
-div.pt22 { margin-top: 22em; }
-div.pt23 { margin-top: 23em; }
-div.pt24 { margin-top: 24em; }
-div.pt25 { margin-top: 25em; }
-div.pt26 { margin-top: 26em; }
-div.pt27 { margin-top: 27em; }
-div.pt28 { margin-top: 28em; }
-div.pt29 { margin-top: 29em; }
-div.pt30 { margin-top: 30em; }
+div.pt1 { padding-top: 1em; }
+div.pt2 { padding-top: 2em; }
+div.pt3 { padding-top: 3em; }
+div.pt4 { padding-top: 4em; }
+div.pt5 { padding-top: 5em; }
+div.pt6 { padding-top: 6em; }
+div.pt7 { padding-top: 7em; }
+div.pt8 { padding-top: 8em; }
+div.pt9 { padding-top: 9em; }
+div.pt10 { padding-top: 10em; }
+div.pt11 { padding-top: 11em; }
+div.pt12 { padding-top: 12em; }
+div.pt13 { padding-top: 13em; }
+div.pt14 { padding-top: 14em; }
+div.pt15 { padding-top: 15em; }
+div.pt16 { padding-top: 16em; }
+div.pt17 { padding-top: 17em; }
+div.pt18 { padding-top: 18em; }
+div.pt19 { padding-top: 19em; }
+div.pt20 { padding-top: 20em; }
+div.pt21 { padding-top: 21em; }
+div.pt22 { padding-top: 22em; }
+div.pt23 { padding-top: 23em; }
+div.pt24 { padding-top: 24em; }
+div.pt25 { padding-top: 25em; }
+div.pt26 { padding-top: 26em; }
+div.pt27 { padding-top: 27em; }
+div.pt28 { padding-top: 28em; }
+div.pt29 { padding-top: 29em; }
+div.pt30 { padding-top: 30em; }
+
+/* 字下げ2 */
+div.mt1 { margin-top: 1em; }
+div.mt2 { margin-top: 2em; }
+div.mt3 { margin-top: 3em; }
+div.mt4 { margin-top: 4em; }
+div.mt5 { margin-top: 5em; }
+div.mt6 { margin-top: 6em; }
+div.mt7 { margin-top: 7em; }
+div.mt8 { margin-top: 8em; }
+div.mt9 { margin-top: 9em; }
+div.mt10 { margin-top: 10em; }
+div.mt11 { margin-top: 11em; }
+div.mt12 { margin-top: 12em; }
+div.mt13 { margin-top: 13em; }
+div.mt14 { margin-top: 14em; }
+div.mt15 { margin-top: 15em; }
+div.mt16 { margin-top: 16em; }
+div.mt17 { margin-top: 17em; }
+div.mt18 { margin-top: 18em; }
+div.mt19 { margin-top: 19em; }
+div.mt20 { margin-top: 20em; }
+div.mt21 { margin-top: 21em; }
+div.mt22 { margin-top: 22em; }
+div.mt23 { margin-top: 23em; }
+div.mt24 { margin-top: 24em; }
+div.mt25 { margin-top: 25em; }
+div.mt26 { margin-top: 26em; }
+div.mt27 { margin-top: 27em; }
+div.mt28 { margin-top: 28em; }
+div.mt29 { margin-top: 29em; }
+div.mt30 { margin-top: 30em; }
 
 /* 字上げ */
 div.pb1 { margin-bottom: 1em; }
