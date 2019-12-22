@@ -1,5 +1,5 @@
 #if (${sectionInfo.Middle} || ${sectionInfo.bottom})
-</div>
+</td></tr></table>
 #if (${kindle})
 </div></div>
 #end
