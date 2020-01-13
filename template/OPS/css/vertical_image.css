@@ -23,6 +23,14 @@ text-align: center;
 /* ページ内 画像は縮小のみ */
 body .img {
 }
+body .img img {
+height: ${sectionInfo.ImageHeightPercent}%;
+min-height: ${sectionInfo.ImageHeightPercent}%;
+  display:            inline-block;
+  page-break-inside:  avoid;
+  max-height:         100%;
+  max-width:          100%;
+}
 
 /* 幅を合わせる */
 body.fit_w img {
