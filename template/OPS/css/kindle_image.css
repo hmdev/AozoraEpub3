@@ -29,8 +29,6 @@ width: auto;
 height: auto;
 }
 body .img img {
-height: ${sectionInfo.ImageHeightPercent}%;
-min-height: ${sectionInfo.ImageHeightPercent}%;
   display:            inline-block;
   page-break-inside:  avoid;
   max-height:         100%;
