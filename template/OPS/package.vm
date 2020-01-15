@@ -45,9 +45,9 @@
 
 	<manifest>
 #if (${kindle} && ${bookInfo.ImageOnly})
-		<item id="k_image" href="css/kindle_image.css" media-type="text/css"/>
+		<item id="k_image" href="css/fixed-layout-jp.css" media-type="text/css"/>
 #elseif (${svgImage} && ${bookInfo.ImageOnly})
-		<item id="svg_image" href="css/svg_image.css" media-type="text/css"/>
+		<item id="svg_image" href="css/fixed-layout-jp.css" media-type="text/css"/>
 #elseif (${bookInfo.Vertical})
 #if (${bookInfo.ImageOnly})
 		<item id="v_image" href="css/vertical_image.css" media-type="text/css"/>
@@ -57,6 +57,7 @@
 		<item id="v_text" href="css/vertical_text.css" media-type="text/css"/>
 		<item id="v_middle" href="css/vertical_middle.css" media-type="text/css"/>
 		<item id="v_image" href="css/vertical_image.css" media-type="text/css"/>
+		<item id="fixed-layout-jp" href="css/fixed-layout-jp.css" media-type="text/css"/>
 #end
 #else
 #if (${bookInfo.ImageOnly})
@@ -108,7 +109,7 @@
 	<spine page-progression-direction="ltr" toc="ncx">
 #end
 #if (${bookInfo.InsertCoverPage})
-		<itemref idref="cover-page" linear="yes"/>
+		   <itemref idref="cover-page" properties="rendition:page-spread-center" linear="yes"/>
 #end
 #if (${title_page})
 		<itemref idref="title-page" linear="yes"/>

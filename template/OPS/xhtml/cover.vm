@@ -4,8 +4,10 @@
 
 <head>
 #if (${svgImage} && ${bookInfo.ImageOnly})
-	<link rel="stylesheet" type="text/css" href="../css/svg_image.css"/>
+<meta name="viewport" content="width=${coverImage.Width}, height=${imageInfo.OutHeight}"/>
+	<link rel="stylesheet" type="text/css" href="../css/fixed-layout-jp.css"/>
 #elseif (${kindle} && ${bookInfo.ImageOnly})
+<meta name="viewport" content="width=${coverImage.Width}, height=${imageInfo.OutHeight}"/>
 	<link rel="stylesheet" type="text/css" href="../css/kindle_image.css"/>
 #elseif (${bookInfo.Vertical})
 	<link rel="stylesheet" type="text/css" href="../css/vertical_image.css"/>

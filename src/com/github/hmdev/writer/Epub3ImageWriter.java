@@ -44,19 +44,19 @@ public class Epub3ImageWriter extends Epub3Writer
 	};
 	final static String[] TEMPLATE_FILE_NAMES_SVG_IMAGE = new String[]{
 		"META-INF/container.xml",
-		OPS_PATH+CSS_PATH+"svg_image.css"
+		OPS_PATH+CSS_PATH+"fixed-layout-jp.css"
 	};
 	String[] getTemplateFiles()
 	{
-		if (this.isKindle) return TEMPLATE_FILE_NAMES_KINDLE_IMAGE;
+		if (this.isKindle) return TEMPLATE_FILE_NAMES_SVG_IMAGE;
 		if (this.isSvgImage) return TEMPLATE_FILE_NAMES_SVG_IMAGE;
-		if (this.bookInfo != null && this.bookInfo.vertical) return TEMPLATE_FILE_NAMES_VERTICAL_IMAGE;
-		return TEMPLATE_FILE_NAMES_HORIZONTAL_IMAGE;
+//		if (this.bookInfo != null && this.bookInfo.vertical) return TEMPLATE_FILE_NAMES_VERTICAL_IMAGE;
+		return TEMPLATE_FILE_NAMES_SVG_IMAGE;
 	}
-	
+
 	/** 出力先ePubのZipストリーム */
 	ZipArchiveOutputStream zos;
-	
+
 	/** コンストラクタ
 	 * @param templatePath epubテンプレート格納パス文字列 最後は"/"
 	 */
@@ -64,9 +64,9 @@ public class Epub3ImageWriter extends Epub3Writer
 	{
 		super(jarPath);
 	}
-	
+
 	/** 本文を出力する
-	 * setFileNamesで sortedFileNames が設定されている必要がある 
+	 * setFileNamesで sortedFileNames が設定されている必要がある
 	 * @throws RarException */
 	@Override
 	void writeSections(AozoraEpub3Converter converter, BufferedReader src, BufferedWriter bw, File srcFile, String srcExt, ZipArchiveOutputStream zos) throws IOException, RarException
@@ -79,13 +79,13 @@ public class Epub3ImageWriter extends Epub3Writer
 			pageNum++;
 			vecFileName.add(this.getImageFilePath(srcFilePath.trim(), pageNum));
 		}
-		
+
 		//画像を出力して出力サイズを取得
 		zos.setLevel(0);
 		//サブパスの文字長
 		int archivePathLength = 0;
 		if (this.bookInfo.textEntryName != null) archivePathLength = this.bookInfo.textEntryName.indexOf('/')+1;
-		
+
 		if ("rar".equals(srcExt)) {
 			Archive archive = new Archive(srcFile);
 			try {
@@ -118,7 +118,7 @@ public class Epub3ImageWriter extends Epub3Writer
 			}
 			} finally { zis.close(); }
 		}
-		
+
 		//画像xhtmlを出力
 		zos.setLevel(9);
 		pageNum = 0;
@@ -140,8 +140,8 @@ public class Epub3ImageWriter extends Epub3Writer
 			if (this.canceled) return;
 		}
 	}
-	
-	/** セクション開始. 
+
+	/** セクション開始.
 	 * @throws IOException */
 	private void startImageSection(String srcImageFilePath) throws IOException
 	{
@@ -149,7 +149,7 @@ public class Epub3ImageWriter extends Epub3Writer
 		String sectionId = decimalFormat.format(this.sectionIndex);
 		//package.opf用にファイル名
 		SectionInfo sectionInfo = new SectionInfo(sectionId);
-		
+
 		//画像専用指定
 		sectionInfo.setImagePage(true);
 		//画像サイズが横長なら幅に合わせる
@@ -176,7 +176,7 @@ public class Epub3ImageWriter extends Epub3Writer
 				}
 			}
 		}
-		
+
 		this.sectionInfos.add(sectionInfo);
 		if (this.sectionIndex ==1 || this.sectionIndex % 5 == 0) this.addChapter(null, ""+this.sectionIndex, 0); //目次追加
 		super.zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+XHTML_PATH+sectionId+".xhtml"));
@@ -187,7 +187,7 @@ public class Epub3ImageWriter extends Epub3Writer
 		Velocity.getTemplate(this.templatePath+OPS_PATH+XHTML_PATH+XHTML_HEADER_VM).merge(this.velocityContext, bw);
 		bw.flush();
 	}
-	
+
 	/** SVGでセクション出力 */
 	private void printSvgImageSection(String srcImageFilePath) throws IOException
 	{
@@ -196,7 +196,7 @@ public class Epub3ImageWriter extends Epub3Writer
 		//package.opf用にファイル名
 		SectionInfo sectionInfo = new SectionInfo(sectionId);
 		ImageInfo imageInfo = this.imageInfoReader.getImageInfo(srcImageFilePath);
-		
+
 		//画像専用指定
 		sectionInfo.setImagePage(true);
 		this.sectionInfos.add(sectionInfo);
@@ -210,7 +210,7 @@ public class Epub3ImageWriter extends Epub3Writer
 		Velocity.getTemplate(this.templatePath+OPS_PATH+XHTML_PATH+SVG_IMAGE_VM).merge(this.velocityContext, bw);
 		bw.flush();
 	}
-	
+
 	@Override
 	public String getImageFilePath(String srcImageFileName, int lineNum)
 	{
@@ -234,7 +234,7 @@ public class Epub3ImageWriter extends Epub3Writer
 				isCover = true;
 			}
 			this.imageInfos.add(imageInfo);
-			
+
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
