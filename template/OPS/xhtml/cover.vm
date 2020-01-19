@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="ja" lang="ja">
 
 <head>
-#if (${svgImage} || ${bookInfo.ImageOnly})
+#if (${svgImage})
 <meta name="viewport" content="width=${coverImage.Width}, height=${imageInfo.OutHeight}"/>
 	<link rel="stylesheet" type="text/css" href="../css/fixed-layout-jp.css"/>
 #elseif (${kindle} && ${bookInfo.ImageOnly})

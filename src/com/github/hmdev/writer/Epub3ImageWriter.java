@@ -48,9 +48,8 @@ public class Epub3ImageWriter extends Epub3Writer
 		OPS_PATH+CSS_PATH+"fixed-layout-jp.css"
 	};
 	String[] getTemplateFiles()
-	{
+	{	if (this.isSvgImage) return TEMPLATE_FILE_NAMES_SVG_IMAGE;
 		if (this.isKindle) return TEMPLATE_FILE_NAMES_KINDLE_IMAGE;
-		if (this.isSvgImage) return TEMPLATE_FILE_NAMES_SVG_IMAGE;
 //		if (this.bookInfo != null && this.bookInfo.vertical) return TEMPLATE_FILE_NAMES_VERTICAL_IMAGE;
 		return TEMPLATE_FILE_NAMES_VERTICAL_IMAGE;
 	}

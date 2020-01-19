@@ -38,7 +38,8 @@
 		<meta name="primary-writing-mode" content="horizontal-rl"/>
 		<meta name="RegionMagnification" content="false"/>
 		<meta name="orientation-lock" content="none"/>
-		<!--<meta name="original-resolution" content="844x1200"/>-->
+		<meta name="original-resolution" content="${coverImage.Width}x${coverImage.Height}"/>
+
 #end
 #end
 	</metadata>
@@ -51,7 +52,6 @@
 #elseif (${bookInfo.Vertical})
 #if (${bookInfo.ImageOnly})
 		<item id="v_image" href="css/vertical_image.css" media-type="text/css"/>
-		<item id="fixed-layout-jp" href="css/fixed-layout-jp.css" media-type="text/css"/>
 #else
 		<item id="vertical" href="css/vertical.css" media-type="text/css"/>
 		<item id="v_font" href="css/vertical_font.css" media-type="text/css"/>
