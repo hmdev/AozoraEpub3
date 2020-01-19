@@ -499,13 +499,13 @@ public class Epub3Writer
 		velocityContext.put("vecGaijiInfo", this.vecGaijiInfo);
 
 		//スタイルと外字のcssを格納
-		if (bookInfo.vertical) {
+		if (!bookInfo.imageOnly && bookInfo.vertical) {
 			zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+CSS_PATH+VERTICAL_TEXT_CSS));
 			bw = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"));
 			Velocity.mergeTemplate(templatePath+OPS_PATH+CSS_PATH+VERTICAL_TEXT_CSS_VM, "UTF-8", velocityContext, bw);
 			bw.flush();
 			zos.closeArchiveEntry();
-		} else {
+		} else if(!bookInfo.imageOnly){
 			zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+CSS_PATH+HORIZONTAL_TEXT_CSS));
 			bw = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"));
 			Velocity.mergeTemplate(templatePath+OPS_PATH+CSS_PATH+HORIZONTAL_TEXT_CSS_VM, "UTF-8", velocityContext, bw);
