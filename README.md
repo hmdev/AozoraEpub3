@@ -1,9 +1,11 @@
-フォーク版AozoraEpub3
+改造版AozoraEpub3
 ============
 
-フォーク版の説明
+改造版の説明
 ------------
-プルリクエストを反映することを目的としたフォーク版。
+電書協のEPUBに近づけることを目的としたフォーク版。
+AozoraEpub3を電子出版目的に使う場合に、元のままでは審査が通らないことが有る。EPUBバリデーションを通すのと、多くのEPUBビュワーで表示に問題がないようにしている。
+
 Javaライセンスの問題からAdoptOpenJDKでビルドすることにします。
 https://adoptopenjdk.net/releases.html
 OpenJDK 11 (LTS)、HotSpot、OS、Install JREを選んでインストール。
@@ -56,7 +58,7 @@ WindowsXP以降 Ubuntu MacOSX で動作確認済
 　AozoraEpub3.jar をダブルクリックして実行します。
 　またはコンソールから "java -jar AozoraEpub3.jar" でも実行可。
 　※javaが見えなければフルパスで指定
-　　例: "C:\Program Files (x86)\Java\jre7\bin\java.exe" -jar AozoraEpub3.jar
+　　例: "C:\Program Files\AdoptOpenJDK\jre-11.0.5.10-hotspot\bin/java.exe" -jar AozoraEpub3.jar
 
 #### 変換
 　表示されたアプレットに、変換したい青空文庫テキストファイル（拡張子txtまたはzip)
