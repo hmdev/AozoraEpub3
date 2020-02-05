@@ -9,6 +9,8 @@ AozoraEpub3を電子出版目的に使う場合に、元のままでは審査が
 Javaライセンスの問題からAdoptOpenJDKでビルドすることにします。
 https://adoptopenjdk.net/releases.html
 OpenJDK 11 (LTS)、HotSpot、OS、Install JREを選んでインストール。
+
+
 Read this in other languages: [English](https://github.com/kyukyunyorituryo/AozoraEpub3/blob/master/README.en.md)
 
 説明
