@@ -46,14 +46,18 @@ or "java -jar AozoraEpub3.jar" from the console.
 * If java is not visible, specify the full path.
 Example: "C: \Program Files \AdoptOpenJDK \jre- 11.0.5.10 -hotspot \bin/java.exe" -jar AozoraEpub3.jar
 
-#### Transform
+#### EPUB convert
 Aozora Bunko text file (Extension txt or zip) to be converted into the displayed applet
 Drag and drop (Multiple). (Same as opening from "File Selection")
 The "Original Filename .epub" or "[author's name] Title. epub" file is generated in the same location as the text file.
 * If you convert the image only zip without text, it will generate an ePub file with only images.
 
-You can also use drag-and-drop to retrieve and convert URLs or URL shortcuts (.url) on the list page of a Web novel site.
-(Only sites with definition files in web /)
+#### Converting Web novels
+You can also use drag-and-drop to retrieve and convert URLs or URL shortcuts (.url) on the list page of a Web novel site. (Only sites with definition files in web /)
+
+You can obtain it from "syosetu.com", (+ Related Sites), "NEWVEL-LIBRARY", "FC2 Novels", "HAMELN", "Arcadia", "novelist.jp", "dNoVeLs", and "Kakyomu".
+https://syosetu.com , https://novel.fc2.com/ , https://syosetu.org/ , http://www.mai-net.net/ , http://novelist.jp/ , http://www.dnovels.net/ , https://kakuyomu.jp/
+
 
 screen setting
 ------------
