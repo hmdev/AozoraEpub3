@@ -46,14 +46,18 @@ or "java -jar AozoraEpub3.jar" from the console.
 * If java is not visible, specify the full path.
 Example: "C: \Program Files \AdoptOpenJDK \jre- 11.0.5.10 -hotspot \bin/java.exe" -jar AozoraEpub3.jar
 
-#### Transform
+#### EPUB convert
 Aozora Bunko text file (Extension txt or zip) to be converted into the displayed applet
 Drag and drop (Multiple). (Same as opening from "File Selection")
 The "Original Filename .epub" or "[author's name] Title. epub" file is generated in the same location as the text file.
 * If you convert the image only zip without text, it will generate an ePub file with only images.
 
-You can also use drag-and-drop to retrieve and convert URLs or URL shortcuts (.url) on the list page of a Web novel site.
-(Only sites with definition files in web /)
+#### Converting Web novels
+You can also use drag-and-drop to retrieve and convert URLs or URL shortcuts (.url) on the list page of a Web novel site. (Only sites with definition files in web /)
+
+You can obtain it from "syosetu.com", (+ Related Sites), "NEWVEL-LIBRARY", "FC2 Novels", "HAMELN", "Arcadia", "novelist.jp", "dNoVeLs", and "Kakyomu".
+https://syosetu.com , https://novel.fc2.com/ , https://syosetu.org/ , http://www.mai-net.net/ , http://novelist.jp/ , http://www.dnovels.net/ , https://kakuyomu.jp/
+
 
 screen setting
 ------------
@@ -297,14 +301,13 @@ Horizontal annotations not supported on Kindle
 
 #### Exceptionally Programmed
 — Middle left and right of the page
-- Convert [# Noted] ○ [# end with "△" note] and [# "○" and "△" readings] to | ○ < △ >
-- ["#" "X" "and" "X" "] - > Convert to the same number of ruby characters
-- Suppress [# end indentation here] for continuous indentation
+-［＃注記付き］ Convert [# Noted] ○ [# end with "△" note] and [# "○" and "△" readings] to | ○ < △ >
+- ［＃「○」に×傍点］ - > Convert to the same number of ruby characters
+- Suppress［＃ここで字下げ終わり］for continuous indentation
 - Indentation calculation with indentation and indentation numerically
-[# From here, ○ characters are indented and ● characters are filled.] [# Word indent from here, Word wrap, Word indent]
+［＃ここから○字下げ、折り返して●字下げ］［＃ここから○字下げ、●字詰め］
 - Indentation compound combines classes (Ruled, centered)
-- Images
-[# Description (file name.extension)]
+- Images　［＃説明（ファイル名.拡張子）］ <img src="ファイル名"/>[# Description (file name.extension)]
 & lt; img src = "Filename"/& gt;
 - Suppress horizontal text and automatic tate-chu-yoko
 - Add New Line for Warichu
@@ -314,14 +317,14 @@ Supported Private and Special Characters
 ------------
 * Code-converted Private Character Notes output as UTF -8 characters (UTF8 code, JIS code available)
 Notes on External Characters of Aozora Bunko
-*[# "Sanzui and Tare", unicode6DB6]
-*[# "Sanzui and Tare", U + 6 DB6, 235 -7]
-*[# "Sanzui and Tare", UCS6DB6, 235 -7]
-*[# "Tehen + Rare", Level 3 1 -84 -77]
+ ※［＃「さんずい＋垂」、unicode6DB6］ *[# "Sanzui and Tare", unicode6DB6]
+※［＃「さんずい＋垂」、U+6DB6、235-7］　*[# "Sanzui and Tare", U + 6 DB6, 235 -7]
+ ※［＃「さんずい＋垂」、UCS6DB6、235-7］　*[# "Sanzui and Tare", UCS6DB6, 235 -7]
+ ※［＃「てへん＋劣」、第3水準1-84-77］*[# "Tehen + Rare", Level 3 1 -84 -77]
 Code Only Private Character Notes
-*[# U + 845 b]
-- * [# u + 845 b - e0100]
-*[# U + 845 b - U + e0100]
+※［＃U+845b］　*[# U + 845 b]
+- ※［＃u+845b-e0100］* [# u + 845 b - e0100]
+- ※［＃U+845b-U+e0100］　*[# U + 845 b - U + e0100]
 — Gaiji notes with no code description
 Converts note names to UTF -8 in the correspondence table (chuk _ utf.txt, chuki _ ivs.txt)
 IVS characters can be set to output
@@ -329,15 +332,15 @@ IVS characters can be set to output
 * Gaiji notes not in UTF -8 output alternate characters (chuk _ alt.txt)
 
 * Aozora Bunko Special Characters ([] [] <<>> | # *)
-*[# begin double angle bracket, 1 -1 -52] = >
-*[# close double angle bracket, 1 -1 -53] → >
-*[# opening bracket, 1 -1 -46] → [
-*[# close bracket, 1 -1 -47] →
-*[# Opening bracket (turtle shell), 1 -1 -44] →
-*[# close (turtle shell) bracket, 1 -1 -45] →]
-*[# Vertical Line, 1 -1 -35] → |
-*[# Igeta, 1 -1 -84] → #
-*[# United States, 1 -2 -8] → ※
+［＃始め二重山括弧、1-1-52］　*[# begin double angle bracket, 1 -1 -52]　 → 　《 
+※［＃終わり二重山括弧、1-1-53］ 　*[# close double angle bracket, 1 -1 -53] → 　》
+※［＃始め角括弧、1-1-46］　*[# opening bracket, 1 -1 -46] → ［ 
+※［＃終わり角括弧、1-1-47］　*[# close bracket, 1 -1 -47] →　］
+※［＃始めきっこう（亀甲）括弧、1-1-44］　*[# Opening bracket (turtle shell), 1 -1 -44] →　〔 
+※［＃終わりきっこう（亀甲）括弧、1-1-45］　*[# close (turtle shell) bracket, 1 -1 -45] →　〕
+※［＃縦線、1-1-35］ 　*[# Vertical Line, 1 -1 -35] → ｜ 
+※［＃井げた、1-1-84］　*[# Igeta, 1 -1 -84] →　＃
+※［＃米印、1-2-8］ 　*[# rice sign, 1 -2 -8] → ※
 
 * Output Chinese dots "/\" "/ ′ ′\" in UTF -8
 
