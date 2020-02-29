@@ -244,9 +244,9 @@ public class WebAozoraConverter
 
 		String urlParentPath = urlFilePath;
 		//kakuyomu用のアドレス修正
-		if(urlFilePath.indexOf("kakuyomu")!= -1) {
+		if((urlFilePath.indexOf("kakuyomu")!= -1) || (urlFilePath.indexOf("novelup")!= -1)) {
 			urlFilePath +="/";
-			LogAppender.println("kakuyomuのURL修正");
+			LogAppender.println("URL修正");
 		}
 
 		boolean isPath = false;
@@ -994,7 +994,8 @@ public class WebAozoraConverter
 			case '＃': bw.append("※［＃井げた、1-1-84］"); break;
 			case '※': bw.append("※［＃米印、1-2-8］"); break;
 			case '\t': bw.append(' '); break;
-			case '\n': case '\r': break;
+//			case '\n':
+			case '\r': break;
 			default: bw.append(ch);
 			}
 		}
