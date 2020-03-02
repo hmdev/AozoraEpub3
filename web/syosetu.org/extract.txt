@@ -1,0 +1,52 @@
+################################
+## HAMELN ハーメルン
+## http://syosetu.org/
+################################
+
+## 変換対象URLパターン
+##PAGE_REGEX	^\/Novel/\d+/$
+
+################################
+##一覧ページの抽出設定
+## シリーズタイトル
+#SERIES	
+## タイトル
+TITLE	title:0,#maind .ss font:0,#maind .ss font a:0
+## 著者
+AUTHOR	#maind .ss a:0
+## 説明
+DESCRIPTION	#maind .ss:1
+
+## 各話へのリンク cssQuery
+HREF	#maind .ss table a
+
+##一覧に記載されている各話の更新日時
+SUB_UPDATE	#maind .ss table nobr
+
+##一覧ページのタイトル (本文側に無ければこれを利用)
+SUBTITLE_LIST	#maind .ss td a
+
+################################
+###各話の抽出設定
+
+## 各話 Chapter 先頭の章のみ大見出しで出力
+#CONTENT_CHAPTER	
+## 各話 タイトル 中見出しで出力
+CONTENT_SUBTITLE	#maind .ss font-size:1
+
+## 各話 本文
+CONTENT_ARTICLE	#maind .ss:0
+
+## 本文抽出開始 このタグの次から
+CONTENT_ARTICLE_START	#maind .ss font-size:1
+
+## 本文抽出終了 このタグの前まで
+CONTENT_ARTICLE_END	#maind .ss div:-2
+
+##前書き
+#CONTENT_PREAMBLE	
+## 補足
+#CONTENT_APPENDIX	
+
+##本文タグ外に画像がある場合本文の前に出力
+#CONTENT_IMG	
