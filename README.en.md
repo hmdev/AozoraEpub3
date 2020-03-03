@@ -55,8 +55,8 @@ The "Original Filename .epub" or "[author's name] Title. epub" file is generated
 #### Converting Web novels
 You can also use drag-and-drop to retrieve and convert URLs or URL shortcuts (.url) on the list page of a Web novel site. (Only sites with definition files in web /)
 
-You can obtain it from "syosetu.com", (+ Related Sites), "NEWVEL-LIBRARY", "FC2 Novels", "HAMELN", "Arcadia", "novelist.jp", "dNoVeLs", and "Kakyomu".
-https://syosetu.com , https://novel.fc2.com/ , https://syosetu.org/ , http://www.mai-net.net/ , http://novelist.jp/ , http://www.dnovels.net/ , https://kakuyomu.jp/
+You can obtain it from "syosetu.com", (+ Related Sites), "NEWVEL-LIBRARY", "FC2 Novels", "HAMELN", "Arcadia", "novelist.jp", "dNoVeLs", "Kakyomu", and "novelup.plus".
+https://syosetu.com , https://novel.fc2.com/ , https://syosetu.org/ , http://www.mai-net.net/ , http://novelist.jp/ , http://www.dnovels.net/ , https://kakuyomu.jp/ , https://novelup.plus/
 
 
 screen setting
@@ -332,13 +332,13 @@ IVS characters can be set to output
 * Gaiji notes not in UTF -8 output alternate characters (chuk _ alt.txt)
 
 * Aozora Bunko Special Characters ([] [] <<>> | # *)
-［＃始め二重山括弧、1-1-52］　*[# begin double angle bracket, 1 -1 -52]　 → 　《 
+［＃始め二重山括弧、1-1-52］　*[# begin double angle bracket, 1 -1 -52]　 → 　《
 ※［＃終わり二重山括弧、1-1-53］ 　*[# close double angle bracket, 1 -1 -53] → 　》
-※［＃始め角括弧、1-1-46］　*[# opening bracket, 1 -1 -46] → ［ 
+※［＃始め角括弧、1-1-46］　*[# opening bracket, 1 -1 -46] → ［
 ※［＃終わり角括弧、1-1-47］　*[# close bracket, 1 -1 -47] →　］
-※［＃始めきっこう（亀甲）括弧、1-1-44］　*[# Opening bracket (turtle shell), 1 -1 -44] →　〔 
+※［＃始めきっこう（亀甲）括弧、1-1-44］　*[# Opening bracket (turtle shell), 1 -1 -44] →　〔
 ※［＃終わりきっこう（亀甲）括弧、1-1-45］　*[# close (turtle shell) bracket, 1 -1 -45] →　〕
-※［＃縦線、1-1-35］ 　*[# Vertical Line, 1 -1 -35] → ｜ 
+※［＃縦線、1-1-35］ 　*[# Vertical Line, 1 -1 -35] → ｜
 ※［＃井げた、1-1-84］　*[# Igeta, 1 -1 -84] →　＃
 ※［＃米印、1-2-8］ 　*[# rice sign, 1 -2 -8] → ※
 

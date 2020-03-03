@@ -5,7 +5,7 @@
     <!--define folder properties-->
     <property name="dir.buildfile" value="."/>
     <property name="dir.workspace" value="${dir.buildfile}/.."/>
-    <property name="dir.jarfile" value="C:/Users/user/Desktop/AozoraEpub3-1.1.0b54Q/"/>
+    <property name="dir.jarfile" value="C:/Users/user/Desktop/AozoraEpub3-1.1.0b55Q/"/>
     <target name="create_run_jar">
         <jar destfile="${dir.jarfile}/AozoraEpub3.jar">
             <manifest>
@@ -320,7 +320,7 @@
         <copy file="${dir.buildfile}/web/kakuyomu.jp/extract.txt" todir="${dir.jarfile}/web/kakuyomu.jp/"/>
         <copy file="${dir.buildfile}/web/ncode.syosetu.com/extract.txt" todir="${dir.jarfile}/web/ncode.syosetu.com"/>
         <copy file="${dir.buildfile}/web/novel.fc2.com/extract.txt" todir="${dir.jarfile}/web/novel.fc2.com"/>
-        <copy file="${dir.buildfile}/web/novel.syosetu.org/extract.txt" todir="${dir.jarfile}/web/novel.syosetu.org"/>
+        <copy file="${dir.buildfile}/web/syosetu.org/extract.txt" todir="${dir.jarfile}/web/syosetu.org"/>
         <copy file="${dir.buildfile}/web/novel18.syosetu.com/extract.txt" todir="${dir.jarfile}/web/novel18.syosetu.com"/>
         <copy file="${dir.buildfile}/web/novelist.jp/extract.txt" todir="${dir.jarfile}/web/novelist.jp"/>
         <copy file="${dir.buildfile}/web/www.akatsuki-novels.com/extract.txt" todir="${dir.jarfile}/web/www.akatsuki-novels.com"/>
@@ -337,6 +337,7 @@
          <copy file="${dir.buildfile}/chuki_utf.txt" todir="${dir.jarfile}"/>
          <copy file="${dir.buildfile}/LICENSE.txt" todir="${dir.jarfile}"/>
          <copy file="${dir.buildfile}/README.md" todir="${dir.jarfile}"/>
+         <copy file="${dir.buildfile}/README.en.md" todir="${dir.jarfile}"/>
          <copy file="${dir.buildfile}/README_Changes.txt" todir="${dir.jarfile}"/>
          <copy file="${dir.buildfile}/replace_sample.txt" todir="${dir.jarfile}"/>
     </target>
