@@ -327,6 +327,7 @@
         <copy file="${dir.buildfile}/web/www.dnovels.net/extract.txt" todir="${dir.jarfile}/web/www.dnovels.net"/>
         <copy file="${dir.buildfile}/web/www.mai-net.net/extract.txt" todir="${dir.jarfile}/web/www.mai-net.net"/>
         <copy file="${dir.buildfile}/web/www.newvel.jp/extract.txt" todir="${dir.jarfile}/web/www.newvel.jp"/>
+        <copy file="${dir.buildfile}/web/novelup.plus/extract.txt" todir="${dir.jarfile}/web/novelup.plus"/>
 
          <copy file="${dir.buildfile}/AozoraEpub3.ico" todir="${dir.jarfile}"/>
          <copy file="${dir.buildfile}/chuki_alt.txt" todir="${dir.jarfile}"/>
