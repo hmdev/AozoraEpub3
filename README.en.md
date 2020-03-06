@@ -6,6 +6,11 @@ This is a fork version that aims to be close to the EPUB of the JASRAC. When usi
 
 Due to a Java licensing issue, we decided to build with the AdoptOpenJDK. https://adoptopenjdk.net/releases.html OpenJDK 11 (LTS), HotSpot, OS, and Install JRE.
 
+
+Downloads
+============
+Check the releases page [releases page](https://github.com/kyukyunyorituryo/AozoraEpub3/releases) to get the latest distribution.
+
 Description
 ------------
 This is a tool to convert text files with notes from Aozora Bunko into ePub 3 files. ・ Convert the text and image file (or zip) of Aozora Bunko txt to ePub 3 ・ Get the HTML of the Web novel and save it in Aozora Bunko txt format then convert it to ePub 3 ・ Convert the image zip/rar to ePub 3.
