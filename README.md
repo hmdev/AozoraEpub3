@@ -13,6 +13,11 @@ OpenJDK 11 (LTS)、HotSpot、OS、Install JREを選んでインストール。
 
 Read this in other languages: [English](https://github.com/kyukyunyorituryo/AozoraEpub3/blob/master/README.en.md)
 
+ダウンロード
+============
+ [リリースページ](https://github.com/kyukyunyorituryo/AozoraEpub3/releases)をクリックしてダウンロードしてください。
+ 
+
 説明
 ------------
 青空文庫の注記入りテキストファイルをePub3ファイルに変換するツールです。
