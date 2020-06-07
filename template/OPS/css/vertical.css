@@ -331,16 +331,20 @@ writing-mode: horizontal-tb;
 -epub-writing-mode: horizontal-tb;
 }
 
+/* 上付文字・下付文字
+---------------------------------------------------------------- */
 /* 行右小書き 上付き小文字 */
-.sup {
-vertical-align: super;
-font-size: 0.66em;
+.super {
+  font-size:      smaller;
+  vertical-align: super;
 }
 /* 行左小書き 下付き小文字 */
 .sub {
-vertical-align: sub;
-font-size: 0.66em;
+  font-size:      smaller;
+  vertical-align: sub;
 }
+
+
 
 /* 中央揃え */
 div.center, div.center p { text-align: center; }
