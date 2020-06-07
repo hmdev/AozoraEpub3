@@ -221,8 +221,8 @@
 ##訂正と「ママ」 → 未対応
 
 ####縦横中 (前後の外字画像がずれるので外にspan追加)
-縦中横	<span class="tcy"><span>
-縦中横終わり	</span></span>
+縦中横	<span class="tcy">
+縦中横終わり	</span>
 
 ####横に寝る文字を正立で表示 青空文庫注記仕様外
 正立	<span class="upr">
@@ -701,7 +701,7 @@
 ここでキャプション終わり	</span>		1
 
 ##外字注記の画像 String.formatで出力
-外字画像	<span class="gaiji"><img src="%s"/></span>
+外字画像	<img class="gaiji" src="%s" alt=""/>
 
 ##間にpタグが入るのでブロック注記同様divにする
 表題前	<div class="font5">		1

@@ -90,15 +90,37 @@ hr { margin: .5em 0 .5em 0; }
 .strike { text-decoration:line-through; }
 .dbl_strike { text-decoration:line-through; }
 
-/* 外字文字画像 */
-.gaiji {
+/* 外字画像
+---------------------------------------------------------------- */
+img.gaiji,
+img.gaiji-line,
+img.gaiji-wide {
 display: inline-block;
-vertical-align: middle;
+margin: 0;
+padding: 0;
+border: none;
+background: transparent;
 }
-.gaiji img {
+img.gaiji {
 width: 1em;
-left: -.2em;
+height: 1em;
 }
+img.gaiji-line {
+width: 1em;
+height: auto;
+}
+img.gaiji-wide {
+width: auto;
+height: 1em;
+}
+/* 外字画像のベースライン 縦書き*/
+
+img.gaiji,
+img.gaiji-line,
+img.gaiji-wide {
+vertical-align: baseline;
+}
+
 /* 外字フォント */
 .glyph {
 width: 1em;
@@ -249,9 +271,10 @@ clear: both;
 /* 縦中横 */
 /* 外字画像と重ならない対策 ※有効にすると字下げ折り返し内で画面外にずれる */
 /*span.tcy { display: inline-block; }*/
-.tcy span {
-text-combine: horizontal;
+.tcy {
 -webkit-text-combine: horizontal;
+-webkit-text-combine-upright: all;
+text-combine-upright: all;
 -epub-text-combine: horizontal;
 }
 

@@ -79,13 +79,34 @@ hr { margin: .5em 0 .5em 0; }
 .strike { text-decoration:line-through; }
 .dbl_strike { text-decoration:line-through; }
 
-/* 外字文字画像 */
-.gaiji {
+/* 外字画像
+---------------------------------------------------------------- */
+img.gaiji,
+img.gaiji-line,
+img.gaiji-wide {
 display: inline-block;
-vertical-align: baseline;
+margin: 0;
+padding: 0;
+border: none;
+background: transparent;
 }
-.gaiji img {
+img.gaiji {
+width: 1em;
 height: 1em;
+}
+img.gaiji-line {
+width: 1em;
+height: auto;
+}
+img.gaiji-wide {
+width: auto;
+height: 1em;
+}
+/* 外字画像のベースライン 横書き*/
+img.gaiji,
+img.gaiji-line,
+img.gaiji-wide {
+vertical-align: text-bottom;
 }
 /* 外字フォント */
 .glyph {
