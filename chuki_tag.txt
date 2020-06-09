@@ -36,26 +36,26 @@
 ページの左下	<div class="btm">	</div>	L
 
 ############# 見出し #############
-ここから大見出し	<div class="chap1">		1
-ここで大見出し終わり	</div>		1
-ここから中見出し	<div class="chap2">		1
-ここで中見出し終わり	</div>		1
-ここから小見出し	<div class="chap3">		1
-ここで小見出し終わり	</div>		1
+ここから大見出し	<h1 class="font-1em50">		1
+ここで大見出し終わり	</h1>		1
+ここから中見出し	<h2 class="font-1em30">		1
+ここで中見出し終わり	</h2>		1
+ここから小見出し	<h3 class="font-1em10">		1
+ここで小見出し終わり	</h3>		1
 ###見出し注記は自動で閉じる(見出し終わり注記ではタグは定義しない)
-見出し	<div class="chap1">	</div>		1
+見出し	<h1 class="font-1em50">	</h1>		1
 見出し終わり			1
-大見出し	<div class="chap1">	</div>	1
+大見出し	<h1 class="font-1em50">	</h1>	1
 大見出し終わり			1
-中見出し	<div class="chap2">	</div>	1
+中見出し	<h2 class="font-1em30">	</h2>	1
 中見出し終わり			1
-小見出し	<div class="chap3">	</div>	1
+小見出し	<h3 class="font-1em10">	</h3>	1
 小見出し終わり			1
-同行大見出し	<span class="font5">
+同行大見出し	<span class="font-1em50"">
 同行大見出し終わり	</span>
-同行中見出し	<span class="font3">
+同行中見出し	<span class="font-1em30">
 同行中見出し終わり	</span>
-同行小見出し	<span class="font1">
+同行小見出し	<span class="font-1em10">
 同行小見出し終わり	</span>
 窓大見出し	<span class="mado L">
 窓大見出し終わり	</span>
@@ -279,33 +279,33 @@
 ここで破線枠囲み終わり	</div>		1
 
 ####文字サイズ
-１段階大きな文字	<span class="font1">
-２段階大きな文字	<span class="font2">
-３段階大きな文字	<span class="font3">
-４段階大きな文字	<span class="font4">
-５段階大きな文字	<span class="font5">
-６段階大きな文字	<span class="font6">
+１段階大きな文字	<span class="font-1em10">
+２段階大きな文字	<span class="font-1em20">
+３段階大きな文字	<span class="font-1em30">
+４段階大きな文字	<span class="font-1em40">
+５段階大きな文字	<span class="font-1em50">
+６段階大きな文字	<span class="font-1em60">
 大きな文字終わり	</span>
-ここから１段階大きな文字	<div class="font1">		1
-ここから２段階大きな文字	<div class="font2">		1
-ここから３段階大きな文字	<div class="font3">		1
-ここから４段階大きな文字	<div class="font4">		1
-ここから５段階大きな文字	<div class="font5">		1
-ここから６段階大きな文字	<div class="font6">		1
+ここから１段階大きな文字	<div class="font-1em10">		1
+ここから２段階大きな文字	<div class="font-1em20">		1
+ここから３段階大きな文字	<div class="font-1em30">		1
+ここから４段階大きな文字	<div class="font-1em40">		1
+ここから５段階大きな文字	<div class="font-1em50">		1
+ここから６段階大きな文字	<div class="font-1em60">		1
 ここで大きな文字終わり	</div>		1
-１段階小さな文字	<span class="font-1">
-２段階小さな文字	<span class="font-2">
-３段階小さな文字	<span class="font-3">
-４段階小さな文字	<span class="font-4">
-５段階小さな文字	<span class="font-5">
-６段階小さな文字	<span class="font-6">
+１段階小さな文字	<span class="font-0em90">
+２段階小さな文字	<span class="font-0em83">
+３段階小さな文字	<span class="font-0em77">
+４段階小さな文字	<span class="font-0em70">
+５段階小さな文字	<span class="font-0em66">
+６段階小さな文字	<span class="font-0em62">
 小さな文字終わり	</span>
-ここから１段階小さな文字	<div class="font-1">		1
-ここから２段階小さな文字	<div class="font-2">		1
-ここから３段階小さな文字	<div class="font-3">		1
-ここから４段階小さな文字	<div class="font-4">		1
-ここから５段階小さな文字	<div class="font-5">		1
-ここから６段階小さな文字	<div class="font-6">		1
+ここから１段階小さな文字	<div class="font-0em90">		1
+ここから２段階小さな文字	<div class="font-0em83">		1
+ここから３段階小さな文字	<div class="font-0em77">		1
+ここから４段階小さな文字	<div class="font-0em70">		1
+ここから５段階小さな文字	<div class="font-0em66">		1
+ここから６段階小さな文字	<div class="font-0em62">		1
 ここで小さな文字終わり	</div>		1
 
 ####外字注記形式による代替表現 → 別処理
@@ -704,15 +704,15 @@
 外字画像	<img class="gaiji" src="%s" alt=""/>
 
 ##間にpタグが入るのでブロック注記同様divにする
-表題前	<div class="font5">		1
+表題前	<div class="font-1em50">		1
 表題後	</div>		1
-原題前	<div class="font4">		1
+原題前	<div class="font-1em40">		1
 原題後	</div>		1
-副題前	<div class="pt2 font2">		1
+副題前	<div class="pt2 font-1em20">		1
 副題後	</div>		1
-副原題前	<div class="pt2 font2">		1
+副原題前	<div class="pt2 font-1em20">		1
 副原題後	</div>		1
-著者前	<div class="btm pb2 font1">		1
+著者前	<div class="btm pb2 font-1em10">		1
 著者後	</div>		1
-副著者前	<div class="btm pb2 font1">		1
+副著者前	<div class="btm pb2 font-1em10">		1
 副著者後	</div>		1

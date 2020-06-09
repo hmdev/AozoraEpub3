@@ -268,6 +268,85 @@ border-left-width: 1px;
 clear: both;
 }
 
+/* 見出しのデフォルト書体指定
+---------------------------------------------------------------- */
+/* 縦組み用 */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+font-family: serif-ja-v, serif-ja, serif;
+}
+/* フォント指定
+---------------------------------------------------------------- */
+/* 明朝 */
+.hltr .mfont,
+.vrtl .mfont {
+  font-family: serif-ja, serif;
+}
+
+/* ゴシック */
+.hltr .gfont,
+.vrtl .gfont {
+  font-family: sans-serif-ja, sans-serif;
+}
+
+/* フォントサイズ（％指定） */
+.font-050per { font-size:  50%; }
+.font-060per { font-size:  60%; }
+.font-070per { font-size:  70%; }
+.font-075per { font-size:  75%; }
+.font-080per { font-size:  80%; }
+.font-085per { font-size:  85%; }
+.font-090per { font-size:  90%; }
+.font-100per { font-size: 100%; }
+.font-110per { font-size: 110%; }
+.font-115per { font-size: 115%; }
+.font-120per { font-size: 120%; }
+.font-130per { font-size: 130%; }
+.font-140per { font-size: 140%; }
+.font-150per { font-size: 150%; }
+.font-160per { font-size: 160%; }
+.font-170per { font-size: 170%; }
+.font-180per { font-size: 180%; }
+.font-190per { font-size: 190%; }
+.font-200per { font-size: 200%; }
+.font-250per { font-size: 250%; }
+.font-300per { font-size: 300%; }
+
+
+/* フォントサイズ（文字数指定） */
+.font-0em50 { font-size:  0.50em; }
+.font-0em60 { font-size:  0.60em; }
+.font-0em70 { font-size:  0.70em; }
+.font-0em75 { font-size:  0.75em; }
+.font-0em80 { font-size:  0.80em; }
+.font-0em85 { font-size:  0.85em; }
+.font-0em90 { font-size:  0.90em; }
+.font-1em   { font-size:  1.00em; }
+.font-1em10 { font-size:  1.10em; }
+.font-1em15 { font-size:  1.15em; }
+.font-1em20 { font-size:  1.20em; }
+.font-1em30 { font-size:  1.30em; }
+.font-1em40 { font-size:  1.40em; }
+.font-1em50 { font-size:  1.50em; }
+.font-1em60 { font-size:  1.60em; }
+.font-1em70 { font-size:  1.70em; }
+.font-1em80 { font-size:  1.80em; }
+.font-1em90 { font-size:  1.90em; }
+.font-2em   { font-size:  2.00em; }
+.font-2em50 { font-size:  2.50em; }
+.font-3em   { font-size:  3.00em; }
+
+/* AozoraEpub3用フォントサイズ（％指定） */
+.font-0em83 { font-size: 0.83em; }
+.font-0em77 { font-size: 0.77em; }
+.font-0em66 { font-size: 0.66em; }
+.font-0em62 { font-size: 0.62em; }}
+
+
 /* 縦中横 */
 /* 外字画像と重ならない対策 ※有効にすると字下げ折り返し内で画面外にずれる */
 /*span.tcy { display: inline-block; }*/
