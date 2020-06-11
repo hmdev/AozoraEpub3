@@ -4,7 +4,7 @@
 改造版の説明
 ------------
 電書協のEPUBに近づけることを目的としたフォーク版。
-AozoraEpub3を電子出版目的に使う場合に、元のままでは審査が通らないことが有る。EPUBバリデーションを通すのと、多くのEPUBビュワーで表示に問題がないようにしている。
+AozoraEpub3を電子出版目的に使う場合に、審査が通るように修正している。EPUBバリデーションを通すのと、多くのEPUBビュワーで表示に問題がないようにすることを目的としている。
 
 Javaライセンスの問題からAdoptOpenJDKでビルドすることにします。
 https://adoptopenjdk.net/releases.html
@@ -16,7 +16,7 @@ Read this in other languages: [English](https://github.com/kyukyunyorituryo/Aozo
 ダウンロード
 ============
  [リリースページ](https://github.com/kyukyunyorituryo/AozoraEpub3/releases)をクリックしてダウンロードしてください。
- 
+
 
 説明
 ------------
