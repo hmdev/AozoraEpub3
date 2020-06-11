@@ -123,7 +123,8 @@ border: 1px dashed #000;
 padding: 0.5em;
 }
 
-/* 圏点 */
+/* 傍点 */
+/*
 span.sesame {
 text-emphasis-style: sesame;
 -webkit-text-emphasis-style: sesame;
@@ -174,6 +175,50 @@ text-emphasis-style: open triangle;
 -webkit-text-emphasis-style: open triangle;
 -epub-text-emphasis-style: open triangle;
 }
+*/
+/* 圏点・傍点
+---------------------------------------------------------------- */
+.em-sesame {
+  -webkit-text-emphasis-style: filled sesame;
+  -epub-text-emphasis-style:   filled sesame;
+}
+.em-sesame-open {
+  -webkit-text-emphasis-style: open sesame;
+  -epub-text-emphasis-style:   open sesame;
+}
+.em-dot {
+  -webkit-text-emphasis-style: filled dot;
+  -epub-text-emphasis-style:   filled dot;
+}
+.em-dot-open {
+  -webkit-text-emphasis-style: open dot;
+  -epub-text-emphasis-style:   open dot;
+}
+.em-circle {
+  -webkit-text-emphasis-style: filled circle;
+  -epub-text-emphasis-style:   filled circle;
+}
+.em-circle-open {
+  -webkit-text-emphasis-style: open circle;
+  -epub-text-emphasis-style:   open circle;
+}
+.em-double-circle {
+  -webkit-text-emphasis-style: filled double-circle;
+  -epub-text-emphasis-style:   filled double-circle;
+}
+.em-double-circle-open {
+  -webkit-text-emphasis-style: open double-circle;
+  -epub-text-emphasis-style:   open double-circle;
+}
+.em-triangle {
+  -webkit-text-emphasis-style: filled triangle;
+  -epub-text-emphasis-style:   filled triangle;
+}
+.em-triangle-open {
+  -webkit-text-emphasis-style: open triangle;
+  -epub-text-emphasis-style:   open triangle;
+}
+
 span.x-dot {
 text-emphasis-style: '×';
 -webkit-text-emphasis-style: '×';
