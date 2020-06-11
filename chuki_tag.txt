@@ -247,11 +247,11 @@
 ここで横書き終わり	</div>		1
 
 ####小書き
-行右小書き	<span class="sup">
+行右小書き	<span class="super">
 行右小書き終わり	</span>
 行左小書き	<span class="sub">
 行左小書き終わり	</span>
-上付き小文字	<span class="sup">
+上付き小文字	<span class="super">
 上付き小文字終わり	</span>
 下付き小文字	<span class="sub">
 下付き小文字終わり	</span>

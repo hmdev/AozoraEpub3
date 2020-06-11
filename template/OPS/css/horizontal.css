@@ -211,6 +211,18 @@ border-top-style: solid;
 padding-top: 1px;
 border-top-width: 1px;
 }
+/* 小書き文字
+----------------------------------------------------------------
+通常の文字を「ぁゃっ」のような小書き文字に見せるための指定
+---------------------------------------------------------------- */
+.kogaki {
+  font-size:      0.75em;
+}
+/* 【横組み】左下 */
+.hltr .kogaki {
+  padding:        0 0.15em 0 0.1em;
+  vertical-align: baseline;
+}
 
 /* 文字サイズ 大 */
 .font1, .chap3 { font-size: 110%; }

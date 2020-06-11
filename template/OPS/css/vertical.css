@@ -160,6 +160,7 @@ top:0; left:0.76em;
 }
 
 /* 圏点 */
+/* 傍点 */
 span.sesame {
 text-emphasis-style: sesame;
 -webkit-text-emphasis-style: sesame;
@@ -248,25 +249,33 @@ padding-left: 1px;
 border-left-width: 1px;
 }
 
+
+/*AozoraEpubで使わない*/
 /* 文字サイズ 大 */
+/*
 .font1, .chap3 { font-size: 110%; }
 .font2 { font-size: 120%; }
 .font3, .chap2 { font-size: 130%; }
 .font4 { font-size: 140%; }
 .font5, .chap1 { font-size: 150%; }
 .font6 { font-size: 160%; }
+*/
 /* 文字サイズ 小 */
+/*
 .font-1 { font-size: 90%; }
 .font-2 { font-size: 83%; }
 .font-3 { font-size: 77%; }
 .font-4, .kogaki  { font-size: 70%; }
 .font-5 { font-size: 66%; }
 .font-6 { font-size: 62%; }
+*/
 
 /* 見出し*/
+/*
 .chap1, .chap2, .chap3 {
 clear: both;
 }
+*/
 
 /* 見出しのデフォルト書体指定
 ---------------------------------------------------------------- */
@@ -423,7 +432,19 @@ writing-mode: horizontal-tb;
   vertical-align: sub;
 }
 
+/* 小書き文字
+----------------------------------------------------------------
+通常の文字を「ぁゃっ」のような小書き文字に見せるための指定
+---------------------------------------------------------------- */
+.kogaki {
+  font-size:      0.75em;
+}
 
+/* 【縦組み】右上 */
+.vrtl .kogaki {
+  padding:        0.1em 0 0.15em 0;
+  vertical-align: super;
+}
 
 /* 中央揃え */
 div.center, div.center p { text-align: center; }
