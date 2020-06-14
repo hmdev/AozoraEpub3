@@ -160,7 +160,7 @@
 
 
 ####傍線 (すべて傍線と同じ表現)
-傍線	<span class="underline">
+傍線	<span class="em-line">
 傍線終わり	</span>
 二重傍線	<span class="double_underline">
 二重傍線終わり	</span>
@@ -171,8 +171,23 @@
 波線	<span class="wave_underline">
 波線終わり	</span>
 
-左に傍線	<span class="left_underline">
+左に傍線	<span class="em-line-outside">
 左に傍線終わり	</span>
+左に二重傍線	<span class="left_double_underline">
+左に二重傍線終わり	</span>
+左に鎖線	<span class="left_dotted_underline">
+左に鎖線終わり	</span>
+左に破線	<span class="left_dashed_underline">
+左に破線終わり	</span>
+左に波線	<span class="left_wave_underline">
+左に波線終わり	</span>
+
+打ち消し線	<span class="line-through">
+打ち消し線終わり	</span>
+赤線	<span class="line-red">
+赤線終わり	</span>
+左に赤線	<span class="left-line-red">
+左に赤線終わり	</span>
 
 ####太字
 太字	<span class="b">

@@ -230,7 +230,62 @@ text-emphasis-position: under;
 -epub-text-emphasis-position: under;
 }
 
-/* 傍線 */
+/* 横組み打ち消し線
+---------------------------------------------------------------- */
+.line-through {
+  text-decoration: line-through;
+}
+
+/* 【横組み】下線　 */
+.em-line {
+text-decoration: underline;
+}
+/* 【横組み】上線　 */
+.em-line-outside {
+text-decoration: overline;
+}
+/* 【横組み】二重線 */
+double_underline {
+text-decoration:underline double;
+}
+/* 【横組み】鎖線 */
+dotted_underline {
+text-decoration:underline dotted;
+}
+/* 【横組み】破線 */
+dashed_underline {
+text-decoration:underline dashed;
+}
+/* 【横組み】波線 */
+wave_underline {
+text-decoration:underline wavy;
+}
+/* 【横組み】赤線 */
+line-red {
+text-decoration:underline red;
+}
+/* 【横組み】左に二重傍線 */
+left_double_underline {
+text-decoration:overline double;
+}
+/* 【横組み】左に鎖線 */
+left_dotted_underline {
+text-decoration:overline dotted;
+}
+/* 【横組み】左に破線 */
+left_dashed_underline {
+text-decoration:overline dotted;
+}
+/* 【横組み】左に波線 */
+left_wave_underline {
+text-decoration:overline wavy;
+}
+/* 【横組み】左に赤線 */
+left-line-red {
+text-decoration:overline red;
+}
+
+/* 傍線
 span.underline, span.double_underline, span.dotted_underline, span.dashed_underline, span.wave_underline {
 border-bottom-width: 1px;
 padding-bottom: 1px;
@@ -249,13 +304,16 @@ span.dashed_underline {
 border-bottom-style: dashed;
 }
 span.wave_underline {
-border-bottom-style: solid;/*wave;*/
+border-bottom-style: solid;
 }
 span.left_underline {
 border-top-style: solid;
 padding-top: 1px;
 border-top-width: 1px;
 }
+
+*/
+
 /* 小書き文字
 ----------------------------------------------------------------
 通常の文字を「ぁゃっ」のような小書き文字に見せるための指定
