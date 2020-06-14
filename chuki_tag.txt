@@ -210,21 +210,21 @@
 ここまでゴシック体	</div>		1
 
 ####取り消し線 二重は普通の取り消し線で代用
-取消線	<span class="strike">
+取消線	<span class="line-through">
 取消線終わり	</span>
-ここから取消線	<div class="strike">		1
+ここから取消線	<div class="line-through">		1
 ここで取消線終わり	</div>		1
-取り消し線	<span class="strike">
+取り消し線	<span class="line-through">
 取り消し線終わり	</span>
-ここから取り消し線	<div class="strike">		1
+ここから取り消し線	<div class="line-through">		1
 ここで取り消し線終わり	</div>		1
-二重取り消し線	<span class="dbl_strike">
+二重取り消し線	<span class="line-through">
 二重取り消し線終わり	</span>
-ここから二重取り消し線	<div class="dbl_strike">		1
+ここから二重取り消し線	<div class="line-through">		1
 ここで二重取り消し線終わり	</div>		1
-二重取消線	<span class="dbl_strike">
+二重取消線	<span class="line-through">
 二重取消線終わり	</span>
-ここから二重取消線	<div class="dbl_strike">		1
+ここから二重取消線	<div class="line-through">		1
 ここで二重取消線終わり	</div>		1
 
 ############## 画像 ############## → 別処理

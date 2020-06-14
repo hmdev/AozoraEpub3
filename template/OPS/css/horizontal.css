@@ -75,10 +75,10 @@ line-height: 1.4em;
 /* 区切り線 */
 hr { margin: .5em 0 .5em 0; }
 
-/* 取り消し線 */
+/* 取り消し線
 .strike { text-decoration:line-through; }
 .dbl_strike { text-decoration:line-through; }
-
+*/
 /* 外字画像
 ---------------------------------------------------------------- */
 img.gaiji,
