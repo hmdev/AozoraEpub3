@@ -264,7 +264,7 @@ border-top-width: 1px;
   font-size:      0.75em;
 }
 /* 【横組み】左下 */
-.hltr .kogaki {
+.kogaki {
   padding:        0 0.15em 0 0.1em;
   vertical-align: baseline;
 }
@@ -302,14 +302,12 @@ font-family: serif-ja, serif;
 /* フォント指定
 ---------------------------------------------------------------- */
 /* 明朝 */
-.hltr .mfont,
-.vrtl .mfont {
+.mfont {
   font-family: serif-ja, serif;
 }
 
 /* ゴシック */
-.hltr .gfont,
-.vrtl .gfont {
+.gfont {
   font-family: sans-serif-ja, sans-serif;
 }
 

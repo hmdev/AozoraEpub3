@@ -336,14 +336,12 @@ font-family: serif-ja-v, serif-ja, serif;
 /* フォント指定
 ---------------------------------------------------------------- */
 /* 明朝 */
-.hltr .mfont,
-.vrtl .mfont {
+.mfont {
   font-family: serif-ja, serif;
 }
 
 /* ゴシック */
-.hltr .gfont,
-.vrtl .gfont {
+.gfont {
   font-family: sans-serif-ja, sans-serif;
 }
 
@@ -486,7 +484,7 @@ writing-mode: horizontal-tb;
 }
 
 /* 【縦組み】右上 */
-.vrtl .kogaki {
+.kogaki {
   padding:        0.1em 0 0.15em 0;
   vertical-align: super;
 }
