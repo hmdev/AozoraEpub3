@@ -273,25 +273,35 @@
 小書き	<span class="kogaki">
 小書き終わり	</span>
 
-####罫囲み
-罫囲み	<span class="border">
+####罫囲み 点線(鎖線)dotted、二重線double
+罫囲み	<span class="k-solid">
 罫囲み終わり	</span>
-破線罫囲み	<span class="dashed_border">
+破線罫囲み	<span class="k-dashed">
 破線罫囲み終わり	</span>
-破線の罫囲み	<span class="dashed_border">
+破線の罫囲み	<span class="k-dashed">
 破線の罫囲み終わり	</span>
-枠囲み	<span class="border">
+枠囲み	<span class="k-solid">
 枠囲み終わり	</span>
-破線枠囲み	<span class="dashed_border">
+破線枠囲み	<span class="k-dashed">
 破線枠囲み終わり	</span>
-ここから罫囲み	<div class="border">		1
+ここから罫囲み	<div class="k-solid">		1
 ここで罫囲み終わり	</div>		1
-ここから破線罫囲み	<div class="dashed_border">		1
+ここから破線罫囲み	<div class="k-dashed">		1
 ここで破線罫囲み終わり	</div><br/>		1
-ここから枠囲み	<div class="border">		1
+ここから枠囲み	<div class="k-solid">		1
 ここで枠囲み終わり	</div>		1
-ここから破線枠囲み	<div class="dashed_border">		1
+ここから破線枠囲み	<div class="k-dashed">		1
 ここで破線枠囲み終わり	</div>		1
+
+鎖線罫囲み	<span class=".k-dotted">
+鎖線罫囲み終わり	</span>
+二重線罫囲み	<span class="k-double">
+二重線罫囲み終わり	</span>
+ここから鎖線罫囲み	<div class=".k-dotted">		1
+ここで鎖線罫囲み終わり	</div>		1
+ここから二重線罫囲み	<div class="k-double">		1
+ここで二重線罫囲み終わり	</div><br/>		1
+
 
 ####文字サイズ
 １段階大きな文字	<span class="font-1em10">

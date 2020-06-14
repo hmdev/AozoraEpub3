@@ -112,15 +112,125 @@ vertical-align: text-bottom;
 .glyph {
 height: 1em;
 }
-/* 罫囲み */
+/* 罫線
+----------------------------------------------------------------
+線種や線幅など、細かな調整が必要なときは、
+無理に既存のクラスを用いず新たにクラスを作成すること
+---------------------------------------------------------------- */
+/* 線種【実線】 */
+.k-solid-top,
+.k-solid-right,
+.k-solid-bottom,
+.k-solid-left,
+.k-solid-topbottom,
+.k-solid-rightleft {
+  border-width: 1px;
+  border-color: #000000;
+}
+/* 線位置【実線】 */
+.k-solid-top       { border-style: solid none none none;  }
+.k-solid-right     { border-style: none solid none none;  }
+.k-solid-bottom    { border-style: none none solid none;  }
+.k-solid-left      { border-style: none none none solid;  }
+.k-solid-topbottom { border-style: solid none solid none; }
+.k-solid-rightleft { border-style: none solid none solid; }
+
+/* 線種【点線】 */
+.k-dotted-top,
+.k-dotted-right,
+.k-dotted-bottom,
+.k-dotted-left,
+.k-dotted-topbottom,
+.k-dotted-rightleft {
+  border-width: 2px;
+  border-color: #000000;
+}
+/* 線位置【点線】 */
+.k-dotted-top       { border-style: dotted none none none;   }
+.k-dotted-right     { border-style: none dotted none none;   }
+.k-dotted-bottom    { border-style: none none dotted none;   }
+.k-dotted-left      { border-style: none none none dotted;   }
+.k-dotted-topbottom { border-style: dotted none dotted none; }
+.k-dotted-rightleft { border-style: none dotted none dotted; }
+
+/* 線種【二重線】 */
+.k-double-top,
+.k-double-right,
+.k-double-bottom,
+.k-double-left,
+.k-double-topbottom,
+.k-double-rightleft {
+  border-width: 4px;
+  border-color: #000000;
+}
+/* 線位置【二重線】 */
+.k-double-top       { border-style: double none none none;   }
+.k-double-right     { border-style: none double none none;   }
+.k-double-bottom    { border-style: none none double none;   }
+.k-double-left      { border-style: none none none double;   }
+.k-double-topbottom { border-style: double none double none; }
+.k-double-rightleft { border-style: none double none double; }
+
+/* 線種【破線】 */
+.k-dashed-top,
+.k-dashed-right,
+.k-dashed-bottom,
+.k-dashed-left,
+.k-dashed-topbottom,
+.k-dashed-rightleft {
+  border-width: 1px;
+  border-color: #000000;
+}
+/* 線位置【破線】 */
+.k-dashed-top       { border-style: dashed none none none;   }
+.k-dashed-right     { border-style: none dashed none none;   }
+.k-dashed-bottom    { border-style: none none dashed none;   }
+.k-dashed-left      { border-style: none none none dashed;   }
+.k-dashed-topbottom { border-style: dashed none dashed none; }
+.k-dashed-rightleft { border-style: none dashed none dashed; }
+
+/* 線幅 */
+.k-0px    { border-width: 0;      }
+.k-1px    { border-width: 1px;    }
+.k-2px    { border-width: 2px;    }
+.k-3px    { border-width: 3px;    }
+.k-4px    { border-width: 4px;    }
+.k-5px    { border-width: 5px;    }
+.k-6px    { border-width: 6px;    }
+.k-7px    { border-width: 7px;    }
+.k-8px    { border-width: 8px;    }
+.k-thin   { border-width: thin;   }
+.k-medium { border-width: medium; }
+.k-thick  { border-width: thick;  }
+
+/* １Ｃ用の線色 */
+.k-black       { border-color: #000000; }
+.k-dimgray     { border-color: #696969; }
+.k-gray        { border-color: #808080; }
+.k-darkgray    { border-color: #a9a9a9; }
+.k-silver      { border-color: #c0c0c0; }
+.k-gainsboro   { border-color: #dcdcdc; }
+.k-white       { border-color: #ffffff; }
+
+/* 基本色 */
+.k-red         { border-color: #ff0000; }
+.k-blue        { border-color: #0000ff; }
+.k-cyan        { border-color: #00ffff; }
+.k-magenta     { border-color: #ff00ff; }
+.k-orangered   { border-color: #ff4500; }
+
+
+/* 罫囲み
 .border {
 border: 1px solid #000;
-padding: 0.5em;
+margin: 0.25em;
+padding: 0.25em;
 }
-/* 破線罫囲み */
+破線罫囲み
 .dashed_border {
 border: 1px dashed #000;
-padding: 0.5em;
+margin: 0.25em;
+padding: 0.25em;
 }
 
 /* 傍点 */
