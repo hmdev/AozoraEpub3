@@ -532,6 +532,89 @@ font-family: serif-ja, serif;
 .font-0em66 { font-size: 0.66em; }
 .font-0em62 { font-size: 0.62em; }
 
+/* 太字
+---------------------------------------------------------------- */
+/* 太字 */
+.bold {
+  font-weight: bold;
+}
+/* 太字解除 */
+.font-weight-normal {
+  font-weight: normal;
+}
+
+
+/* 斜体
+---------------------------------------------------------------- */
+/* 斜体 */
+.italic {
+  font-style: italic;
+}
+/* 斜体解除 */
+.font-style-normal {
+  font-style: normal;
+}
+
+
+/* 文字色
+---------------------------------------------------------------- */
+/* １Ｃ用文字色 */
+.color-black       { color: #000000; }
+.color-dimgray     { color: #696969; }
+.color-gray        { color: #808080; }
+.color-darkgray    { color: #a9a9a9; }
+.color-silver      { color: #c0c0c0; }
+.color-gainsboro   { color: #dcdcdc; }
+.color-white       { color: #ffffff; }
+.color-transparent { color: transparent; }
+
+/* 基本色 */
+.color-red         { color: #ff0000; }
+.color-blue        { color: #0000ff; }
+.color-cyan        { color: #00ffff; }
+.color-magenta     { color: #ff00ff; }
+.color-orangered   { color: #ff4500; }
+
+
+/* 背景色
+---------------------------------------------------------------- */
+/* １Ｃ用背景色 */
+.bg-black       { background-color: #000000; }
+.bg-dimgray     { background-color: #696969; }
+.bg-gray        { background-color: #808080; }
+.bg-darkgray    { background-color: #a9a9a9; }
+.bg-silver      { background-color: #c0c0c0; }
+.bg-gainsboro   { background-color: #dcdcdc; }
+.bg-white       { background-color: #ffffff; }
+.bg-transparent { background-color: transparent; }
+
+/* 基本色 */
+.bg-red         { background-color: #ff0000; }
+.bg-blue        { background-color: #0000ff; }
+.bg-cyan        { background-color: #00ffff; }
+.bg-magenta     { background-color: #ff00ff; }
+.bg-orangered   { background-color: #ff4500; }
+
+
+/* 文字色の白黒反転
+---------------------------------------------------------------- */
+.inverse {
+  color:      #ffffff;
+  background: #000000;
+}
+
+
+/* 区切り線
+---------------------------------------------------------------- */
+hr {
+  border-width: 1px;
+  border-color: #000000;
+}
+/* 【横組み】水平線 */
+hr {
+  margin:       0.5em 0;
+  border-style: solid none none none;
+}
 
 /* 縦中横 */
 

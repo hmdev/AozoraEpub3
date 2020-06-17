@@ -190,24 +190,31 @@
 左に赤線終わり	</span>
 
 ####太字
-太字	<span class="b">
+太字	<span class="bold">
 太字終わり	</span>
-ここから太字	<div class="b">		1
+ここから太字	<div class="bold">		1
 ここで太字終わり	</div>		1
 ここまで太字	</div>		1
 
 ####斜体
-斜体	<span class="i">
+斜体	<span class="italic">
 斜体終わり	</span>
-ここから斜体	<div class="i">		1
+ここから斜体	<div class="italic">		1
 ここで斜体終わり	</div>		1
 
 ###ゴシック体
-ゴシック体	<span class="gtc">
+ゴシック体	<span class="gfont">
 ゴシック体終わり	</span>
-ここからゴシック体	<div class="gtc">		1
+ここからゴシック体	<div class="gfont">		1
 ここでゴシック体終わり	</div>		1
 ここまでゴシック体	</div>		1
+
+###明朝体
+明朝体	<span class="mfont">
+明朝体終わり	</span>
+ここから明朝体	<div class="mfont">		1
+ここで明朝体終わり	</div>		1
+ここまで明朝体	</div>		1
 
 ####取り消し線 二重は普通の取り消し線で代用
 取消線	<span class="line-through">
