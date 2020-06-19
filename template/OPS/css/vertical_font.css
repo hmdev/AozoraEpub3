@@ -5,7 +5,76 @@
 body {
 font-family: "@ＭＳ 明朝", "@MS Mincho", "ヒラギノ明朝 ProN W3", "HiraMinProN-W3", serif, sans-serif;
 }
+/*
+青空文庫追加
+*/
+/*
+傍点
+*/
+span.x-dot {
+text-emphasis-style: '×';
+-webkit-text-emphasis-style: '×';
+-epub-text-emphasis-style: '×';
+}
+span.left_emp {
+text-emphasis-position: under;
+-webkit-text-emphasis-position: under;
+-epub-text-emphasis-position: under;
+}
+/* AozoraEpub3用フォントサイズ（％指定） */
+.font-0em83 { font-size: 0.83em; }
+.font-0em77 { font-size: 0.77em; }
+.font-0em66 { font-size: 0.66em; }
+.font-0em62 { font-size: 0.62em; }
 
+
+/*
+傍線
+*/
+/* 【縦組み】二重線 */
+double_underline {
+text-decoration:overline double;
+}
+/* 【縦組み】鎖線 */
+dotted_underline {
+text-decoration:overline dotted;
+}
+/* 【縦組み】破線 */
+dashed_underline {
+text-decoration:overline dashed;
+}
+/* 【縦組み】波線 */
+wave_underline {
+text-decoration:overline wavy;
+}
+/* 【縦組み】赤線 */
+line-red {
+text-decoration:overline red;
+}
+/* 【縦組み】左に二重傍線 */
+left_double_underline {
+text-decoration:underline double;
+}
+/* 【縦組み】左に鎖線 */
+left_dotted_underline {
+text-decoration:underline dotted;
+}
+/* 【縦組み】左に破線 */
+left_dashed_underline {
+text-decoration:underline dotted;
+}
+/* 【縦組み】左に波線 */
+left_wave_underline {
+text-decoration:underline wavy;
+}
+/* 【縦組み】左に赤線 */
+left-line-red {
+text-decoration:underline red;
+}
+
+/*
+青空文庫追加
+*/
 
 /* 見出しのデフォルト書体指定
 ---------------------------------------------------------------- */
@@ -138,18 +207,6 @@ top:-.7em; left:.1em;
 .kindle .dakuten span {
 top:0; left:0.76em;
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
