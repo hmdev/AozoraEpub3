@@ -105,7 +105,7 @@
 #end
 
 #foreach(${sectionInfo} in ${sections})
-#if (${kindle} && ${bookInfo.ImageOnly})
+#if (${bookInfo.ImageOnly})
 #if ($velocityCount % 2 == 0)
 		<itemref idref="sec${sectionInfo.SectionId}" linear="yes" properties="page-spread-left"/>
 #else
