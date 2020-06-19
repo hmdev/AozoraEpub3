@@ -32,8 +32,7 @@ public class Epub3ImageWriter extends Epub3Writer
 	/** コピーのみのファイル */
 	final static String[] TEMPLATE_FILE_NAMES_VERTICAL_IMAGE = new String[]{
 		"META-INF/container.xml",
-		OPS_PATH+CSS_PATH+"vertical_image.css",
-		OPS_PATH+CSS_PATH+"fixed-layout-jp.css"
+		OPS_PATH+CSS_PATH+"vertical_image.css"
 	};
 	final static String[] TEMPLATE_FILE_NAMES_HORIZONTAL_IMAGE = new String[]{
 		"META-INF/container.xml",
@@ -48,10 +47,11 @@ public class Epub3ImageWriter extends Epub3Writer
 		OPS_PATH+CSS_PATH+"fixed-layout-jp.css"
 	};
 	String[] getTemplateFiles()
-	{	if (this.isSvgImage) return TEMPLATE_FILE_NAMES_SVG_IMAGE;
-		if (this.isKindle) return TEMPLATE_FILE_NAMES_KINDLE_IMAGE;
+	{	//if (this.isSvgImage)
+		return TEMPLATE_FILE_NAMES_SVG_IMAGE;
+		//if (!this.bookInfo.vertical) return TEMPLATE_FILE_NAMES_HORIZONTAL_IMAGE;
 //		if (this.bookInfo != null && this.bookInfo.vertical) return TEMPLATE_FILE_NAMES_VERTICAL_IMAGE;
-		return TEMPLATE_FILE_NAMES_VERTICAL_IMAGE;
+	//	return TEMPLATE_FILE_NAMES_VERTICAL_IMAGE;
 	}
 
 	/** 出力先ePubのZipストリーム */
@@ -126,7 +126,7 @@ public class Epub3ImageWriter extends Epub3Writer
 			if (this.canceled) return;
 			String fileName = vecFileName.get(pageNum++);
 			if (fileName != null) {
-				if (isSvgImage) {
+				if (bookInfo.imageOnly) {
 					this.printSvgImageSection(srcFilePath);
 				} else {
 					this.startImageSection(srcFilePath);
