@@ -27,20 +27,13 @@
 		<meta name="cover" content="img${coverImage.Id}"/>
 #end
 #if (${bookInfo.ImageOnly})
-#if (${svgImage})
+		<!-- Fixed-Layout Documents指定 -->
 		<meta property="rendition:layout">pre-paginated</meta>
-#end
-		<meta name="fixed-layout" content="true"/>
-		<meta name="book-type" content="comic"/>
-#if (${kindle})
-		<meta name="zero-gutter" content="true"/>
-		<meta name="zero-margin" content="true"/>
+		<meta property="rendition:spread">landscape</meta>
+		<!-- etc. -->
+		<meta property="ebpaj:guide-version">1.1</meta>
 		<meta name="primary-writing-mode" content="horizontal-rl"/>
-		<meta name="RegionMagnification" content="false"/>
-		<meta name="orientation-lock" content="none"/>
-		<meta name="original-resolution" content="${coverImage.Width}x${coverImage.Height}"/>
 
-#end
 #end
 	</metadata>
 
