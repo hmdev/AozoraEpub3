@@ -289,8 +289,6 @@
         <copy file="${dir.buildfile}/template/OPS/css/horizontal_image.css" todir="${dir.jarfile}/template/OPS/css"/>
         <copy file="${dir.buildfile}/template/OPS/css/horizontal_middle.css" todir="${dir.jarfile}/template/OPS/css"/>
         <copy file="${dir.buildfile}/template/OPS/css/horizontal_text.vm" todir="${dir.jarfile}/template/OPS/css"/>
-        <copy file="${dir.buildfile}/template/OPS/css/kindle_image.css" todir="${dir.jarfile}/template/OPS/css"/>
-        <copy file="${dir.buildfile}/template/OPS/css/svg_image.css" todir="${dir.jarfile}/template/OPS/css"/>
         <copy file="${dir.buildfile}/template/OPS/css/vertical.css" todir="${dir.jarfile}/template/OPS/css"/>
         <copy file="${dir.buildfile}/template/OPS/css/vertical_font.css" todir="${dir.jarfile}/template/OPS/css"/>
         <copy file="${dir.buildfile}/template/OPS/css/vertical_image.css" todir="${dir.jarfile}/template/OPS/css"/>

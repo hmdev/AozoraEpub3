@@ -38,10 +38,6 @@ public class Epub3ImageWriter extends Epub3Writer
 		"META-INF/container.xml",
 		OPS_PATH+CSS_PATH+"horizontal_image.css"
 	};
-	final static String[] TEMPLATE_FILE_NAMES_KINDLE_IMAGE = new String[]{
-		"META-INF/container.xml",
-		OPS_PATH+CSS_PATH+"kindle_image.css"
-	};
 	final static String[] TEMPLATE_FILE_NAMES_SVG_IMAGE = new String[]{
 		"META-INF/container.xml",
 		OPS_PATH+CSS_PATH+"fixed-layout-jp.css"
