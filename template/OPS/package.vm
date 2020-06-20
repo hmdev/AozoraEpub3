@@ -32,8 +32,11 @@
 		<meta property="rendition:spread">landscape</meta>
 		<!-- etc. -->
 		<meta property="ebpaj:guide-version">1.1</meta>
+#if (${bookInfo.Vertical})
 		<meta name="primary-writing-mode" content="horizontal-rl"/>
-
+#else
+		<meta name="primary-writing-mode" content="horizontal-lr"/>
+#end
 #end
 	</metadata>
 
@@ -105,11 +108,17 @@
 #end
 
 #foreach(${sectionInfo} in ${sections})
-#if (${bookInfo.ImageOnly})
+#if (${bookInfo.ImageOnly} && ${bookInfo.Vertical})
 #if ($velocityCount % 2 == 0)
 		<itemref idref="sec${sectionInfo.SectionId}" linear="yes" properties="page-spread-left"/>
 #else
 		<itemref idref="sec${sectionInfo.SectionId}" linear="yes" properties="page-spread-right"/>
+#end
+#elseif (${bookInfo.ImageOnly} && !${bookInfo.Vertical})
+#if ($velocityCount % 2 == 0)
+		<itemref idref="sec${sectionInfo.SectionId}" linear="yes" properties="page-spread-right"/>
+#else
+		<itemref idref="sec${sectionInfo.SectionId}" linear="yes" properties="page-spread-left"/>
 #end
 #else
 		<itemref idref="sec${sectionInfo.SectionId}" linear="yes"/>
