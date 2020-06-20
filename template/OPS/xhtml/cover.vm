@@ -1,21 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="ja" lang="ja">
-
 <head>
-#if (${bookInfo.ImageOnly})
 <meta name="viewport" content="width=${coverImage.Width}, height=${imageInfo.OutHeight}"/>
 	<link rel="stylesheet" type="text/css" href="../css/fixed-layout-jp.css"/>
-#elseif (${bookInfo.Vertical})
-	<link rel="stylesheet" type="text/css" href="../css/vertical_image.css"/>
-#else
-	<link rel="stylesheet" type="text/css" href="../css/horizontal_image.css"/>
-#end
 	<title>${title}</title>
-
 </head>
-
-#if (${bookInfo.ImageOnly})
 <body>
 <div>
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="100%" height="100%" viewBox="0 0 ${coverImage.Width} ${coverImage.Height}">
@@ -23,16 +13,4 @@
 </svg>
 </div>
 </body>
-#else
-#if (${sectionInfo.ImageFitW})
-<body class="fit_w">
-#elseif (${sectionInfo.ImageFitH})
-<body class="fit_h">
-#else
-<body>
-#end
-<span class="img"><img src="../images/${coverImage.OutFileName}"/></span>
-</body>
-#end
-
 </html>

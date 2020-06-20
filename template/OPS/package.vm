@@ -63,11 +63,8 @@
 		<item id="nav" properties="nav" href="xhtml/nav.xhtml" media-type="application/xhtml+xml"/>
 
 #if (${bookInfo.InsertCoverPage})
-#if (${bookInfo.ImageOnly} )
 		<item id="cover-page" href="xhtml/cover.xhtml" media-type="application/xhtml+xml" properties="svg"/>
-#else
-		<item id="cover-page" href="xhtml/cover.xhtml" media-type="application/xhtml+xml"/>
-#end
+
 #end
 #if (${title_page})
 		<item id="title-page" href="xhtml/title.xhtml" media-type="application/xhtml+xml"/>
