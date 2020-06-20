@@ -51,7 +51,7 @@
 中見出し終わり			1
 小見出し	<h3 class="font-1em10">	</h3>	1
 小見出し終わり			1
-同行大見出し	<span class="font-1em50"">
+同行大見出し	<span class="font-1em50">
 同行大見出し終わり	</span>
 同行中見出し	<span class="font-1em30">
 同行中見出し終わり	</span>
