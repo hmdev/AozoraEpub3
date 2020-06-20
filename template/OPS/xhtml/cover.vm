@@ -13,8 +13,6 @@
 #end
 	<title>${title}</title>
 
-
-
 </head>
 
 #if (${bookInfo.ImageOnly})
