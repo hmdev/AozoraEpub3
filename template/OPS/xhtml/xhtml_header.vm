@@ -1,6 +1,15 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="ja" lang="ja">
+<html
+ xmlns="http://www.w3.org/1999/xhtml"
+ xmlns:epub="http://www.idpf.org/2007/ops"
+ xml:lang="ja"
+ #if (${bookInfo.Vertical})
+ class="vrtl"
+ #else
+ class="hltr"
+ #end
+>
 <head>
 #if (${bookInfo.Vertical})
 #if (${sectionInfo.ImagePage})
@@ -9,9 +18,7 @@
 #if (${sectionInfo.Middle} || ${sectionInfo.Bottom})
 	<link rel="stylesheet" type="text/css" href="../css/vertical_middle.css"/>
 #end
-	<link rel="stylesheet" type="text/css" href="../css/vertical_text.css"/>
-	<link rel="stylesheet" type="text/css" href="../css/vertical_font.css"/>
-	<link rel="stylesheet" type="text/css" href="../css/vertical.css"/>
+	<link rel="stylesheet" type="text/css" href="../css/book-style.css"/>
 #end
 #else
 #if (${sectionInfo.ImagePage})

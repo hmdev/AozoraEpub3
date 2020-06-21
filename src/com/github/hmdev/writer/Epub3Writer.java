@@ -123,7 +123,11 @@ public class Epub3Writer
 		OPS_PATH+CSS_PATH+"vertical_image.css",
 		OPS_PATH+CSS_PATH+"vertical_font.css",
 		OPS_PATH+CSS_PATH+"vertical.css",
-		OPS_PATH+CSS_PATH+"fixed-layout-jp.css"
+		OPS_PATH+CSS_PATH+"fixed-layout-jp.css",
+		OPS_PATH+CSS_PATH+"book-style.css",
+		OPS_PATH+CSS_PATH+"style-reset.css",
+		OPS_PATH+CSS_PATH+"style-standard.css",
+		OPS_PATH+CSS_PATH+"style-advance.css",
 	};
 	final static String[] TEMPLATE_FILE_NAMES_HORIZONTAL = new String[]{
 		"META-INF/container.xml",
