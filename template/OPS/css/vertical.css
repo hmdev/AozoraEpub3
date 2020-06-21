@@ -29,43 +29,43 @@ text-emphasis-position: under;
 傍線
 */
 /* 【縦組み】二重線 */
-double_underline {
+.vrtl .double_underline {
 text-decoration:overline double;
 }
 /* 【縦組み】鎖線 */
-dotted_underline {
+.vrtl .dotted_underline {
 text-decoration:overline dotted;
 }
 /* 【縦組み】破線 */
-dashed_underline {
+.vrtl .dashed_underline {
 text-decoration:overline dashed;
 }
 /* 【縦組み】波線 */
-wave_underline {
+.vrtl .wave_underline {
 text-decoration:overline wavy;
 }
 /* 【縦組み】赤線 */
-line-red {
+.vrtl .line-red {
 text-decoration:overline red;
 }
 /* 【縦組み】左に二重傍線 */
-left_double_underline {
+.vrtl .left_double_underline {
 text-decoration:underline double;
 }
 /* 【縦組み】左に鎖線 */
-left_dotted_underline {
+.vrtl .left_dotted_underline {
 text-decoration:underline dotted;
 }
 /* 【縦組み】左に破線 */
-left_dashed_underline {
+.vrtl .left_dashed_underline {
 text-decoration:underline dotted;
 }
 /* 【縦組み】左に波線 */
-left_wave_underline {
+.vrtl .left_wave_underline {
 text-decoration:underline wavy;
 }
 /* 【縦組み】左に赤線 */
-left-line-red {
+.vrtl .left-line-red {
 text-decoration:underline red;
 }
 
@@ -88,7 +88,7 @@ text-orientation: upright;
 
 
 /** 縦書き用 ページ設定以外の基本部分 */
-p {
+.vrtl p {
 text-align: justify;
 margin: 0;
 }
