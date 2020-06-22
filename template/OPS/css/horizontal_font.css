@@ -2,6 +2,6 @@
 @namespace "http://www.w3.org/1999/xhtml";
 
 /** 横書きフォント */
-body {
+.hltr body {
 font-family: "ＭＳ 明朝", "MS Mincho", "ヒラギノ明朝 ProN W3", "HiraMinProN-W3", serif, sans-serif;
 }

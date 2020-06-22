@@ -6,14 +6,14 @@
 margin: ${pageMargin[0]} ${pageMargin[1]} ${pageMargin[2]} ${pageMargin[3]};
 }
 
-html {
+html.hltr {
 margin: ${bodyMargin[0]} ${bodyMargin[1]} ${bodyMargin[2]} ${bodyMargin[3]};
 padding: 0;
 writing-mode: horizontal-tb;
 -webkit-writing-mode: horizontal-tb;
 -epub-writing-mode: horizontal-tb;
 -epub-line-break: strict;
-line-break: strict;	
+line-break: strict;
 -epub-word-break: normal;
 word-break: normal;
 }
@@ -31,7 +31,7 @@ vertical-align: baseline;
 #if (${boldUseGothic})
 .b,
 #end
-.gtc {
+.hltr .gtc {
 font-family: 'ＭＳ ゴシック','MS Gothic',sans-serif;
 }
 #if (${gothicUseBold})
