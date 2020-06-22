@@ -1,92 +1,6 @@
 @charset "utf-8";
 @namespace "http://www.w3.org/1999/xhtml";
 
-
-/*
-青空文庫追加
-*/
-/*
-傍点
-*/
-span.x-dot {
-text-emphasis-style: '×';
--webkit-text-emphasis-style: '×';
--epub-text-emphasis-style: '×';
-}
-span.left_emp {
-text-emphasis-position: under;
--webkit-text-emphasis-position: under;
--epub-text-emphasis-position: under;
-}
-/* AozoraEpub3用フォントサイズ（％指定） */
-.font-0em83 { font-size: 0.83em; }
-.font-0em77 { font-size: 0.77em; }
-.font-0em66 { font-size: 0.66em; }
-.font-0em62 { font-size: 0.62em; }
-
-
-/*
-傍線
-*/
-/* 【縦組み】二重線 */
-.vrtl .double_underline {
-text-decoration:overline double;
-}
-/* 【縦組み】鎖線 */
-.vrtl .dotted_underline {
-text-decoration:overline dotted;
-}
-/* 【縦組み】破線 */
-.vrtl .dashed_underline {
-text-decoration:overline dashed;
-}
-/* 【縦組み】波線 */
-.vrtl .wave_underline {
-text-decoration:overline wavy;
-}
-/* 【縦組み】赤線 */
-.vrtl .line-red {
-text-decoration:overline red;
-}
-/* 【縦組み】左に二重傍線 */
-.vrtl .left_double_underline {
-text-decoration:underline double;
-}
-/* 【縦組み】左に鎖線 */
-.vrtl .left_dotted_underline {
-text-decoration:underline dotted;
-}
-/* 【縦組み】左に破線 */
-.vrtl .left_dashed_underline {
-text-decoration:underline dotted;
-}
-/* 【縦組み】左に波線 */
-.vrtl .left_wave_underline {
-text-decoration:underline wavy;
-}
-/* 【縦組み】左に赤線 */
-.vrtl .left-line-red {
-text-decoration:underline red;
-}
-
-/*
-青空文庫追加
-*/
-
-
-/* 外字フォント */
-.glyph {
-width: 1em;
-text-orientation: upright;
--webkit-text-orientation: upright;
--epub-text-orientation: upright;
-}
-/* 外字画像と重ならない対策 ※有効にすると字下げ折り返し内で画面外にずれる */
-/*span.tcy { display: inline-block; }*/
-
-
-
-
 /** 縦書き用 ページ設定以外の基本部分 */
 .vrtl p {
 text-align: justify;
@@ -446,3 +360,85 @@ div.jzm40 { max-height: 40em; }
 
 /* 行内全角スペース調整用 */
 span.fullsp { padding-top:.5em; }
+
+/*
+青空文庫追加
+*/
+/*
+傍点
+*/
+span.x-dot {
+text-emphasis-style: '×';
+-webkit-text-emphasis-style: '×';
+-epub-text-emphasis-style: '×';
+}
+span.left_emp {
+text-emphasis-position: under;
+-webkit-text-emphasis-position: under;
+-epub-text-emphasis-position: under;
+}
+/* AozoraEpub3用フォントサイズ（％指定） */
+.font-0em83 { font-size: 0.83em; }
+.font-0em77 { font-size: 0.77em; }
+.font-0em66 { font-size: 0.66em; }
+.font-0em62 { font-size: 0.62em; }
+
+
+/*
+傍線
+*/
+/* 【縦組み】二重線 */
+.vrtl .double_underline {
+text-decoration:overline double;
+}
+/* 【縦組み】鎖線 */
+.vrtl .dotted_underline {
+text-decoration:overline dotted;
+}
+/* 【縦組み】破線 */
+.vrtl .dashed_underline {
+text-decoration:overline dashed;
+}
+/* 【縦組み】波線 */
+.vrtl .wave_underline {
+text-decoration:overline wavy;
+}
+/* 【縦組み】赤線 */
+.vrtl .line-red {
+text-decoration:overline red;
+}
+/* 【縦組み】左に二重傍線 */
+.vrtl .left_double_underline {
+text-decoration:underline double;
+}
+/* 【縦組み】左に鎖線 */
+.vrtl .left_dotted_underline {
+text-decoration:underline dotted;
+}
+/* 【縦組み】左に破線 */
+.vrtl .left_dashed_underline {
+text-decoration:underline dotted;
+}
+/* 【縦組み】左に波線 */
+.vrtl .left_wave_underline {
+text-decoration:underline wavy;
+}
+/* 【縦組み】左に赤線 */
+.vrtl .left-line-red {
+text-decoration:underline red;
+}
+
+/*
+青空文庫追加
+*/
+
+
+/* 外字フォント */
+.glyph {
+width: 1em;
+text-orientation: upright;
+-webkit-text-orientation: upright;
+-epub-text-orientation: upright;
+}
+/* 外字画像と重ならない対策 ※有効にすると字下げ折り返し内で画面外にずれる */
+/*span.tcy { display: inline-block; }*/

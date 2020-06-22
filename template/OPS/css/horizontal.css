@@ -75,546 +75,10 @@ line-height: 1.4em;
 /* 区切り線 */
 hr { margin: .5em 0 .5em 0; }
 
-/* 取り消し線
-.strike { text-decoration:line-through; }
-.dbl_strike { text-decoration:line-through; }
-*/
-/* 外字画像
----------------------------------------------------------------- */
-img.gaiji,
-img.gaiji-line,
-img.gaiji-wide {
-display: inline-block;
-margin: 0;
-padding: 0;
-border: none;
-background: transparent;
-}
-img.gaiji {
-width: 1em;
-height: 1em;
-}
-img.gaiji-line {
-width: 1em;
-height: auto;
-}
-img.gaiji-wide {
-width: auto;
-height: 1em;
-}
-/* 外字画像のベースライン 横書き*/
-img.gaiji,
-img.gaiji-line,
-img.gaiji-wide {
-vertical-align: text-bottom;
-}
-/* 外字フォント */
-.glyph {
-height: 1em;
-}
-/* 罫線
-----------------------------------------------------------------
-線種や線幅など、細かな調整が必要なときは、
-無理に既存のクラスを用いず新たにクラスを作成すること
----------------------------------------------------------------- */
-/* 線種【実線】 */
-.k-solid-top,
-.k-solid-right,
-.k-solid-bottom,
-.k-solid-left,
-.k-solid-topbottom,
-.k-solid-rightleft {
-  border-width: 1px;
-  border-color: #000000;
-}
-/* 線位置【実線】 */
-.k-solid-top       { border-style: solid none none none;  }
-.k-solid-right     { border-style: none solid none none;  }
-.k-solid-bottom    { border-style: none none solid none;  }
-.k-solid-left      { border-style: none none none solid;  }
-.k-solid-topbottom { border-style: solid none solid none; }
-.k-solid-rightleft { border-style: none solid none solid; }
-
-/* 線種【点線】 */
-.k-dotted-top,
-.k-dotted-right,
-.k-dotted-bottom,
-.k-dotted-left,
-.k-dotted-topbottom,
-.k-dotted-rightleft {
-  border-width: 2px;
-  border-color: #000000;
-}
-/* 線位置【点線】 */
-.k-dotted-top       { border-style: dotted none none none;   }
-.k-dotted-right     { border-style: none dotted none none;   }
-.k-dotted-bottom    { border-style: none none dotted none;   }
-.k-dotted-left      { border-style: none none none dotted;   }
-.k-dotted-topbottom { border-style: dotted none dotted none; }
-.k-dotted-rightleft { border-style: none dotted none dotted; }
-
-/* 線種【二重線】 */
-.k-double-top,
-.k-double-right,
-.k-double-bottom,
-.k-double-left,
-.k-double-topbottom,
-.k-double-rightleft {
-  border-width: 4px;
-  border-color: #000000;
-}
-/* 線位置【二重線】 */
-.k-double-top       { border-style: double none none none;   }
-.k-double-right     { border-style: none double none none;   }
-.k-double-bottom    { border-style: none none double none;   }
-.k-double-left      { border-style: none none none double;   }
-.k-double-topbottom { border-style: double none double none; }
-.k-double-rightleft { border-style: none double none double; }
-
-/* 線種【破線】 */
-.k-dashed-top,
-.k-dashed-right,
-.k-dashed-bottom,
-.k-dashed-left,
-.k-dashed-topbottom,
-.k-dashed-rightleft {
-  border-width: 1px;
-  border-color: #000000;
-}
-/* 線位置【破線】 */
-.k-dashed-top       { border-style: dashed none none none;   }
-.k-dashed-right     { border-style: none dashed none none;   }
-.k-dashed-bottom    { border-style: none none dashed none;   }
-.k-dashed-left      { border-style: none none none dashed;   }
-.k-dashed-topbottom { border-style: dashed none dashed none; }
-.k-dashed-rightleft { border-style: none dashed none dashed; }
-
-/* 線幅 */
-.k-0px    { border-width: 0;      }
-.k-1px    { border-width: 1px;    }
-.k-2px    { border-width: 2px;    }
-.k-3px    { border-width: 3px;    }
-.k-4px    { border-width: 4px;    }
-.k-5px    { border-width: 5px;    }
-.k-6px    { border-width: 6px;    }
-.k-7px    { border-width: 7px;    }
-.k-8px    { border-width: 8px;    }
-.k-thin   { border-width: thin;   }
-.k-medium { border-width: medium; }
-.k-thick  { border-width: thick;  }
-
-/* １Ｃ用の線色 */
-.k-black       { border-color: #000000; }
-.k-dimgray     { border-color: #696969; }
-.k-gray        { border-color: #808080; }
-.k-darkgray    { border-color: #a9a9a9; }
-.k-silver      { border-color: #c0c0c0; }
-.k-gainsboro   { border-color: #dcdcdc; }
-.k-white       { border-color: #ffffff; }
-
-/* 基本色 */
-.k-red         { border-color: #ff0000; }
-.k-blue        { border-color: #0000ff; }
-.k-cyan        { border-color: #00ffff; }
-.k-magenta     { border-color: #ff00ff; }
-.k-orangered   { border-color: #ff4500; }
 
 
-/* 罫囲み
-.border {
-border: 1px solid #000;
-margin: 0.25em;
-padding: 0.25em;
-}
-破線罫囲み
-.dashed_border {
-border: 1px dashed #000;
-margin: 0.25em;
-padding: 0.25em;
-}
-
-/* 傍点 */
-/*
-span.sesame {
-text-emphasis-style: sesame;
--webkit-text-emphasis-style: sesame;
--epub-text-emphasis-style: sesame;
-}
-span.open_sesame {
-text-emphasis-style: open sesame;
--webkit-text-emphasis-style: open sesame;
--epub-text-emphasis-style: open sesame;
-}
-span.dot {
-text-emphasis-style: dot;
--webkit-text-emphasis-style: dot;
--epub-text-emphasis-style: dot;
-}
-span.open_dot {
-text-emphasis-style: open dot;
--webkit-text-emphasis-style: open dot;
--epub-text-emphasis-style: open dot;
-}
-span.circle {
-text-emphasis-style: circle;
--webkit-text-emphasis-style: circle;
--epub-text-emphasis-style: circle;
-}
-span.open_circle {
-text-emphasis-style: open circle;
--webkit-text-emphasis-style: open circle;
--epub-text-emphasis-style: open circle;
-}
-span.double-circle {
-text-emphasis-style: double-circle;
--webkit-text-emphasis-style: double-circle;
--epub-text-emphasis-style: double-circle;
-}
-span.open_double-circle {
-text-emphasis-style: open double-circle;
--webkit-text-emphasis-style: open double-circle;
--epub-text-emphasis-style: open double-circle;
-}
-span.triangle {
-text-emphasis-style: triangle;
--webkit-text-emphasis-style: triangle;
--epub-text-emphasis-style: triangle;
-}
-span.open_triangle {
-text-emphasis-style: open triangle;
--webkit-text-emphasis-style: open triangle;
--epub-text-emphasis-style: open triangle;
-}
-*/
-/* 圏点・傍点
----------------------------------------------------------------- */
-.em-sesame {
-  -webkit-text-emphasis-style: filled sesame;
-  -epub-text-emphasis-style:   filled sesame;
-}
-.em-sesame-open {
-  -webkit-text-emphasis-style: open sesame;
-  -epub-text-emphasis-style:   open sesame;
-}
-.em-dot {
-  -webkit-text-emphasis-style: filled dot;
-  -epub-text-emphasis-style:   filled dot;
-}
-.em-dot-open {
-  -webkit-text-emphasis-style: open dot;
-  -epub-text-emphasis-style:   open dot;
-}
-.em-circle {
-  -webkit-text-emphasis-style: filled circle;
-  -epub-text-emphasis-style:   filled circle;
-}
-.em-circle-open {
-  -webkit-text-emphasis-style: open circle;
-  -epub-text-emphasis-style:   open circle;
-}
-.em-double-circle {
-  -webkit-text-emphasis-style: filled double-circle;
-  -epub-text-emphasis-style:   filled double-circle;
-}
-.em-double-circle-open {
-  -webkit-text-emphasis-style: open double-circle;
-  -epub-text-emphasis-style:   open double-circle;
-}
-.em-triangle {
-  -webkit-text-emphasis-style: filled triangle;
-  -epub-text-emphasis-style:   filled triangle;
-}
-.em-triangle-open {
-  -webkit-text-emphasis-style: open triangle;
-  -epub-text-emphasis-style:   open triangle;
-}
-
-span.x-dot {
-text-emphasis-style: '×';
--webkit-text-emphasis-style: '×';
--epub-text-emphasis-style: '×';
-}
-span.left_emp {
-text-emphasis-position: under;
--webkit-text-emphasis-position: under;
--epub-text-emphasis-position: under;
-}
-
-/* 横組み打ち消し線
----------------------------------------------------------------- */
-.line-through {
-  text-decoration: line-through;
-}
-
-/* 【横組み】下線　 */
-.em-line {
-text-decoration: underline;
-}
-/* 【横組み】上線　 */
-.em-line-outside {
-text-decoration: overline;
-}
-/* 【横組み】二重線 */
-double_underline {
-text-decoration:underline double;
-}
-/* 【横組み】鎖線 */
-dotted_underline {
-text-decoration:underline dotted;
-}
-/* 【横組み】破線 */
-dashed_underline {
-text-decoration:underline dashed;
-}
-/* 【横組み】波線 */
-wave_underline {
-text-decoration:underline wavy;
-}
-/* 【横組み】赤線 */
-line-red {
-text-decoration:underline red;
-}
-/* 【横組み】左に二重傍線 */
-left_double_underline {
-text-decoration:overline double;
-}
-/* 【横組み】左に鎖線 */
-left_dotted_underline {
-text-decoration:overline dotted;
-}
-/* 【横組み】左に破線 */
-left_dashed_underline {
-text-decoration:overline dotted;
-}
-/* 【横組み】左に波線 */
-left_wave_underline {
-text-decoration:overline wavy;
-}
-/* 【横組み】左に赤線 */
-left-line-red {
-text-decoration:overline red;
-}
-
-/* 傍線
-span.underline, span.double_underline, span.dotted_underline, span.dashed_underline, span.wave_underline {
-border-bottom-width: 1px;
-padding-bottom: 1px;
-}
-span.underline {
-border-bottom-style: solid;
-}
-span.double_underline {
-border-bottom-width: 3px;
-border-bottom-style: double;
-}
-span.dotted_underline {
-border-bottom-style: dotted;
-}
-span.dashed_underline {
-border-bottom-style: dashed;
-}
-span.wave_underline {
-border-bottom-style: solid;
-}
-span.left_underline {
-border-top-style: solid;
-padding-top: 1px;
-border-top-width: 1px;
-}
-
-*/
-
-/* 小書き文字
-----------------------------------------------------------------
-通常の文字を「ぁゃっ」のような小書き文字に見せるための指定
----------------------------------------------------------------- */
-.kogaki {
-  font-size:      0.75em;
-}
-/* 【横組み】左下 */
-.kogaki {
-  padding:        0 0.15em 0 0.1em;
-  vertical-align: baseline;
-}
-
-/* 文字サイズ 大 */
-.font1, .chap3 { font-size: 110%; }
-.font2 { font-size: 120%; }
-.font3, .chap2 { font-size: 130%; }
-.font4 { font-size: 140%; }
-.font5, .chap1 { font-size: 150%; }
-.font6 { font-size: 160%; }
-/* 文字サイズ 小 */
-.font-1 { font-size: 90%; }
-.font-2 { font-size: 83%; }
-.font-3 { font-size: 77%; }
-.font-4, .kogaki { font-size: 70%; }
-.font-5 { font-size: 66%; }
-.font-6 { font-size: 62%; }
-
-/* 見出し*/
-.chap1, .chap2, .chap3 {
-clear: both;
-}
-/* 見出しのデフォルト書体指定
----------------------------------------------------------------- */
-/* 横組み用 */
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-font-family: serif-ja, serif;
-}
-/* フォント指定
----------------------------------------------------------------- */
-/* 明朝 */
-.mfont {
-  font-family: serif-ja, serif;
-}
-
-/* ゴシック */
-.gfont {
-  font-family: sans-serif-ja, sans-serif;
-}
-
-/* フォントサイズ（％指定） */
-.font-050per { font-size:  50%; }
-.font-060per { font-size:  60%; }
-.font-070per { font-size:  70%; }
-.font-075per { font-size:  75%; }
-.font-080per { font-size:  80%; }
-.font-085per { font-size:  85%; }
-.font-090per { font-size:  90%; }
-.font-100per { font-size: 100%; }
-.font-110per { font-size: 110%; }
-.font-115per { font-size: 115%; }
-.font-120per { font-size: 120%; }
-.font-130per { font-size: 130%; }
-.font-140per { font-size: 140%; }
-.font-150per { font-size: 150%; }
-.font-160per { font-size: 160%; }
-.font-170per { font-size: 170%; }
-.font-180per { font-size: 180%; }
-.font-190per { font-size: 190%; }
-.font-200per { font-size: 200%; }
-.font-250per { font-size: 250%; }
-.font-300per { font-size: 300%; }
 
 
-/* フォントサイズ（文字数指定） */
-.font-0em50 { font-size:  0.50em; }
-.font-0em60 { font-size:  0.60em; }
-.font-0em70 { font-size:  0.70em; }
-.font-0em75 { font-size:  0.75em; }
-.font-0em80 { font-size:  0.80em; }
-.font-0em85 { font-size:  0.85em; }
-.font-0em90 { font-size:  0.90em; }
-.font-1em   { font-size:  1.00em; }
-.font-1em10 { font-size:  1.10em; }
-.font-1em15 { font-size:  1.15em; }
-.font-1em20 { font-size:  1.20em; }
-.font-1em30 { font-size:  1.30em; }
-.font-1em40 { font-size:  1.40em; }
-.font-1em50 { font-size:  1.50em; }
-.font-1em60 { font-size:  1.60em; }
-.font-1em70 { font-size:  1.70em; }
-.font-1em80 { font-size:  1.80em; }
-.font-1em90 { font-size:  1.90em; }
-.font-2em   { font-size:  2.00em; }
-.font-2em50 { font-size:  2.50em; }
-.font-3em   { font-size:  3.00em; }
-
-/* AozoraEpub3用フォントサイズ（％指定） */
-.font-0em83 { font-size: 0.83em; }
-.font-0em77 { font-size: 0.77em; }
-.font-0em66 { font-size: 0.66em; }
-.font-0em62 { font-size: 0.62em; }
-
-/* 太字
----------------------------------------------------------------- */
-/* 太字 */
-.bold {
-  font-weight: bold;
-}
-/* 太字解除 */
-.font-weight-normal {
-  font-weight: normal;
-}
-
-
-/* 斜体
----------------------------------------------------------------- */
-/* 斜体 */
-.italic {
-  font-style: italic;
-}
-/* 斜体解除 */
-.font-style-normal {
-  font-style: normal;
-}
-
-
-/* 文字色
----------------------------------------------------------------- */
-/* １Ｃ用文字色 */
-.color-black       { color: #000000; }
-.color-dimgray     { color: #696969; }
-.color-gray        { color: #808080; }
-.color-darkgray    { color: #a9a9a9; }
-.color-silver      { color: #c0c0c0; }
-.color-gainsboro   { color: #dcdcdc; }
-.color-white       { color: #ffffff; }
-.color-transparent { color: transparent; }
-
-/* 基本色 */
-.color-red         { color: #ff0000; }
-.color-blue        { color: #0000ff; }
-.color-cyan        { color: #00ffff; }
-.color-magenta     { color: #ff00ff; }
-.color-orangered   { color: #ff4500; }
-
-
-/* 背景色
----------------------------------------------------------------- */
-/* １Ｃ用背景色 */
-.bg-black       { background-color: #000000; }
-.bg-dimgray     { background-color: #696969; }
-.bg-gray        { background-color: #808080; }
-.bg-darkgray    { background-color: #a9a9a9; }
-.bg-silver      { background-color: #c0c0c0; }
-.bg-gainsboro   { background-color: #dcdcdc; }
-.bg-white       { background-color: #ffffff; }
-.bg-transparent { background-color: transparent; }
-
-/* 基本色 */
-.bg-red         { background-color: #ff0000; }
-.bg-blue        { background-color: #0000ff; }
-.bg-cyan        { background-color: #00ffff; }
-.bg-magenta     { background-color: #ff00ff; }
-.bg-orangered   { background-color: #ff4500; }
-
-
-/* 文字色の白黒反転
----------------------------------------------------------------- */
-.inverse {
-  color:      #ffffff;
-  background: #000000;
-}
-
-
-/* 区切り線
----------------------------------------------------------------- */
-hr {
-  border-width: 1px;
-  border-color: #000000;
-}
-/* 【横組み】水平線 */
-hr {
-  margin:       0.5em 0;
-  border-style: solid none none none;
-}
 
 /* 縦中横 */
 
@@ -640,49 +104,63 @@ position: relative;
 top: -.35em;
 }
 
-/* 上付文字・下付文字
----------------------------------------------------------------- */
-/* 上付文字 */
-.super {
-  font-size:      smaller;
-  vertical-align: super;
-}
-/* 下付文字 */
-.sub {
-  font-size:      smaller;
-  vertical-align: sub;
-}
-
 
 /* 中央揃え */
 div.center, div.center p { text-align: center; }
 
 /* 字下げ */
-div.pt1 { margin-left: 1em; }
-div.pt2 { margin-left: 2em; }
-div.pt3 { margin-left: 3em; }
-div.pt4 { margin-left: 4em; }
-div.pt5 { margin-left: 5em; }
-div.pt6 { margin-left: 6em; }
-div.pt7 { margin-left: 7em; }
-div.pt8 { margin-left: 8em; }
-div.pt9 { margin-left: 9em; }
-div.pt10 { margin-left: 10em; }
-div.pt11 { margin-left: 11em; }
-div.pt12 { margin-left: 12em; }
-div.pt13 { margin-left: 13em; }
-div.pt14 { margin-left: 14em; }
-div.pt15 { margin-left: 15em; }
-div.pt16 { margin-left: 16em; }
-div.pt17 { margin-left: 17em; }
-div.pt18 { margin-left: 18em; }
-div.pt19 { margin-left: 19em; }
-div.pt20 { margin-left: 20em; }
-div.pt21 { margin-left: 21em; }
-div.pt22 { margin-left: 22em; }
-div.pt23 { margin-left: 23em; }
-div.pt24 { margin-left: 24em; }
-div.pt25 { margin-left: 25em; }
+div.pt1 { padding-left: 1em; }
+div.pt2 { padding-left: 2em; }
+div.pt3 { padding-left: 3em; }
+div.pt4 { padding-left: 4em; }
+div.pt5 { padding-left: 5em; }
+div.pt6 { padding-left: 6em; }
+div.pt7 { padding-left: 7em; }
+div.pt8 { padding-left: 8em; }
+div.pt9 { padding-left: 9em; }
+div.pt10 { padding-left: 10em; }
+div.pt11 { padding-left: 11em; }
+div.pt12 { padding-left: 12em; }
+div.pt13 { padding-left: 13em; }
+div.pt14 { padding-left: 14em; }
+div.pt15 { padding-left: 15em; }
+div.pt16 { padding-left: 16em; }
+div.pt17 { padding-left: 17em; }
+div.pt18 { padding-left: 18em; }
+div.pt19 { padding-left: 19em; }
+div.pt20 { padding-left: 20em; }
+div.pt21 { padding-left: 21em; }
+div.pt22 { padding-left: 22em; }
+div.pt23 { padding-left: 23em; }
+div.pt24 { padding-left: 24em; }
+div.pt25 { padding-left: 25em; }
+
+/* 字下げ２ */
+div.mt1 { margin-left: 1em; }
+div.mt2 { margin-left: 2em; }
+div.mt3 { margin-left: 3em; }
+div.mt4 { margin-left: 4em; }
+div.mt5 { margin-left: 5em; }
+div.mt6 { margin-left: 6em; }
+div.mt7 { margin-left: 7em; }
+div.mt8 { margin-left: 8em; }
+div.mt9 { margin-left: 9em; }
+div.mt10 { margin-left: 10em; }
+div.mt11 { margin-left: 11em; }
+div.mt12 { margin-left: 12em; }
+div.mt13 { margin-left: 13em; }
+div.mt14 { margin-left: 14em; }
+div.mt15 { margin-left: 15em; }
+div.mt16 { margin-left: 16em; }
+div.mt17 { margin-left: 17em; }
+div.mt18 { margin-left: 18em; }
+div.mt19 { margin-left: 19em; }
+div.mt20 { margin-left: 20em; }
+div.mt21 { margin-left: 21em; }
+div.mt22 { margin-left: 22em; }
+div.mt23 { margin-left: 23em; }
+div.mt24 { margin-left: 24em; }
+div.mt25 { margin-left: 25em; }
 
 /* 字上げ */
 div.pb1 { margin-right: 1em; }
@@ -823,3 +301,76 @@ div.jzm50 { max-width: 50em; }
 
 /* 行内全角スペース調整用 */
 span.fullsp { padding-left:.5em; }
+
+
+
+
+/*
+傍点
+*/
+/* 圏点 */
+span.x-dot {
+text-emphasis-style: '×';
+-webkit-text-emphasis-style: '×';
+-epub-text-emphasis-style: '×';
+}
+span.left_emp {
+text-emphasis-position: under;
+-webkit-text-emphasis-position: under;
+-epub-text-emphasis-position: under;
+}
+
+/* AozoraEpub3用フォントサイズ（％指定） */
+.font-0em83 { font-size: 0.83em; }
+.font-0em77 { font-size: 0.77em; }
+.font-0em66 { font-size: 0.66em; }
+.font-0em62 { font-size: 0.62em; }
+
+/* 傍線 */
+/* 【横組み】二重線 */
+double_underline {
+text-decoration:underline double;
+}
+/* 【横組み】鎖線 */
+dotted_underline {
+text-decoration:underline dotted;
+}
+/* 【横組み】破線 */
+dashed_underline {
+text-decoration:underline dashed;
+}
+/* 【横組み】波線 */
+wave_underline {
+text-decoration:underline wavy;
+}
+/* 【横組み】赤線 */
+line-red {
+text-decoration:underline red;
+}
+/* 【横組み】左に二重傍線 */
+left_double_underline {
+text-decoration:overline double;
+}
+/* 【横組み】左に鎖線 */
+left_dotted_underline {
+text-decoration:overline dotted;
+}
+/* 【横組み】左に破線 */
+left_dashed_underline {
+text-decoration:overline dotted;
+}
+/* 【横組み】左に波線 */
+left_wave_underline {
+text-decoration:overline wavy;
+}
+/* 【横組み】左に赤線 */
+left-line-red {
+text-decoration:overline red;
+}
+
+
+/* 外字フォント */
+.glyph {
+height: 1em;
+}
+
