@@ -1,7 +1,7 @@
 @charset "utf-8";
 @namespace "http://www.w3.org/1999/xhtml";
 
-/** 縦書き テキスト用スタイル */
+/** 横書き テキスト用スタイル */
 @page {
 margin: ${pageMargin[0]} ${pageMargin[1]} ${pageMargin[2]} ${pageMargin[3]};
 }

@@ -15,15 +15,15 @@ margin: 0;
 padding: 0;
 }
 
-body {
+.vrtl body {
 margin: 0;
 padding: 0;
 text-align: center;
 }
 /* ページ内 画像は縮小のみ */
-body .img {
+.vrtl body .img {
 }
-body .img img {
+.vrtl body .img img {
   display:            inline-block;
   page-break-inside:  avoid;
   max-height:         100%;

@@ -1,0 +1,113 @@
+@charset "utf-8";
+@namespace "http://www.w3.org/1999/xhtml";
+
+/** 共通部分 左右中央 */
+
+
+table {
+width:100%;
+height:100%;
+}
+table td {
+width:100%;
+height:100%;
+display: table-cell;
+}
+
+/* 左右中央 */
+table.middle td {
+vertical-align: middle;
+}
+/* ページ左 */
+table.bottom td {
+vertical-align: bottom;
+}
+
+
+
+/** 縦書き用 左右中央 */
+/**
+@page {
+margin-left: 0;
+margin-right: 0;
+width:100%;
+}
+*/
+html.vrtl {
+margin-left: 0;
+margin-right: 0;
+width:100%;
+}
+.vrtl body {
+margin-left: 0;
+margin-right: 0;
+vertical-align: middle;
+width:100%;
+}
+
+/* kindle左右中央 */
+.vrtl div.kindle_outer {
+writing-mode: horizontal-tb;
+-webkit-writing-mode: horizontal-tb;
+-epub-writing-mode: horizontal-tb;
+text-align: center;
+width:100%;
+margin: 0;
+padding: 0;
+line-height: 0;
+}
+.vrtl div.kindle_outer.bottom {
+text-align: left;
+}
+.vrtl div.kindle_inner {
+display: inline-block;
+writing-mode: vertical-rl;
+-webkit-writing-mode: vertical-rl;
+-epub-writing-mode: vertical-rl;
+text-align: left;
+line-height: 1.5;
+height: 95%;
+}
+
+/* 横書き左右中央 */
+/**
+@page {
+margin-top: 0;
+margin-bottom: 0;
+}
+ */
+html.hltr {
+margin-top: 0;
+margin-bottom: 0;
+width:100%;
+height:100%;
+}
+.hltr body {
+margin-top: 0;
+margin-bottom: 0;
+vertical-align: baseline;
+width:100%;
+height:100%;
+}
+
+
+/* kindle左右中央 */
+.hltr div.kindle_outer {
+writing-mode: vertical-rl;
+-webkit-writing-mode: vertical-rl;
+-epub-writing-mode: vertical-rl;
+text-align: center;
+height:100%;
+}
+.hltr div.kindle_outer.bottom {
+text-align: right;
+}
+.hltr div.kindle_inner {
+display: inline-block;
+writing-mode: horizontal-tb;
+-webkit-writing-mode: horizontal-tb;
+-epub-writing-mode: horizontal-tb;
+text-align: left;
+line-height: 1.5;
+width: 95%;
+}

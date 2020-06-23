@@ -1,0 +1,64 @@
+@charset "utf-8";
+@namespace "http://www.w3.org/1999/xhtml";
+
+/*共通部分 */
+
+/* 画像用 */
+@page {
+margin: 0;
+padding: 0;
+}
+
+html {
+writing-mode: horizontal-tb;
+-webkit-writing-mode: horizontal-tb;
+-epub-writing-mode: horizontal-tb;
+margin: 0;
+padding: 0;
+}
+
+/* 幅を合わせる */
+body.fit_w img {
+width: 100%;
+min-width: 100%;
+height: auto;
+}
+/* 高さを合わせる */
+body.fit_h img {
+width: auto;
+height: 100%;
+min-height: 100%;
+}
+
+/*縦書き部分*/
+
+.vrtl body {
+margin: 0;
+padding: 0;
+text-align: center;
+}
+/* ページ内 画像は縮小のみ */
+.vrtl body .img {
+}
+.vrtl body .img img {
+  display:            inline-block;
+  page-break-inside:  avoid;
+  max-height:         100%;
+  max-width:          100%;
+}
+
+/*横書き部分*/
+.hltr body {
+margin: 0;
+padding: 0;
+}
+.hltr body.fit_h {
+text-align: center;
+}
+/* ページ内 画像は縮小のみ */
+.hltr body .img {
+width: 100%;
+height: 100%;
+text-align: center;
+}
+
