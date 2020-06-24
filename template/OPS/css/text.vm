@@ -73,4 +73,3 @@ font-family: 'ＭＳ ゴシック','MS Gothic',sans-serif;
 #end
 .hltr .b { font-weight: bold; }
 .hltr .i { font-style: italic; }
-#end

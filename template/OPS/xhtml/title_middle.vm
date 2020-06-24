@@ -11,17 +11,12 @@
  #end
 >
 <head>
-#if (${bookInfo.Vertical})
-<link rel="stylesheet" type="text/css" href="../css/vertical_text.css"/>
-<link rel="stylesheet" type="text/css" href="../css/vertical_font.css"/>
-<link rel="stylesheet" type="text/css" href="../css/vertical_middle.css"/>
+<link rel="stylesheet" type="text/css" href="../css/text.css"/>
+<link rel="stylesheet" type="text/css" href="../css/font.css"/>
+<link rel="stylesheet" type="text/css" href="../css/middle.css"/>
 <link rel="stylesheet" type="text/css" href="../css/vertical.css"/>
-#else
-<link rel="stylesheet" type="text/css" href="../css/horizontal_text.css"/>
-<link rel="stylesheet" type="text/css" href="../css/horizontal_font.css"/>
-<link rel="stylesheet" type="text/css" href="../css/horizontal_middle.css"/>
 <link rel="stylesheet" type="text/css" href="../css/horizontal.css"/>
-#end
+
 <style type="text/css">
 .title, .subtitle, .orgtitle, .suborgtitle, .creator, .subcreator, .publisher, .series { line-height: 1.25; }
 .series { font-size:1.25em; }

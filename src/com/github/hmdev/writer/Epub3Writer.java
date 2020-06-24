@@ -79,6 +79,10 @@ public class Epub3Writer
 	final static String HORIZONTAL_TEXT_CSS = "horizontal_text.css";
 	/** 横書きcss Velocityテンプレート */
 	final static String HORIZONTAL_TEXT_CSS_VM = "horizontal_text.vm";
+	/** 共用css */
+	final static String TEXT_CSS = "text.css";
+	/** 共用css Velocityテンプレート */
+	final static String TEXT_CSS_VM = "text.vm";
 
 	/** xhtmlヘッダVelocityテンプレート */
 	final static String XHTML_HEADER_VM = "xhtml_header.vm";
@@ -138,10 +142,26 @@ public class Epub3Writer
 		OPS_PATH+CSS_PATH+"horizontal.css",
 		OPS_PATH+CSS_PATH+"fixed-layout-jp.css"
 	};
+	final static String[] TEMPLATE_FILE_NAMES_STANDARD = new String[]{
+			"META-INF/container.xml",
+			//OPS_PATH+CSS_PATH+"vertical_text.css",
+			OPS_PATH+CSS_PATH+"middle.css",
+			OPS_PATH+CSS_PATH+"image.css",
+			OPS_PATH+CSS_PATH+"font.css",
+			OPS_PATH+CSS_PATH+"vertical.css",
+			OPS_PATH+CSS_PATH+"horizontal.css",
+			OPS_PATH+CSS_PATH+"fixed-layout-jp.css",
+			OPS_PATH+CSS_PATH+"book-style.css",
+			OPS_PATH+CSS_PATH+"style-reset.css",
+			OPS_PATH+CSS_PATH+"style-standard.css",
+			OPS_PATH+CSS_PATH+"style-advance.css",
+		};
+
 	String[] getTemplateFiles()
 	{
-		if (this.bookInfo != null && this.bookInfo.vertical) return TEMPLATE_FILE_NAMES_VERTICAL;
-		return TEMPLATE_FILE_NAMES_HORIZONTAL;
+//		if (this.bookInfo != null && this.bookInfo.vertical) return TEMPLATE_FILE_NAMES_VERTICAL;
+//		return TEMPLATE_FILE_NAMES_HORIZONTAL;
+		return TEMPLATE_FILE_NAMES_STANDARD;
 	}
 
 	////////////////////////////////
@@ -503,6 +523,7 @@ public class Epub3Writer
 		velocityContext.put("vecGaijiInfo", this.vecGaijiInfo);
 
 		//スタイルと外字のcssを格納
+		/*
 		if (!bookInfo.imageOnly && bookInfo.vertical) {
 			zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+CSS_PATH+VERTICAL_TEXT_CSS));
 			bw = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"));
@@ -516,7 +537,14 @@ public class Epub3Writer
 			bw.flush();
 			zos.closeArchiveEntry();
 		}
-
+*/
+		if (!bookInfo.imageOnly) {
+			zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+CSS_PATH+TEXT_CSS));
+			bw = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"));
+			Velocity.mergeTemplate(templatePath+OPS_PATH+CSS_PATH+TEXT_CSS_VM, "UTF-8", velocityContext, bw);
+			bw.flush();
+			zos.closeArchiveEntry();
+		}
 		//表紙をテンプレート＋メタ情報から生成 先に出力すると外字画像出力で表紙の順番が狂う
 		if (!bookInfo.imageOnly && (bookInfo.titlePageType == BookInfo.TITLE_MIDDLE || bookInfo.titlePageType == BookInfo.TITLE_HORIZONTAL)) {
 			String vmFilePath = templatePath+OPS_PATH+XHTML_PATH+TITLE_M_VM;

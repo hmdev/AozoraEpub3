@@ -3,8 +3,9 @@
 @import "style-standard.css";
 @import "style-advance.css";
 @import "vertical.css";
-@import "vertical_font.css";
-@import "vertical_text.css";
+@import "horizontal.css";
+@import "font.css";
+@import "text.css";
 
 /* -------------------------------------------------------------
 Windows でチェックするときは以下の指定を利用

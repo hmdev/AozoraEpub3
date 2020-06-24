@@ -43,25 +43,19 @@
 	<manifest>
 #if (${bookInfo.ImageOnly})
 		<item id="svg_image" href="css/fixed-layout-jp.css" media-type="text/css"/>
-#elseif (${bookInfo.Vertical})
+#else
 		<item id="vertical" href="css/vertical.css" media-type="text/css"/>
-		<item id="v_font" href="css/vertical_font.css" media-type="text/css"/>
-		<item id="v_text" href="css/vertical_text.css" media-type="text/css"/>
-		<item id="v_middle" href="css/vertical_middle.css" media-type="text/css"/>
-		<item id="v_image" href="css/vertical_image.css" media-type="text/css"/>
+		<item id="horizontal" href="css/horizontal.css" media-type="text/css"/>
+		<item id="v_font" href="css/font.css" media-type="text/css"/>
+		<item id="v_text" href="css/text.css" media-type="text/css"/>
+		<item id="v_middle" href="css/middle.css" media-type="text/css"/>
+		<item id="v_image" href="css/image.css" media-type="text/css"/>
 		<item id="fixed-layout-jp" href="css/fixed-layout-jp.css" media-type="text/css"/>
 		<item id="book-style" href="css/book-style.css" media-type="text/css"/>
 		<item id="style-reset" href="css/style-reset.css" media-type="text/css"/>
 		<item id="style-standard" href="css/style-standard.css" media-type="text/css"/>
 		<item id="style-advance" href="css/style-advance.css" media-type="text/css"/>
 
-#else
-		<item id="horizontal" href="css/horizontal.css" media-type="text/css"/>
-		<item id="h_font" href="css/horizontal_font.css" media-type="text/css"/>
-		<item id="h_text" href="css/horizontal_text.css" media-type="text/css"/>
-		<item id="h_middle" href="css/horizontal_middle.css" media-type="text/css"/>
-		<item id="h_image" href="css/horizontal_image.css" media-type="text/css"/>
-		<item id="fixed-layout-jp" href="css/fixed-layout-jp.css" media-type="text/css"/>
 #end
 
 		<item id="nav" properties="nav" href="xhtml/nav.xhtml" media-type="application/xhtml+xml"/>

@@ -11,27 +11,16 @@
  #end
 >
 <head>
-#if (${bookInfo.Vertical})
+
 #if (${sectionInfo.ImagePage})
-	<link rel="stylesheet" type="text/css" href="../css/vertical_image.css"/>
+	<link rel="stylesheet" type="text/css" href="../css/image.css"/>
 #else
 #if (${sectionInfo.Middle} || ${sectionInfo.Bottom})
-	<link rel="stylesheet" type="text/css" href="../css/vertical_middle.css"/>
+	<link rel="stylesheet" type="text/css" href="../css/middle.css"/>
 #end
 	<link rel="stylesheet" type="text/css" href="../css/book-style.css"/>
 #end
-#else
-#if (${sectionInfo.ImagePage})
-	<link rel="stylesheet" type="text/css" href="../css/horizontal_image.css"/>
-#else
-#if (${sectionInfo.Middle})
-	<link rel="stylesheet" type="text/css" href="../css/horizontal_middle.css"/>
-#end
-	<link rel="stylesheet" type="text/css" href="../css/horizontal_text.css"/>
-	<link rel="stylesheet" type="text/css" href="../css/horizontal_font.css"/>
-	<link rel="stylesheet" type="text/css" href="../css/horizontal.css"/>
-#end
-#end
+
 	<title>${title}</title>
 
 #if (${sectionInfo.ImageHeight} > 0)
