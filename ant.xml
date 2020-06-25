@@ -285,16 +285,16 @@
 
     	<mkdir dir="${dir.jarfile}/template/OPS/css"/>
         <copy file="${dir.buildfile}/template/OPS/css/horizontal.css" todir="${dir.jarfile}/template/OPS/css"/>
-        <copy file="${dir.buildfile}/template/OPS/css/horizontal_font.css" todir="${dir.jarfile}/template/OPS/css"/>
-        <copy file="${dir.buildfile}/template/OPS/css/horizontal_image.css" todir="${dir.jarfile}/template/OPS/css"/>
-        <copy file="${dir.buildfile}/template/OPS/css/horizontal_middle.css" todir="${dir.jarfile}/template/OPS/css"/>
-        <copy file="${dir.buildfile}/template/OPS/css/horizontal_text.vm" todir="${dir.jarfile}/template/OPS/css"/>
+        <copy file="${dir.buildfile}/template/OPS/css/font.css" todir="${dir.jarfile}/template/OPS/css"/>
+        <copy file="${dir.buildfile}/template/OPS/css/image.css" todir="${dir.jarfile}/template/OPS/css"/>
+        <copy file="${dir.buildfile}/template/OPS/css/middle.css" todir="${dir.jarfile}/template/OPS/css"/>
+        <copy file="${dir.buildfile}/template/OPS/css/text.vm" todir="${dir.jarfile}/template/OPS/css"/>
         <copy file="${dir.buildfile}/template/OPS/css/vertical.css" todir="${dir.jarfile}/template/OPS/css"/>
-        <copy file="${dir.buildfile}/template/OPS/css/vertical_font.css" todir="${dir.jarfile}/template/OPS/css"/>
-        <copy file="${dir.buildfile}/template/OPS/css/vertical_image.css" todir="${dir.jarfile}/template/OPS/css"/>
-        <copy file="${dir.buildfile}/template/OPS/css/vertical_middle.css" todir="${dir.jarfile}/template/OPS/css"/>
-        <copy file="${dir.buildfile}/template/OPS/css/vertical_text.vm" todir="${dir.jarfile}/template/OPS/css"/>
     	<copy file="${dir.buildfile}/template/OPS/css/fixed-layout-jp.css" todir="${dir.jarfile}/template/OPS/css"/>
+        <copy file="${dir.buildfile}/template/OPS/css/book-style.css" todir="${dir.jarfile}/template/OPS/css"/>
+        <copy file="${dir.buildfile}/template/OPS/css/style-advance.css" todir="${dir.jarfile}/template/OPS/css"/>
+        <copy file="${dir.buildfile}/template/OPS/css/style-standard.css" todir="${dir.jarfile}/template/OPS/css"/>
+        <copy file="${dir.buildfile}/template/OPS/css/style-reset.css" todir="${dir.jarfile}/template/OPS/css"/>
 
     	<mkdir dir="${dir.jarfile}/template/OPS/css_custom"/>
         <copy file="${dir.buildfile}/template/OPS/css_custom/horizontal_font_reader.css" todir="${dir.jarfile}/template/OPS/css_custom"/>
