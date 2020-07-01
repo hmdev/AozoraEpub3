@@ -14,8 +14,7 @@
 <link rel="stylesheet" type="text/css" href="../css/text.css"/>
 <link rel="stylesheet" type="text/css" href="../css/font.css"/>
 <link rel="stylesheet" type="text/css" href="../css/middle.css"/>
-<link rel="stylesheet" type="text/css" href="../css/vertical.css"/>
-<link rel="stylesheet" type="text/css" href="../css/horizontal.css"/>
+<link rel="stylesheet" type="text/css" href="../css/aozora.css"/>
 
 <style type="text/css">
 .title, .subtitle, .orgtitle, .suborgtitle, .creator, .subcreator, .publisher, .series { line-height: 1.25; }

@@ -72,13 +72,13 @@ public class Epub3Writer
 	final static String GAIJI_PATH = "gaiji/";
 
 	/** 縦書きcss */
-	final static String VERTICAL_TEXT_CSS = "vertical_text.css";
+//	final static String VERTICAL_TEXT_CSS = "vertical_text.css";
 	/** 縦書きcss Velocityテンプレート */
-	final static String VERTICAL_TEXT_CSS_VM = "vertical_text.vm";
+//	final static String VERTICAL_TEXT_CSS_VM = "vertical_text.vm";
 	/** 横書きcss */
-	final static String HORIZONTAL_TEXT_CSS = "horizontal_text.css";
+//	final static String HORIZONTAL_TEXT_CSS = "horizontal_text.css";
 	/** 横書きcss Velocityテンプレート */
-	final static String HORIZONTAL_TEXT_CSS_VM = "horizontal_text.vm";
+//	final static String HORIZONTAL_TEXT_CSS_VM = "horizontal_text.vm";
 	/** 共用css */
 	final static String TEXT_CSS = "text.css";
 	/** 共用css Velocityテンプレート */
@@ -120,7 +120,7 @@ public class Epub3Writer
 	final static String TOC_VM = "toc.ncx.vm";
 
 	/** コピーのみのファイル */
-	final static String[] TEMPLATE_FILE_NAMES_VERTICAL = new String[]{
+/** 	final static String[] TEMPLATE_FILE_NAMES_VERTICAL = new String[]{
 		"META-INF/container.xml",
 		//OPS_PATH+CSS_PATH+"vertical_text.css",
 		OPS_PATH+CSS_PATH+"vertical_middle.css",
@@ -132,8 +132,8 @@ public class Epub3Writer
 		OPS_PATH+CSS_PATH+"style-reset.css",
 		OPS_PATH+CSS_PATH+"style-standard.css",
 		OPS_PATH+CSS_PATH+"style-advance.css",
-	};
-	final static String[] TEMPLATE_FILE_NAMES_HORIZONTAL = new String[]{
+	}; */
+/** 	final static String[] TEMPLATE_FILE_NAMES_HORIZONTAL = new String[]{
 		"META-INF/container.xml",
 		//OPS_PATH+CSS_PATH+"horizontal_text.css",
 		OPS_PATH+CSS_PATH+"horizontal_middle.css",
@@ -141,15 +141,14 @@ public class Epub3Writer
 		OPS_PATH+CSS_PATH+"horizontal_font.css",
 		OPS_PATH+CSS_PATH+"horizontal.css",
 		OPS_PATH+CSS_PATH+"fixed-layout-jp.css"
-	};
+	}; */
 	final static String[] TEMPLATE_FILE_NAMES_STANDARD = new String[]{
 			"META-INF/container.xml",
 			//OPS_PATH+CSS_PATH+"vertical_text.css",
 			OPS_PATH+CSS_PATH+"middle.css",
 			OPS_PATH+CSS_PATH+"image.css",
 			OPS_PATH+CSS_PATH+"font.css",
-			OPS_PATH+CSS_PATH+"vertical.css",
-			OPS_PATH+CSS_PATH+"horizontal.css",
+			OPS_PATH+CSS_PATH+"aozora.css",
 			OPS_PATH+CSS_PATH+"fixed-layout-jp.css",
 			OPS_PATH+CSS_PATH+"book-style.css",
 			OPS_PATH+CSS_PATH+"style-reset.css",
