@@ -58,11 +58,11 @@ public class Epub3Writer
 	final static String MIMETYPE_PATH = "mimetype";
 
 	/** ORBパス */
-	final static String OPS_PATH = "OPS/";
+	final static String OPS_PATH = "item/";
 	/** 画像格納パス */
-	final static String IMAGES_PATH = "images/";
+	final static String IMAGES_PATH = "image/";
 	/** CSS格納パス */
-	final static String CSS_PATH = "css/";
+	final static String CSS_PATH = "style/";
 	/** xhtml格納パス */
 	final static String XHTML_PATH = "xhtml/";
 
@@ -110,7 +110,7 @@ public class Epub3Writer
 	final static String SVG_IMAGE_VM = "svg_image.vm";
 
 	/** opfファイル */
-	final static String PACKAGE_FILE = "package.opf";
+	final static String PACKAGE_FILE = "standard.opf";
 	/** opfファイル Velocityテンプレート */
 	final static String PACKAGE_VM = "package.vm";
 

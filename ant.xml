@@ -273,42 +273,42 @@
         <delete dir="${dir.jarfile}/template"/>
         <mkdir dir="${dir.jarfile}/template"/>
         <mkdir dir="${dir.jarfile}/template/fonts"/>
-            <mkdir dir="${dir.jarfile}/template/images"/>
+            <mkdir dir="${dir.jarfile}/template/image"/>
         <copy file="${dir.buildfile}/template/mimetype" todir="${dir.jarfile}/template/"/>
 
         <mkdir dir="${dir.jarfile}/template/META-INF"/>
         <copy file="${dir.buildfile}/template/META-INF/container.xml" todir="${dir.jarfile}/template/META-INF"/>
 
-    	<mkdir dir="${dir.jarfile}/template/OPS"/>
-        <copy file="${dir.buildfile}/template/OPS/package.vm" todir="${dir.jarfile}/template/OPS"/>
-        <copy file="${dir.buildfile}/template/OPS/toc.ncx.vm" todir="${dir.jarfile}/template/OPS"/>
+    	<mkdir dir="${dir.jarfile}/template/item"/>
+        <copy file="${dir.buildfile}/template/item/package.vm" todir="${dir.jarfile}/template/item"/>
+        <copy file="${dir.buildfile}/template/item/toc.ncx.vm" todir="${dir.jarfile}/template/item"/>
 
-    	<mkdir dir="${dir.jarfile}/template/OPS/css"/>
-        <copy file="${dir.buildfile}/template/OPS/css/aozora.css" todir="${dir.jarfile}/template/OPS/css"/>
-        <copy file="${dir.buildfile}/template/OPS/css/font.css" todir="${dir.jarfile}/template/OPS/css"/>
-        <copy file="${dir.buildfile}/template/OPS/css/image.css" todir="${dir.jarfile}/template/OPS/css"/>
-        <copy file="${dir.buildfile}/template/OPS/css/middle.css" todir="${dir.jarfile}/template/OPS/css"/>
-        <copy file="${dir.buildfile}/template/OPS/css/text.vm" todir="${dir.jarfile}/template/OPS/css"/>
-    	<copy file="${dir.buildfile}/template/OPS/css/fixed-layout-jp.css" todir="${dir.jarfile}/template/OPS/css"/>
-        <copy file="${dir.buildfile}/template/OPS/css/book-style.css" todir="${dir.jarfile}/template/OPS/css"/>
-        <copy file="${dir.buildfile}/template/OPS/css/style-advance.css" todir="${dir.jarfile}/template/OPS/css"/>
-        <copy file="${dir.buildfile}/template/OPS/css/style-standard.css" todir="${dir.jarfile}/template/OPS/css"/>
-        <copy file="${dir.buildfile}/template/OPS/css/style-reset.css" todir="${dir.jarfile}/template/OPS/css"/>
+    	<mkdir dir="${dir.jarfile}/template/item/style"/>
+        <copy file="${dir.buildfile}/template/item/style/aozora.css" todir="${dir.jarfile}/template/item/style"/>
+        <copy file="${dir.buildfile}/template/item/style/font.css" todir="${dir.jarfile}/template/item/style"/>
+        <copy file="${dir.buildfile}/template/item/style/image.css" todir="${dir.jarfile}/template/item/style"/>
+        <copy file="${dir.buildfile}/template/item/style/middle.css" todir="${dir.jarfile}/template/item/style"/>
+        <copy file="${dir.buildfile}/template/item/style/text.vm" todir="${dir.jarfile}/template/item/style"/>
+    	<copy file="${dir.buildfile}/template/item/style/fixed-layout-jp.css" todir="${dir.jarfile}/template/item/style"/>
+        <copy file="${dir.buildfile}/template/item/style/book-style.css" todir="${dir.jarfile}/template/item/style"/>
+        <copy file="${dir.buildfile}/template/item/style/style-advance.css" todir="${dir.jarfile}/template/item/style"/>
+        <copy file="${dir.buildfile}/template/item/style/style-standard.css" todir="${dir.jarfile}/template/item/style"/>
+        <copy file="${dir.buildfile}/template/item/style/style-reset.css" todir="${dir.jarfile}/template/item/style"/>
 
-    	<mkdir dir="${dir.jarfile}/template/OPS/css_custom"/>
-        <copy file="${dir.buildfile}/template/OPS/css_custom/horizontal_font_reader.css" todir="${dir.jarfile}/template/OPS/css_custom"/>
-        <copy file="${dir.buildfile}/template/OPS/css_custom/horizontal_font_sample.css" todir="${dir.jarfile}/template/OPS/css_custom"/>
-        <copy file="${dir.buildfile}/template/OPS/css_custom/vertical_font_reader.css" todir="${dir.jarfile}/template/OPS/css_custom"/>
-        <copy file="${dir.buildfile}/template/OPS/css_custom/vertical_font_sample.css" todir="${dir.jarfile}/template/OPS/css_custom"/>
+    	<mkdir dir="${dir.jarfile}/template/item/css_custom"/>
+        <copy file="${dir.buildfile}/template/item/css_custom/horizontal_font_reader.css" todir="${dir.jarfile}/template/item/css_custom"/>
+        <copy file="${dir.buildfile}/template/item/css_custom/horizontal_font_sample.css" todir="${dir.jarfile}/template/item/css_custom"/>
+        <copy file="${dir.buildfile}/template/item/css_custom/vertical_font_reader.css" todir="${dir.jarfile}/template/item/css_custom"/>
+        <copy file="${dir.buildfile}/template/item/css_custom/vertical_font_sample.css" todir="${dir.jarfile}/template/item/css_custom"/>
 
-    	<mkdir dir="${dir.jarfile}/template/OPS/xhtml"/>
-        <copy file="${dir.buildfile}/template/OPS/xhtml/cover.vm" todir="${dir.jarfile}/template/OPS/xhtml/"/>
-        <copy file="${dir.buildfile}/template/OPS/xhtml/svg_image.vm" todir="${dir.jarfile}/template/OPS/xhtml/"/>
-        <copy file="${dir.buildfile}/template/OPS/xhtml/title_horizontal.vm" todir="${dir.jarfile}/template/OPS/xhtml/"/>
-        <copy file="${dir.buildfile}/template/OPS/xhtml/title_middle.vm" todir="${dir.jarfile}/template/OPS/xhtml/"/>
-        <copy file="${dir.buildfile}/template/OPS/xhtml/xhtml_footer.vm" todir="${dir.jarfile}/template/OPS/xhtml/"/>
-        <copy file="${dir.buildfile}/template/OPS/xhtml/xhtml_header.vm" todir="${dir.jarfile}/template/OPS/xhtml/"/>
-        <copy file="${dir.buildfile}/template/OPS/xhtml/xhtml_nav.vm" todir="${dir.jarfile}/template/OPS/xhtml/"/>
+    	<mkdir dir="${dir.jarfile}/template/item/xhtml"/>
+        <copy file="${dir.buildfile}/template/item/xhtml/cover.vm" todir="${dir.jarfile}/template/item/xhtml/"/>
+        <copy file="${dir.buildfile}/template/item/xhtml/svg_image.vm" todir="${dir.jarfile}/template/item/xhtml/"/>
+        <copy file="${dir.buildfile}/template/item/xhtml/title_horizontal.vm" todir="${dir.jarfile}/template/item/xhtml/"/>
+        <copy file="${dir.buildfile}/template/item/xhtml/title_middle.vm" todir="${dir.jarfile}/template/item/xhtml/"/>
+        <copy file="${dir.buildfile}/template/item/xhtml/xhtml_footer.vm" todir="${dir.jarfile}/template/item/xhtml/"/>
+        <copy file="${dir.buildfile}/template/item/xhtml/xhtml_header.vm" todir="${dir.jarfile}/template/item/xhtml/"/>
+        <copy file="${dir.buildfile}/template/item/xhtml/xhtml_nav.vm" todir="${dir.jarfile}/template/item/xhtml/"/>
 
         <delete dir="${dir.jarfile}/web"/>
         <mkdir dir="${dir.jarfile}/web"/>

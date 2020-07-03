@@ -13,12 +13,12 @@
 <head>
 
 #if (${sectionInfo.ImagePage})
-	<link rel="stylesheet" type="text/css" href="../css/image.css"/>
+	<link rel="stylesheet" type="text/css" href="../style/image.css"/>
 #else
 #if (${sectionInfo.Middle} || ${sectionInfo.Bottom})
-	<link rel="stylesheet" type="text/css" href="../css/middle.css"/>
+	<link rel="stylesheet" type="text/css" href="../style/middle.css"/>
 #end
-	<link rel="stylesheet" type="text/css" href="../css/book-style.css"/>
+	<link rel="stylesheet" type="text/css" href="../style/book-style.css"/>
 #end
 
 	<title>${title}</title>

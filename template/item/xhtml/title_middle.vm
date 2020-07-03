@@ -11,10 +11,10 @@
  #end
 >
 <head>
-<link rel="stylesheet" type="text/css" href="../css/text.css"/>
-<link rel="stylesheet" type="text/css" href="../css/font.css"/>
-<link rel="stylesheet" type="text/css" href="../css/middle.css"/>
-<link rel="stylesheet" type="text/css" href="../css/aozora.css"/>
+<link rel="stylesheet" type="text/css" href="../style/text.css"/>
+<link rel="stylesheet" type="text/css" href="../style/font.css"/>
+<link rel="stylesheet" type="text/css" href="../style/middle.css"/>
+<link rel="stylesheet" type="text/css" href="../style/aozora.css"/>
 
 <style type="text/css">
 .title, .subtitle, .orgtitle, .suborgtitle, .creator, .subcreator, .publisher, .series { line-height: 1.25; }

@@ -42,18 +42,18 @@
 
 	<manifest>
 #if (${bookInfo.ImageOnly})
-		<item id="svg_image" href="css/fixed-layout-jp.css" media-type="text/css"/>
+		<item id="svg_image" href="style/fixed-layout-jp.css" media-type="text/css"/>
 #else
-		<item id="vertical" href="css/aozora.css" media-type="text/css"/>
-		<item id="v_font" href="css/font.css" media-type="text/css"/>
-		<item id="v_text" href="css/text.css" media-type="text/css"/>
-		<item id="v_middle" href="css/middle.css" media-type="text/css"/>
-		<item id="v_image" href="css/image.css" media-type="text/css"/>
-		<item id="fixed-layout-jp" href="css/fixed-layout-jp.css" media-type="text/css"/>
-		<item id="book-style" href="css/book-style.css" media-type="text/css"/>
-		<item id="style-reset" href="css/style-reset.css" media-type="text/css"/>
-		<item id="style-standard" href="css/style-standard.css" media-type="text/css"/>
-		<item id="style-advance" href="css/style-advance.css" media-type="text/css"/>
+		<item id="vertical" href="style/aozora.css" media-type="text/css"/>
+		<item id="v_font" href="style/font.css" media-type="text/css"/>
+		<item id="v_text" href="style/text.css" media-type="text/css"/>
+		<item id="v_middle" href="style/middle.css" media-type="text/css"/>
+		<item id="v_image" href="style/image.css" media-type="text/css"/>
+		<item id="fixed-layout-jp" href="style/fixed-layout-jp.css" media-type="text/css"/>
+		<item id="book-style" href="style/book-style.css" media-type="text/css"/>
+		<item id="style-reset" href="style/style-reset.css" media-type="text/css"/>
+		<item id="style-standard" href="style/style-standard.css" media-type="text/css"/>
+		<item id="style-advance" href="style/style-advance.css" media-type="text/css"/>
 #end
 
 		<item id="nav" properties="nav" href="xhtml/nav.xhtml" media-type="application/xhtml+xml"/>
@@ -77,9 +77,9 @@
 #end
 #foreach($image in ${images})
 #if ($image.IsCover)
-		<item id="img${image.Id}" href="images/${image.OutFileName}" media-type="${image.Format}" properties="cover-image"/>
+		<item id="img${image.Id}" href="image/${image.OutFileName}" media-type="${image.Format}" properties="cover-image"/>
 #else
-		<item id="img${image.Id}" href="images/${image.OutFileName}" media-type="${image.Format}"/>
+		<item id="img${image.Id}" href="image/${image.OutFileName}" media-type="${image.Format}"/>
 #end
 #end
 		<item href="toc.ncx" id="ncx" media-type="application/x-dtbncx+xml"/>
