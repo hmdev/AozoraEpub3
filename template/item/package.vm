@@ -40,6 +40,7 @@
 		<!-- Fixed-Layout Documents指定 -->
 		<meta property="rendition:layout">pre-paginated</meta>
 		<meta property="rendition:spread">landscape</meta>
+		<meta name="original-resolution" content="${coverImage.Width}x${coverImage.Height}"/>
 		<!-- etc. -->
 		<meta property="ebpaj:guide-version">1.1</meta>
 #if (${bookInfo.Vertical})
