@@ -1,7 +1,17 @@
-<?xml version="1.0" encoding="utf-8"?>
-<package version="3.0" unique-identifier="pub-id" xmlns="http://www.idpf.org/2007/opf" prefix="ebpaj: http://www.ebpaj.jp/" xml:lang="ja">
-  <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
-
+<?xml version="1.0" encoding="UTF-8"?>
+<package
+ xmlns="http://www.idpf.org/2007/opf"
+ version="3.0"
+ xml:lang="ja"
+ unique-identifier="pub-id"
+#if (${bookInfo.ImageOnly})
+ prefix="rendition: http://www.idpf.org/vocab/rendition/#
+         ebpaj: http://www.ebpaj.jp/"
+#else
+ prefix="ebpaj: http://www.ebpaj.jp/"
+#end
+>
+		<metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
 		<dc:title id="title">${title}</dc:title>
 		<meta refines="#title" property="dcterms:title">${title}</meta>
 #if (${titleAs})
