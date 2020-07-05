@@ -29,9 +29,6 @@
 		<dc:language id="pub-lang">ja</dc:language>
 		<dc:identifier id="pub-id">urn:uuid:${identifier}</dc:identifier>
 		<meta property="dcterms:modified">${modified}</meta>
-#if (${bookInfo.InsertCoverPage})
-		<meta name="cover" content="img${coverImage.Id}"/>
-#end
 
 #if (${bookInfo.ImageOnly})
 		<!-- Fixed-Layout Documents指定 -->
