@@ -13,42 +13,40 @@
 >
 		<metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
 		<dc:title id="title">${title}</dc:title>
-		<meta refines="#title" property="dcterms:title">${title}</meta>
 #if (${titleAs})
 		<meta refines="#title" property="file-as">${titleAs}</meta>
 #end
 #if (${creator})
 		<dc:creator id="creator">${creator}</dc:creator>
-		<meta refines="#creator" property="dcterms:creator">${creator}</meta>
 #if (${creatorAs})
 		<meta refines="#creator" property="file-as">${creatorAs}</meta>
 #end
+		<meta refines="#creator" property="display-seq">1</meta>
 #end
 #if (${publisher})
 		<dc:publisher id="publisher">${publisher}</dc:publisher>
-		<meta refines="#publisher" property="dcterms:publisher">${publisher}</meta>
 #end
 		<dc:language id="pub-lang">ja</dc:language>
-		<meta refines="#pub-lang" property="dcterms:language">ja</meta>
 		<dc:identifier id="pub-id">urn:uuid:${identifier}</dc:identifier>
-		<meta refines="#pub-id" property="dcterms:identifier">urn:uuid:${identifier}</meta>
 		<meta property="dcterms:modified">${modified}</meta>
 #if (${bookInfo.InsertCoverPage})
 		<meta name="cover" content="img${coverImage.Id}"/>
 #end
+
 #if (${bookInfo.ImageOnly})
 		<!-- Fixed-Layout Documents指定 -->
 		<meta property="rendition:layout">pre-paginated</meta>
 		<meta property="rendition:spread">landscape</meta>
 		<meta name="original-resolution" content="${coverImage.Width}x${coverImage.Height}"/>
-		<!-- etc. -->
-		<meta property="ebpaj:guide-version">1.1</meta>
+
 #if (${bookInfo.Vertical})
 		<meta name="primary-writing-mode" content="horizontal-rl"/>
 #else
 		<meta name="primary-writing-mode" content="horizontal-lr"/>
 #end
 #end
+<!-- etc. -->
+<meta property="ebpaj:guide-version">1.1.3</meta>
 	</metadata>
 
 	<manifest>
