@@ -135,21 +135,4 @@
 #end
 	</spine>
 
-#if (${bookInfo.InsertCoverPage} || ${bookInfo.InsertTocPage})
-	<guide>
-#if (${bookInfo.InsertCoverPage})
-		<reference type="cover" title="cover-page" href="xhtml/cover.xhtml"/>
-#end
-#if (${title_page})
-		<reference type="title" title="title-page" href="xhtml/title.xhtml"/>
-#end
-#if (${bookInfo.InsertTocPage})
-		<reference type="toc" title="nav" href="xhtml/nav.xhtml"/>
-#end
-#foreach(${sectionInfo} in ${sections})
-		<reference type="text" title="sec${sectionInfo.SectionId}" href="xhtml/${sectionInfo.SectionId}.xhtml"/>
-#break
-#end
-	</guide>
-#end
 </package>
