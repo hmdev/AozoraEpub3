@@ -12,22 +12,29 @@
 #end
 >
 		<metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
+<!-- 作品名 -->
 		<dc:title id="title">${title}</dc:title>
 #if (${titleAs})
 		<meta refines="#title" property="file-as">${titleAs}</meta>
 #end
 #if (${creator})
-		<dc:creator id="creator">${creator}</dc:creator>
+
+<!-- 著者名 -->
+		<dc:creator id="creator01">${creator}</dc:creator>
 #if (${creatorAs})
-		<meta refines="#creator" property="file-as">${creatorAs}</meta>
+		<meta refines="#creator01" property="file-as">${creatorAs}</meta>
 #end
-		<meta refines="#creator" property="display-seq">1</meta>
+		<meta refines="#creator01" property="display-seq">1</meta>
 #end
 #if (${publisher})
+<!-- 出版社名 -->
 		<dc:publisher id="publisher">${publisher}</dc:publisher>
 #end
+<!-- 言語 -->
 		<dc:language id="pub-lang">ja</dc:language>
+<!-- ファイルid -->
 		<dc:identifier id="pub-id">urn:uuid:${identifier}</dc:identifier>
+<!-- 更新日 -->
 		<meta property="dcterms:modified">${modified}</meta>
 
 #if (${bookInfo.ImageOnly})
@@ -47,6 +54,9 @@
 	</metadata>
 
 	<manifest>
+<!-- navigation -->
+		<item media-type="application/xhtml+xml" id="nav" href="xhtml/nav.xhtml" properties="nav"/>
+<!-- style -->
 #if (${bookInfo.ImageOnly})
 		<item id="svg_image" href="style/fixed-layout-jp.css" media-type="text/css"/>
 #else
@@ -61,11 +71,17 @@
 		<item id="style-standard" href="style/style-standard.css" media-type="text/css"/>
 		<item id="style-advance" href="style/style-advance.css" media-type="text/css"/>
 #end
-
-		<item id="nav" properties="nav" href="xhtml/nav.xhtml" media-type="application/xhtml+xml"/>
-
+<!-- image -->
+#foreach($image in ${images})
+#if ($image.IsCover)
+		<item media-type="${image.Format}" id="img${image.Id}" href="image/${image.OutFileName}" properties="cover-image"/>
+#else
+		<item id="img${image.Id}" href="image/${image.OutFileName}" media-type="${image.Format}"/>
+#end
+#end
+<!-- xhtml -->
 #if (${bookInfo.InsertCoverPage})
-		<item id="cover-page" href="xhtml/cover.xhtml" media-type="application/xhtml+xml" properties="svg"/>
+		<item media-type="application/xhtml+xml" id="cover-page" href="xhtml/cover.xhtml" properties="svg"/>
 
 #end
 #if (${title_page})
@@ -81,13 +97,7 @@
 		<item id="sec${sectionInfo.SectionId}" href="xhtml/${sectionInfo.SectionId}.xhtml" media-type="application/xhtml+xml"/>
 #end
 #end
-#foreach($image in ${images})
-#if ($image.IsCover)
-		<item id="img${image.Id}" href="image/${image.OutFileName}" media-type="${image.Format}" properties="cover-image"/>
-#else
-		<item id="img${image.Id}" href="image/${image.OutFileName}" media-type="${image.Format}"/>
-#end
-#end
+
 		<item href="toc.ncx" id="ncx" media-type="application/x-dtbncx+xml"/>
 	</manifest>
 
