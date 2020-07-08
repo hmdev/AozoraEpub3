@@ -98,13 +98,13 @@
 #end
 #end
 
-		<item href="toc.ncx" id="ncx" media-type="application/x-dtbncx+xml"/>
+##		<item href="toc.ncx" id="ncx" media-type="application/x-dtbncx+xml"/>
 	</manifest>
 
 #if (${bookInfo.Vertical})
-	<spine page-progression-direction="rtl" toc="ncx">
+	<spine page-progression-direction="rtl">
 #else
-	<spine page-progression-direction="ltr" toc="ncx">
+	<spine page-progression-direction="ltr">
 #end
 #if (${bookInfo.InsertCoverPage})
 		   <itemref idref="cover-page" properties="rendition:page-spread-center" linear="yes"/>
