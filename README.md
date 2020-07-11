@@ -17,6 +17,13 @@ Read this in other languages: [English](https://github.com/kyukyunyorituryo/Aozo
 ============
  [リリースページ](https://github.com/kyukyunyorituryo/AozoraEpub3/releases)をクリックしてダウンロードしてください。
 
+寄付のお願い
+============
+個人で開発しているので、開発継続のために支援していただければと思います。
+
+[GitHub Sponsors](https://github.com/sponsors/kyukyunyorituryo)
+
+[欲しい物リスト](https://www.amazon.co.jp/gp/registry/wishlist/PP7F9RZJ1B0Y/ref=nav_wishlist_lists_1)
 
 説明
 ------------
