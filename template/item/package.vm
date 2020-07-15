@@ -89,7 +89,7 @@
 
 #if (${bookInfo.ImageOnly})
 #foreach(${sectionInfo} in ${sections})
-		<item id="sec${sectionInfo.SectionId}" href="xhtml/${sectionInfo.SectionId}.xhtml" media-type="application/xhtml+xml" properties="svg"/>
+		<item media-type="application/xhtml+xml" id="sec${sectionInfo.SectionId}" href="xhtml/${sectionInfo.SectionId}.xhtml" properties="svg"/>
 #end
 #else
 #foreach(${sectionInfo} in ${sections})
@@ -106,7 +106,7 @@
 	<spine page-progression-direction="ltr">
 #end
 #if (${bookInfo.InsertCoverPage})
-		   <itemref idref="cover-page" properties="rendition:page-spread-center" linear="yes"/>
+		   <itemref linear="yes" idref="cover-page" properties="rendition:page-spread-center"/>
 #end
 #if (${title_page})
 		<itemref idref="title-page" linear="yes"/>
@@ -118,18 +118,18 @@
 #foreach(${sectionInfo} in ${sections})
 #if (${bookInfo.ImageOnly} && ${bookInfo.Vertical})
 #if ($velocityCount % 2 == 0)
-		<itemref idref="sec${sectionInfo.SectionId}" linear="yes" properties="page-spread-left"/>
+		<itemref linear="yes" idref="sec${sectionInfo.SectionId}" properties="page-spread-left"/>
 #else
-		<itemref idref="sec${sectionInfo.SectionId}" linear="yes" properties="page-spread-right"/>
+		<itemref linear="yes" idref="sec${sectionInfo.SectionId}" properties="page-spread-right"/>
 #end
 #elseif (${bookInfo.ImageOnly} && !${bookInfo.Vertical})
 #if ($velocityCount % 2 == 0)
-		<itemref idref="sec${sectionInfo.SectionId}" linear="yes" properties="page-spread-right"/>
+		<itemref linear="yes" idref="sec${sectionInfo.SectionId}" properties="page-spread-right"/>
 #else
-		<itemref idref="sec${sectionInfo.SectionId}" linear="yes" properties="page-spread-left"/>
+		<itemref linear="yes" idref="sec${sectionInfo.SectionId}" properties="page-spread-left"/>
 #end
 #else
-		<itemref idref="sec${sectionInfo.SectionId}" linear="yes"/>
+		<itemref linear="yes" idref="sec${sectionInfo.SectionId}"/>
 #end
 #end
 	</spine>
