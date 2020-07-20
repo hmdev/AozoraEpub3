@@ -3,7 +3,7 @@
  xmlns="http://www.idpf.org/2007/opf"
  version="3.0"
  xml:lang="ja"
- unique-identifier="pub-id"
+ unique-identifier="unique-id"
  prefix="rendition: http://www.idpf.org/vocab/rendition/#
          ebpaj: http://www.ebpaj.jp/
          fixed-layout-jp: http://www.digital-comic.jp/
@@ -32,7 +32,7 @@
 <!-- 言語 -->
 		<dc:language id="pub-lang">ja</dc:language>
 <!-- ファイルid -->
-		<dc:identifier id="pub-id">urn:uuid:${identifier}</dc:identifier>
+		<dc:identifier id="unique-id">urn:uuid:${identifier}</dc:identifier>
 <!-- 更新日 -->
 		<meta property="dcterms:modified">${modified}</meta>
 
