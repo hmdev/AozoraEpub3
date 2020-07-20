@@ -20,9 +20,10 @@
 <!-- 著者名 -->
 		<dc:creator id="creator01">${creator}</dc:creator>
 #if (${creatorAs})
+		<meta refines="#creator01" property="role" scheme="marc:relators">aut</meta>
 		<meta refines="#creator01" property="file-as">${creatorAs}</meta>
-#end
 		<meta refines="#creator01" property="display-seq">1</meta>
+#end
 #end
 #if (${publisher})
 <!-- 出版社名 -->
