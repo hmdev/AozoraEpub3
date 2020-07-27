@@ -55,7 +55,7 @@
 
 	<manifest>
 <!-- navigation -->
-		<item media-type="application/xhtml+xml" id="nav" href="xhtml/nav.xhtml" properties="nav"/>
+		<item media-type="application/xhtml+xml" id="nav" href="nav.xhtml" properties="nav"/>
 <!-- style -->
 #if (${bookInfo.ImageOnly})
 		<item id="svg_image" href="style/fixed-layout-jp.css" media-type="text/css"/>

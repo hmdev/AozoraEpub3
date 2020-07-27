@@ -834,7 +834,7 @@ public class Epub3Writer
 
 		//navファイル
 		velocityContext.put("chapters", chapterInfos);
-		zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+XHTML_PATH+XHTML_NAV_FILE));
+		zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+XHTML_NAV_FILE));
 		bw = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"));
 		Velocity.mergeTemplate(templatePath+OPS_PATH+XHTML_PATH+XHTML_NAV_VM, "UTF-8", velocityContext, bw);
 		bw.flush();
