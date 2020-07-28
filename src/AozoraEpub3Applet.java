@@ -177,6 +177,8 @@ public class AozoraEpub3Applet extends JApplet
 
 	//入力ファイルエンコード
 	JComboBox jComboEncType;
+	JComboBox jComboLangType;
+
 
 	/** 表紙 */
 	JComboBox jComboCover;
@@ -889,8 +891,18 @@ public class AozoraEpub3Applet extends JApplet
 		jComboEncType = new JComboBox(new String[]{"MS932", "UTF-8"});
 		jComboEncType.setToolTipText("入力ファイルのテキストファイルの文字コード。青空文庫の標準はMS932(SJIS)です");
 		jComboEncType.setFocusable(false);
-		jComboEncType.setPreferredSize(new Dimension(100, 22));
+		jComboEncType.setPreferredSize(new Dimension(70, 22));
 		panel1.add(jComboEncType);
+		/*
+		label = new JLabel("言語");
+		label.setBorder(padding0);
+		panel1.add(label);
+		jComboLangType = new JComboBox(new String[]{"日本語", "英語"});
+		jComboLangType.setToolTipText("出力するEPUBの言語を選択する。");
+		jComboLangType.setFocusable(false);
+		jComboLangType.setPreferredSize(new Dimension(70, 22));
+		panel1.add(jComboLangType);
+		*/
 		panel.add(panel1);
 
 		//右パネル
@@ -4684,8 +4696,8 @@ public class AozoraEpub3Applet extends JApplet
 		//アイコン設定
 		jFrame.setIconImage(applet.iconImage);
 		//最小サイズ
-		jFrame.setMinimumSize(new Dimension(520, 320));
-		jFrame.setPreferredSize(new Dimension(520, 400));
+		jFrame.setMinimumSize(new Dimension(540, 320));
+		jFrame.setPreferredSize(new Dimension(540, 400));
 
 		try {
 			int x = (int)Float.parseFloat(applet.props.getProperty("PosX"));
