@@ -709,8 +709,8 @@
 画像幅上	<span class="img ft" style="width:%s%%"><img style="width:100%%" src="%s" alt=""/>
 画像幅下	<span class="img fb" style="width:%s%%"><img style="width:100%%" src="%s" alt=""/>
 ##画面サイズよりも大きい 横または縦をcssで100%指定
-画像横	<span class="img fw"><img src="%s" alt=""/>
-画像縦	<span class="img fh"><img src="%s" alt=""/>
+画像横	<span><img class="fit" src="%s" alt=""/>
+画像縦	<span><img class="fit" src="%s" alt=""/>
 ##回り込み幅100%
 画像上横	<span class="img ft fw"><img src="%s" alt=""/>
 画像下横	<span class="img fb fw"><img src="%s" alt=""/>
