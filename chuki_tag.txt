@@ -700,7 +700,7 @@
 
 #### 画像 String.formatで出力
 ##拡大無し
-画像	<span class="img"><img class="fit" src="%s" alt=""/>
+画像	<span><img class="fit" src="%s" alt=""/>
 ##回り込み
 画像上	<span class="img ft"><img src="%s" alt=""/>
 画像下	<span class="img fb"><img src="%s" alt=""/>
