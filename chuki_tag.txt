@@ -702,8 +702,8 @@
 ##拡大無し
 画像	<span><img class="fit" src="%s" alt=""/>
 ##回り込み
-画像上	<span class="img ft"><img src="%s" alt=""/>
-画像下	<span class="img fb"><img src="%s" alt=""/>
+画像上	<span class="float-start m-end-1em"><img src="%s" alt=""/>
+画像下	<span class="float-end m-start-1em"><img src="%s" alt=""/>
 ##画面サイズ比で幅の%を指定
 画像幅	<span class="img" style="width:%s%%"><img style="width:100%%" src="%s" alt=""/>
 画像幅上	<span class="img ft" style="width:%s%%"><img style="width:100%%" src="%s" alt=""/>
