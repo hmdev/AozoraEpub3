@@ -973,7 +973,7 @@ public class AozoraEpub3Applet extends JApplet
 		//画面サイズ
 		label = new JLabel(" 画面: 横");
 		panel.add(label);
-		jTextDispW = new JTextField("600");
+		jTextDispW = new JTextField("1600");
 		jTextDispW.setHorizontalAlignment(JTextField.RIGHT);
 		jTextDispW.setMaximumSize(text4);
 		jTextDispW.setPreferredSize(text4);
@@ -985,7 +985,7 @@ public class AozoraEpub3Applet extends JApplet
 		panel.add(label);
 		label = new JLabel("縦");
 		panel.add(label);
-		jTextDispH = new JTextField("800");
+		jTextDispH = new JTextField("2560");
 		jTextDispH.setHorizontalAlignment(JTextField.RIGHT);
 		jTextDispH.setMaximumSize(text4);
 		jTextDispH.setPreferredSize(text4);
@@ -1000,7 +1000,7 @@ public class AozoraEpub3Applet extends JApplet
 		//横x縦
 		label = new JLabel("  表紙: 横");
 		panel.add(label);
-		jTextCoverW = new JTextField("600");
+		jTextCoverW = new JTextField("1600");
 		jTextCoverW.setHorizontalAlignment(JTextField.RIGHT);
 		jTextCoverW.setInputVerifier(new IntegerInputVerifier(600, 64, 4096));
 		jTextCoverW.setMaximumSize(text4);
@@ -1012,7 +1012,7 @@ public class AozoraEpub3Applet extends JApplet
 		panel.add(label);
 		label = new JLabel("縦");
 		panel.add(label);
-		jTextCoverH = new JTextField("800");
+		jTextCoverH = new JTextField("2560");
 		jTextCoverH.setHorizontalAlignment(JTextField.RIGHT);
 		jTextCoverH.setInputVerifier(new IntegerInputVerifier(800, 64, 4096));
 		jTextCoverH.setMaximumSize(text4);
@@ -1119,7 +1119,7 @@ public class AozoraEpub3Applet extends JApplet
 		//横x縦
 		label = new JLabel("横");
 		panel.add(label);
-		jTextSinglePageSizeW = new JTextField("400");
+		jTextSinglePageSizeW = new JTextField("200");
 		jTextSinglePageSizeW.setHorizontalAlignment(JTextField.RIGHT);
 		jTextSinglePageSizeW.setInputVerifier(new IntegerInputVerifier(400, 1, 9999));
 		jTextSinglePageSizeW.setMaximumSize(text4);
@@ -1131,7 +1131,7 @@ public class AozoraEpub3Applet extends JApplet
 		panel.add(label);
 		label = new JLabel("縦");
 		panel.add(label);
-		jTextSinglePageSizeH = new JTextField("600");
+		jTextSinglePageSizeH = new JTextField("300");
 		jTextSinglePageSizeH.setHorizontalAlignment(JTextField.RIGHT);
 		jTextSinglePageSizeH.setInputVerifier(new IntegerInputVerifier(600, 1, 9999));
 		jTextSinglePageSizeH.setMaximumSize(text4);
@@ -1145,7 +1145,7 @@ public class AozoraEpub3Applet extends JApplet
 		label = new JLabel("横のみ");
 		label.setBorder(padding2H);
 		panel.add(label);
-		jTextSinglePageWidth = new JTextField("600");
+		jTextSinglePageWidth = new JTextField("300");
 		jTextSinglePageWidth.setHorizontalAlignment(JTextField.RIGHT);
 		jTextSinglePageWidth.setInputVerifier(new IntegerInputVerifier(600, 1, 9999));
 		jTextSinglePageWidth.setMaximumSize(text4);
