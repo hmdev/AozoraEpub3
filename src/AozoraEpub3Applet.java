@@ -889,6 +889,7 @@ public class AozoraEpub3Applet extends JApplet
 		label.setBorder(padding0);
 		panel1.add(label);
 		jComboEncType = new JComboBox(new String[]{"MS932", "UTF-8"});
+		//jComboEncType = new JComboBox(new String[]{"MS932", "UTF-8","自動"});
 		jComboEncType.setToolTipText("入力ファイルのテキストファイルの文字コード。青空文庫の標準はMS932(SJIS)です");
 		jComboEncType.setFocusable(false);
 		jComboEncType.setPreferredSize(new Dimension(70, 22));
