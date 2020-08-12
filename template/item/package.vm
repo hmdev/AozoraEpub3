@@ -30,7 +30,7 @@
 		<dc:publisher id="publisher">${publisher}</dc:publisher>
 #end
 <!-- 言語 -->
-		<dc:language id="pub-lang">ja</dc:language>
+		<dc:language id="pub-lang">${language}</dc:language>
 <!-- ファイルid -->
 		<dc:identifier id="unique-id">urn:uuid:${identifier}</dc:identifier>
 <!-- 更新日 -->

@@ -459,6 +459,8 @@ public class Epub3Writer
 		if (bookInfo.creatorAs != null) velocityContext.put("creatorAs", CharUtils.escapeHtml(bookInfo.creatorAs));
 		//刊行者情報
 		if (bookInfo.publisher != null) velocityContext.put("publisher", bookInfo.publisher);
+		//言語 &<>はエスケープ
+		velocityContext.put("language", CharUtils.escapeHtml(bookInfo.language));
 
 		//書籍情報
 		velocityContext.put("bookInfo", bookInfo);

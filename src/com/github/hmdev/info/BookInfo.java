@@ -48,7 +48,7 @@ public class BookInfo
 			}
 		}
 	}
-	
+
 	/** 表題は出力しない  */
 	public final static int TITLE_NONE = -1;
 	/** 表題は別ページにせずそのまま出力  */
@@ -58,36 +58,36 @@ public class BookInfo
 	public final static int TITLE_MIDDLE = 1;
 	/** 表題ページ横書き */
 	public final static int TITLE_HORIZONTAL = 2;
-	
+
 	/** 表題種別 */
 	public int titlePageType = 0;
-	
+
 	////////////////////////////////
 	/** タイトル等の行 */
 	String[] metaLines;
 	/** タイトル等の開始行番号 */
 	public int metaLineStart;
-	
+
 	/** テキストの行数 */
 	public int totalLineNum = -1;
-	
+
 	/** タイトル */
 	public String title;
 	/** タイトル行番号 */
 	public int titleLine = -1;
 	/** タイトル読み */
 	public String titleAs;
-	
+
 	/** 副題 */
 	public String subTitle;
 	/** 副題番号 */
 	public int subTitleLine = -1;
-	
+
 	/** 原題行番号 */
 	public int orgTitleLine = -1;
 	/** 原副題行番号 */
 	public int subOrgTitleLine = -1;
-	
+
 	/** 著作者 */
 	public String creator;
 	/** 著作者行番号 */
@@ -96,43 +96,47 @@ public class BookInfo
 	public int subCreatorLine = -1;
 	/** 著者読み */
 	public String creatorAs;
-	
+
 	/** シリーズ名 */
 	public int seriesLine = -1;
 	/** 刊行者行 */
 	public int publisherLine = -1;
 	/** 刊行者文字列 */
 	public String publisher;
-	
+	/** 言語行 */
+	public int languageLine = -1;
+	/** EPUBの言語の指定　*/
+	public String language;
+
 	////////////////////////////////
-	
+
 	/** タイトル行の最後 */
 	public int titleEndLine = -1;
-	
+
 	/** コメント先頭行 */
 	int firstCommentLineNum = -1;
-	
+
 	/** 発刊日時 */
 	public Date published;
 	/** 更新日時 */
 	public Date modified;
-	
+
 	/** 縦書きならtrue */
 	public boolean vertical = true;
-	
+
 	/** 右から左ならtrue */
 	public boolean rtl = false;
-	
+
 	/** 入力ファイル */
 	public File srcFile;
 	/** 圧縮ファイル内のテキストファイルエントリー名 */
 	public String textEntryName = null;
-	
+
 	/** 先頭の画像行番号 */
 	public int firstImageLineNum = -1;
 	/** 先頭の画像位置 外字等の小さい画像は無視される */
 	public int firstImageIdx = -1;
-	
+
 	/** 表紙編集情報 */
 	public CoverEditInfo coverEditInfo;
 	/** 表紙ファイル名 フルパスかURL ""なら先頭の挿絵 nullなら表紙無し */
@@ -143,12 +147,12 @@ public class BookInfo
 	public int coverImageIndex = -1;
 	/** imageにしたとき用の元ファイルの拡張子 */
 	public String coverExt = null;
-	
+
 	/** 先頭に表紙ページを追加 */
 	public boolean insertCoverPage = false;
 	/** 表紙を目次に入れる */
 	public boolean insertCoverPageToc = false;
-	
+
 	/** 表紙ページを追加した場合は表紙は目次より前に出力 */
 	public boolean insertTitlePage = false;
 	/** 目次ページを追加 */
@@ -157,16 +161,16 @@ public class BookInfo
 	public boolean tocVertical = false;
 	/** 表題を目次に追加 */
 	public boolean insertTitleToc = true;
-	
+
 	/** txtのない画像のみの場合 */
 	public boolean imageOnly = false;
-	
+
 	/** タイトルページの改ページ行 前に改ページがなければ-1 表題がなければ-2 */
 	//public int preTitlePageBreak = -2;
-	
+
 	/** 改ページ単位で区切られたセクションの情報を格納 */
 	//Vector<SectionInfo> vecSectionInfo;
-	
+
 	/** 画像単体ページ開始行 */
 	HashMap<Integer, String> mapImageSectionLine;
 	/** 強制改ページ行 */
@@ -177,14 +181,14 @@ public class BookInfo
 	HashSet<Integer> mapIgnoreLine;
 	/** 見出し行の情報 */
 	HashMap<Integer, ChapterLineInfo> mapChapterLine;
-	
+
 	////////////////////////////////////////////////////////////////
 	public BookInfo(File srcFile)
 	{
 		this.srcFile = srcFile;
 		this.modified = new Date();
 	}
-	
+
 	public void clear()
 	{
 		if (this.mapImageSectionLine != null) this.mapImageSectionLine.clear();
@@ -192,7 +196,7 @@ public class BookInfo
 		if (this.mapNoPageBreakLine != null) this.mapNoPageBreakLine.clear();
 		if (this.mapIgnoreLine != null) this.mapIgnoreLine.clear();
 	}
-	
+
 	/*public void addSectionInfo(SectionInfo sectionInfo)
 	{
 		this.vecSectionInfo.add(sectionInfo);
@@ -219,7 +223,7 @@ public class BookInfo
 		if (this.mapImageSectionLine == null) return null;
 		return this.mapImageSectionLine.get(lineNum);
 	}
-	
+
 	/** 強制改ページ行数を保存 */
 	public void addPageBreakLine(int lineNum)
 	{
@@ -232,7 +236,7 @@ public class BookInfo
 		if (this.mapPageBreakLine == null) return false;
 		return this.mapPageBreakLine.contains(lineNum);
 	}
-	
+
 	/** 改ページしない行数を保存 */
 	public void addNoPageBreakLine(int lineNum)
 	{
@@ -245,7 +249,7 @@ public class BookInfo
 		if (this.mapNoPageBreakLine == null) return false;
 		return this.mapNoPageBreakLine.contains(lineNum);
 	}
-	
+
 	/** 出力しない行数を保存 */
 	public void addIgnoreLine(int lineNum)
 	{
@@ -258,7 +262,7 @@ public class BookInfo
 		if (this.mapIgnoreLine == null) return false;
 		return this.mapIgnoreLine.contains(lineNum);
 	}
-	
+
 	/** 見出し行と階層レベルを保存 */
 	public void addChapterLineInfo(ChapterLineInfo chapterLineInfo)
 	{
@@ -276,7 +280,7 @@ public class BookInfo
 		if (this.mapChapterLine == null) return null;
 		return this.mapChapterLine.get(lineNum);
 	}
-	
+
 	/** 見出し行なら目次階層レベルを返す */
 	public int getChapterLevel(int lineNum)
 	{
@@ -284,14 +288,14 @@ public class BookInfo
 		ChapterLineInfo info = this.mapChapterLine.get(lineNum);
 		return info == null ? 0 : info.level;
 	}
-	
+
 	/** 行番号順に並び替えた目次一覧リストを生成して返す */
 	public Vector<ChapterLineInfo> getChapterLineInfoList()
 	{
 		Vector<ChapterLineInfo> list = new Vector<ChapterLineInfo>();
-		
+
 		if (this.mapChapterLine == null) return list;
-		
+
 		int[] lines = new int[this.mapChapterLine.size()];
 		int i = 0;
 		for (Integer lineNum : this.mapChapterLine.keySet()) {
@@ -303,7 +307,7 @@ public class BookInfo
 		}
 		return list;
 	}
-	
+
 	/** 目次ページの自動抽出見出しを除外 */
 	public void excludeTocChapter()
 	{
@@ -338,14 +342,14 @@ public class BookInfo
 			this.mapChapterLine.remove(lineNum);
 		}
 	}
-	
+
 	private boolean isPattern(int num)
 	{
 		ChapterLineInfo chapterLineInfo = this.getChapterLineInfo(num);
 		if (chapterLineInfo == null) return false;
-		return chapterLineInfo.isPattern();	
+		return chapterLineInfo.isPattern();
 	}
-	
+
 	////////////////////////////////////////////////////////////////
 	public String getTitle()
 	{
@@ -430,12 +434,12 @@ public class BookInfo
 	{
 		return insertCoverPage;
 	}
-	
+
 	public boolean isInsertCoverPageToc()
 	{
 		return insertCoverPageToc;
 	}
-	
+
 	public boolean isInsertTitlePage()
 	{
 		return insertTitlePage;
@@ -475,7 +479,14 @@ public class BookInfo
 	{
 		this.imageOnly = imageOnly;
 	}
-	
+	public String getLanguage()
+	{
+		return language;
+	}
+	public void setLanguage(String language)
+	{
+		this.language = language;
+	}
 	////////////////////////////////////////////////////////////////
 	public String getTitleText()
 	{
@@ -541,13 +552,21 @@ public class BookInfo
 		} catch (Exception e) {}
 		return null;
 	}
-	
+
+	public String getLanguageText()
+	{
+		if (this.languageLine == -1) return null;
+		try {
+			return metaLines[this.languageLine-this.metaLineStart];
+		} catch (Exception e) {}
+		return null;
+	}
 	////////////////////////////////////////////////////////////////
 	/** 先頭行から表題と著者を取得 */
 	public void setMetaInfo(TitleType titleType, boolean pubFirst, String[] metaLines, int metaLineStart, int firstCommentLineNum)
 	{
 		this.firstCommentLineNum = firstCommentLineNum;
-		
+
 		this.titleLine = -1;
 		this.orgTitleLine = -1;
 		this.subTitleLine = -1;
@@ -560,9 +579,9 @@ public class BookInfo
 		this.creator = "";
 		this.creatorAs = null;
 		this.publisher = null;
-		
+
 		if (titleType != TitleType.NONE) {
-			
+
 			//バッファからタイトルと著者取得
 			this.metaLines = metaLines;
 			this.metaLineStart = metaLineStart;
@@ -573,7 +592,7 @@ public class BookInfo
 					linesLength = i; break;
 				}
 			}
-			
+
 			int arrIndex = 0;
 			//先頭に発行者で2行以上
 			if (pubFirst && linesLength >= 2) {
@@ -765,9 +784,9 @@ public class BookInfo
 					break;
 				}
 			}
-			
+
 			if (this.creator != null && (this.creator.startsWith("―") || this.creator.startsWith("【"))) this.creator = null;
-			
+
 			if (this.title != null) {
 				this.title = CharUtils.getChapterName(CharUtils.removeRuby(this.title), 0, false);
 			}
@@ -779,7 +798,7 @@ public class BookInfo
 	{
 		setMetaInfo(titleType, pubFirst, this.metaLines, this.metaLineStart, this.firstCommentLineNum);
 	}
-	
+
 	/** ファイル名からタイトルと著者名を取得 */
 	static public String[] getFileTitleCreator(String fileName)
 	{
@@ -790,7 +809,7 @@ public class BookInfo
 		noExtName = noExtName.replaceAll("（","\\(").replaceAll("）","\\)");
 		noExtName = noExtName.replaceAll("\\(青空[^\\)]*\\)", "");
 		noExtName = noExtName.replaceAll("\\([^\\)]*(校正|軽量|表紙|挿絵|補正|修正|ルビ|Rev|rev)[^\\)]*\\)", "");
-		
+
 		Matcher m = Pattern.compile("[\\[|［](.+?)[\\]|］][ |　]*(.*)[ |　]*$").matcher(noExtName);
 		if (m.find()) {
 			titleCreator[0] = m.group(2);
@@ -815,7 +834,7 @@ public class BookInfo
 		}
 		return titleCreator;
 	}
-	
+
 	/** ファイルまたはURLの文字列から画像を読み込んで表紙イメージとして設定 */
 	public void loadCoverImage(String path)
 	{

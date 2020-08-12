@@ -894,16 +894,17 @@ public class AozoraEpub3Applet extends JApplet
 		jComboEncType.setFocusable(false);
 		jComboEncType.setPreferredSize(new Dimension(70, 22));
 		panel1.add(jComboEncType);
-		/*
+//		/*
 		label = new JLabel("言語");
 		label.setBorder(padding0);
 		panel1.add(label);
-		jComboLangType = new JComboBox(new String[]{"日本語", "英語"});
+		jComboLangType = new JComboBox(new String[]{"ja", "en"});
 		jComboLangType.setToolTipText("出力するEPUBの言語を選択する。");
-		jComboLangType.setFocusable(false);
+		jComboLangType.setEditable(true);
+		//jComboLangType.setFocusable(false);
 		jComboLangType.setPreferredSize(new Dimension(70, 22));
 		panel1.add(jComboLangType);
-		*/
+//		*/
 		panel.add(panel1);
 
 		//右パネル
@@ -3549,6 +3550,8 @@ public class AozoraEpub3Applet extends JApplet
 		//縦書き横書き設定追加
 		bookInfo.vertical = this.jRadioVertical.isSelected();
 		this.aozoraConverter.vertical = bookInfo.vertical;
+		//言語設定
+		bookInfo.language =this.jComboLangType.getEditor().getItem().toString().trim();
 
 		//表紙設定
 		//表題左右中央
