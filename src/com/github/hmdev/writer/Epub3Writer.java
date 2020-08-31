@@ -843,13 +843,13 @@ public class Epub3Writer
 		zos.closeArchiveEntry();
 
 		//tocファイル
-/*		velocityContext.put("chapters", chapterInfos);
+		velocityContext.put("chapters", chapterInfos);
 		zos.putArchiveEntry(new ZipArchiveEntry(OPS_PATH+TOC_FILE));
 		bw = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"));
 		Velocity.mergeTemplate(templatePath+OPS_PATH+TOC_VM, "UTF-8", velocityContext, bw);
 		bw.flush();
 		zos.closeArchiveEntry();
-*/
+
 		if (src != null) src.close();
 
 		if (this.canceled) return;
