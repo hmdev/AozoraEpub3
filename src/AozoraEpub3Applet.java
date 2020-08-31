@@ -4323,6 +4323,9 @@ public class AozoraEpub3Applet extends JApplet
 		jRadioHorizontal.setSelected(!selected);
 		//入力文字コード
 		try { jComboEncType.setSelectedIndex(Integer.parseInt(props.getProperty("EncType"))); } catch (Exception e) {}
+		//言語設定
+		if (props.getProperty("LangType") != null && props.getProperty("LangType").length() > 0)
+			jComboLangType.setSelectedItem(props.getProperty("LangType"));
 
 		////////////////////////////////////////////////////////////////
 		//画像設定
@@ -4661,6 +4664,7 @@ public class AozoraEpub3Applet extends JApplet
 		props.setProperty("ReplaceCover", this.jConfirmDialog.jCheckReplaceCover.isSelected()?"1":"");
 
 		props.setProperty("EncType", ""+this.jComboEncType.getSelectedIndex());
+		props.setProperty("LangType", ""+this.jComboLangType.getEditor().getItem().toString().trim());
 		props.setProperty("OverWrite", this.jCheckOverWrite.isSelected()?"1":"");
 	}
 
