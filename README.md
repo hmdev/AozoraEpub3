@@ -6,9 +6,6 @@
 電書協のEPUBに近づけることを目的としたフォーク版。
 AozoraEpub3を電子出版目的に使う場合に、審査が通るように修正している。EPUBバリデーションを通すのと、多くのEPUBビュワーで表示に問題がないようにすることを目的としている。
 
-Javaライセンスの問題からAdoptOpenJDKでビルドすることにします。
-https://adoptopenjdk.net/releases.html
-OpenJDK 11 (LTS)、HotSpot、OS、Install JREを選んでインストール。
 
 
 Read this in other languages: [English](https://github.com/kyukyunyorituryo/AozoraEpub3/blob/master/README.en.md)
@@ -57,10 +54,16 @@ Read this in other languages: [English](https://github.com/kyukyunyorituryo/Aozo
 
 動作環境
 ------------
-Java 8 以降の動作環境 ( http://www.java.com/ja/ )
-AdoptOpenJDK（https://adoptopenjdk.net/releases.html）
+Java 8 以降のOpenJDK（https://adoptopenjdk.net/releases.html）
+
+Javaライセンスの問題からAdoptOpenJDKでビルドすることにします。Oracle JAVAはJREを含めて有償化されるので、OpenJDKを利用してください。
+
+https://adoptopenjdk.net/releases.html
+OpenJDK 11 (LTS)、HotSpot、OS、Install JREを選んでインストールしてください。
 
 WindowsXP以降 Ubuntu MacOSX で動作確認済
+
+　Linux版のkindlegenの配布が終了されました。そのため、mobiの変換はLinuxではできなくなりました。
 
 
 使い方
