@@ -1796,14 +1796,14 @@ public class AozoraEpub3Applet extends JApplet
 		panel.setLayout(new FlowLayout(FlowLayout.LEFT, 1, 0));
 
 		//nav階層化
-		jCheckNavNest = new JCheckBox("目次ページ階層化 ");
+		jCheckNavNest = new JCheckBox("目次ページ階層化 ",true);
 		jCheckNavNest.setToolTipText("目次ページ(nav.xhtml)を階層化します");
 		jCheckNavNest.setFocusPainted(false);
 		jCheckNavNest.setBorder(padding2);
 		panel.add(jCheckNavNest);
 
 		//表紙
-		jCheckNcxNest = new JCheckBox("目次(ncx)階層化 ");
+		jCheckNcxNest = new JCheckBox("目次(ncx)階層化 ",true);
 		jCheckNcxNest.setToolTipText("目次(toc.ncx)を階層化します");
 		jCheckNcxNest.setFocusPainted(false);
 		jCheckNcxNest.setBorder(padding2);
