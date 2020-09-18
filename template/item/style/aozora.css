@@ -48,9 +48,18 @@ div.center, div.center p { text-align: center; }
 
 
 /* 地付き */
-div.btm, div.btm p { text-align: right; }
+div.btm, div.btm p {
+  text-align: right;
+  -webkit-text-align-last: auto;
+  -epub-text-align-last:   auto;
+}
 /* 地付きで字詰め */
-div.btm .jzm { text-align: right;  display: inline-block; }
+.align-right .jzm {
+	text-align: right;
+  -webkit-text-align-last: auto;
+  -epub-text-align-last:   auto;
+    display: inline-block;
+}
 
 
 
