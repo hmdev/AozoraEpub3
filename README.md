@@ -54,7 +54,7 @@ Read this in other languages: [English](https://github.com/kyukyunyorituryo/Aozo
 
 動作環境
 ------------
-Java 8 以降のOpenJDK（https://adoptopenjdk.net/releases.html）
+Java 8 以降のOpenJDK　https://adoptopenjdk.net/releases.html
 
 Javaライセンスの問題からAdoptOpenJDKでビルドすることにします。Oracle JAVAはJREを含めて有償化されるので、OpenJDKを利用してください。
 
