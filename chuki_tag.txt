@@ -353,6 +353,68 @@
 ここから天付き	<div class="align-left">		1
 ここで天付き終わり	</div>		1
 
+####文字色
+黒色	<span class="color-black">
+黒色終わり	</span>
+ここから黒色	<div class="color-black">		1
+ここで黒色終わり	</div>		1
+暗灰色	<span class="color-dimgray">
+暗灰色終わり	</span>
+ここから暗灰色	<div class="color-dimgray">		1
+ここで暗灰色終わり	</div>		1
+灰色	<span class="color-gray">
+灰色終わり	</span>
+ここから灰色	<div class="color-gray">		1
+ここで灰色終わり	</div>		1
+鼠色	<span class="color-darkgray">
+鼠色終わり	</span>
+ここから鼠色	<div class="color-darkgray">		1
+ここで鼠色終わり	</div>		1
+銀色	<span class="color-silver">
+銀色終わり	</span>
+ここから銀色	<div class="color-silver">		1
+ここで銀色終わり	</div>		1
+白鼠色	<span class="color-gainsboro">
+白鼠色終わり	</span>
+ここから白鼠色	<div class="color-gainsboro">		1
+ここで白鼠色終わり	</div>		1
+白色	<span class="color-white">
+白色終わり	</span>
+ここから白色	<div class="color-white">		1
+ここで白色終わり	</div>		1
+黒地白色	<span class="inverse">
+黒地白色終わり	</span>
+ここから黒地白色	<div class="inverse">		1
+ここで黒地白色終わり	</div>		1
+透明色	<span class="color-transparent">
+透明色終わり	</span>
+ここから透明色	<div class="color-transparent">		1
+ここで透明色終わり	</div>		1
+灰地透明色	<span class="color-transparent bg-gray">
+灰地透明色終わり	</span>
+ここから灰地透明色	<div class="color-transparent bg-gray">		1
+ここで灰地透明色終わり	</div>		1
+赤色	<span class="color-red">
+赤色終わり	</span>
+ここから赤色	<div class="color-red">		1
+ここで赤色終わり	</div>		1
+青色	<span class="color-blue">
+青色終わり	</span>
+ここから青色	<div class="color-blue">		1
+ここで青色終わり	</div>		1
+水色	<span class="color-cyan">
+水色終わり	</span>
+ここから水色	<div class="color-cyan">		1
+ここで水色終わり	</div>		1
+赤紫色	<span class="color-magenta">
+赤紫色終わり	</span>
+ここから赤紫色	<div class="color-magenta">		1
+ここで赤紫色終わり	</div>		1
+橙色	<span class="color-orangered">
+橙色終わり	</span>
+ここから橙色	<div class="color-orangered">		1
+ここで橙色終わり	</div>		1
+
 
 ############# 字下げ #############
 ####字下げ (［＃ここで字下げ終わり］の省略判別はプログラム内で処理)
