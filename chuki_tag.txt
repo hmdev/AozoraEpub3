@@ -415,6 +415,60 @@
 ここから橙色	<div class="color-orangered">		1
 ここで橙色終わり	</div>		1
 
+####背景
+黒背景	<span class="bg-black">
+黒背景終わり	</span>
+ここから黒背景	<div class="bg-black">		1
+ここで黒背景終わり	</div>		1
+暗灰背景	<span class="bg-dimgray">
+暗灰背景終わり	</span>
+ここから暗灰背景	<div class="bg-dimgray">		1
+ここで暗灰背景終わり	</div>		1
+灰背景	<span class="bg-gray">
+灰背景終わり	</span>
+ここから灰背景	<div class="bg-gray">		1
+ここで灰背景終わり	</div>		1
+鼠背景	<span class="bg-darkgray">
+鼠背景終わり	</span>
+ここから鼠背景	<div class="bg-darkgray">		1
+ここで鼠背景終わり	</div>		1
+銀背景	<span class="bg-silver">
+銀背景終わり	</span>
+ここから銀背景	<div class="bg-silver">		1
+ここで銀背景終わり	</div>		1
+白鼠背景	<span class="bg-gainsboro">
+白鼠背景終わり	</span>
+ここから白鼠背景	<div class="bg-gainsboro">		1
+ここで白鼠背景終わり	</div>		1
+白背景	<span class="bg-white">
+白背景終わり	</span>
+ここから白背景	<div class="bg-white">		1
+ここで白背景終わり	</div>		1
+透明背景	<span class="bg-transparent">
+透明背景終わり	</span>
+ここから透明背景	<div class="bg-transparent">		1
+ここで透明背景終わり	</div>		1
+赤背景	<span class="bg-red">
+赤背景終わり	</span>
+ここから赤背景	<div class="bg-red">		1
+ここで赤背景終わり	</div>		1
+青背景	<span class="bg-blue">
+青背景終わり	</span>
+ここから青背景	<div class="bg-blue">		1
+ここで青背景終わり	</div>		1
+水背景	<span class="bg-cyan">
+水背景終わり	</span>
+ここから水背景	<div class="bg-cyan">		1
+ここで水背景終わり	</div>		1
+赤紫背景	<span class="bg-magenta">
+赤紫背景終わり	</span>
+ここから赤紫背景	<div class="bg-magenta">		1
+ここで赤紫背景終わり	</div>		1
+橙背景	<span class="bg-orangered">
+橙背景終わり	</span>
+ここから橙背景	<div class="bg-orangered">		1
+ここで橙背景終わり	</div>		1
+
 
 ############# 字下げ #############
 ####字下げ (［＃ここで字下げ終わり］の省略判別はプログラム内で処理)

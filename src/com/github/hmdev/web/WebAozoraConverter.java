@@ -1167,6 +1167,7 @@ public class WebAozoraConverter
 		if (cookie != null && cookie.length > 0) conn.setRequestProperty("Cookie", cookie[0].query);
 		if (referer != null) conn.setRequestProperty("Referer", referer);
 		conn.setConnectTimeout(10000);//10秒
+		conn.setReadTimeout(10000);//10秒
 		BufferedInputStream bis = new BufferedInputStream(conn.getInputStream(), 8192);
 		BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(cacheFile));
 		IOUtils.copy(bis, bos);
