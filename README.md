@@ -14,7 +14,7 @@ Read this in other languages: [English](https://github.com/kyukyunyorituryo/Aozo
 ============
  [リリースページ](https://github.com/kyukyunyorituryo/AozoraEpub3/releases)をクリックしてダウンロードしてください。
 
-寄付のお願い
+支援のお願い
 ============
 個人で開発しているので、開発継続のために支援していただければと思います。
 
@@ -388,6 +388,8 @@ WindowsXP以降 Ubuntu MacOSX で動作確認済
 - ページ左下
 - ページの左下
 - 正立
+- 文字色　黒色　黒色終わり　ここから黒色　ここで黒色終わり
+- 色背景　黒背景　黒背景終わり　ここから黒背景　ここで黒背景終わり
 
 未対応注記
 ------------
