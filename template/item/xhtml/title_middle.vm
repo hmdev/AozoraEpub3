@@ -11,9 +11,7 @@
  #end
 >
 <head>
-<link rel="stylesheet" type="text/css" href="../style/text.css"/>
-<link rel="stylesheet" type="text/css" href="../style/font.css"/>
-<link rel="stylesheet" type="text/css" href="../style/middle.css"/>
+<link rel="stylesheet" type="text/css" href="../style/book-style.css"/>
 <link rel="stylesheet" type="text/css" href="../style/aozora.css"/>
 
 <style type="text/css">
