@@ -12,7 +12,7 @@
 >
 <head>
 <link rel="stylesheet" type="text/css" href="../style/book-style.css"/>
-<link rel="stylesheet" type="text/css" href="../style/aozora.css"/>
+<link rel="stylesheet" type="text/css" href="../style/middle.css"/>
 
 <style type="text/css">
 .title, .subtitle, .orgtitle, .suborgtitle, .creator, .subcreator, .publisher, .series { line-height: 1.25; }
