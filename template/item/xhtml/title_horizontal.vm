@@ -1,64 +1,49 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="ja" lang="ja">
+<html
+xmlns="http://www.w3.org/1999/xhtml"
+xmlns:epub="http://www.idpf.org/2007/ops"
+xml:lang="ja"
+class="hltr"
+>
 <head>
-<style type="text/css">
-@page { margin:0; }
-html {
-writing-mode:horizontal-tb;
--webkit-writing-mode:horizontal-tb;
--epub-writing-mode:horizontal-tb;
-margin:0;
-padding:0;
-height:98%;/*ADE error in 100%*/
-}
-body { margin:0; padding:0; height:98%; text-align:center; line-height: 1.5; }
-.outer { margin:1.5% 2% 0 2%; width:96%; height:98.5%; text-align:center;
-#if (${title_border})
-border:1px solid black;
-#end
-}
-.upper { padding:20% 5% 0 5%; height:50%; text-align:center; }
-.lower { padding:0 5%; height:25%; text-align:center; }
-
-.title, .subtitle, .orgtitle, .suborgtitle, .creator, .subcreator, .series, .publisher { text-align:center; line-height: 1.25; }
-.series { padding-bottom:.5em; font-size:1.25em; }
-.title {
-#if (${TITLE.length()} > 30)
-font-size:1.75em;
-#else
-font-size:2em;
-#end
-}
-.title ruby rt { font-size:.4em; }
-.orgtitle { padding-top:.5em; font-size:1.4em; }
-.orgtitle ruby rt { font-size:.5em; }
-.subtitle { padding-top:.25em; font-size:1.6em; }
-.subtitle ruby rt { font-size:.5em; }
-.suborgtitle { padding-top:.25em; font-size:1.25em; }
-.creator { padding-top:5%; font-size:1.25em; }
-.subcreator { padding-top:1em; font-size:1.25em; }
-.publisher {  }
-
-.space { padding-top: 5%; }
-
-.sup {
-vertical-align: super;
-font-size: 0.66em;
-letter-spacing: -2px;
-}
-.sub {
-vertical-align: sub;
-font-size: 0.66em;
-letter-spacing: -2px;
-}
-
-</style>
+<meta charset="UTF-8"/>
 <title>${title}</title>
+<link rel="stylesheet" type="text/css" href="../style/book-style.css"/>
 </head>
+<body class="p-titlepage">
+<div class="main">
 
-<body>
-<div class="outer">
+<div class="book-title">
+#if (${SERIES})
+<div class="book-title-before">
+${SERIES}
+</div>
+#else
+<div class="book-title-main">
+${TITLE}
+</div>
+<div class="book-title-after">
+${SUBTITLE}
+</div>
+</div>
+<div class="author">
+#if (${CREATOR})
+${CREATOR}
+#end
+#if (${SUBCREATOR})
+>${SUBCREATOR}
+#end
+</div>
+#if (${PUBLISHER})
+<div class="label">
+<p class="label-name">${PUBLISHER}</p>
+</div>
+#end
+</div>
+</body>
+</html>
+
 
 <div class="upper">
 #if (${SERIES})
