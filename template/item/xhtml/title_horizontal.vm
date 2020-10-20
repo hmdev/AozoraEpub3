@@ -17,22 +17,25 @@ class="hltr"
 <div class="book-title">
 #if (${SERIES})
 <div class="book-title-before">
-${SERIES}
+<p>${SERIES}</p>
 </div>
-#else
+#end
 <div class="book-title-main">
-${TITLE}
+<p>${TITLE}</p>
 </div>
+#if (${SUBTITLE})
 <div class="book-title-after">
-${SUBTITLE}
+<p>${SUBTITLE}</p>
 </div>
+#end
 </div>
+
 <div class="author">
 #if (${CREATOR})
-${CREATOR}
+<p>${CREATOR}</p>
 #end
 #if (${SUBCREATOR})
->${SUBCREATOR}
+<p>${SUBCREATOR}</p>
 #end
 </div>
 #if (${PUBLISHER})
@@ -44,47 +47,3 @@ ${CREATOR}
 </body>
 </html>
 
-
-<div class="upper">
-#if (${SERIES})
-	<div class="series">${SERIES}</div>
-#else
-	<div class="space"></div>
-#end
-#if (!${ORGTITLE})
-	<div class="space"></div>
-#end
-#if (!${SUBTITLE})
-	<div class="space"></div>
-#end
-#if (!${SUBORGTITLE})
-	<div class="space"></div>
-#end
-	<div class="title">${TITLE}</div>
-#if (${ORGTITLE})
-	<div class="orgtitle">${ORGTITLE}</div>
-#end
-#if (${SUBTITLE})
-	<div class="subtitle">${SUBTITLE}</div>
-#end
-#if (${SUBORGTITLE})
-	<div class="suborgtitle">${SUBORGTITLE}</div>
-#end
-</div>
-
-<div class="lower">
-#if (${CREATOR})
-	<div class="creator">${CREATOR}</div>
-#end
-#if (${SUBCREATOR})
-	<div class="subcreator">${SUBCREATOR}</div>
-#end
-#if (${PUBLISHER})
-	<br/>
-	<div class="publisher">${PUBLISHER}</div>
-#end
-</div>
-
-</div>
-</body>
-</html>

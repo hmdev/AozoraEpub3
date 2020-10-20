@@ -34,9 +34,9 @@
 
 <div class="book-title start-2em">
 #if (${SERIES})
-	<div class="series book-title-before"">${SERIES}</div>
+	<div class="series book-title-before""><p>${SERIES}</p></div>
 #end
-	<div class="title book-title-main">${TITLE}</div>
+	<div class="title book-title-main"><p>${TITLE}</p></div>
 #if (${ORGTITLE})
 	<div class="orgtitle pt1">${ORGTITLE}</div>
 #end
