@@ -4,7 +4,7 @@
  xmlns="http://www.w3.org/1999/xhtml"
  xmlns:epub="http://www.idpf.org/2007/ops"
  xml:lang="ja"
-#if (${bookInfo.Vertical})
+#if (${bookInfo.Vertical} || !${sectionInfo.ImagePage}|| !${sectionInfo.Middle})
  class="vrtl"
 #else
  class="hltr"
@@ -33,19 +33,14 @@ min-height: ${sectionInfo.ImageHeightPercent}%;
 </head>
 
 #if (${sectionInfo.ImageFitW})
-<body class="fit_w">
-#elseif (${sectionInfo.ImageFitH})
-<body class="fit_h">
-#elseif (${kindle})
-<body class="kindle">
-#else
+<body class="p-image">
+#else (${sectionInfo.ImageFitH})
 <body>
 #end
 #if (${sectionInfo.Middle})
-#if (${kindle})
-<div class="kindle_outer"><div class="kindle_inner">
-#end
-<table class="middle"><tr><td>
+<body class="p-text">
+<div class="main vrtl block-align-center">
+<div class="start-2em">
 #end
 #if (${sectionInfo.Bottom})
 #if (${kindle})
