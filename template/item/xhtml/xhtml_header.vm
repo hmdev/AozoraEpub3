@@ -39,6 +39,7 @@ min-height: ${sectionInfo.ImageHeightPercent}%;
 #else
 <body>
 #end
+<div class="main">
 #if (${sectionInfo.Middle})
 <div class="main vrtl block-align-center">
 <div class="start-2em">

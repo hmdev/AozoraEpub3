@@ -847,9 +847,9 @@
 画像終わり	</span>
 
 ## キャプション 画像の次の行にあれば画像終わりの前に出力
-キャプション	<span class="caption">
+キャプション	<span class="caption hltr block-align-center">
 キャプション終わり	</span>
-ここからキャプション	<span class="caption">		1
+ここからキャプション	<span class="caption  hltr block-align-center">		1
 ここでキャプション終わり	</span>		1
 
 ##外字注記の画像 String.formatで出力
