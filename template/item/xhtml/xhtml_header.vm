@@ -32,18 +32,18 @@ min-height: ${sectionInfo.ImageHeightPercent}%;
 #end
 </head>
 
-#if (${sectionInfo.ImageFitW})
+#if ((${sectionInfo.ImageFitW}) || (${sectionInfo.ImageFitH}))
 <body class="p-image">
-#else (${sectionInfo.ImageFitH})
+#elseif ((${sectionInfo.Middle}) ||(${sectionInfo.Bottom}) )
+<body class="p-text">
+#else
 <body>
 #end
 #if (${sectionInfo.Middle})
-<body class="p-text">
 <div class="main vrtl block-align-center">
 <div class="start-2em">
 #end
 #if (${sectionInfo.Bottom})
-<body class="p-text">
 <div class="main vrtl block-align-end">
 <div class="start-2em">
 #end
