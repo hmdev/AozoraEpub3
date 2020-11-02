@@ -4,8 +4,10 @@
  xmlns="http://www.w3.org/1999/xhtml"
  xmlns:epub="http://www.idpf.org/2007/ops"
  xml:lang="ja"
-#if (${bookInfo.Vertical} || !${sectionInfo.ImagePage}|| !${sectionInfo.Middle})
+#if (${bookInfo.Vertical})
  class="vrtl"
+#elseif (${sectionInfo.ImagePage}  || ${sectionInfo.Middle})
+ class="hltr"
 #else
  class="hltr"
 #end
@@ -13,14 +15,8 @@
 <head>
 <meta charset="UTF-8"/>
 <title>${title}</title>
-#if (${sectionInfo.ImagePage})
-<link rel="stylesheet" type="text/css" href="../style/image.css"/>
-#else
-#if (${sectionInfo.Middle} || ${sectionInfo.Bottom})
-<link rel="stylesheet" type="text/css" href="../style/middle.css"/>
-#end
 <link rel="stylesheet" type="text/css" href="../style/book-style.css"/>
-#end
+
 
 #if (${sectionInfo.ImageHeight} > 0)
 <style type="text/css">
