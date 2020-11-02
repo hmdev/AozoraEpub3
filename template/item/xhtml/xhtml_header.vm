@@ -4,10 +4,10 @@
  xmlns="http://www.w3.org/1999/xhtml"
  xmlns:epub="http://www.idpf.org/2007/ops"
  xml:lang="ja"
-#if (${bookInfo.Vertical})
- class="vrtl"
-#elseif (${sectionInfo.ImagePage}  || ${sectionInfo.Middle})
+#if (${sectionInfo.ImagePage}  || ${sectionInfo.Middle})
  class="hltr"
+#elseif (${bookInfo.Vertical})
+ class="vrtl"
 #else
  class="hltr"
 #end
