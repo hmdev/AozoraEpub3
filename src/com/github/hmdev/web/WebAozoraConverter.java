@@ -561,10 +561,10 @@ public class WebAozoraConverter
 							newChapter = true;
 							preChapterTitle = chapterTitle;
 							bw.append("\n［＃改ページ］\n");
-							bw.append("［＃ここから大見出し］\n");
+							bw.append("［＃大見出し］");
 							printText(bw, preChapterTitle);
-							bw.append('\n');
-							bw.append("［＃ここで大見出し終わり］\n");
+//						bw.append('\n');
+							bw.append("［＃大見出し終わり］\n");
 							bw.append('\n');
 						}
 						//更新日時を一覧から取得
@@ -732,10 +732,10 @@ public class WebAozoraConverter
 			String subTitle = getExtractText(doc, this.queryMap.get(ExtractId.CONTENT_SUBTITLE));
 			if (subTitle == null) subTitle = listSubTitle; //一覧のタイトルを設定
 			if (subTitle != null) {
-				bw.append("［＃ここから中見出し］\n");
+				bw.append("［＃中見出し］");
 				printText(bw, subTitle);
-				bw.append('\n');
-				bw.append("［＃ここで中見出し終わり］\n");
+//				bw.append('\n');
+				bw.append("［＃中見出し終わり］\n");
 			}
 			//公開日付
 			String coutentUpdate = getExtractText(doc, this.queryMap.get(ExtractId.CONTENT_UPDATE));
