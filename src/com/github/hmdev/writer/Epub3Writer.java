@@ -145,8 +145,8 @@ public class Epub3Writer
 	final static String[] TEMPLATE_FILE_NAMES_STANDARD = new String[]{
 			"META-INF/container.xml",
 			//OPS_PATH+CSS_PATH+"vertical_text.css",
-			OPS_PATH+CSS_PATH+"middle.css",
-			OPS_PATH+CSS_PATH+"image.css",
+//			OPS_PATH+CSS_PATH+"middle.css",
+//			OPS_PATH+CSS_PATH+"image.css",
 			OPS_PATH+CSS_PATH+"font.css",
 			OPS_PATH+CSS_PATH+"aozora.css",
 			OPS_PATH+CSS_PATH+"fixed-layout-jp.css",

@@ -63,8 +63,6 @@
 		<item id="vertical" href="style/aozora.css" media-type="text/css"/>
 		<item id="v_font" href="style/font.css" media-type="text/css"/>
 		<item id="v_text" href="style/text.css" media-type="text/css"/>
-		<item id="v_middle" href="style/middle.css" media-type="text/css"/>
-		<item id="v_image" href="style/image.css" media-type="text/css"/>
 		<item id="fixed-layout-jp" href="style/fixed-layout-jp.css" media-type="text/css"/>
 		<item id="book-style" href="style/book-style.css" media-type="text/css"/>
 		<item id="style-reset" href="style/style-reset.css" media-type="text/css"/>
