@@ -9,7 +9,7 @@
 ################################
 ## 一覧ページの抽出設定
 ## タイトル
-TITLE	.novel_title p:0
+TITLE	.novel_title h1:0
 ## 著者
 AUTHOR	.novel_author a:0
 ## 説明
@@ -22,14 +22,16 @@ COVER_IMG	.novel_cover img:0
 HREF	.episode_link a
 ##HREF	a	https://novelup.plus/story/\d+?/\d+?
 ##一覧に記載されている各話の更新日時
-SUB_UPDATE	.update_date  span:0
+##SUB_UPDATE	.update_date  p span:1
 
 ################################
 ###各話の抽出設定
 
 
 ## 各話 Chapter 先頭の章のみ大見出しで出力
-CONTENT_CHAPTER	.episode_title p:0
+CONTENT_CHAPTER	.episode_chapter p:0
 
+## 各話 タイトル 中見出しで出力
+CONTENT_SUBTITLE	.episode_title h1:0
 ## 各話 本文
 CONTENT_ARTICLE	.content p:0
