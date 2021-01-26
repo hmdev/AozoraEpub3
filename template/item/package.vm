@@ -95,7 +95,9 @@
 		<item id="sec${sectionInfo.SectionId}" href="xhtml/${sectionInfo.SectionId}.xhtml" media-type="application/xhtml+xml"/>
 #end
 #end
-
+#foreach(${gaijiInfo} in ${vecGaijiInfo})
+		<item id="font_${velocityCount}" href="gaiji/${gaijiInfo.FileName}" media-type="application/font-sfnt"/>
+#end
 		<item href="toc.ncx" id="ncx" media-type="application/x-dtbncx+xml"/>
 	</manifest>
 
