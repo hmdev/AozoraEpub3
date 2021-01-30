@@ -96,7 +96,7 @@
 #end
 #end
 #foreach(${gaijiInfo} in ${vecGaijiInfo})
-		<item id="font_${velocityCount}" href="gaiji/${gaijiInfo.FileName}" media-type="application/font-sfnt"/>
+		<item id="gaiji_${velocityCount}" href="gaiji/${gaijiInfo.FileName}" media-type="application/font-sfnt"/>
 #end
 		<item href="toc.ncx" id="ncx" media-type="application/x-dtbncx+xml"/>
 	</manifest>
