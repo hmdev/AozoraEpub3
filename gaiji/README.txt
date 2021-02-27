@@ -29,8 +29,7 @@ GlyphWikiの１文字フォントのそのまま利用で、上下に余白が�
 ####fontforgeの画面上での操作
 
 １．fontforgeをインストール
-  fontforge: http://fontforge.github.io/ja/
-  Windows: http://www.geocities.jp/meir000/fontforge/
+  fontforge: https://fontforge.org/
 ２．フォントを選択
   起動時に１文字フォントファイルを開く
   エンコーディング → 定義済のグリフのみ表示 → フォントを選択
@@ -50,7 +49,7 @@ GlyphWikiの１文字フォントのそのまま利用で、上下に余白が�
 ２．１文字フォントのフォルダに gaiji/convert.pe をコピー
 ３．１文字フォントのフォルダをコマンドプロンプトで開く
 ４．スクリプトを実行(フォントのあるフォルダで実行すること)
-  [fontforgeのパス]fontforge.exe -script convert.pe [AozoraEpub3のインストールパス]\gaiji *.ttf 
+  [fontforgeのパス]fontforge.exe -script convert.pe [AozoraEpub3のインストールパス]\gaiji *.ttf
   例: c:\fontforge-cygwin\cygwin\bin\fontforge.exe -script convert.pe "c:\Program Files\AozoraEpub3\gaiji" *.ttf
 
 * エラーが出た場合
