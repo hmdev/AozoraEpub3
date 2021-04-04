@@ -2063,7 +2063,7 @@ public class AozoraEpub3Applet extends JApplet
 		jRadioDakutenType0.setFocusPainted(false);
 		panel.add(jRadioDakutenType0);
 		group.add(jRadioDakutenType0);
-		jRadioDakutenType1 = new JRadioButton("重ねる", true);
+		jRadioDakutenType1 = new JRadioButton("重ねる");
 		jRadioDakutenType1.setToolTipText("Reader,Kobo,Kindle以外はずれる場合があります。ルビ内はそのまま出力します");
 		jRadioDakutenType1.setBorder(padding2);
 		jRadioDakutenType1.setFocusPainted(false);
