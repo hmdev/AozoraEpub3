@@ -1366,7 +1366,37 @@ public class Epub3Writer
 		} catch (Exception e) { e.printStackTrace(); }
 		return Math.min(100, ratio);
 	}
+	public int getImageOrientation(String srcFilePath)
+	{
+		int wide =0;
+			try {
+			ImageInfo imageInfo = this.imageInfoReader.getImageInfo(srcFilePath);
+			if (imageInfo != null) {
 
+				//外字や数式は除外 行方向に64px以下
+				if (this.bookInfo.vertical) {
+					if (imageInfo.getWidth() <= 64) return -1;
+				} else if (imageInfo.getHeight() <= 64) return -1;
+
+
+				//回転時は縦横入れ替え
+				int imgW = imageInfo.getWidth();
+				int imgH = imageInfo.getHeight();
+				if (imageInfo.rotateAngle == 90 || imageInfo.rotateAngle == 270) {
+					imgW = imageInfo.getHeight();
+					imgH = imageInfo.getWidth();
+				}
+				if (imgW==imgH){
+					wide=0;
+					}else if (imgW > imgH){
+					wide = 1;
+					} else{
+					wide=2;
+					}
+			}
+					} catch (Exception e) { e.printStackTrace(); }
+		return wide;
+	}
 	/** Kindleかどうかを設定 Kindleなら例外処理を行う */
 	public void setIsKindle(boolean isKindle)
 	{

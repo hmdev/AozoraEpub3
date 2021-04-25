@@ -854,6 +854,8 @@
 
 ##外字注記の画像 String.formatで出力
 外字画像	<img class="gaiji" src="%s" alt=""/>
+縦長外字画像	<img class="gaiji-line" src="%s" alt=""/>
+横長外字画像	<img class="gaiji-wide" src="%s" alt=""/>
 
 ##間にpタグが入るのでブロック注記同様divにする
 表題前	<div class="font-1em50">		1
