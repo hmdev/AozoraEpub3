@@ -1366,6 +1366,8 @@ public class Epub3Writer
 		} catch (Exception e) { e.printStackTrace(); }
 		return Math.min(100, ratio);
 	}
+
+	//外字画像の縦と横の長さを比較して、同じなら0、横長なら1、縦長なら2を返す。
 	public int getImageOrientation(String srcFilePath)
 	{
 		int wide =0;
