@@ -673,7 +673,7 @@ public class AozoraEpub3Applet extends JApplet
 		label = new JLabel("表紙: ");
 		panel.add(label);
 
-		jTextMaxCoverLine = new JTextField("10");
+		jTextMaxCoverLine = new JTextField(10);
 		jTextMaxCoverLine.setToolTipText("先頭の挿絵に利用する画像注記を取得する最大行数 0なら制限なし");
 		jTextMaxCoverLine.setHorizontalAlignment(JTextField.RIGHT);
 		jTextMaxCoverLine.setMinimumSize(text4);
