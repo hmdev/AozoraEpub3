@@ -5,7 +5,7 @@
     <!--define folder properties-->
     <property name="dir.buildfile" value="."/>
     <property name="dir.workspace" value="${dir.buildfile}/.."/>
-    <property name="dir.jarfile" value="C:/Users/user/Desktop/AozoraEpub3-1.1.1b8Q/"/>
+    <property name="dir.jarfile" value="C:/Users/user/Desktop/AozoraEpub3-1.1.1b9Q/"/>
     <target name="create_run_jar">
         <jar destfile="${dir.jarfile}/AozoraEpub3.jar">
             <manifest>
@@ -335,6 +335,7 @@
          <copy file="${dir.buildfile}/chuki_utf.txt" todir="${dir.jarfile}"/>
          <copy file="${dir.buildfile}/LICENSE.txt" todir="${dir.jarfile}"/>
          <copy file="${dir.buildfile}/README.md" todir="${dir.jarfile}"/>
+         <copy file="${dir.buildfile}/README.txt" todir="${dir.jarfile}"/>
          <copy file="${dir.buildfile}/README.en.md" todir="${dir.jarfile}"/>
          <copy file="${dir.buildfile}/README_Changes.txt" todir="${dir.jarfile}"/>
          <copy file="${dir.buildfile}/replace_sample.txt" todir="${dir.jarfile}"/>
