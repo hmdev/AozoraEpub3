@@ -107,6 +107,7 @@ import com.github.hmdev.util.LogAppender;
 import com.github.hmdev.web.WebAozoraConverter;
 import com.github.hmdev.writer.Epub3ImageWriter;
 import com.github.hmdev.writer.Epub3Writer;
+import com.github.junrar.exception.RarException;
 
 /**
  * 青空文庫テキスト→ePub3変換操作用アプレット
@@ -888,8 +889,8 @@ public class AozoraEpub3Applet extends JApplet
 		label = new JLabel("入力文字コード");
 		label.setBorder(padding0);
 		panel1.add(label);
-		jComboEncType = new JComboBox(new String[]{"MS932", "UTF-8"});
-		//jComboEncType = new JComboBox(new String[]{"MS932", "UTF-8","自動"});
+	//	jComboEncType = new JComboBox(new String[]{"MS932", "UTF-8"});
+		jComboEncType = new JComboBox(new String[]{"AUTO","MS932", "UTF-8"});
 		jComboEncType.setToolTipText("入力ファイルのテキストファイルの文字コード。青空文庫の標準はMS932(SJIS)です");
 		jComboEncType.setFocusable(false);
 		jComboEncType.setPreferredSize(new Dimension(70, 22));
@@ -3459,7 +3460,18 @@ public class AozoraEpub3Applet extends JApplet
 			e.printStackTrace();
 			LogAppender.error(e.getMessage());
 		}
+		//文字コード判別
+		String encauto ="";
 
+		try {
+			encauto=AozoraEpub3.getTextCharset(srcFile, ext, imageInfoReader, txtIdx);
+		} catch (IOException | RarException e1) {
+			// TODO 自動生成された catch ブロック
+			e1.printStackTrace();
+		}
+		//エンコード設定を一時退避する
+		String encType = (String)jComboEncType.getSelectedItem();
+		 if (this.jComboEncType.getSelectedItem().toString().equals("AUTO")) jComboEncType.setSelectedItem(encauto);
 		//BookInfo取得
 		BookInfo bookInfo = null;
 		try {
@@ -3775,7 +3787,8 @@ public class AozoraEpub3Applet extends JApplet
 			this.jComboEncType.getSelectedItem().toString(),
 			bookInfo, imageInfoReader, txtIdx
 		);
-
+		//設定を戻す
+	jComboEncType.setSelectedItem(encType);
 		imageInfoReader = null;
 		//画像は除去
 		bookInfo.coverImage = null;

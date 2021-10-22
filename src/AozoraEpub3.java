@@ -70,7 +70,7 @@ public class AozoraEpub3
 			options.addOption("ext", true, "出力ファイル拡張子\n[.epub] (default)\n[.kepub.epub]");
 			options.addOption("of", false, "出力ファイル名を入力ファイル名に合せる");
 			options.addOption("d", "dst", true, "出力先パス");
-			options.addOption("enc", true, "入力ファイルエンコード\n[MS932] (default)\n[UTF-8]");
+			options.addOption("enc", true, "入力ファイルエンコード標準は自動認識\n[MS932]\n[UTF-8]");
 			//options.addOption("id", false, "栞用ID出力 (for Kobo)");
 			//options.addOption("tcy", false, "自動縦中横有効");
 			//options.addOption("g4", false, "4バイト文字変換");
@@ -247,7 +247,7 @@ public class AozoraEpub3
 			//オプション指定を反映
 			boolean useFileName = false;//表題に入力ファイル名利用
 			String coverFileName = null;
-			String encType = "";//文字コードの初期設定を空に
+			String encType = "AUTO";//文字コードの初期設定を空に
 			String outExt = ".epub";
 			boolean autoFileName = true; //ファイル名を表題に利用
 			boolean vertical = true;
@@ -355,7 +355,7 @@ public class AozoraEpub3
 					String encauto ="";
 
 					encauto=AozoraEpub3.getTextCharset(srcFile, ext, imageInfoReader, txtIdx);
-					 if (encType.equals("")) encType =encauto;
+					 if (encType.equals("AUTO")) encType =encauto;
 					if (!imageOnly) {
 						bookInfo = AozoraEpub3.getBookInfo(srcFile, ext, txtIdx, imageInfoReader, aozoraConverter, encType, BookInfo.TitleType.indexOf(titleIndex), false);
 						bookInfo.vertical = vertical;
