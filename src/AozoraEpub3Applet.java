@@ -3462,15 +3462,17 @@ public class AozoraEpub3Applet extends JApplet
 		}
 		//文字コード判別
 		String encauto ="";
-
+	//エンコード設定を一時退避する
+		String encType = (String)jComboEncType.getSelectedItem();
 		try {
 			encauto=AozoraEpub3.getTextCharset(srcFile, ext, imageInfoReader, txtIdx);
 		} catch (IOException | RarException e1) {
 			// TODO 自動生成された catch ブロック
 			e1.printStackTrace();
 		}
-		//エンコード設定を一時退避する
-		String encType = (String)jComboEncType.getSelectedItem();
+
+		LogAppender.append(encauto);
+		if (encauto==null)encauto="UTF-8";
 		 if (this.jComboEncType.getSelectedItem().toString().equals("AUTO")) jComboEncType.setSelectedItem(encauto);
 		//BookInfo取得
 		BookInfo bookInfo = null;
