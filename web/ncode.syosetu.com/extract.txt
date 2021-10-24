@@ -27,7 +27,7 @@ HREF	.subtitle a
 SUB_UPDATE	.long_update
 
 ##本文に日付が無い場合 公開・更新日時の文字列に利用
-CONTENT_UPDATE_LIST	.long_update	^([^<]+)\n(<span title=\"([^"]+)\".*)?$	$1 公開　$3
+CONTENT_UPDATE_LIST	.long_update	^([^<]+)(<span title=\"([^"]+)\".*)?$	$1 公開　$3
 
 ################################
 ###各話の抽出設定
