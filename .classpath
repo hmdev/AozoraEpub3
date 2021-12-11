@@ -13,7 +13,6 @@
 	<classpathentry kind="lib" path="lib/commons-collections-3.2.2.jar"/>
 	<classpathentry kind="lib" path="lib/commons-compress-1.21.jar"/>
 	<classpathentry kind="lib" path="lib/commons-lang-2.6.jar"/>
-	<classpathentry kind="lib" path="lib/commons-logging-1.2.jar"/>
 	<classpathentry kind="lib" path="lib/jsoup-1.14.3.jar"/>
 	<classpathentry kind="lib" path="lib/velocity-engine-core-2.3.jar"/>
 	<classpathentry kind="lib" path="lib/junrar-7.4.0.jar"/>
