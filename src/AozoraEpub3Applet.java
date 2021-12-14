@@ -3471,7 +3471,7 @@ public class AozoraEpub3Applet extends JApplet
 			e1.printStackTrace();
 		}
 
-		LogAppender.append(encauto);
+//		LogAppender.append(encauto);
 		if (encauto==null)encauto="UTF-8";
 		 if (this.jComboEncType.getSelectedItem().toString().equals("AUTO")) jComboEncType.setSelectedItem(encauto);
 		//BookInfo取得
