@@ -3466,6 +3466,7 @@ public class AozoraEpub3Applet extends JApplet
 		String encType = (String)jComboEncType.getSelectedItem();
 		try {
 			encauto=AozoraEpub3.getTextCharset(srcFile, ext, imageInfoReader, txtIdx);
+			if (encauto=="SHIFT_JIS")encauto="MS932";
 		} catch (IOException | RarException e1) {
 			// TODO 自動生成された catch ブロック
 			e1.printStackTrace();
@@ -3473,7 +3474,9 @@ public class AozoraEpub3Applet extends JApplet
 
 //		LogAppender.append(encauto);
 		if (encauto==null)encauto="UTF-8";
-		 if (this.jComboEncType.getSelectedItem().toString().equals("AUTO")) jComboEncType.setSelectedItem(encauto);
+		 if (this.jComboEncType.getSelectedItem().toString().equals("AUTO")) {
+			 encType=encauto;
+		 }
 		//BookInfo取得
 		BookInfo bookInfo = null;
 		try {
@@ -3481,7 +3484,7 @@ public class AozoraEpub3Applet extends JApplet
 				//テキストファイルからメタ情報や画像単独ページ情報を取得
 				bookInfo = AozoraEpub3.getBookInfo(
 					srcFile, ext, txtIdx, imageInfoReader, this.aozoraConverter,
-					this.jComboEncType.getSelectedItem().toString(),
+					encType,
 					BookInfo.TitleType.indexOf(this.jComboTitle.getSelectedIndex()),
 					jCheckPubFirst.isSelected()
 				);
