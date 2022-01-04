@@ -355,6 +355,7 @@ public class AozoraEpub3
 					String encauto ="";
 
 					encauto=AozoraEpub3.getTextCharset(srcFile, ext, imageInfoReader, txtIdx);
+					if (encauto=="SHIFT_JIS")encauto="MS932";
 					 if (encType.equals("AUTO")) encType =encauto;
 					if (!imageOnly) {
 						bookInfo = AozoraEpub3.getBookInfo(srcFile, ext, txtIdx, imageInfoReader, aozoraConverter, encType, BookInfo.TitleType.indexOf(titleIndex), false);
