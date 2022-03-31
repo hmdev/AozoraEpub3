@@ -54,14 +54,12 @@ Read this in other languages: [English](https://github.com/kyukyunyorituryo/Aozo
 
 動作環境
 ------------
-Java 8 以降のOpenJDK　https://adoptopenjdk.net/releases.html
+Java 8 以降のOpenJDK　https://adoptium.net/temurin/releases/
 
-Javaライセンスの問題からAdoptOpenJDKでビルドすることにします。Oracle JAVAはJREを含めて有償化されるので、OpenJDKを利用してください。
+Javaライセンスの問題からAdoptiumでビルドすることにします。Oracle JAVAまたは、OpenJDKを利用してください。
 
-https://adoptopenjdk.net/releases.html
-OpenJDK 11 (LTS)、HotSpot、OS、Install JREを選んでインストールしてください。
-
-WindowsXP以降 Ubuntu MacOSX で動作確認済
+https://adoptium.net/temurin/releases/
+Windowsの場合はOperating System：Windows、Architecture：x64、Package Type：JRE、Version：11を選んでインストールしてください。今後さらに新しくする場合もあります。
 
 　Linux版のkindlegenの配布が終了されました。そのため、mobiの変換はLinuxではできなくなりました。
 
