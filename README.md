@@ -86,6 +86,10 @@ Windowsの場合はOperating System：Windows、Architecture：x64、Package Typ
 　（web/ 以下に定義ファイルがあるサイトのみ）
  - 「小説家になろう/小説を読もう！」(＋関連サイト)「NEWVEL-LIBRARY」「FC2小説」「HAMELN」「Arcadia」「novelist.jp」「dNoVeLs」「暁」「カクヨム」「ノベルアップ＋」から取得が可能です。
 
+#### Wikiページ
+　Wikiで簡単な使い方を公開しています。
+https://github.com/kyukyunyorituryo/AozoraEpub3/wiki/
+
 
 画面設定
 ------------
