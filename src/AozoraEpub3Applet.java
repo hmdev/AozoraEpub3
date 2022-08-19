@@ -3789,7 +3789,7 @@ public class AozoraEpub3Applet extends JApplet
 			srcFile, ext, outFile,
 			this.aozoraConverter,
 			writer,
-			this.jComboEncType.getSelectedItem().toString(),
+			encType,
 			bookInfo, imageInfoReader, txtIdx
 		);
 		//設定を戻す
