@@ -147,7 +147,7 @@ public class AozoraEpub3Applet extends JApplet
 	JPopupMenu jPopupPreset;
 
 	/** 表題 */
-	JComboBox jComboTitle;
+	JComboBox<String> jComboTitle;
 	JCheckBox jCheckPubFirst;
 	JCheckBox jCheckUseFileName;
 	JCheckBox jCheckAutoFileName;
@@ -161,10 +161,10 @@ public class AozoraEpub3Applet extends JApplet
 	//出力先
 	/** 入力と同じ */
 	JCheckBox jCheckSamePath;
-	JComboBox jComboDstPath;
+	JComboBox<String> jComboDstPath;
 	JButton jButtonDstPath;
 
-	JComboBox jComboExt;
+	JComboBox<String> jComboExt;
 	JCheckBox jCheckMarkId;
 
 	JCheckBox jCheckOverWrite;
@@ -177,12 +177,12 @@ public class AozoraEpub3Applet extends JApplet
 	JRadioButton jRadioRtL;
 
 	//入力ファイルエンコード
-	JComboBox jComboEncType;
-	JComboBox jComboLangType;
+	JComboBox<String> jComboEncType;
+	JComboBox<String> jComboLangType;
 
 
 	/** 表紙 */
-	JComboBox jComboCover;
+	JComboBox<String> jComboCover;
 	JCheckBox jCheckCoverHistory;
 	JButton jButtonCover;
 	JTextField jTextMaxCoverLine;
@@ -210,7 +210,7 @@ public class AozoraEpub3Applet extends JApplet
 
 	//回り込み
 	JCheckBox jCheckImageFloat;
-	JComboBox jComboImageFloatType;
+	JComboBox<String> jComboImageFloatType;
 	JTextField jTextImageFloatW;
 	JTextField jTextImageFloatH;
 
@@ -229,7 +229,7 @@ public class AozoraEpub3Applet extends JApplet
 
 	JCheckBox jCheckSvgImage;
 
-	JComboBox jComboRotateImage;
+	JComboBox<String> jComboRotateImage;
 
 	//倍率
 	JCheckBox jCheckImageScale;
@@ -254,7 +254,7 @@ public class AozoraEpub3Applet extends JApplet
 	JTextField jTextAutoMarginLimitV;
 	JTextField jTextAutoMarginWhiteLevel;
 	JTextField jTextAutoMarginPadding;
-	JComboBox jComboAutoMarginNombre;
+	JComboBox<String>  jComboAutoMarginNombre;
 	JTextField jTextAutoMarginNombreSize;
 
 	JRadioButton jRadioSpaceHyp0;
@@ -273,15 +273,15 @@ public class AozoraEpub3Applet extends JApplet
 	JCheckBox jCheckCommentPrint;
 	JCheckBox jCheckCommentConvert;
 
-	JComboBox jComboxRemoveEmptyLine;
-	JComboBox jComboxMaxEmptyLine;
+	JComboBox<String> jComboxRemoveEmptyLine;
+	JComboBox<String> jComboxMaxEmptyLine;
 
 	JCheckBox jCheckForceIndent;
 
 	JCheckBox jCheckPageBreak;
 	JTextField jTextPageBreakSize;
 	JCheckBox jCheckPageBreakEmpty;
-	JComboBox jComboxPageBreakEmptyLine;
+	JComboBox<String> jComboxPageBreakEmptyLine;
 	JTextField jTextPageBreakEmptySize;
 	JCheckBox jCheckPageBreakChapter;
 	JTextField jTextPageBreakChapterSize;
@@ -307,11 +307,11 @@ public class AozoraEpub3Applet extends JApplet
 	JCheckBox jCheckChapterNumParen;
 	JCheckBox jCheckChapterNumParenTitle;
 	JCheckBox jCheckChapterPattern;
-	JComboBox jComboChapterPattern;
+	JComboBox<String> jComboChapterPattern;
 
 	//スタイル
-	JComboBox jComboLineHeight;
-	JComboBox jComboFontSize;
+	JComboBox<String> jComboLineHeight;
+	JComboBox<String> jComboFontSize;
 	JCheckBox jCheckBoldUseGothic;
 	JCheckBox jCheckGothicUseBold;
 
@@ -541,7 +541,7 @@ public class AozoraEpub3Applet extends JApplet
 			if (idx > 0) {
 				Object item = jComboProfile.getItemAt(idx-1);
 				jComboProfile.removeItemAt(idx-1);
-				jComboProfile.insertItemAt(item, idx);
+				jComboProfile.insertItemAt((String) item, idx);
 				//移動ボタン有効化
 				setProfileMoveEnable();
 			}
@@ -557,7 +557,7 @@ public class AozoraEpub3Applet extends JApplet
 			if (idx < jComboProfile.getItemCount()-1) {
 				Object item = jComboProfile.getItemAt(idx+1);
 				jComboProfile.removeItemAt(idx+1);
-				jComboProfile.insertItemAt(item, idx);
+				jComboProfile.insertItemAt((String) item, idx);
 				//移動ボタン有効化
 				setProfileMoveEnable();
 			}
