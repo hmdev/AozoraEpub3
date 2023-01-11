@@ -8,8 +8,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Properties;
 
-import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
@@ -79,9 +80,10 @@ public class AozoraEpub3
 			options.addOption("hor", false, "横書き (指定がなければ縦書き)");
 			options.addOption("device", true, "端末種別(指定した端末向けの例外処理を行う)\n[kindle]");
 
+			CommandLineParser parser = new DefaultParser();
 			CommandLine commandLine;
 			try {
-				commandLine = new BasicParser().parse(options, args, true);
+				commandLine = parser.parse(options, args, true);
 			} catch (ParseException e) {
 				new HelpFormatter().printHelp(helpMsg, options);
 				return;
@@ -563,8 +565,8 @@ public class AozoraEpub3
 			FileHeader fileHeader = archive.nextFileHeader();
 			while (fileHeader != null) {
 				if (!fileHeader.isDirectory()) {
-					String entryName = fileHeader.getFileNameW();
-					if (entryName.length() == 0) entryName = fileHeader.getFileNameString();
+					String entryName = fileHeader.getFileName();
+					if (entryName.length() == 0) entryName = fileHeader.getFileName().toString();
 					entryName = entryName.replace('\\', '/');
 					if (entryName.substring(entryName.lastIndexOf('.')+1).equalsIgnoreCase("txt") && txtIdx-- == 0) {
 						if (imageInfoReader != null) imageInfoReader.setArchiveTextEntry(entryName);
@@ -636,8 +638,8 @@ public class AozoraEpub3
 			FileHeader fileHeader = archive.nextFileHeader();
 			while (fileHeader != null) {
 				if (!fileHeader.isDirectory()) {
-					String entryName = fileHeader.getFileNameW();
-					if (entryName.length() == 0) entryName = fileHeader.getFileNameString();
+					String entryName = fileHeader.getFileName();
+					if (entryName.length() == 0) entryName = fileHeader.getFileName().toString();
 					entryName = entryName.replace('\\', '/');
 					if (entryName.substring(entryName.lastIndexOf('.')+1).equalsIgnoreCase("txt") && txtIdx-- == 0) {
 						if (imageInfoReader != null) imageInfoReader.setArchiveTextEntry(entryName);
@@ -697,8 +699,8 @@ public class AozoraEpub3
 		try {
 			for (FileHeader fileHeader : archive.getFileHeaders()) {
 				if (!fileHeader.isDirectory()) {
-					String entryName = fileHeader.getFileNameW();
-					if (entryName.length() == 0) entryName = fileHeader.getFileNameString();
+					String entryName = fileHeader.getFileName();
+					if (entryName.length() == 0) entryName = fileHeader.getFileName().toString();
 					entryName = entryName.replace('\\', '/');
 					if (entryName.substring(entryName.lastIndexOf('.')+1).equalsIgnoreCase("txt")) txtCount++;
 				}
