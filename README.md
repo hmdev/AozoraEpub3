@@ -72,7 +72,9 @@ Windowsの場合はOperating System：Windows、Architecture：x64、Package Typ
 #### 起動
 　AozoraEpub3.jar をダブルクリックして実行します。
 　またはコンソールから "java -jar AozoraEpub3.jar" でも実行可。
+ 
 　※javaが見えなければフルパスで指定
+ 
 　　例: "C:\Program Files\AdoptOpenJDK\jre-11.0.5.10-hotspot\bin/java.exe" -jar AozoraEpub3.jar
 
 #### 変換
