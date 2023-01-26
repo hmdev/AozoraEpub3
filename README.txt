@@ -18,7 +18,9 @@ https://github.com/hmdev/AozoraEpub3　をもとにしたフォーク版です�
 -----------------------------------------------------------------------------------------
 ■インストール
 -----------------------------------------------------------------------------------------
-https://adoptopenjdk.net/releases.html OpenJDK 11 (LTS)、HotSpot、OS、Install JREを選んでインストールしてください。
+JAVAのインストール
+https://adoptium.net/temurin/releases/
+Windowsの場合はOperating System：Windows、Architecture：x64、Package Type：JRE、Version：17を選んでインストールしてください。
 
 Windows Ubuntu MacOSX で動作確認済
 
