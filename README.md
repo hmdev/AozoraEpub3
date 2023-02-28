@@ -22,6 +22,11 @@ Read this in other languages: [English](https://github.com/kyukyunyorituryo/Aozo
 
 [欲しい物リスト](https://www.amazon.co.jp/gp/registry/wishlist/PP7F9RZJ1B0Y/ref=nav_wishlist_lists_1)
 
+[Kindle商品サイト](https://kyukyunyorituryo.github.io/kindle_sale/)
+
+サイトから購入するとアフィリエイト収益が入ります。
+
+
 説明
 ------------
 青空文庫の注記入りテキストファイルをePub3ファイルに変換するツールです。
