@@ -5,7 +5,7 @@
     <!--define folder properties-->
     <property name="dir.buildfile" value="."/>
     <property name="dir.workspace" value="${dir.buildfile}/.."/>
-    <property name="dir.jarfile" value="C:/Users/user/Desktop/AozoraEpub3-1.1.1b14Q/"/>
+    <property name="dir.jarfile" value="C:/Users/Owner/Desktop/AozoraEpub3-1.1.1b14Q/"/>
     <target name="create_run_jar">
         <jar destfile="${dir.jarfile}/AozoraEpub3.jar">
             <manifest>

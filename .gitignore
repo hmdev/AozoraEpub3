@@ -8,3 +8,8 @@
 /パッケージ作成*
 /profiles
 /kindlegen.exe
+/.idea
+/.gradle
+/gradle
+/build
+.gitignore
