@@ -1,0 +1,39 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+mainClassName = 'AozoraEpub3'
+
+repositories {
+    mavenCentral()
+}
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src']
+        }
+        resources {
+            srcDirs= ["src"]
+        }
+    }
+}
+dependencies {
+// https://mvnrepository.com/artifact/org.apache.velocity/velocity
+    implementation group: 'org.apache.velocity', name: 'velocity', version: '1.7'
+    // https://mvnrepository.com/artifact/com.github.junrar/junrar
+    implementation group: 'com.github.junrar', name: 'junrar', version: '7.5.4'
+// https://mvnrepository.com/artifact/org.jsoup/jsoup
+    implementation group: 'org.jsoup', name: 'jsoup', version: '1.15.4'
+// https://mvnrepository.com/artifact/commons-lang/commons-lang
+    implementation group: 'commons-lang', name: 'commons-lang', version: '2.6'
+// https://mvnrepository.com/artifact/org.apache.commons/commons-compress
+    implementation group: 'org.apache.commons', name: 'commons-compress', version: '1.22'
+// https://mvnrepository.com/artifact/commons-collections/commons-collections
+    implementation group: 'commons-collections', name: 'commons-collections', version: '3.2.2'
+// https://mvnrepository.com/artifact/commons-cli/commons-cli
+    implementation group: 'commons-cli', name: 'commons-cli', version: '1.4'
+// https://mvnrepository.com/artifact/com.github.albfernandez/juniversalchardet
+    implementation group: 'com.github.albfernandez', name: 'juniversalchardet', version: '2.4.0'
+
+}
