@@ -352,6 +352,8 @@
 天付き	<div class="align-left">	</div>	1
 ここから天付き	<div class="align-left">		1
 ここで天付き終わり	</div>		1
+ここから脚注	<div epub:type="footnote">		1
+ここで脚注終わり	</div>		1
 
 ####文字色
 黒色	<span class="color-black">

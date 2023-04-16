@@ -2161,7 +2161,7 @@ public class AozoraEpub3Converter
 					}
 
 					String href = getTagAttr(chukiTag, "href");
-					if (href != null && href.startsWith("http")) {
+					if (href != null && (href.startsWith("http")||href.startsWith(""))) {
 						buf.append(chukiTag.replaceAll("&", "&amp;"));
 						linkStarted = true;
 					} else {
