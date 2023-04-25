@@ -369,10 +369,6 @@ public class AozoraEpub3
 						//表題ページ
 						bookInfo.titlePageType = titlePage;
 					}
-					//表題の見出しが非表示で行が追加されていたら削除
-					if (!bookInfo.insertTitleToc && bookInfo.titleLine >= 0) {
-						bookInfo.removeChapterLineInfo(bookInfo.titleLine);
-					}
 
 					Epub3Writer writer = epub3Writer;
 					if (!isFile) {
@@ -397,6 +393,12 @@ public class AozoraEpub3
 							imageInfoReader.sortImageFileNames();
 						}
 					}
+
+					//表題の見出しが非表示で行が追加されていたら削除
+					if (!bookInfo.insertTitleToc && bookInfo.titleLine >= 0) {
+						bookInfo.removeChapterLineInfo(bookInfo.titleLine);
+					}
+
 					//先頭からの場合で指定行数以降なら表紙無し
 					if ("".equals(coverFileName)) {
 						try {
