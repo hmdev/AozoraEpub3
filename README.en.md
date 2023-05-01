@@ -34,8 +34,8 @@ Abnormalities in comments, notes that are not supported, and private characters 
 
 System Requirements
 ------------
-Java 8 and later system requirements (http://www.java.com/ja/)
-AdoptOpenJDK (https://adoptopenjdk.net/releases.html)
+Java 17 and later system requirements (http://www.java.com/ja/)
+AdoptOpenJDK (https://adoptium.net/temurin/releases/)
 
 Windows XP or later works with Ubuntu Mac OS X.
 
@@ -49,7 +49,7 @@ Unzip AozoraEpub3 -*. zip to any folder.
 Double-click AozoraEpub3.jar to run it.
 or "java -jar AozoraEpub3.jar" from the console.
 * If java is not visible, specify the full path.
-Example: "C: \Program Files \AdoptOpenJDK \jre- 11.0.5.10 -hotspot \bin/java.exe" -jar AozoraEpub3.jar
+Example: "C:\Program Files\Eclipse Adoptium\jre-17.0.7.7-hotspot\bin/java.exe/java.exe" -jar AozoraEpub3.jar
 
 #### EPUB convert
 Aozora Bunko text file (Extension txt or zip) to be converted into the displayed applet
