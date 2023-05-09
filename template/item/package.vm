@@ -96,7 +96,7 @@
 #end
 #end
 #foreach(${gaijiInfo} in ${vecGaijiInfo})
-		<item id="gaiji_${velocityCount}" href="gaiji/${gaijiInfo.FileName}" media-type="application/font-sfnt"/>
+		<item id="gaiji_$foreach.count" href="gaiji/${gaijiInfo.FileName}" media-type="application/font-sfnt"/>
 #end
 		<item href="toc.ncx" id="ncx" media-type="application/x-dtbncx+xml"/>
 	</manifest>
@@ -118,13 +118,13 @@
 
 #foreach(${sectionInfo} in ${sections})
 #if (${bookInfo.ImageOnly} && ${bookInfo.Vertical})
-#if ($velocityCount % 2 == 0)
+#if ($foreach.count % 2 == 0)
 		<itemref linear="yes" idref="sec${sectionInfo.SectionId}" properties="page-spread-left"/>
 #else
 		<itemref linear="yes" idref="sec${sectionInfo.SectionId}" properties="page-spread-right"/>
 #end
 #elseif (${bookInfo.ImageOnly} && !${bookInfo.Vertical})
-#if ($velocityCount % 2 == 0)
+#if ($foreach.count % 2 == 0)
 		<itemref linear="yes" idref="sec${sectionInfo.SectionId}" properties="page-spread-right"/>
 #else
 		<itemref linear="yes" idref="sec${sectionInfo.SectionId}" properties="page-spread-left"/>
