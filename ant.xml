@@ -10,14 +10,14 @@
         <jar destfile="${dir.jarfile}/AozoraEpub3.jar">
             <manifest>
                 <attribute name="Main-Class" value="AozoraEpub3Applet"/>
-                <attribute name="Class-Path" value=". lib/commons-cli-1.5.0.jar lib/slf4j-simple-2.0.7.jar lib/slf4j-api-2.0.7.jar lib/commons-collections-3.2.2.jar lib/commons-compress-1.23.0.jar lib/commons-lang3-3.12.0.jar lib/jsoup-1.16.1.jar lib/junrar-7.5.4.jar lib/velocity-engine-core-2.3.jar lib/juniversalchardet-2.4.0.jar"/>
+                <attribute name="Class-Path" value=". lib/commons-cli-1.5.0.jar lib/slf4j-simple-2.0.7.jar lib/slf4j-api-2.0.7.jar lib/commons-collections4-4.4.jar lib/commons-compress-1.23.0.jar lib/commons-lang3-3.12.0.jar lib/jsoup-1.16.1.jar lib/junrar-7.5.4.jar lib/velocity-engine-core-2.3.jar lib/juniversalchardet-2.4.0.jar"/>
             </manifest>
             <fileset dir="${dir.buildfile}/bin"/>
         </jar>
         <delete dir="${dir.jarfile}/lib"/>
         <mkdir dir="${dir.jarfile}/lib"/>
         <copy file="${dir.buildfile}/lib/commons-cli-1.5.0.jar" todir="${dir.jarfile}/lib"/>
-        <copy file="${dir.buildfile}/lib/commons-collections-3.2.2.jar" todir="${dir.jarfile}/lib"/>
+        <copy file="${dir.buildfile}/lib/commons-collections4-4.4.jar" todir="${dir.jarfile}/lib"/>
         <copy file="${dir.buildfile}/lib/commons-compress-1.23.0.jar" todir="${dir.jarfile}/lib"/>
         <copy file="${dir.buildfile}/lib/commons-lang3-3.12.0.jar" todir="${dir.jarfile}/lib"/>
         <copy file="${dir.buildfile}/lib/jsoup-1.16.1.jar" todir="${dir.jarfile}/lib"/>
