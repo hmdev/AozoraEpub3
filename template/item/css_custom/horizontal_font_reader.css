@@ -2,7 +2,7 @@
 @namespace "http://www.w3.org/1999/xhtml";
 
 /** 横書きフォント変更 Sony Reader用
- ファイル名を horizontal_font.css に変更すると有効
+ ファイル名を font.css に変更すると有効
  READER/fonts/ の下にフォントファイルをコピーしてsrc:urlのフォントをコピーしたファイル名に変更
  フォントファイルが無い場合は標準フォントが利用される */
 
@@ -10,6 +10,12 @@
 font-family: "CustomFont";
 src: url(res:///ebook/fonts/../../mnt/sdcard/fonts/Dfpaburi.ttc);
 }
-body {
+
+/** 横書きフォント */
+.hltr body {
 font-family: "CustomFont", "ＭＳ 明朝", "MS Mincho", "ヒラギノ明朝 ProN W3", "HiraMinProN-W3", serif, sans-serif;
+}
+/** 縦書きフォント */
+.vrtl body {
+font-family: "@ＭＳ 明朝", "@MS Mincho", "ヒラギノ明朝 ProN W3", "HiraMinProN-W3", serif, sans-serif;
 }
