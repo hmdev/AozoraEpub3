@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Objects;
 import java.util.Properties;
 
 import org.apache.commons.cli.CommandLine;
@@ -194,14 +195,14 @@ public class AozoraEpub3
 			try { pageMargin = props.getProperty("PageMargin").split(","); } catch (Exception e) {}
 			if (pageMargin.length != 4) pageMargin = new String[]{"0", "0", "0", "0"};
 			else {
-				String pageMarginUnit = props.getProperty("PageMarginUnit");
+				String pageMarginUnit = Objects.equals(props.getProperty("PageMarginUnit"), "0") ?"em":"%";;
 				for (int i=0; i<4; i++) { pageMargin[i] += pageMarginUnit; }
 			}
 			String[] bodyMargin = {};
 			try { bodyMargin = props.getProperty("BodyMargin").split(","); } catch (Exception e) {}
 			if (bodyMargin.length != 4) bodyMargin = new String[]{"0", "0", "0", "0"};
 			else {
-				String bodyMarginUnit = props.getProperty("BodyMarginUnit");
+				String bodyMarginUnit = Objects.equals(props.getProperty("BodyMarginUnit"), "0") ?"em":"%";
 				for (int i=0; i<4; i++) { bodyMargin[i] += bodyMarginUnit; }
 			}
 			float lineHeight = 1.8f; try { lineHeight = Float.parseFloat(props.getProperty("LineHeight")); } catch (Exception e) {}
