@@ -505,7 +505,7 @@ public class AozoraEpub3
 
 	/** ファイルを変換
 	 * @param srcFile 変換するファイル
-	 * @param dstPath 出力先パス */
+//	 * @param dstPath 出力先パス */
 	static public void convertFile(File srcFile, String ext, File outFile, AozoraEpub3Converter aozoraConverter, Epub3Writer epubWriter,
 			String encType, BookInfo bookInfo, ImageInfoReader imageInfoReader, int txtIdx)
 	{
