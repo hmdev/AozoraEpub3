@@ -57,7 +57,6 @@ import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.InputMap;
 import javax.swing.InputVerifier;
-import javax.swing.JApplet;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -112,7 +111,7 @@ import com.github.junrar.exception.RarException;
 /**
  * 青空文庫テキスト→ePub3変換操作用アプレット
  */
-public class AozoraEpub3Applet extends JApplet
+public class AozoraEpub3Applet extends JFrame
 {
 	private static final long serialVersionUID = 1L;
 
@@ -394,18 +393,17 @@ public class AozoraEpub3Applet extends JApplet
 	int coverW;
 	int coverH;
 
-	/** コンストラクタ */
-	private AozoraEpub3Applet(JFrame parent)
+	/** コンストラクタ
+	private AozoraEpub3Applet(String parent)
 	{
 		super();
-		this.jFrameParent = parent;
+	//	this.jFrameParent = parent;
 	}
-
+*/
 	/** アプレット初期化 */
-	@Override
 	public void init()
 	{
-		super.init();
+	//	super.init();
 		this.setSize(new Dimension(520, 460));
 
 		//パス関連初期化
@@ -569,7 +567,7 @@ public class AozoraEpub3Applet extends JApplet
 		jButtonProfileCreate.setBorder(padding3);
 		jButtonProfileCreate.setFocusPainted(false);
 		jButtonProfileCreate.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent arg0) {
-			jProfileDialog.showCreate(jFrameParent.getLocation(), jComboProfile.getSelectedItem().toString()+"のコピー");
+			jProfileDialog.showCreate(getLocation(), jComboProfile.getSelectedItem().toString()+"のコピー");
 		}});
 		panel.add(jButtonProfileCreate);
 		//編集
@@ -578,7 +576,7 @@ public class AozoraEpub3Applet extends JApplet
 		jButtonProfileEdit.setBorder(padding3);
 		jButtonProfileEdit.setFocusPainted(false);
 		jButtonProfileEdit.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent arg0) {
-			jProfileDialog.showEdit(jFrameParent.getLocation(), jComboProfile.getSelectedItem().toString(), jComboProfile.getItemCount() > 1);
+			jProfileDialog.showEdit(getLocation(), jComboProfile.getSelectedItem().toString(), jComboProfile.getItemCount() > 1);
 		}});
 		panel.add(jButtonProfileEdit);
 
@@ -3686,7 +3684,7 @@ public class AozoraEpub3Applet extends JApplet
 				srcFile,
 				(dstPath!=null ? dstPath.getAbsolutePath() : srcFile.getParentFile().getAbsolutePath())+File.separator,
 				title, creator, this.jComboTitle.getSelectedIndex(), jCheckPubFirst.isSelected(),
-				bookInfo, imageInfoReader, this.jFrameParent.getLocation(),
+				bookInfo, imageInfoReader, getLocation(),
 				coverW, coverH
 			);
 
@@ -4713,28 +4711,29 @@ public class AozoraEpub3Applet extends JApplet
 		} catch(Exception e) { e.printStackTrace(); }
 
 		//フレーム初期化
-		final JFrame jFrame = new JFrame("AozoraEpub3");
+		final AozoraEpub3Applet jFrame = new AozoraEpub3Applet();
 		//アップレット生成と初期化
-		final AozoraEpub3Applet applet = new AozoraEpub3Applet(jFrame);
-		applet.iconImage = java.awt.Toolkit.getDefaultToolkit().createImage(AozoraEpub3Applet.class.getResource("images/icon.png"));
-		applet.init();
+	//	final AozoraEpub3Applet applet = new AozoraEpub3Applet(jFrame);
+		jFrame.setIconImage(new ImageIcon( AozoraEpub3App.class.getResource("images/icon.png")).getImage());
+		jFrame.setTitle("AozoraEpub3");
+		jFrame.init();
 
 		//アイコン設定
-		jFrame.setIconImage(applet.iconImage);
+	//	jFrame.setIconImage(applet.iconImage);
 		//最小サイズ
 		jFrame.setMinimumSize(new Dimension(540, 320));
 		jFrame.setPreferredSize(new Dimension(540, 400));
 
 		try {
-			int x = (int)Float.parseFloat(applet.props.getProperty("PosX"));
-			int y = (int)Float.parseFloat(applet.props.getProperty("PosY"));
+			int x = (int)Float.parseFloat(jFrame.props.getProperty("PosX"));
+			int y = (int)Float.parseFloat(jFrame.props.getProperty("PosY"));
 			jFrame.setLocation(x, y);
 		} catch (Exception e) {}
 
-		jFrame.setSize(applet.getSize());
+		jFrame.setSize(jFrame.getSize());
 		try {
-			int w = (int)Float.parseFloat(applet.props.getProperty("SizeW"));
-			int h = (int)Float.parseFloat(applet.props.getProperty("SizeH"));
+			int w = (int)Float.parseFloat(jFrame.props.getProperty("SizeW"));
+			int h = (int)Float.parseFloat(jFrame.props.getProperty("SizeH"));
 			jFrame.setSize(w, h);
 		} catch (Exception e) {}
 
@@ -4745,19 +4744,19 @@ public class AozoraEpub3Applet extends JApplet
 					//Window位置を割くに設定しておく
 					Point location = jFrame.getLocation();
 					Dimension size = jFrame.getSize();
-					applet.props.setProperty("PosX", ""+location.getX());
-					applet.props.setProperty("PosY", ""+location.getY());
-					applet.props.setProperty("SizeW", ""+size.getWidth());
-					applet.props.setProperty("SizeH", ""+size.getHeight());
+					jFrame.props.setProperty("PosX", ""+location.getX());
+					jFrame.props.setProperty("PosY", ""+location.getY());
+					jFrame.props.setProperty("SizeW", ""+size.getWidth());
+					jFrame.props.setProperty("SizeH", ""+size.getHeight());
 					//props保存と終了処理
-					applet.finalize();
+					jFrame.finalize();
 				} catch (Throwable e) {
 					e.printStackTrace();
 				}
 				System.exit(0);
 			}
 		});
-		jFrame.add(applet);
+	//	jFrame.add(applet);
 		jFrame.setVisible(true);
 
 		//引数にファイルが指定されていたら変換実行
@@ -4768,12 +4767,12 @@ public class AozoraEpub3Applet extends JApplet
 			if (vecFiles.size() > 0) {
 				File[] files = new File[vecFiles.size()];
 				for (int i=0; i<files.length; i++) files[i] = vecFiles.get(i);
-				applet.startConvertWorker(vecFiles, null, null, null);
+				jFrame.startConvertWorker(vecFiles, null, null, null);
 			}
 		}
 
 		//Focus
-		applet.jTabbedPane.requestFocus();
+		jFrame.jTabbedPane.requestFocus();
 	}
 
 	/** アプレット終了時の処理
