@@ -4714,7 +4714,7 @@ public class AozoraEpub3Applet extends JFrame
 		final AozoraEpub3Applet jFrame = new AozoraEpub3Applet();
 		//アップレット生成と初期化
 	//	final AozoraEpub3Applet applet = new AozoraEpub3Applet(jFrame);
-		jFrame.setIconImage(new ImageIcon( AozoraEpub3App.class.getResource("images/icon.png")).getImage());
+		jFrame.setIconImage(new ImageIcon( AozoraEpub3Applet.class.getResource("images/icon.png")).getImage());
 		jFrame.setTitle("AozoraEpub3");
 		jFrame.init();
 
