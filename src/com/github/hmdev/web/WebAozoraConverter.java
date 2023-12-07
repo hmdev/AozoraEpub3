@@ -14,14 +14,15 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Vector;
+import java.time.Instant;
+import java.time.ZonedDateTime;
+import java.util.*;
 import java.util.regex.Pattern;
-
+import java.io.StringWriter;
 import org.apache.commons.compress.utils.IOUtils;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.Velocity;
+import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -288,6 +289,85 @@ public class WebAozoraConverter
 
 			//パスならlist.txtの情報を元にキャッシュ後に青空txt変換して改ページで繋げて出力
 			Document doc = Jsoup.parse(cacheFile, null);
+			//カクヨムのJSON取得してHTMLに変換
+			if(urlFilePath.indexOf("kakuyomu")!= -1) {
+				String cd = urlString.substring(urlString.lastIndexOf('/') + 1);
+				System.out.println("current=" + cd);
+				Element NEXT_DATA = doc.getElementById("__NEXT_DATA__");
+				//System.out.println(NEXT_DATA.data());
+				String jsonText = NEXT_DATA.data();
+				JSONObject json = new JSONObject(jsonText);
+				JSONObject episode = json.getJSONObject("props").getJSONObject("pageProps").getJSONObject("__APOLLO_STATE__");
+				String title = episode.getJSONObject("Work:" + cd).getString("title");
+				String introduction = episode.getJSONObject("Work:" + cd).getString("introduction");
+				String author = episode.getJSONObject(episode.getJSONObject("Work:" + cd).getJSONObject("author").getString("__ref")).getString("activityName");
+
+				//System.out.println("タイトルは" + title + "イントロは" + introduction + "著者は" + author);
+				Iterator<String> keys = episode.keys();
+				while (keys.hasNext()) {
+					String key = keys.next();
+					if (episode.get(key) instanceof JSONObject) {
+						//フィルタリングします
+						if (!key.startsWith("Episode:")) {
+							keys.remove();
+						}
+					}
+				}
+				//System.out.println(episode.length());
+				String[][] book = new String[episode.length()][];
+
+				for (int i = 0; i < episode.length(); i++) {
+					book[i] = new String[3];
+					book[i][0] = episode.names().getString(i);
+					book[i][1] = episode.getJSONObject(book[i][0]).getString("title");
+					book[i][2] = episode.getJSONObject(book[i][0]).getString("publishedAt");
+					ZonedDateTime zdt = ZonedDateTime.parse(book[i][2]);
+					Instant ins1 = zdt.toInstant();
+					Date d = Date.from(ins1);
+					SimpleDateFormat sf = new SimpleDateFormat("yyyy年MM月dd日");
+					book[i][2] = sf.format(d);
+					book[i][0] = episode.getJSONObject(book[i][0]).getString("id");
+				}
+				Arrays.sort(book, Comparator.comparing(a -> a[0]));
+				/*
+				for (int i = 0; i < book.length; i++) {
+					System.out.println(book[i][0]+book[i][1]+book[i][2]);
+				}
+
+				ZonedDateTime zdt = ZonedDateTime.parse(book[0][2]);
+				Instant ins1 = zdt.toInstant();
+				Date d = Date.from(ins1);
+				SimpleDateFormat sf = new SimpleDateFormat("yyyy年MM月dd日");
+				System.out.println(sf.format(d));
+
+				 */
+				String template = """
+						<h1 id="workTitle"><a href="">$title</a></h1>
+						<span id="workAuthor-activityName"><a href="">$author</a></span>
+						<p id="introduction">$introduction</p>
+						<ol class="widget-toc-items">
+						#set( $i=0)
+						#foreach( $object in $book)
+						<a href="/works/$cd/episodes/$book[$i][0]">
+						<time class="widget-toc-episode-datePublished">$book[$i][2]</time>
+						</a>
+						#set($i=$i + 1)
+						#end
+						</ol>
+						""";
+				VelocityContext context = new VelocityContext();
+				context.put("title", title);
+				context.put("cd", cd);
+				context.put("author", author);
+				context.put("introduction", introduction);
+				context.put("book", book);
+
+				StringWriter sw = new StringWriter();
+				Velocity.evaluate( context, sw, "", template);
+				System.out.println(sw);
+				doc = Jsoup.parse(sw.toString());
+
+			}
 
 			//表紙画像
 			Elements images = getExtractElements(doc, this.queryMap.get(ExtractId.COVER_IMG));

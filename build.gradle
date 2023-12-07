@@ -41,5 +41,7 @@ dependencies {
     implementation group: 'commons-cli', name: 'commons-cli', version: '1.5.0'
     // https://mvnrepository.com/artifact/com.github.albfernandez/juniversalchardet
     implementation group: 'com.github.albfernandez', name: 'juniversalchardet', version: '2.4.0'
+    // https://mvnrepository.com/artifact/org.json/json
+    implementation group: 'org.json', name: 'json', version: '20231013'
 
 }
