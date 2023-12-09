@@ -16,5 +16,6 @@
 	<classpathentry kind="lib" path="lib/slf4j-api-2.0.7.jar"/>
 	<classpathentry kind="lib" path="lib/velocity-engine-core-2.3.jar"/>
 	<classpathentry kind="lib" path="lib/juniversalchardet-2.4.0.jar"/>
+	<classpathentry kind="lib" path="lib/json-20231013.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

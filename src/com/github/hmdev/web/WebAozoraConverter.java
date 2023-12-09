@@ -292,7 +292,7 @@ public class WebAozoraConverter
 			//カクヨムのJSON取得してHTMLに変換
 			if(urlFilePath.indexOf("kakuyomu")!= -1) {
 				String cd = urlString.substring(urlString.lastIndexOf('/') + 1);
-				System.out.println("current=" + cd);
+				//System.out.println("current=" + cd);
 				Element NEXT_DATA = doc.getElementById("__NEXT_DATA__");
 				//System.out.println(NEXT_DATA.data());
 				String jsonText = NEXT_DATA.data();
@@ -329,18 +329,6 @@ public class WebAozoraConverter
 					book[i][0] = episode.getJSONObject(book[i][0]).getString("id");
 				}
 				Arrays.sort(book, Comparator.comparing(a -> a[0]));
-				/*
-				for (int i = 0; i < book.length; i++) {
-					System.out.println(book[i][0]+book[i][1]+book[i][2]);
-				}
-
-				ZonedDateTime zdt = ZonedDateTime.parse(book[0][2]);
-				Instant ins1 = zdt.toInstant();
-				Date d = Date.from(ins1);
-				SimpleDateFormat sf = new SimpleDateFormat("yyyy年MM月dd日");
-				System.out.println(sf.format(d));
-
-				 */
 				String template = """
 						<h1 id="workTitle"><a href="">$title</a></h1>
 						<span id="workAuthor-activityName"><a href="">$author</a></span>
