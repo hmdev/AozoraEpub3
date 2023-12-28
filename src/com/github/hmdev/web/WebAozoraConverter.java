@@ -302,18 +302,13 @@ public class WebAozoraConverter
 				String title = episode.getJSONObject("Work:" + cd).getString("title");
 				String introduction = episode.getJSONObject("Work:" + cd).getString("introduction");
 				String author = episode.getJSONObject(episode.getJSONObject("Work:" + cd).getJSONObject("author").getString("__ref")).getString("activityName");
-				//page["Work:" + cd].tableOfContents
-				JSONArray toc =episode.getJSONObject("Work:" + cd).getJSONArray("tableOfContents");
+					JSONArray toc =episode.getJSONObject("Work:" + cd).getJSONArray("tableOfContents");
 				List<String> page = new ArrayList<String>();
-				//String [] page  =new String[episode.length()];
 				String [] tocc =new String[toc.length()];
 				for (int i = 0; i < toc.length(); i++) {
-
 					tocc[i]=episode.getJSONObject("Work:" + cd).getJSONArray("tableOfContents").getJSONObject(i).getString("__ref");
 					for (int j = 0; j < episode.getJSONObject(tocc[i]).getJSONArray("episodeUnions").length(); j++) {
-
 						page.add(episode.getJSONObject(tocc[i]).getJSONArray("episodeUnions").getJSONObject(j).getString("__ref"));
-
 					}
 				}
 				Iterator<String> keys = episode.keys();
@@ -343,7 +338,6 @@ public class WebAozoraConverter
 					book[i][2] = sf.format(d);
 
 				}
-				//Arrays.sort(book, Comparator.comparing(a -> a[0]));
 				String template = """
 						<h1 id="workTitle"><a href="">$title</a></h1>
 						<span id="workAuthor-activityName"><a href="">$author</a></span>
