@@ -22,6 +22,7 @@ import java.io.StringWriter;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -301,8 +302,20 @@ public class WebAozoraConverter
 				String title = episode.getJSONObject("Work:" + cd).getString("title");
 				String introduction = episode.getJSONObject("Work:" + cd).getString("introduction");
 				String author = episode.getJSONObject(episode.getJSONObject("Work:" + cd).getJSONObject("author").getString("__ref")).getString("activityName");
+				//page["Work:" + cd].tableOfContents
+				JSONArray toc =episode.getJSONObject("Work:" + cd).getJSONArray("tableOfContents");
+				List<String> page = new ArrayList<String>();
+				//String [] page  =new String[episode.length()];
+				String [] tocc =new String[toc.length()];
+				for (int i = 0; i < toc.length(); i++) {
 
-				//System.out.println("タイトルは" + title + "イントロは" + introduction + "著者は" + author);
+					tocc[i]=episode.getJSONObject("Work:" + cd).getJSONArray("tableOfContents").getJSONObject(i).getString("__ref");
+					for (int j = 0; j < episode.getJSONObject(tocc[i]).getJSONArray("episodeUnions").length(); j++) {
+
+						page.add(episode.getJSONObject(tocc[i]).getJSONArray("episodeUnions").getJSONObject(j).getString("__ref"));
+
+					}
+				}
 				Iterator<String> keys = episode.keys();
 				while (keys.hasNext()) {
 					String key = keys.next();
@@ -313,22 +326,24 @@ public class WebAozoraConverter
 						}
 					}
 				}
+				//System.out.println("タイトルは" + title + "イントロは" + introduction + "著者は" + author);
+
 				//System.out.println(episode.length());
 				String[][] book = new String[episode.length()][];
-
+				String[] array = page.toArray(new String[page.size()]);
 				for (int i = 0; i < episode.length(); i++) {
 					book[i] = new String[3];
-					book[i][0] = episode.names().getString(i);
-					book[i][1] = episode.getJSONObject(book[i][0]).getString("title");
-					book[i][2] = episode.getJSONObject(book[i][0]).getString("publishedAt");
+					book[i][0] = episode.getJSONObject(array[i]).getString("id");
+					book[i][1] = episode.getJSONObject(array[i]).getString("title");
+					book[i][2] = episode.getJSONObject(array[i]).getString("publishedAt");
 					ZonedDateTime zdt = ZonedDateTime.parse(book[i][2]);
 					Instant ins1 = zdt.toInstant();
 					Date d = Date.from(ins1);
 					SimpleDateFormat sf = new SimpleDateFormat("yyyy年MM月dd日");
 					book[i][2] = sf.format(d);
-					book[i][0] = episode.getJSONObject(book[i][0]).getString("id");
+
 				}
-				Arrays.sort(book, Comparator.comparing(a -> a[0]));
+				//Arrays.sort(book, Comparator.comparing(a -> a[0]));
 				String template = """
 						<h1 id="workTitle"><a href="">$title</a></h1>
 						<span id="workAuthor-activityName"><a href="">$author</a></span>
