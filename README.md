@@ -59,14 +59,15 @@ Read this in other languages: [English](https://github.com/kyukyunyorituryo/Aozo
 
 動作環境
 ------------
-Java 17 以降のOpenJDK　https://adoptium.net/temurin/releases/
+Java 17 以降のOpenJDKでJava 21を推奨　https://adoptium.net/temurin/releases/
 
-Javaライセンスの問題からAdoptiumでビルドすることにします。Oracle JAVAまたは、OpenJDKを利用してください。
+Javaライセンスの問題からAdoptiumでビルドすることにします。Oracle JAVAまたは、OpenJDKを利用してください。AdoptiumのJavaではインストール時にパスが通るので使いやすい。
 
 https://adoptium.net/temurin/releases/
-Windowsの場合はOperating System：Windows、Architecture：x64、Package Type：JRE、Version：17を選んでインストールしてください。今後さらに新しくする場合もあります。
 
-　Linux版のkindlegenの配布が終了されました。そのため、mobiの変換はLinuxではできなくなりました。
+Windowsの場合はOperating System：Windows、Architecture：x64、Package Type：JRE、Version：21を選んでインストールしてください。今後さらに新しくする場合もあります。
+
+　Linux版のkindlegenの配布が終了されました。そのため、mobiへの変換はLinuxではできなくなりました。
 
 
 使い方
@@ -80,7 +81,7 @@ Windowsの場合はOperating System：Windows、Architecture：x64、Package Typ
  
 　※javaが見えなければフルパスで指定
  
-　　例: "C:\Program Files\Eclipse Adoptium\jre-17.0.7.7-hotspot\bin/java.exe" -jar AozoraEpub3.jar
+　　例: "C:\Program Files\Eclipse Adoptium\jre-21.0.1.12-hotspot\bin/java.exe" -jar AozoraEpub3.jar
 
 #### 変換
 　表示されたアプレットに、変換したい青空文庫テキストファイル（拡張子txtまたはzip)

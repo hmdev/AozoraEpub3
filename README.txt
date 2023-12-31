@@ -20,14 +20,11 @@ https://github.com/hmdev/AozoraEpub3　をもとにしたフォーク版です�
 -----------------------------------------------------------------------------------------
 JAVAのインストール
 https://adoptium.net/temurin/releases/
-Windowsの場合はOperating System：Windows、Architecture：x64、Package Type：JRE、Version：17を選んでインストールしてください。
+Windowsの場合はOperating System：Windows、Architecture：x64、Package Type：JRE、Version：21を選んでインストールしてください。
 
 Windows Ubuntu MacOSX で動作確認済
 
 　Linux版のkindlegenの配布が終了されました。そのため、mobiの変換はLinuxではできなくなりました。
-　Apple Silicon M1では、下記記事を参考にAzul Zulu Javaのarm64を入れてください。
-
-https://qiita.com/shibukawa/items/797b7cbb7e530842e6f7
 
 AozoraEpub3-*.zip を任意のフォルダに解凍します。
 -----------------------------------------------------------------------------------------

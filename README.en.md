@@ -4,7 +4,7 @@ description of the modified version
 ------------
 This is a fork version that aims to be close to the EPUB of the JASRAC. When using Aozora Epub 3 for electronic publishing purposes, the original version may not pass the review. Through EPUB validation, we ensure that many EPUB viewers have no display problems.
 
-Due to a Java licensing issue, we decided to build with the AdoptOpenJDK. https://adoptopenjdk.net/releases.html OpenJDK 11 (LTS), HotSpot, OS, and Install JRE.
+Due to a Java licensing issue, we decided to build with the AdoptOpenJDK. https://adoptopenjdk.net/releases.html OpenJDK 21 (LTS), HotSpot, OS, and Install JRE.
 
 
 Downloads
@@ -34,7 +34,7 @@ Abnormalities in comments, notes that are not supported, and private characters 
 
 System Requirements
 ------------
-Java 17 and later system requirements (http://www.java.com/ja/)
+Java 21 and later system requirements (http://www.java.com/ja/)
 AdoptOpenJDK (https://adoptium.net/temurin/releases/)
 
 Windows XP or later works with Ubuntu Mac OS X.
@@ -49,7 +49,7 @@ Unzip AozoraEpub3 -*. zip to any folder.
 Double-click AozoraEpub3.jar to run it.
 or "java -jar AozoraEpub3.jar" from the console.
 * If java is not visible, specify the full path.
-Example: "C:\Program Files\Eclipse Adoptium\jre-17.0.7.7-hotspot\bin/java.exe/java.exe" -jar AozoraEpub3.jar
+Example: "C:\Program Files\Eclipse Adoptium\jre-21.0.1.12-hotspot\bin/java.exe" -jar AozoraEpub3.jar
 
 #### EPUB convert
 Aozora Bunko text file (Extension txt or zip) to be converted into the displayed applet
