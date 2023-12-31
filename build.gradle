@@ -2,8 +2,13 @@ plugins {
     id 'java'
     id 'application'
 }
-
-mainClassName = 'AozoraEpub3Applet'
+// compileJavaタスクのエンコーディング
+compileJava.options.encoding = 'UTF-8'
+// compileTestJavaタスクのエンコーディング
+compileTestJava.options.encoding = 'UTF-8'
+// javadocタスクのエンコーディング
+javadoc.options.encoding = 'UTF-8'
+//mainClassName = 'AozoraEpub3Applet'
 
 repositories {
     mavenCentral()
@@ -18,11 +23,21 @@ sourceSets {
         }
     }
 }
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
+}
+application {
+    // Define the main class for the application.
+    mainClass.set('AozoraEpub3Applet')
+}
 jar {
 
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
     manifest {
+      //  attributes 'Main-Class': 'AozoraEpub3'
         attributes 'Main-Class': 'AozoraEpub3Applet'
     }
 
@@ -54,7 +69,7 @@ dependencies {
     // https://mvnrepository.com/artifact/org.jsoup/jsoup
     implementation group: 'org.jsoup', name: 'jsoup', version: '1.16.1'
     // https://mvnrepository.com/artifact/org.apache.commons/commons-compress
-    implementation group: 'org.apache.commons', name: 'commons-compress', version: '1.23.0'
+    implementation group: 'org.apache.commons', name: 'commons-compress', version: '1.25.0'
     // https://mvnrepository.com/artifact/commons-cli/commons-cli
     implementation group: 'commons-cli', name: 'commons-cli', version: '1.5.0'
     // https://mvnrepository.com/artifact/com.github.albfernandez/juniversalchardet
