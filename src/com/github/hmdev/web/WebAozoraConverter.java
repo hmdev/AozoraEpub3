@@ -302,9 +302,9 @@ public class WebAozoraConverter
 				String title = episode.getJSONObject("Work:" + cd).getString("title");
 				String introduction = episode.getJSONObject("Work:" + cd).getString("introduction");
 				String author = episode.getJSONObject(episode.getJSONObject("Work:" + cd).getJSONObject("author").getString("__ref")).getString("activityName");
-					JSONArray toc =episode.getJSONObject("Work:" + cd).getJSONArray("tableOfContents");
+				JSONArray toc =episode.getJSONObject("Work:" + cd).getJSONArray("tableOfContents");
 				List<String> page = new ArrayList<String>();
-				String [] tocc =new String[toc.length()];
+				String [] tocc = new String[toc.length()];
 				for (int i = 0; i < toc.length(); i++) {
 					tocc[i]=episode.getJSONObject("Work:" + cd).getJSONArray("tableOfContents").getJSONObject(i).getString("__ref");
 					for (int j = 0; j < episode.getJSONObject(tocc[i]).getJSONArray("episodeUnions").length(); j++) {
@@ -363,7 +363,6 @@ public class WebAozoraConverter
 				Velocity.evaluate( context, sw, "", template);
 				//System.out.println(sw);
 				doc = Jsoup.parse(sw.toString());
-
 			}
 
 			//表紙画像
