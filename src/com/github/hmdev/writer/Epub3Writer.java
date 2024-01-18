@@ -414,10 +414,10 @@ public class Epub3Writer
 	 * @param converter 青空文庫テキスト変換クラス 画像のみの場合と切り替えて利用する
 	 * @param src 青空文庫テキストファイルの入力Stream
 	 * @param srcFile 青空文庫テキストファイル zip時の画像取得用
-	 * @param zipTextFileName zipの場合はzip内のテキストファイルのパス付きファイル名
+	 * //@param zipTextFileName zipの場合はzip内のテキストファイルのパス付きファイル名
 	 * @param epubFile 出力ファイル .epub拡張子
 	 * @param bookInfo 書籍情報と縦横書き指定
-	 * @param zipImageFileInfos zipの場合はzip内画像の情報 key=サブフォルダ付きの画像ファイル名
+	 * //@param zipImageFileInfos zipの場合はzip内画像の情報 key=サブフォルダ付きの画像ファイル名
 	 * @throws IOException */
 	public void write(AozoraEpub3Converter converter, BufferedReader src, File srcFile, String srcExt, File epubFile, BookInfo bookInfo, ImageInfoReader imageInfoReader) throws Exception
 	{
@@ -728,94 +728,20 @@ public class Epub3Writer
 			if (chapterInfos.get(i).getChapterName() == null) chapterInfos.remove(i);
 		}
 
-		//表題のレベルを2つめと同じにする
-		if (bookInfo.insertTitleToc && chapterInfos.size() >= 2) {
-			chapterInfos.get(0).chapterLevel = chapterInfos.get(1).chapterLevel;
-		}
+		boolean insertTitleToc = bookInfo != null && bookInfo.insertTitleToc;
 
 		//目次の階層情報を設定
-		//レベルを0から開始に変更
-		int[] chapterCounts = new int[10];
-		for (ChapterInfo chapterInfo : chapterInfos) {
-			chapterCounts[chapterInfo.getChapterLevel()]++;
-		}
-		int[] newLevel = new int[10];
-		int level = 0;
-		for (int i=0; i<chapterCounts.length; i++) {
-			if (chapterCounts[i] > 0) newLevel[i] = level++;
-		}
-		for (ChapterInfo chapterInfo : chapterInfos) {
-			chapterInfo.chapterLevel = newLevel[chapterInfo.chapterLevel];
-		}
-
-		//開始終了情報を追加 nav用
-		ChapterInfo preChapterInfo = new ChapterInfo(null, null, null, 0); //レベル0
-		for (ChapterInfo chapterInfo : chapterInfos) {
-			if (preChapterInfo != null) {
-				//開始
-				chapterInfo.levelStart = Math.max(0, chapterInfo.chapterLevel - preChapterInfo.chapterLevel);
-				//終了
-				preChapterInfo.levelEnd = Math.max(0, preChapterInfo.chapterLevel - chapterInfo.chapterLevel);
-			}
-			preChapterInfo = chapterInfo;
-		}
-		//一番最後は閉じる
-		if (chapterInfos.size() > 0) {
-			ChapterInfo chapterInfo = chapterInfos.lastElement();
-			if (chapterInfo != null) chapterInfo.levelEnd = chapterInfo.chapterLevel;
-		}
+		ChapterInfo.setTocNestLevel(this.navNest, this.ncxNest, chapterInfos, insertTitleToc);
 
 		int ncxDepth = 1;
-		if (this.ncxNest) {
-			int minLevel = 99; int maxLevel = 0;
-			//navPointを閉じる回数をlevelEndに設定
-			int[] navPointLevel = new int[10]; //navPointを開始したレベルidxに1を設定
-			preChapterInfo = null;
-			for (ChapterInfo chapterInfo : chapterInfos) {
-				if (preChapterInfo != null) {
-					int preLevel = preChapterInfo.chapterLevel;
-					int curLevel = chapterInfo.chapterLevel;
-					minLevel = Math.min(minLevel, curLevel);
-					maxLevel = Math.max(maxLevel, curLevel);
-					navPointLevel[preLevel] = 1;
-					if (preLevel < curLevel) {
-						//前より小さい場合
-						preChapterInfo.navClose = 0;
-					} else if (preLevel > curLevel) {
-						//前より大きい
-						int close = 0;
-						for (int i=curLevel; i<navPointLevel.length; i++) {
-							if (navPointLevel[i] == 1) {
-								close++;
-								navPointLevel[i] = 0;
-							}
-						}
-						preChapterInfo.navClose = close;
-					} else {
-						preChapterInfo.navClose = 1;
-						navPointLevel[preLevel] = 0;
-					}
-				}
-				preChapterInfo = chapterInfo;
-			}
-			if (minLevel<maxLevel) ncxDepth = maxLevel-minLevel+1;
-
-			//一番最後は閉じる
-			if (chapterInfos.size() > 0) {
-				ChapterInfo chapterInfo = chapterInfos.lastElement();
-				if (chapterInfo != null) {
-					int close = 1;
-					for (int i=0; i<navPointLevel.length; i++) {
-						if (navPointLevel[i] == 1) {
-							close++;
-						}
-					}
-					chapterInfo.navClose = close;
-				}
+		if(this.ncxNest) {
+			for (int i = 0; i < chapterInfos.size(); i++) {
+				ncxDepth = Math.max(ncxDepth, chapterInfos.get(i).getChapterLevel() + 1);
 			}
 		}
 
-		//velocityに設定 1～
+		// velocityに設定
+		assert ncxDepth >= 1;
 		velocityContext.put("ncx_depth", ncxDepth);
 
 		//出力前に縦中横とエスケープ処理
