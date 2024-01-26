@@ -50,6 +50,7 @@ tasks.withType(JavaCompile) {
     options.compilerArgs << '-Xlint:unchecked'
 }
 */
+ant.importBuild 'ant.xml'
 
 dependencies {
 // https://mvnrepository.com/artifact/org.apache.velocity/velocity-engine-core
