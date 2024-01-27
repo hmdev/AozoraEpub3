@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.FontMetrics;
+import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Point;
@@ -43,7 +44,9 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -2217,7 +2220,7 @@ public class AozoraEpub3Applet extends JFrame
 		jTextArea.append(" )\n対応ファイル: 青空文庫txt(txt,zip,rar), 画像(zip,rar,cbz), URLショートカット(url)\n");
 		jTextArea.append("ファイルまたはURL文字列をここにドラッグ＆ドロップ／ペーストで変換します。\n");
 		jTextArea.setEditable(false);
-		jTextArea.setFont(new Font("Default", Font.PLAIN, 12));
+		jTextArea.setFont(getDefaultFont());
 		jTextArea.setBorder(new LineBorder(Color.white, 3));
 		//new DropTarget(jTextArea, DnDConstants.ACTION_COPY_OR_MOVE, new DropListener(), true);
 		jTextArea.setTransferHandler(new TextAreaTransferHandler("text"));
@@ -4684,6 +4687,32 @@ public class AozoraEpub3Applet extends JFrame
 		props.setProperty("OverWrite", this.jCheckOverWrite.isSelected()?"1":"");
 	}
 
+	/** 候補リストからフォントの選択 */
+	private static FontUIResource getDefaultFont() {
+		final String[] sysFonts = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
+		final String[] fontList = {"Yu Gothic UI", "Meiryo UI", "MS PGothic"};
+		final int FONT_SIZE = 12;
+		FontUIResource fr = new FontUIResource("SansSerif", Font.PLAIN, FONT_SIZE);
+		for (int i = 0; i < fontList.length; ++i) {
+			if (Arrays.asList(sysFonts).contains(fontList[i])) {
+				fr = new FontUIResource(fontList[i], Font.PLAIN, FONT_SIZE);
+				break;
+			}
+		}
+		return fr;
+	}
+
+	/** UI フォントの設定 */
+	private static void setUIFont(FontUIResource fr) {
+		Enumeration<Object> keys = UIManager.getDefaults().keys();
+		while (keys.hasMoreElements()) {
+			Object key = keys.nextElement();
+			Object value = UIManager.get(key);
+			if (value instanceof FontUIResource) {
+				UIManager.put(key, fr);
+			}
+		}
+	}
 	////////////////////////////////////////////////////////////////
 	// JFrame
 	////////////////////////////////////////////////////////////////
@@ -4696,6 +4725,8 @@ public class AozoraEpub3Applet extends JFrame
 			//lafName = "";
 			if (lafName.startsWith("com.sun.java.swing.plaf.windows.")) {
 				UIManager.setLookAndFeel(lafName);
+				// 他言語の Windows でも日本語のフォントを使う
+				setUIFont(getDefaultFont());
 			} else {
 				//Windows以外はMetalのままでFontはPLAIN
 				UIDefaults defaultTable = UIManager.getLookAndFeelDefaults();
