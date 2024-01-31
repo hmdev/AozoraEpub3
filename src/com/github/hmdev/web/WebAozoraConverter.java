@@ -275,7 +275,7 @@ public class WebAozoraConverter
 		try {
 
 			//urlStringのファイルをキャッシュ
-			File cacheFile = new File(cachePath.getAbsolutePath()+"/"+urlFilePath);
+			File cacheFile = new File(cachePath.getAbsolutePath() + "/" + urlFilePath);
 			try {
 				LogAppender.append(urlString);
 				cacheFile(urlString, cacheFile, null);
@@ -290,6 +290,40 @@ public class WebAozoraConverter
 
 			//パスならlist.txtの情報を元にキャッシュ後に青空txt変換して改ページで繋げて出力
 			Document doc = Jsoup.parse(cacheFile, null);
+
+			//なろうページネーション対応
+			if(urlFilePath.indexOf("syosetu.com")!= -1) {
+				boolean pager = doc.getElementsByClass("novelview_pager-next").isEmpty();
+				boolean href = doc.getElementsByClass("novelview_pager-next").attr("href").isEmpty();
+				//ページャーがありリンクがある場合
+				if(!pager && !href) {
+					//link=n00000/?p=2
+					//baseUri=https://ncode.syosetu.com/
+					String link = doc.getElementsByClass("novelview_pager-next").attr("href");
+					//System.out.println(baseUri+link);/
+					String pagerurl=baseUri+link;
+					String pagerurlFilePath = CharUtils.escapeUrlToFile(pagerurl.substring(pagerurl.indexOf("//")+2));
+					//urlStringのファイルをキャッシュ
+					File pagercacheFile = new File(cachePath.getAbsolutePath() + "/" + pagerurlFilePath);
+					try {
+						LogAppender.append(pagerurl);
+						try { Thread.sleep(this.interval); } catch (InterruptedException e) { }
+						cacheFile(pagerurl, pagercacheFile, null);
+						LogAppender.println(" : List Loaded.");
+					} catch (Exception e) {
+						e.printStackTrace();
+						LogAppender.println("一覧ページの取得に失敗しました。 ");
+						if (!pagercacheFile.exists()) return null;
+
+						LogAppender.println("キャッシュファイルを利用します。");
+					}
+					Document pagedoc = Jsoup.parse(pagercacheFile, null);
+					Elements index = pagedoc.getElementsByClass("index_box").first().children().clone();
+					doc.getElementsByClass("index_box").append(String.valueOf(index));
+
+				}
+
+		}
 			//カクヨムのJSON取得してHTMLに変換
 			if(urlFilePath.indexOf("kakuyomu")!= -1) {
 				String cd = urlString.substring(urlString.lastIndexOf('/') + 1);
