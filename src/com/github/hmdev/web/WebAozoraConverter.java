@@ -301,25 +301,37 @@ public class WebAozoraConverter
 					//baseUri=https://ncode.syosetu.com/
 					String link = doc.getElementsByClass("novelview_pager-next").attr("href");
 					//System.out.println(baseUri+link);/
-					String pagerurl=baseUri+link;
-					String pagerurlFilePath = CharUtils.escapeUrlToFile(pagerurl.substring(pagerurl.indexOf("//")+2));
-					//urlStringのファイルをキャッシュ
-					File pagercacheFile = new File(cachePath.getAbsolutePath() + "/" + pagerurlFilePath);
-					try {
-						LogAppender.append(pagerurl);
-						try { Thread.sleep(this.interval); } catch (InterruptedException e) { }
-						cacheFile(pagerurl, pagercacheFile, null);
-						LogAppender.println(" : List Loaded.");
-					} catch (Exception e) {
-						e.printStackTrace();
-						LogAppender.println("一覧ページの取得に失敗しました。 ");
-						if (!pagercacheFile.exists()) return null;
+					//目次２ページ目から１０ページ目までの取得処理ループ
+					for (int i = 0; i < 10; i++) {
+						String pagerurl = baseUri + link;
+						String pagerurlFilePath = CharUtils.escapeUrlToFile(pagerurl.substring(pagerurl.indexOf("//") + 2));
+						//urlStringのファイルをキャッシュ
+						File pagercacheFile = new File(cachePath.getAbsolutePath() + "/" + pagerurlFilePath);
+						try {
+							LogAppender.append(pagerurl);
+							try {
+								Thread.sleep(this.interval);
+							} catch (InterruptedException e) {
+							}
+							cacheFile(pagerurl, pagercacheFile, null);
+							LogAppender.println(" : List Loaded.");
+						} catch (Exception e) {
+							e.printStackTrace();
+							LogAppender.println("一覧ページの取得に失敗しました。 ");
+							if (!pagercacheFile.exists()) return null;
 
-						LogAppender.println("キャッシュファイルを利用します。");
+							LogAppender.println("キャッシュファイルを利用します。");
+						}
+						Document pagedoc = Jsoup.parse(pagercacheFile, null);
+						Elements index = pagedoc.getElementsByClass("index_box").first().children().clone();
+						doc.getElementsByClass("index_box").append(String.valueOf(index));
+						href = pagedoc.getElementsByClass("novelview_pager-next").attr("href").isEmpty();
+						if (href) {
+							LogAppender.println("目次最終ページ");
+							break;
+						}
+						link = pagedoc.getElementsByClass("novelview_pager-next").attr("href");
 					}
-					Document pagedoc = Jsoup.parse(pagercacheFile, null);
-					Elements index = pagedoc.getElementsByClass("index_box").first().children().clone();
-					doc.getElementsByClass("index_box").append(String.valueOf(index));
 
 				}
 
