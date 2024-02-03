@@ -4779,8 +4779,7 @@ public class AozoraEpub3Applet extends JFrame
 					jFrame.props.setProperty("PosY", ""+location.getY());
 					jFrame.props.setProperty("SizeW", ""+size.getWidth());
 					jFrame.props.setProperty("SizeH", ""+size.getHeight());
-					//props保存と終了処理
-					jFrame.finalize();
+					jFrame.close();
 				} catch (Throwable e) {
 					e.printStackTrace();
 				}
@@ -4808,8 +4807,8 @@ public class AozoraEpub3Applet extends JFrame
 
 	/** アプレット終了時の処理
 	 * 設定ファイルを保存 */
-	@Override
-	protected void finalize() throws Throwable
+	//@Override
+	protected void close() throws Throwable
 	{
 		this.convertCanceled = true;
 
@@ -4869,7 +4868,7 @@ public class AozoraEpub3Applet extends JFrame
 		this.props.store(fos, "AozoraEpub3 Parameters");
 		fos.close();
 
-		super.finalize();
+		//super.finalize();
 	}
 
 	////////////////////////////////////////////////////////////////
