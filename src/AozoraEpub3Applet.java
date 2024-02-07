@@ -4807,7 +4807,6 @@ public class AozoraEpub3Applet extends JFrame
 
 	/** アプレット終了時の処理
 	 * 設定ファイルを保存 */
-	//@Override
 	protected void close() throws Throwable
 	{
 		this.convertCanceled = true;
