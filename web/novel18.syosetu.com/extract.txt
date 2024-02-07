@@ -14,7 +14,7 @@ PAGER_MAX	100
 ##目次のクラスネーム
 INDEX	.index_box:0
 ##ページャーリンクのクラスネーム
-NEXTPAGE	.novelview_pager-next
+#NEXTPAGE	.novelview_pager-next
 
 ################################
 ##一覧ページの抽出設定
