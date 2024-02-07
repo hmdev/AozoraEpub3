@@ -9,6 +9,13 @@
 ##送信するクッキー 複数はセミコロン区切り key1=value1; key2=value2
 COOKIE	over18=yes
 
+##ページャーの上限
+PAGER_MAX	100
+##目次のクラスネーム
+INDEX	.index_box:0
+##ページャーリンクのクラスネーム
+NEXTPAGE	.novelview_pager-next
+
 ################################
 ##一覧ページの抽出設定
 ## シリーズタイトル

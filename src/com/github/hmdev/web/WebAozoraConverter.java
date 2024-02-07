@@ -291,18 +291,33 @@ public class WebAozoraConverter
 			//パスならlist.txtの情報を元にキャッシュ後に青空txt変換して改ページで繋げて出力
 			Document doc = Jsoup.parse(cacheFile, null);
 
+			//ページネーション対応
+			Elements toc_index = getExtractElements(doc, this.queryMap.get(ExtractId.INDEX));
+			if (toc_index != null) {
+				//LogAppender.println("目次がある");
+			}
+			Elements next_page = getExtractElements(doc, this.queryMap.get(ExtractId.NEXTPAGE));
+			if (next_page == null) {
+				LogAppender.println("ページャーがありません");
+			}
 			//なろうページネーション対応
-			if(urlFilePath.indexOf("syosetu.com")!= -1) {
-				boolean pager = doc.getElementsByClass("novelview_pager-next").isEmpty();
-				boolean href = doc.getElementsByClass("novelview_pager-next").attr("href").isEmpty();
-				//ページャーがありリンクがある場合
-				if(!pager && !href) {
+			//ページャーがありリンクがある場合
+			if(next_page != null) {
+			ExtractInfo[] pagerele = this.queryMap.get(ExtractId.PAGER_MAX);
+			String pagerMax ="";
+			if (pagerele != null && pagerele.length > 0) pagerMax = pagerele[0].query;
+			LogAppender.println("ページャー最大値は"+pagerMax);
+			//LogAppender.println(String.valueOf(toc_index));
+
+
+					boolean pager = toc_index.isEmpty();
+					boolean href = next_page.attr("href").isEmpty();
 					//link=n00000/?p=2
 					//baseUri=https://ncode.syosetu.com/
-					String link = doc.getElementsByClass("novelview_pager-next").attr("href");
+					String link = next_page.attr("href");
 					//System.out.println(baseUri+link);/
 					//目次２ページ目から１０ページ目までの取得処理ループ
-					for (int i = 0; i < 10; i++) {
+					for (int i = 0; i < Integer.parseInt(pagerMax); i++) {
 						String pagerurl = baseUri + link;
 						String pagerurlFilePath = CharUtils.escapeUrlToFile(pagerurl.substring(pagerurl.indexOf("//") + 2));
 						//urlStringのファイルをキャッシュ
@@ -323,19 +338,21 @@ public class WebAozoraConverter
 							LogAppender.println("キャッシュファイルを利用します。");
 						}
 						Document pagedoc = Jsoup.parse(pagercacheFile, null);
-						Elements index = pagedoc.getElementsByClass("index_box").first().children().clone();
-						doc.getElementsByClass("index_box").append(String.valueOf(index));
-						href = pagedoc.getElementsByClass("novelview_pager-next").attr("href").isEmpty();
+						Elements index = getExtractElements(pagedoc, this.queryMap.get(ExtractId.INDEX)).first().children().clone();
+						//Elements index = pagedoc.getElementsByClass("index_box").first().children().clone();
+						toc_index.append(String.valueOf(index));
+						//Elements next_page = getExtractElements(pagedoc, this.queryMap.get(ExtractId.NEXTPAGE));
+						href = getExtractElements(pagedoc, this.queryMap.get(ExtractId.NEXTPAGE)).attr("href").isEmpty();
 						if (href) {
 							LogAppender.println("目次最終ページ");
 							break;
 						}
-						link = pagedoc.getElementsByClass("novelview_pager-next").attr("href");
+						link = getExtractElements(pagedoc, this.queryMap.get(ExtractId.NEXTPAGE)).attr("href");
 					}
 
 				}
 
-		}
+
 			//カクヨムのJSON取得してHTMLに変換
 			if(urlFilePath.indexOf("kakuyomu")!= -1) {
 				String cd = urlString.substring(urlString.lastIndexOf('/') + 1);
