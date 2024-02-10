@@ -1746,7 +1746,7 @@ public class AozoraEpub3Converter
 			}
 		}
 		
-		//割仲介し文字位置
+		//割り注開始文字位置
 		int wrcStart = 0;
 		//割り注の改行挿入位置
 		int wrcBrPos = -1;
@@ -2428,11 +2428,20 @@ public class AozoraEpub3Converter
 		String rubyEndChuki = chukiMap.get("ルビ終了")[0];
 		
 		boolean noTcy = false;
+		boolean noTcyPre = noTcy;
 		for (int i=begin; i<end; i++) {
 			
 			//縦中横と横書きの中かチェック
-			if (!noTcy && noTcyStart.contains(i)) noTcy = true;
-			else if (noTcy && noTcyEnd.contains(i)) noTcy = false;
+			if (!noTcy && noTcyStart.contains(i)) {
+				//未処理の文字列が残っていないなら noTcy と同じ値を設定。残っているなら noTcy の値を保存。
+				noTcyPre = (rubyStart == -1)? true : noTcy;
+				noTcy = true;
+			} else if (noTcy && noTcyEnd.contains(i)) {
+				//未処理の文字列が残っていないなら noTcy と同じ値を設定。残っているなら noTcy の値を保存。
+				noTcyPre = (rubyStart == -1)? false : noTcy;
+				noTcy = false;
+			}
+			assert rubyStart != -1 || noTcyPre == noTcy;
 			
 			switch (ch[i]) {
 			case '｜':
@@ -2440,7 +2449,7 @@ public class AozoraEpub3Converter
 				if (!CharUtils.isEscapedChar(ch, i)) {
 					//前まで出力
 					if (rubyStart != -1) convertTcyText(buf, ch, rubyStart, i, noTcy);
-					rubyStart = i + 1;
+					rubyStart = i + 1; noTcyPre = noTcy;
 					inRuby = true;
 				}
 				break;
@@ -2499,7 +2508,7 @@ public class AozoraEpub3Converter
 						LogAppender.warn(lineNum, "ルビ開始文字無し");
 					}
 					inRuby = false;
-					rubyStart = -1;
+					rubyStart = -1; noTcyPre = noTcy;
 					rubyTopStart = -1;
 				}
 			} else {
@@ -2517,27 +2526,27 @@ public class AozoraEpub3Converter
 					}
 					if (charTypeChanged) {
 						// rubyStartから前までを出力
-						convertTcyText(buf, ch, rubyStart, i, noTcy);
-						rubyStart = -1; rubyCharType = RubyCharType.NULL;
+						convertTcyText(buf, ch, rubyStart, i, noTcyPre);
+						rubyStart = -1; noTcyPre = noTcy; rubyCharType = RubyCharType.NULL;
 					}
 				}
 				//ルビが終了したか開始されていない
 				if (rubyStart == -1) {
 					// ルビ中でなく漢字
 					if (CharUtils.isKanji(ch, i)) {
-						rubyStart = i; rubyCharType = RubyCharType.KANJI;
+						rubyStart = i; noTcyPre = noTcy; rubyCharType = RubyCharType.KANJI;
 					} else if (CharUtils.isHiragana(ch[i])) {
-						//全角英数字
-						rubyStart = i; rubyCharType = RubyCharType.HIRAGANA;
+						//ひらがな
+						rubyStart = i; noTcyPre = noTcy; rubyCharType = RubyCharType.HIRAGANA;
 					} else if (CharUtils.isKatakana(ch[i])) {
-						//全角英数字
-						rubyStart = i; rubyCharType = RubyCharType.KATAKANA;
+						//カタカナ
+						rubyStart = i; noTcyPre = noTcy; rubyCharType = RubyCharType.KATAKANA;
 					} else if (CharUtils.isHalfSpace(ch[i]) && ch[i]!='>') {
 						//英数字または空白
-						rubyStart = i; rubyCharType = RubyCharType.ALPHA;
+						rubyStart = i; noTcyPre = noTcy; rubyCharType = RubyCharType.ALPHA;
 					} else if (CharUtils.isFullAlpha(ch[i]) || CharUtils.isFullNum(ch[i])) {
 						//全角英数字
-						rubyStart = i; rubyCharType = RubyCharType.FULLALPHA;
+						rubyStart = i; noTcyPre = noTcy; rubyCharType = RubyCharType.FULLALPHA;
 					}
 					// ルビ中でなく漢字、半角以外は出力 数字と!?は英字扱いになっている
 					else {
@@ -2908,24 +2917,21 @@ public class AozoraEpub3Converter
 					if (CharUtils.isHiragana(ch[i]) || CharUtils.isKatakana(ch[i]) || ch[i]=='〻') {
 						//通常の濁点文字ならその文字で出力
 						if (ch[i+1]=='゛') {
-							if ('ッ' != ch[i] && ('か' <= ch[i] && ch[i] <= 'と' || 'カ' <= ch[i] && ch[i] <= 'ト')) {
-								ch[i] = (char)((int)ch[i]+1);
-								buf.append(ch[i]);
+							int pos = "うかきくけこさしすせそたちつてとはひふへほゝウカキクケコサシスセソタチツテトハヒフヘホワヰヱヲヽ".indexOf(ch[i]);
+							if (pos >= 0) {
+								char ch2 = "ゔがぎぐげござじずぜぞだぢづでどばびぶべぼゞヴガギグゲゴザジズゼゾダヂヅデドバビブベボヷヸヹヺヾ".charAt(pos);
+								buf.append(ch2);
 								i++;
 								continue;
 							}
-							if ('ウ' == ch[i]) { buf.append('ヴ'); i++; continue; }
-							if ('ワ' == ch[i]) { buf.append('ヷ'); i++; continue; }
-							if ('ヲ' == ch[i]) { buf.append('ヺ'); i++; continue; }
-							if ('う' == ch[i]) { buf.append('ゔ'); i++; continue; }
-							if ('ゝ' == ch[i]) { buf.append('ゞ'); i++; continue; }
-							if ('ヽ' == ch[i]) { buf.append('ヾ'); i++; continue; }
-						}
-						if ('は' <= ch[i] && ch[i] <= 'ほ' || 'ハ' <= ch[i] && ch[i] <= 'ホ') {
-							if (ch[i+1]=='゛') buf.append((char)((int)ch[i]+1));
-							else buf.append((char)((int)ch[i]+2));
-							i++;
-							continue;
+						} else if (ch[i+1]=='゜') {
+							int pos = "はひふへほハヒフヘホ".indexOf(ch[i]);
+							if (pos >= 0) {
+								char ch2 = "ぱぴぷぺぽパピプペポ".charAt(pos);
+								buf.append(ch2);
+								i++;
+								continue;
+							}
 						}
 						if (this.dakutenType == 1 && !(inYoko || noTcy)) {
 							//濁点をspanで重ねて表示 ルビ内無効
