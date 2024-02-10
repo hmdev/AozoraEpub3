@@ -364,7 +364,11 @@ public class WebAozoraConverter
 				JSONObject episode = json.getJSONObject("props").getJSONObject("pageProps").getJSONObject("__APOLLO_STATE__");
 				String title = episode.getJSONObject("Work:" + cd).getString("title");
 				String introduction = episode.getJSONObject("Work:" + cd).getString("introduction");
-				String author = episode.getJSONObject(episode.getJSONObject("Work:" + cd).getJSONObject("author").getString("__ref")).getString("activityName");
+				String altauthor="";
+				if(episode.getJSONObject("Work:" + cd).optString("alternateAuthorName",null)!=null) {
+					altauthor=altauthor + "／"+ episode.getJSONObject("Work:" + cd).getString("alternateAuthorName");
+				}
+				String author = altauthor + episode.getJSONObject(episode.getJSONObject("Work:" + cd).getJSONObject("author").getString("__ref")).getString("activityName");
 				JSONArray toc =episode.getJSONObject("Work:" + cd).getJSONArray("tableOfContents");
 				List<String> page = new ArrayList<String>();
 				String [] tocc = new String[toc.length()];
