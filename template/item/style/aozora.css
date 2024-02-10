@@ -264,7 +264,7 @@ writing-mode: horizontal-tb;
 }
 
 /* 字下げ */
-.vrtl .vrtl div.pt1 { padding-top: 1em; }
+.vrtl div.pt1 { padding-top: 1em; }
 .vrtl div.pt2 { padding-top: 2em; }
 .vrtl div.pt3 { padding-top: 3em; }
 .vrtl div.pt4 { padding-top: 4em; }
