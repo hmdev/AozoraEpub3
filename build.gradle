@@ -59,9 +59,9 @@ dependencies {
 // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
 // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
-    implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.7'
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.12'
 // https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
-    testImplementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.7'
+    implementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.12'
 // https://mvnrepository.com/artifact/org.apache.commons/commons-collections4
     implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
 
